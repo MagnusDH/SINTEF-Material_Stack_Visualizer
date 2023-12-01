@@ -7,8 +7,13 @@ import pyautogui
 
 """
 To do:
+    *Fix en funksjon som tegner rectangle stack basert på hvor stort vinduet er, MÅ GJØRE FØR EXPORT_AS_JPG
+    
     *Fix "export figure" button to only export the drawn figure, not the whole screen 
     *Create "export all" button to export several figures of each layer in an incremental order
+
+    *(Optional): resize the rectangle stack if the window is adjusted (to make it more clear)
+        -Get the sizes of the window and redraw the rectangle stack based on the new sizes
 """
 
 class App:
@@ -21,6 +26,7 @@ class App:
         self.material_min_thickness = 0             #Minimum thickness of materials
         self.material_max_thickness = 3000          #Maximum thickness of materials
         self.excel_file = "Materials.xlsx"          #Excel-file to load materials from
+        self.rectangle_stack_width = self.canvas_width - 80
 
         #Dictionary for all materials. KEY: "material_name" ---VALUES: list of [thickness, color]
         self.materials = {}
@@ -53,6 +59,7 @@ class App:
         self.draw_rectangle_stack()
 
 
+
     """Creates a canvas based on the given width/height variables"""
     def create_canvas(self, canvas_width, canvas_height):
         self.canvas = Canvas(self.window, width=canvas_width, height=canvas_height)
@@ -65,6 +72,7 @@ class App:
         #Create frame within the main window to contain sliders, color&input widgets
         self.slider_frame = Frame(self.window)
         self.slider_frame.grid(row=0, column=0, padx=10, pady=10, sticky='n')
+        
         
         #Create color boxes, sliders, input boxes and labels
         i = 0 #Row counter
@@ -140,9 +148,9 @@ class App:
         self.canvas.delete("all")
 
         #Main drawing point of stack and width of stack 
-        bottom_x = 2                            #Bottom left corner and start drawing point for stack
-        bottom_y = self.canvas_height           #Bottom left corner and start drawing point for stack
-        stack_width = self.canvas_width - 80    #Width of stack (Leave a little space on the right side of the rectangle-stack for text)
+        bottom_x = 2                                #Bottom left corner and start drawing point for stack
+        bottom_y = self.canvas_height               #Bottom left corner and start drawing point for stack
+        stack_width = self.rectangle_stack_width    #Width of stack (Leave a little space on the right side of the rectangle-stack for text)
 
         #Scaling factor decides the size of each rectangle when drawn. The current algorithm ensures that the rectangle stack is not drawn out of bounds 
         scaling_factor = (self.canvas_height/self.material_max_thickness)/len(self.materials)
@@ -202,14 +210,38 @@ class App:
         window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
 
         #Get current positions of open window
-        x0_pos, y0_pos = window.topleft
-        x1_pos, y1_pos = window.bottomright
+        window_x0_pos, window_y0_pos = window.topleft
+        window_x1_pos, window_y1_pos = window.bottomright
 
-        #Take screenshot
-        screenshot = ImageGrab.grab(bbox = (x0_pos+260 , y0_pos+40, x1_pos, y1_pos))
+        """Ny mate a gjore det pa:
+            -Finn topLeft koordinater til åpent vindu
+                -Legg til vidden til slider frame for å finne start på rectangle stack
+                -Legg til enten: bredden på det lille røde på vinduet eller hele veien ned til toppen av rectangle stack
+
+            -Finn bottomRight koordinater til åpent vindu
+                -trekk fra den lille delen som er hvit fra bunnen av vinduet til der rectangle stack starter
+                -Trenger kanskje ikke trekke fra det hvite fra høyre side fordi teksten må være her?
+
+            -Ta screenshot med nye koordinater    
+        """
+
+        #Find width of slider frame
+        slider_frame_width = self.slider_frame.winfo_reqwidth()
+        
+        #FIX THE ADDED VALUES AT THE END OF EACH COORDINATE!!!!!!!!!!!
+        #Find TopLeft coordinates of rectangle stack based on where the open window is
+        rec_stack_x0 = window_x0_pos + slider_frame_width + 30
+        rec_stack_y0 = window_y0_pos + 39
+
+        #Find BottomRight coordinates of rectangle stack based on where the open window is
+        rec_stack_x1 = window_x0_pos + slider_frame_width + self.rectangle_stack_width + 100
+        rec_stack_y1 = window_y0_pos + self.canvas_height + 100
+        
+        #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
+        screenshot = ImageGrab.grab(bbox = (rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
         
         #Save screenshot as .jpg
-        screenshot.save("output.jpg")
+        screenshot.save("All_Materials.jpg")
 
 
 #Main start point of program
