@@ -22,9 +22,11 @@
 
 
     CHANGES MADE:
-        -Fjernet self.sliders[] listen. Rectangle stack blir nå tegnet basert på tykkelsene i self.materials
-        -La til funksjon som lukker programmet når "esc" blir trykket
+        -self.sliders[] list is removed. The stack is now being drawn based on the thicknesses in self.materials{}
+        -The thickness in self.materials gets updated when the sliders or entry boxes are adjusted. 
+        -New function lets you quit the program when pressing "esc" button
+        -The rectangle stack gets redrawn when the size of the window is changed
+        -The "scaling_factor" is now divided by the height of the canvas and the number of materials to ensure that the stack is not drawn outside the app-window
 
     BUGS:
-        -Det er et delay i sliders når de blir justert. Rectangle stack blir ikke tegnet helt nøyaktig og musen må dras over slideren for at rectangle stack skal bli tegnet HELT korrekt 
-        -For at ikke rectangle stack skal bli tegnet utenfor vinduet blir den totale høyden på programmet delt på antall materialer. Dermed kan det bli uoversiktlig hvis du har for mange materialer
+        -There is a small delay when the sliders are adjusted. Rectangle stack does not get drawn imidietly when the slider is adjusted, so for now you need to hover the mouse over the slider after releasing it to draw the rectangle stack. 

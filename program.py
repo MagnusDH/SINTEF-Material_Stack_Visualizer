@@ -270,5 +270,4 @@ if __name__ == "__main__":
     #Checks if the program window is being resized
     window.bind("<Configure>", app.window_resized)
 
-
     window.mainloop()
