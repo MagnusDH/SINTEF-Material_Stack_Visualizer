@@ -6,14 +6,10 @@ import pygetwindow
 import pyautogui
 
 """
-To do:
-    *Fix en funksjon som tegner rectangle stack basert på hvor stort vinduet er, MÅ GJØRE FØR EXPORT_AS_JPG
-    
+To do:    
     *Fix "export figure" button to only export the drawn figure, not the whole screen 
-    *Create "export all" button to export several figures of each layer in an incremental order
 
-    *(Optional): resize the rectangle stack if the window is adjusted (to make it more clear)
-        -Get the sizes of the window and redraw the rectangle stack based on the new sizes
+    *Create "export all" button to export several figures of each layer in an incremental order
 """
 
 class App:
@@ -21,12 +17,11 @@ class App:
         
         #SETTINGS
         self.app_title = "Material Measurements"
-        self.canvas_width = 800                     #Size of app window
-        self.canvas_height = 800                    #Size of app window
+        self.window_width = 800                     #Start width of app window
+        self.window_height = 800                    #Start height of app window
         self.material_min_thickness = 0             #Minimum thickness of materials
         self.material_max_thickness = 3000          #Maximum thickness of materials
         self.excel_file = "Materials.xlsx"          #Excel-file to load materials from
-        self.rectangle_stack_width = self.canvas_width - 80
 
         #Dictionary for all materials. KEY: "material_name" ---VALUES: list of [thickness, color]
         self.materials = {}
@@ -36,20 +31,20 @@ class App:
         -Creating the main canvas/window
         -Creating sliders, color boxes, input boxes and export button
         -Drawing the rectangle stack for each material"""
-    def run_application(self):
-        
+    def run_application(self):        
         #Main window for application
         self.window = window
         self.window.title(self.app_title)
+        self.window.geometry(f"{self.window_width}x{self.window_height}")
 
         #Read the given excel-file and populate self.materials with: material_name, thickness and color
         self.load_materials_from_excel(self.excel_file)
 
-        #Create canvas to draw everythig on
-        self.create_canvas(self.canvas_width, self.canvas_height)
-
-        #Crate color boxes, sliders and input boxes for each material
+        #Create color boxes, sliders and input boxes for each material
         self.create_user_interface()
+
+        #Create canvas to draw everythig on
+        self.create_canvas(self.window_width-4, self.window_height-4)       
 
         #Create export button which calls "export_as_jpg" function
         self.export_button = Button(self.slider_frame, text="Export as JPG", command=self.export_as_jpg)
@@ -59,11 +54,10 @@ class App:
         self.draw_rectangle_stack()
 
 
-
     """Creates a canvas based on the given width/height variables"""
     def create_canvas(self, canvas_width, canvas_height):
         self.canvas = Canvas(self.window, width=canvas_width, height=canvas_height)
-        self.canvas.grid(row=0, column=1, pady=20)
+        self.canvas.grid(row=0, column=1, sticky="n")
 
 
     """Creates sliders, input and color boxes based on the number of materials in self.materials"""
@@ -72,7 +66,6 @@ class App:
         #Create frame within the main window to contain sliders, color&input widgets
         self.slider_frame = Frame(self.window)
         self.slider_frame.grid(row=0, column=0, padx=10, pady=10, sticky='n')
-        
         
         #Create color boxes, sliders, input boxes and labels
         i = 0 #Row counter
@@ -142,43 +135,62 @@ class App:
 
 
     """Draws rectangles in the rectangle stack for each material in self.materials"""
-    def draw_rectangle_stack(self, event=None):
-
+    def draw_rectangle_stack(self):
         #Clear all existing rectangles
         self.canvas.delete("all")
+        
+        #Draw lines aorund canvas (top left x,y MUST be 2,2
+        self.canvas.create_line(2,2, self.canvas.winfo_reqwidth(), 2, fill="green")
+        self.canvas.create_line(2,2, 2, self.canvas.winfo_reqheight(), fill="black")
+        self.canvas.create_line(2, self.canvas.winfo_reqheight()-3, self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()-3, fill="blue")        
+        self.canvas.create_line(self.canvas.winfo_reqwidth()-3,2, self.canvas.winfo_reqwidth()-3, self.canvas.winfo_reqheight()-3, fill="black")
 
         #Main drawing point of stack and width of stack 
-        bottom_x = 2                                #Bottom left corner and start drawing point for stack
-        bottom_y = self.canvas_height               #Bottom left corner and start drawing point for stack
-        stack_width = self.rectangle_stack_width    #Width of stack (Leave a little space on the right side of the rectangle-stack for text)
-
+        rectangle_x0 = 2        #Top-left X-coordinate of rectangle
+        rectangle_y0 = 2        #Top-left Y-coordinate of rectangle       
+        rectangle_x1 = self.canvas.winfo_reqwidth() - 3    #Bottom-right X-coordinate of rectangle (leave a little space for text
+        rectangle_y1 = self.canvas.winfo_reqheight() - 3                     #Bottom-right Y-coordinate of rectangle
+       
         #Scaling factor decides the size of each rectangle when drawn. The current algorithm ensures that the rectangle stack is not drawn out of bounds 
-        scaling_factor = (self.canvas_height/self.material_max_thickness)/len(self.materials)
-
+        scaling_factor = (self.canvas.winfo_reqheight()/self.material_max_thickness)/len(self.materials)
+        
         #Loop through all the materials and draw rectangle and labels for each
         for material in self.materials:
-            rectangle_height = int(self.materials[material][0]) * scaling_factor                                                        #How large the rectangle should be drawn, adjusted by the scaling factor
-            y1 = bottom_y - rectangle_height                                                                                            #Keeping track of the rectangles height, so that the next rectangle can be drawn on top
-            x1 = bottom_x + stack_width                                                                                                 #Bottom left corner of rectangle stack
+            rectangle_height = int(self.materials[material][0]) * scaling_factor        #How tall the rectangle should be drawn, adjusted by the scaling factor (thickness * scaling_factor)
 
-            self.canvas.create_rectangle(bottom_x, bottom_y, (bottom_x + stack_width), y1, fill=self.materials[material][1])            #Draw rectangle and fill it with a color
+            #Draw rectangles on top of the other
+            rectangle_y0 = rectangle_y1 - rectangle_height
+            self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1])  # Draw rectangle and fill it with a color
 
             #if the rectangle height is big enoug, draw text in middle of rectangle
             if(rectangle_height >=30):
                 label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
-                label_x_pos = bottom_x + (stack_width/2)                                                                                #Text x-position
-                label_y_pos = (bottom_y + y1) / 2                                                                                       #Text y-position
+                label_x_pos = (rectangle_x0 + rectangle_x1) / 2                                                                         #X-position of label
+                label_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Y-position of label
                 self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
 
             #if the rectangle height is to low to display text, draw text on side of box
             else:
                 label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
-                label_x_pos = bottom_x + (stack_width/2)                                                                                #Text x-position
-                label_y_pos = (bottom_y + y1) / 2                                                                                       #Text y-position
-                self.canvas.create_text(x1 + 30, (bottom_y + y1)/2, text=label_text, fill="black", font=("Arial", 8), anchor="center")  #Creation of text
+                label_x_pos = rectangle_x1 - 30                                                                                         #Text x-position (minus 30 to leave a little space on the side)
+                label_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Text y-position
+                self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
 
-            #Readjust the bottom_y position so that the next rectangle can be drawn on top
-            bottom_y = y1
+            rectangle_y1 = rectangle_y0
+
+
+    """Calls draw_rectangle_stack when the program window is adjusted"""
+    def window_resized(self, event):        
+
+        #Create the new canvas sizes        
+        new_canvas_width = self.window.winfo_width() - 270      #Subtract 270 because the slider_frame is 237 pixels
+        new_canvas_height = self.window.winfo_height() - 10     #Subtract 10 to keep a little space in the bottom of the window
+
+        #Apply the new dimensions for the canvas
+        self.canvas.config(width = new_canvas_width, height = new_canvas_height)
+
+        #Redraw the rectangle stack based on the new width and height of the program window
+        self.draw_rectangle_stack()
 
 
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
@@ -226,16 +238,16 @@ class App:
         """
 
         #Find width of slider frame
-        slider_frame_width = self.slider_frame.winfo_reqwidth()
+        # slider_frame_width = self.slider_frame.winfo_reqwidth()
         
-        #FIX THE ADDED VALUES AT THE END OF EACH COORDINATE!!!!!!!!!!!
-        #Find TopLeft coordinates of rectangle stack based on where the open window is
-        rec_stack_x0 = window_x0_pos + slider_frame_width + 30
-        rec_stack_y0 = window_y0_pos + 39
+        # #FIX THE ADDED VALUES AT THE END OF EACH COORDINATE!!!!!!!!!!!
+        # #Find TopLeft coordinates of rectangle stack based on where the open window is
+        # rec_stack_x0 = window_x0_pos + slider_frame_width + 30
+        # rec_stack_y0 = window_y0_pos + 39
 
-        #Find BottomRight coordinates of rectangle stack based on where the open window is
-        rec_stack_x1 = window_x0_pos + slider_frame_width + self.rectangle_stack_width + 100
-        rec_stack_y1 = window_y0_pos + self.canvas_height + 100
+        # #Find BottomRight coordinates of rectangle stack based on where the open window is
+        # rec_stack_x1 = window_x0_pos + slider_frame_width + self.rectangle_stack_width + 100
+        # rec_stack_y1 = window_y0_pos + self.canvas_height + 100
         
         #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
         screenshot = ImageGrab.grab(bbox = (rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
@@ -254,5 +266,9 @@ if __name__ == "__main__":
 
     #Closes the program if "esc" key is pressed
     window.bind("<Escape>", lambda event: window.destroy())
+
+    #Checks if the program window is being resized
+    window.bind("<Configure>", app.window_resized)
+
 
     window.mainloop()
