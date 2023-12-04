@@ -7,7 +7,7 @@
             "python3 program.py"
 
 
-    * Required libraries:
+    *Required libraries:
         1. Pandas: 
             -to read from .excel file
             -" pip install pandas "
@@ -21,12 +21,14 @@
             -" pip install pyautogui "
 
 
-    CHANGES MADE:
-        -self.sliders[] list is removed. The stack is now being drawn based on the thicknesses in self.materials{}
-        -The thickness in self.materials gets updated when the sliders or entry boxes are adjusted. 
-        -New function lets you quit the program when pressing "esc" button
-        -The rectangle stack gets redrawn when the size of the window is changed
-        -The "scaling_factor" is now divided by the height of the canvas and the number of materials to ensure that the stack is not drawn outside the app-window
+    FUNCTIONS OF PROGRAM:
+        -Adjust the thickness of each layer by using the sliders or entry-boxes
+        -Rectangle stack gets redrawn acording to the size of the app-window
+        -Close program by pressing "esc" or closing app-window manually
+        -"export_recStack_as_jpg" takes a screenshot of the entire rectangle stack
+        -"export_all_as_jpg" takes incrementing screenshots of all the materials/layers in the rectangle stack
 
     BUGS:
-        -There is a small delay when the sliders are adjusted. Rectangle stack does not get drawn imidietly when the slider is adjusted, so for now you need to hover the mouse over the slider after releasing it to draw the rectangle stack. 
+        -There is a small delay when the sliders are adjusted. Rectangle stack does not get drawn imidietly when the slider is adjusted, so for now you need to hover the mouse over the slider after releasing it to draw the rectangle stack.
+        
+        -If you maximise all the thicknesses, then the last rectangle is drawn slightly outside the canvas

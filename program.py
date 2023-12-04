@@ -4,13 +4,7 @@ from PIL import ImageGrab, Image
 import pandas as pd
 import pygetwindow
 import pyautogui
-
-"""
-To do:    
-    *Fix "export figure" button to only export the drawn figure, not the whole screen 
-
-    *Create "export all" button to export several figures of each layer in an incremental order
-"""
+import os
 
 class App:
     def __init__(self, window):
@@ -18,7 +12,7 @@ class App:
         #SETTINGS
         self.app_title = "Material Measurements"
         self.window_width = 800                     #Start width of app window
-        self.window_height = 800                    #Start height of app window
+        self.window_height = 900                    #Start height of app window
         self.material_min_thickness = 0             #Minimum thickness of materials
         self.material_max_thickness = 3000          #Maximum thickness of materials
         self.excel_file = "Materials.xlsx"          #Excel-file to load materials from
@@ -27,10 +21,7 @@ class App:
         self.materials = {}
          
 
-    """Runs the application by:
-        -Creating the main canvas/window
-        -Creating sliders, color boxes, input boxes and export button
-        -Drawing the rectangle stack for each material"""
+    """Calls all functions"""
     def run_application(self):        
         #Main window for application
         self.window = window
@@ -46,9 +37,13 @@ class App:
         #Create canvas to draw everythig on
         self.create_canvas(self.window_width-4, self.window_height-4)       
 
-        #Create export button which calls "export_as_jpg" function
-        self.export_button = Button(self.slider_frame, text="Export as JPG", command=self.export_as_jpg)
-        self.export_button.grid(row=len(self.materials), columnspan=4, pady=10)
+        #Create button which calls "export_as_jpg" function
+        self.export_recStack_button = Button(self.slider_frame, text="Export material stack", command=self.export_recStack_as_jpg)
+        self.export_recStack_button.grid(row=len(self.materials), columnspan=4, pady=10)
+
+        #Create button which calls "export_all_as_jpg" function
+        self.export_all_button = Button(self.slider_frame, text = "Export all materials", command=self.export_all_as_jpg)
+        self.export_all_button.grid(row=len(self.materials) + 1, columnspan=4, pady=10)
 
         #Draw the material stack
         self.draw_rectangle_stack()
@@ -134,12 +129,26 @@ class App:
             print("Error: Entry box value is out of range")
 
 
+    """Calls draw_rectangle_stack when the program window is adjusted"""
+    def window_resized(self, event):        
+
+        #Create the new canvas sizes        
+        new_canvas_width = self.window.winfo_width() - 270      #Subtract 270 because the slider_frame is 237 pixels
+        new_canvas_height = self.window.winfo_height() - 10     #Subtract 10 to keep a little space in the bottom of the window
+
+        #Apply the new dimensions for the canvas
+        self.canvas.config(width = new_canvas_width, height = new_canvas_height)
+
+        #Redraw the rectangle stack based on the new width and height of the program window
+        self.draw_rectangle_stack()
+
+
     """Draws rectangles in the rectangle stack for each material in self.materials"""
     def draw_rectangle_stack(self):
         #Clear all existing rectangles
         self.canvas.delete("all")
         
-        #Draw lines aorund canvas (top left x,y MUST be 2,2
+        #Draw lines around canvas (top left x,y MUST be 2,2
         self.canvas.create_line(2,2, self.canvas.winfo_reqwidth(), 2, fill="green")
         self.canvas.create_line(2,2, 2, self.canvas.winfo_reqheight(), fill="black")
         self.canvas.create_line(2, self.canvas.winfo_reqheight()-3, self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()-3, fill="blue")        
@@ -162,14 +171,14 @@ class App:
             rectangle_y0 = rectangle_y1 - rectangle_height
             self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1])  # Draw rectangle and fill it with a color
 
-            #if the rectangle height is big enoug, draw text in middle of rectangle
+            #if the rectangle height is big enoug, write material name in middle of rectangle
             if(rectangle_height >=30):
                 label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
                 label_x_pos = (rectangle_x0 + rectangle_x1) / 2                                                                         #X-position of label
                 label_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Y-position of label
                 self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
 
-            #if the rectangle height is to low to display text, draw text on side of box
+            #if the rectangle height is to low to display text, write material name on side of box
             else:
                 label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
                 label_x_pos = rectangle_x1 - 30                                                                                         #Text x-position (minus 30 to leave a little space on the side)
@@ -177,20 +186,6 @@ class App:
                 self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
 
             rectangle_y1 = rectangle_y0
-
-
-    """Calls draw_rectangle_stack when the program window is adjusted"""
-    def window_resized(self, event):        
-
-        #Create the new canvas sizes        
-        new_canvas_width = self.window.winfo_width() - 270      #Subtract 270 because the slider_frame is 237 pixels
-        new_canvas_height = self.window.winfo_height() - 10     #Subtract 10 to keep a little space in the bottom of the window
-
-        #Apply the new dimensions for the canvas
-        self.canvas.config(width = new_canvas_width, height = new_canvas_height)
-
-        #Redraw the rectangle stack based on the new width and height of the program window
-        self.draw_rectangle_stack()
 
 
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
@@ -213,10 +208,8 @@ class App:
             print(f"Error loading materials from Excel: {error}")
 
 
-    """
-    -Gets coordinates from open window
-    -Uses coordniates to take screenshot and save it as .jpg"""
-    def export_as_jpg(self):
+    """Takes a screenshot of the entire rectangle stack and saves it as .jpg"""
+    def export_recStack_as_jpg(self):
         
         #Get window of app
         window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
@@ -225,35 +218,71 @@ class App:
         window_x0_pos, window_y0_pos = window.topleft
         window_x1_pos, window_y1_pos = window.bottomright
 
-        """Ny mate a gjore det pa:
-            -Finn topLeft koordinater til åpent vindu
-                -Legg til vidden til slider frame for å finne start på rectangle stack
-                -Legg til enten: bredden på det lille røde på vinduet eller hele veien ned til toppen av rectangle stack
-
-            -Finn bottomRight koordinater til åpent vindu
-                -trekk fra den lille delen som er hvit fra bunnen av vinduet til der rectangle stack starter
-                -Trenger kanskje ikke trekke fra det hvite fra høyre side fordi teksten må være her?
-
-            -Ta screenshot med nye koordinater    
-        """
-
-        #Find width of slider frame
-        # slider_frame_width = self.slider_frame.winfo_reqwidth()
-        
-        # #FIX THE ADDED VALUES AT THE END OF EACH COORDINATE!!!!!!!!!!!
-        # #Find TopLeft coordinates of rectangle stack based on where the open window is
-        # rec_stack_x0 = window_x0_pos + slider_frame_width + 30
-        # rec_stack_y0 = window_y0_pos + 39
-
-        # #Find BottomRight coordinates of rectangle stack based on where the open window is
-        # rec_stack_x1 = window_x0_pos + slider_frame_width + self.rectangle_stack_width + 100
-        # rec_stack_y1 = window_y0_pos + self.canvas_height + 100
+        rec_stack_x0 = window_x0_pos + 260
+        rec_stack_y0 = window_y0_pos + 39
+        rec_stack_x1 = window_x1_pos 
+        rec_stack_y1 = window_y1_pos
         
         #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
         screenshot = ImageGrab.grab(bbox = (rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
         
-        #Save screenshot as .jpg
-        screenshot.save("All_Materials.jpg")
+        #Save screenshot as .jpg in specified folder
+        folder_path = "screenshots"
+
+        if os.path.exists(folder_path) == False:    #Create the folder if it doesn't exist
+            os.makedirs(folder_path)
+            
+        file_path = os.path.join(folder_path, "All_Materials.jpg")
+        screenshot.save(file_path)
+
+
+    """Takes a screenshot of every layer in the rectangle in an ascending order and saves each screenshot as .jpg"""
+    def export_all_as_jpg(self):
+        #Get window of app
+        window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
+
+        #Get current positions of open window
+        window_x0_pos, window_y0_pos = window.topleft
+        window_x1_pos, window_y1_pos = window.bottomright
+
+        #Find positions of canvas/rectangles
+        rec_stack_x0 = window_x0_pos + 260
+        rec_stack_x1 = window_x1_pos 
+        rec_stack_y1 = window_y1_pos - 17   #Lowest line of rectangle stack
+        rec_stack_y0 = rec_stack_y1         #Must be the lowest line before the loop
+
+        #Find the height of the rectangle based on the scaling factor
+        scaling_factor = (self.canvas.winfo_reqheight()/self.material_max_thickness)/len(self.materials)
+        
+        i = 1
+
+        #Loop through akk the materials in self.materials
+        for material in self.materials:
+
+            #Calculate the height of the material based on the scaling factor
+            rectangle_height = int(self.materials[material][0]) * scaling_factor
+
+            #Add height to take screenshot of incrementing rectangles
+            rec_stack_y0 -= rectangle_height
+
+            #The x0, x1 and y1 coordinates must always stay the same
+            #The y0 coordinate must change
+
+            #Take screenshot of layer(s)
+            screenshot = ImageGrab.grab(bbox=(rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
+
+            #Save screenshot as .jpg in specified folder
+            folder_path = "screenshots"
+
+            #Create the folder if it doesn't exist
+            if os.path.exists(folder_path) == False:
+                os.makedirs(folder_path)
+            
+            file_path = os.path.join(folder_path, f"{i}_Layers.jpg")
+            screenshot.save(file_path)
+
+            i += 1
+
 
 
 #Main start point of program
