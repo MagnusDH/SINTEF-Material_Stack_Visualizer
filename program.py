@@ -38,11 +38,11 @@ class App:
         self.create_canvas(self.window_width-4, self.window_height-4)       
 
         #Create button which calls "export_as_jpg" function
-        self.export_stack_button = Button(self.slider_frame, text="Export material stack", command=self.export_stack_as_jpg)
+        self.export_stack_button = Button(self.slider_frame, text="Export stack", command=self.export_stack_as_jpg)
         self.export_stack_button.grid(row=len(self.materials), columnspan=4, pady=10)
 
         #Create button which calls "export_all_as_jpg" function
-        self.export_layers_button = Button(self.slider_frame, text = "Export all materials", command=self.export_layers_as_jpg)
+        self.export_layers_button = Button(self.slider_frame, text = "Export layers", command=self.export_layers_as_jpg)
         self.export_layers_button.grid(row=len(self.materials) + 1, columnspan=4, pady=10)
 
         #Draw the material stack
