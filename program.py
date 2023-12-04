@@ -38,12 +38,12 @@ class App:
         self.create_canvas(self.window_width-4, self.window_height-4)       
 
         #Create button which calls "export_as_jpg" function
-        self.export_recStack_button = Button(self.slider_frame, text="Export material stack", command=self.export_recStack_as_jpg)
-        self.export_recStack_button.grid(row=len(self.materials), columnspan=4, pady=10)
+        self.export_stack_button = Button(self.slider_frame, text="Export material stack", command=self.export_stack_as_jpg)
+        self.export_stack_button.grid(row=len(self.materials), columnspan=4, pady=10)
 
         #Create button which calls "export_all_as_jpg" function
-        self.export_all_button = Button(self.slider_frame, text = "Export all materials", command=self.export_all_as_jpg)
-        self.export_all_button.grid(row=len(self.materials) + 1, columnspan=4, pady=10)
+        self.export_layers_button = Button(self.slider_frame, text = "Export all materials", command=self.export_layers_as_jpg)
+        self.export_layers_button.grid(row=len(self.materials) + 1, columnspan=4, pady=10)
 
         #Draw the material stack
         self.draw_rectangle_stack()
@@ -209,7 +209,7 @@ class App:
 
 
     """Takes a screenshot of the entire rectangle stack and saves it as .jpg"""
-    def export_recStack_as_jpg(self):
+    def export_stack_as_jpg(self):
         
         #Get window of app
         window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
@@ -237,7 +237,7 @@ class App:
 
 
     """Takes a screenshot of every layer in the rectangle in an ascending order and saves each screenshot as .jpg"""
-    def export_all_as_jpg(self):
+    def export_layers_as_jpg(self):
         #Get window of app
         window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
 
