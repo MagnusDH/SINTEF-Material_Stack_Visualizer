@@ -29,6 +29,4 @@
         -"export_all_as_jpg" takes incrementing screenshots of all the materials/layers in the rectangle stack
 
     BUGS:
-        -There is a small delay when the sliders are adjusted. Rectangle stack does not get drawn imidietly when the slider is adjusted, so for now you need to hover the mouse over the slider after releasing it to draw the rectangle stack.
-        
-        -If you maximise all the thicknesses, then the last rectangle is drawn slightly outside the canvas
+        -

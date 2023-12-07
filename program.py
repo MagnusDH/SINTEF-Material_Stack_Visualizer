@@ -35,7 +35,7 @@ class App:
         self.create_user_interface()
 
         #Create canvas to draw everythig on
-        self.create_canvas(self.window_width-4, self.window_height-4)       
+        self.create_canvas(self.window_width, self.window_height)       
 
         #Create button which calls "export_as_jpg" function
         self.export_stack_button = Button(self.slider_frame, text="Export stack", command=self.export_stack_as_jpg)
@@ -49,8 +49,9 @@ class App:
         self.draw_rectangle_stack()
 
 
-    """Creates a canvas based on the given width/height variables"""
+    """Creates a canvas to draw rectangle stack on"""
     def create_canvas(self, canvas_width, canvas_height):
+        #Create canvas with the given height&width and attack it to the top of the window
         self.canvas = Canvas(self.window, width=canvas_width, height=canvas_height)
         self.canvas.grid(row=0, column=1, sticky="n")
 
@@ -67,24 +68,25 @@ class App:
         for material in self.materials:
 
             #Create color boxes and place them on grid
-            color_box = Label(self.slider_frame, bg=self.materials[material][1], width=2)                                                                           #Creation of color box in the slider frame
-            color_box.grid(row=i, column=0, padx=5, pady=5, sticky='n')                                                                                             #Color box placement
+            color_box = Label(self.slider_frame, bg=self.materials[material][1], width=2)                           #Creation of color box in the slider frame
+            color_box.grid(row=i, column=0, padx=5, pady=5, sticky='n')                                             #Color box placement
             
             #Create sliders
-            slider = Scale(self.slider_frame, from_=self.material_min_thickness, to=self.material_max_thickness, orient=HORIZONTAL, label=material, resolution=1)   #Creation of slider in the slider frame
-            slider.grid(row=i, column=1, pady=5, padx=5)                                                                                                            #Slider placement
-            slider.set(self.materials[material][0])                                                                                                                 #Set the initial value of the slider
-            slider.bind("<Motion>", lambda event, s=slider: self.slider_updated(event, s))                                                                          #listens to motion on the sliders
+            slider = Scale(self.slider_frame, from_=self.material_min_thickness, to=self.material_max_thickness,
+                       orient=HORIZONTAL, label=material, resolution=1,
+                       command=lambda value, label=material: self.slider_updated(value, label))             #Creation of slider and listening to slider adjustments
+            slider.grid(row=i, column=1, pady=5, padx=5)                                                            #Slider placement
+            slider.set(self.materials[material][0])                                                                 #Set the initial value of the slider
 
             #Create input boxes
-            height_var = StringVar(value=str(self.materials[material][0]))
-            entry = Entry(self.slider_frame, textvariable=height_var, width=6)                                                                                      #Creation of entry box in the slider frame
-            entry.grid(row=i, column=2, padx=5)                                                                                                                     #Entry box placement
-            entry.bind("<Return>", lambda event, s=slider, e=entry: self.entry_updated(event, e, s))                                                                #Listens to updates in the entry/input box
+            height_var = StringVar(value=str(self.materials[material][0]))                                          
+            entry = Entry(self.slider_frame, textvariable=height_var, width=6)                                      #Creation of entry box in the slider frame
+            entry.grid(row=i, column=2, padx=5)                                                                     #Entry box placement
+            entry.bind("<Return>", lambda event, s=slider, e=entry: self.entry_updated(event, e, s))                #Listens to updates in the entry/input box
             
             #Create "nm" label next to slider
-            nm_label = Label(self.slider_frame, text="nm")                                                                                                          #Creation of label in the slider frame
-            nm_label.grid(row=i, column=3)                                                                                                                          #Label placement
+            nm_label = Label(self.slider_frame, text="nm")                                                          #Creation of label in the slider frame
+            nm_label.grid(row=i, column=3)                                                                          #Label placement
 
             #Increment row-counter
             i += 1
@@ -94,19 +96,17 @@ class App:
     -Is called if the slider is adjusted
     -Updates the self.materials dictionary with the new slider value for its corresponding material
     -Calls draw_rectangle_stack to redraw the rectangle stack with the new value"""
-    def slider_updated(self, event, slider):
-
+    def slider_updated(self, value, material_label):
         #Get the new value of the slider
-        slider_value = slider.get()
+        slider_value = int(value)
         
         #Check if slider value is acceptable
         if self.material_min_thickness <= slider_value <= self.material_max_thickness:
-            slider_name = slider.cget("label")              #Get the label/name of the slider                
-            self.materials[slider_name][0] = slider_value   #Assign the value of the slider to its position in the materials dictionary
-            self.draw_rectangle_stack()                     #Redraw the rectangle stack with the new value
-
+            self.materials[material_label][0] = slider_value                            #Assign the value of the slider to its position in the materials dictionary
+            self.draw_rectangle_stack()                                                 #Redraw the rectangle stack with the new value
         else:
             print("Error: Slider value is out of range")
+
 
 
     """
@@ -148,7 +148,7 @@ class App:
         #Clear all existing rectangles
         self.canvas.delete("all")
         
-        #Draw lines around canvas (top left x,y MUST be 2,2
+        #Draw lines around canvas (top left x,y MUST be 2,2, some of the values must be manually adjusted to fit the window)
         self.canvas.create_line(2,2, self.canvas.winfo_reqwidth(), 2, fill="green")
         self.canvas.create_line(2,2, 2, self.canvas.winfo_reqheight(), fill="black")
         self.canvas.create_line(2, self.canvas.winfo_reqheight()-3, self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()-3, fill="blue")        
@@ -161,7 +161,7 @@ class App:
         rectangle_y1 = self.canvas.winfo_reqheight() - 3                     #Bottom-right Y-coordinate of rectangle
        
         #Scaling factor decides the size of each rectangle when drawn. The current algorithm ensures that the rectangle stack is not drawn out of bounds 
-        scaling_factor = (self.canvas.winfo_reqheight()/self.material_max_thickness)/len(self.materials)
+        scaling_factor = (self.canvas.winfo_reqheight()/(self.material_max_thickness+18))/len(self.materials)   #The +18 value is a manual fix so that the rectangle is not drawn outside the canvas
         
         #Loop through all the materials and draw rectangle and labels for each
         for material in self.materials:
@@ -252,7 +252,7 @@ class App:
         rec_stack_y0 = rec_stack_y1         #Must be the lowest line before the loop
 
         #Find the height of the rectangle based on the scaling factor
-        scaling_factor = (self.canvas.winfo_reqheight()/self.material_max_thickness)/len(self.materials)
+        scaling_factor = (self.canvas.winfo_reqheight()/(self.material_max_thickness+18))/len(self.materials)   #The +18 value is a manual fix because the rectangle would be drawn outside the canvas  (See the original line in draw_rectangle_stack)
         
         i = 1
 
