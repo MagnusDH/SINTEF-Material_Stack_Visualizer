@@ -30,3 +30,6 @@
 
     BUGS:
         -
+
+    NOTES:
+        -The export_as_svg functions are heavily based on and taken from chatGPT

@@ -6,19 +6,24 @@ import pygetwindow
 import pyautogui
 import os
 
+import win32gui
+
 class App:
     def __init__(self, window):
         
         #SETTINGS
         self.app_title = "Material Measurements"
         self.window_width = 800                     #Start width of app window
-        self.window_height = 900                    #Start height of app window
+        self.window_height = 800                    #Start height of app window
         self.material_min_thickness = 0             #Minimum thickness of materials
         self.material_max_thickness = 3000          #Maximum thickness of materials
         self.excel_file = "Materials.xlsx"          #Excel-file to load materials from
 
         #Dictionary for all materials. KEY: "material_name" ---VALUES: list of [thickness, color]
         self.materials = {}
+
+        self.total_padding_x = 0
+        self.total_padding_y = 0
          
 
     """Calls all functions"""
@@ -28,6 +33,7 @@ class App:
         self.window.title(self.app_title)
         self.window.geometry(f"{self.window_width}x{self.window_height}")
 
+
         #Read the given excel-file and populate self.materials with: material_name, thickness and color
         self.load_materials_from_excel(self.excel_file)
 
@@ -36,14 +42,6 @@ class App:
 
         #Create canvas to draw everythig on
         self.create_canvas(self.window_width, self.window_height)       
-
-        #Create button which calls "export_as_jpg" function
-        self.export_stack_button = Button(self.slider_frame, text="Export stack", command=self.export_stack_as_jpg)
-        self.export_stack_button.grid(row=len(self.materials), columnspan=4, pady=10)
-
-        #Create button which calls "export_all_as_jpg" function
-        self.export_layers_button = Button(self.slider_frame, text = "Export layers", command=self.export_layers_as_jpg)
-        self.export_layers_button.grid(row=len(self.materials) + 1, columnspan=4, pady=10)
 
         #Draw the material stack
         self.draw_rectangle_stack()
@@ -58,10 +56,12 @@ class App:
 
     """Creates sliders, input and color boxes based on the number of materials in self.materials"""
     def create_user_interface(self):
-
         #Create frame within the main window to contain sliders, color&input widgets
         self.slider_frame = Frame(self.window)
         self.slider_frame.grid(row=0, column=0, padx=10, pady=10, sticky='n')
+        self.total_padding_x += (10 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+        self.total_padding_y += (10 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+
         
         #Create color boxes, sliders, input boxes and labels
         i = 0 #Row counter
@@ -69,14 +69,18 @@ class App:
 
             #Create color boxes and place them on grid
             color_box = Label(self.slider_frame, bg=self.materials[material][1], width=2)                           #Creation of color box in the slider frame
-            color_box.grid(row=i, column=0, padx=5, pady=5, sticky='n')                                             #Color box placement
+            color_box.grid(row=i, column=0, padx=5, pady=5)                                                         #Color box placement
+            self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
             
+
             #Create sliders
             slider = Scale(self.slider_frame, from_=self.material_min_thickness, to=self.material_max_thickness,
                        orient=HORIZONTAL, label=material, resolution=1,
                        command=lambda value, label=material: self.slider_updated(value, label))             #Creation of slider and listening to slider adjustments
             slider.grid(row=i, column=1, pady=5, padx=5)                                                            #Slider placement
+            self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
             slider.set(self.materials[material][0])                                                                 #Set the initial value of the slider
+
 
             #Create input boxes
             height_var = StringVar(value=str(self.materials[material][0]))                                          
@@ -90,6 +94,30 @@ class App:
 
             #Increment row-counter
             i += 1
+
+        #Add padding for the widgets (x-padding is only applied once compared to Y-padding, because the slider frame doesn't get wider for each widget)
+        self.total_padding_x += (5*2)
+
+        #Create button which calls "export_stack_as_jpg" function
+        self.export_stack_button = Button(self.slider_frame, text="Export stack-jpg", command=self.export_stack_as_jpg)
+        self.export_stack_button.grid(row=len(self.materials), column=1)
+
+        #Create button which calls "export_layers_as_jpg" function
+        self.export_layers_button = Button(self.slider_frame, text = "Export layers-jpg", command=self.export_layers_as_jpg)
+        self.export_layers_button.grid(row=len(self.materials), column=2, padx=5)
+        self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+
+        #Create button which calls "export_stack_as_svg" function
+        self.export_layers_button = Button(self.slider_frame, text = "Export stack-svg", command=self.export_stack_as_svg)
+        self.export_layers_button.grid(row=len(self.materials)+1, column=1, padx=5)
+        self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+
+         #Create button which calls "export_all_as_jpg" function
+        self.export_layers_button = Button(self.slider_frame, text = "Export layers-svg", command=self.export_layers_as_svg)
+        self.export_layers_button.grid(row=len(self.materials)+1, column=2, padx=5)
+        self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+
+        
 
 
     """
@@ -131,10 +159,9 @@ class App:
 
     """Calls draw_rectangle_stack when the program window is adjusted"""
     def window_resized(self, event):        
-
         #Create the new canvas sizes        
-        new_canvas_width = self.window.winfo_width() - 270      #Subtract 270 because the slider_frame is 237 pixels
-        new_canvas_height = self.window.winfo_height() - 10     #Subtract 10 to keep a little space in the bottom of the window
+        new_canvas_width = self.window.winfo_width() - self.slider_frame.winfo_width() - self.total_padding_x       #Subtract slider_frame width and padding used for each widget 
+        new_canvas_height = self.window.winfo_height() - 15                                                         #Subtract 15 to keep a little space in the bottom of the window
 
         #Apply the new dimensions for the canvas
         self.canvas.config(width = new_canvas_width, height = new_canvas_height)
@@ -210,7 +237,6 @@ class App:
 
     """Takes a screenshot of the entire rectangle stack and saves it as .jpg"""
     def export_stack_as_jpg(self):
-        
         #Get window of app
         window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
 
@@ -227,13 +253,47 @@ class App:
         screenshot = ImageGrab.grab(bbox = (rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
         
         #Save screenshot as .jpg in specified folder
-        folder_path = "screenshots"
+        folder_path = "jpg_saves"
 
         if os.path.exists(folder_path) == False:    #Create the folder if it doesn't exist
             os.makedirs(folder_path)
             
-        file_path = os.path.join(folder_path, "All_Materials.jpg")
+        file_path = os.path.join(folder_path, "Stack-jpg.jpg")
         screenshot.save(file_path)
+
+
+        # #Get window of app
+        # window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
+
+        # # #Find the height of the red part of open window
+        # # #Find the small padding between the end of the red part of window and the start of the canvas top
+        # # #find the width of the slider frame + total x-padding
+        # # #Find the width and heigh of the canvas
+
+        # #Get current positions of open window
+        # main_window_x0_pos = window.topleft[0]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+        # main_window_y0_pos = window.topleft[1]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+        # main_window_x1_pos = window.bottomright[0]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+        # main_window_y1_pos = window.bottomright[1]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+
+        # main_window_width = self.window.winfo_width()       #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
+        # main_window_height = window.height                  #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
+        # title_bar_height = window.height - self.window.winfo_height()   #FIGURE OUT THIS ONE LATER
+        
+        # #FROM HERE EVERYTHING SHOULD WORK
+
+        # #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
+        # screenshot = ImageGrab.grab(bbox = (main_window_x0_pos, main_window_y0_pos, main_window_x1_pos, main_window_y1_pos))
+
+        # #Save screenshot as .jpg in specified folder
+        # folder_path = "screenshots"
+
+        # #Create folder to save screenshot to, if it doesn't exist
+        # if os.path.exists(folder_path) == False:
+        #     os.makedirs(folder_path)
+            
+        # file_path = os.path.join(folder_path, "All_Materials.jpg")
+        # screenshot.save(file_path)
 
 
     """Takes a screenshot of every layer in the rectangle in an ascending order and saves each screenshot as .jpg"""
@@ -272,17 +332,135 @@ class App:
             screenshot = ImageGrab.grab(bbox=(rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
 
             #Save screenshot as .jpg in specified folder
-            folder_path = "screenshots"
+            folder_path = "jpg_saves"
 
             #Create the folder if it doesn't exist
             if os.path.exists(folder_path) == False:
                 os.makedirs(folder_path)
             
-            file_path = os.path.join(folder_path, f"{i}_Layers.jpg")
+            file_path = os.path.join(folder_path, f"{i}_Layers-jpg.jpg")
             screenshot.save(file_path)
 
             i += 1
 
+
+    """Exports the stack as svg file without material names"""
+    def export_stack_as_svg(self):
+        #Define the name of the svg file to be created
+        filename = "stack-svg.svg"
+        
+        #XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
+        xml_declaration = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
+
+        #Creates the opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
+        svg_open = '<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight())
+
+        #Represents the closing tag for the SVG file.
+        svg_close = '</svg>\n'
+
+        #Retrieve all elements on the canvas
+        elements = self.canvas.find_all()
+
+        #Specify a folder where the SVG-file should be saved
+        folder_path = "svg_saves"
+
+        #Create the folder if it doesn't exist
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        #Create the file path by joining the folder path and the filename
+        file_path = os.path.join(folder_path, filename)
+
+        #Open the file for writing using a context manager, ensuring proper handling and closure of the file
+        with open(file_path, 'w') as f:
+            f.write(xml_declaration)    #Writes the XML declaration to the file.
+            f.write(svg_open)           #Writes the opening SVG tag to the file
+
+            #Iterate through all the elements found in the canvas
+            for element in elements:
+                
+                #Check the type of canvas item
+                item_type = self.canvas.type(element)
+
+
+                #Constructs an SVG <rect> element for rectangles. 
+                if item_type == "rectangle":
+                    svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(
+                        self.canvas.coords(element)[0],                                     #Retrieves the coordinates of the rectangle
+                        self.canvas.coords(element)[1],                                     #Retrieves the coordinates of the rectangle
+                        self.canvas.coords(element)[2] - self.canvas.coords(element)[0],    #Retrieves the coordinates of the rectangle
+                        self.canvas.coords(element)[3] - self.canvas.coords(element)[1],    #Retrieves the coordinates of the rectangle
+                        self.canvas.itemcget(element, 'fill')                               #fill color of the rectangle from the canvas
+                    )
+
+                    #Write the SVG representation of the rectangle to the file.
+                    f.write(svg_element)
+
+            #Writes the closing SVG tag to the file, completing the SVG file.
+            f.write(svg_close)
+
+
+    """Exports each layer of the stack with names"""
+    def export_layers_as_svg(self):
+        #Retrieve all elements on the canvas
+        elements = self.canvas.find_all()
+
+        #Filter elements to include only rectangles
+        rectangles = [element for element in elements if self.canvas.type(element) == "rectangle"]
+
+        #Specify a folder where the SVG-file should be saved
+        folder_path = "svg_saves"
+
+        #Create the folder if it doesn't exist
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        #Iterate through all the rectangles found in the canvas
+        for i, rect_id in enumerate(rectangles):
+            # Define the name of the SVG file for the current layer
+            filename = f"{i + 1}_layers.svg"
+
+            #Create the file path by joining the folder path and the filename
+            file_path = os.path.join(folder_path, filename)
+
+            #Open the file for writing using a context manager
+            with open(file_path, 'w') as f:
+                #Write the XML declaration to the file
+                f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+
+                #Write the opening SVG tag to the file
+                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()))
+
+                #Iterate through all rectangles up to the current index
+                for j in range(i + 1):
+                    rect_id = rectangles[j]
+
+                    #Retrieve the coordinates of the rectangle
+                    x0, y0, x1, y1 = self.canvas.coords(rect_id)
+
+                    #Retrieve fill color of the rectangle from the canvas
+                    fill_color = self.canvas.itemcget(rect_id, 'fill')
+
+                    #Construct an SVG <rect> element for rectangles
+                    svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(x0, y0, x1 - x0, y1 - y0, fill_color)
+
+                    #Write the SVG representation of the rectangle to the file
+                    f.write(svg_element)
+
+                    #Retrieve text on the rectangle
+                    text_item = self.canvas.find_overlapping(x0, y0, x1, y1)
+                    for text_id in text_item:
+                        if self.canvas.type(text_id) == "text":
+                            #Retrieve text content and coordinates
+                            text_content = self.canvas.itemcget(text_id, 'text')
+                            text_x, text_y = self.canvas.coords(text_id)
+                            #Construct an SVG <text> element for text on the rectangle
+                            svg_text_element = '<text x="{}" y="{}" fill="black">{}</text>\n'.format(text_x, text_y, text_content)
+                            #Write the SVG representation of the text to the file
+                            f.write(svg_text_element)
+
+                #Write the closing SVG tag to the file, completing the SVG file
+                f.write('</svg>\n')
 
 
 #Main start point of program
