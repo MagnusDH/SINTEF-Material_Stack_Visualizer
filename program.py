@@ -6,7 +6,8 @@ import pygetwindow
 import pyautogui
 import os
 
-import win32gui
+#TODO
+    #Hvis et rektangel er for lite til å vise tekst: vis teksten på siden med en pil mot laget
 
 class App:
     def __init__(self, window):
@@ -22,6 +23,7 @@ class App:
         #Dictionary for all materials. KEY: "material_name" ---VALUES: list of [thickness, color]
         self.materials = {}
 
+        #Necessary to draw the rectangles correctly on the canvas. The padding values are added manually in the code
         self.total_padding_x = 0
         self.total_padding_y = 0
          
@@ -32,7 +34,6 @@ class App:
         self.window = window
         self.window.title(self.app_title)
         self.window.geometry(f"{self.window_width}x{self.window_height}")
-
 
         #Read the given excel-file and populate self.materials with: material_name, thickness and color
         self.load_materials_from_excel(self.excel_file)
@@ -78,8 +79,8 @@ class App:
                        orient=HORIZONTAL, label=material, resolution=1,
                        command=lambda value, label=material: self.slider_updated(value, label))             #Creation of slider and listening to slider adjustments
             slider.grid(row=i, column=1, pady=5, padx=5)                                                            #Slider placement
-            self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
             slider.set(self.materials[material][0])                                                                 #Set the initial value of the slider
+            self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
 
 
             #Create input boxes
@@ -118,8 +119,6 @@ class App:
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
 
         
-
-
     """
     -Is called if the slider is adjusted
     -Updates the self.materials dictionary with the new slider value for its corresponding material
@@ -134,7 +133,6 @@ class App:
             self.draw_rectangle_stack()                                                 #Redraw the rectangle stack with the new value
         else:
             print("Error: Slider value is out of range")
-
 
 
     """
@@ -402,11 +400,9 @@ class App:
 
     """Exports each layer of the stack with names"""
     def export_layers_as_svg(self):
+        
         #Retrieve all elements on the canvas
-        elements = self.canvas.find_all()
-
-        #Filter elements to include only rectangles
-        rectangles = [element for element in elements if self.canvas.type(element) == "rectangle"]
+        canvas_elements = self.canvas.find_all()
 
         #Specify a folder where the SVG-file should be saved
         folder_path = "svg_saves"
@@ -415,10 +411,22 @@ class App:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-        #Iterate through all the rectangles found in the canvas
-        for i, rect_id in enumerate(rectangles):
-            # Define the name of the SVG file for the current layer
-            filename = f"{i + 1}_layers.svg"
+        #Filter elements to include only rectangles
+        rectangles_on_canvas = []
+        labels_on_canvas = []
+        for element in canvas_elements:
+            if self.canvas.type(element) == "rectangle":
+                rectangles_on_canvas.append(element) 
+            if(self.canvas.type(element) == "text"):
+                labels_on_canvas.append(element)
+
+        # Iterate through all the rectangles found in the canvas
+        i = 1
+        # for rect_id in enumerate(rectangles_on_canvas):
+        for rectangle in rectangles_on_canvas:
+            
+            # Create a name for the SVG file for the current layer
+            filename = f"{i}_layers.svg"
 
             #Create the file path by joining the folder path and the filename
             file_path = os.path.join(folder_path, filename)
@@ -429,38 +437,37 @@ class App:
                 f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
 
                 #Write the opening SVG tag to the file
-                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()))
+                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_width()+100, self.canvas.winfo_reqheight()))   #Added +100 because the rectangle was cropped without it
 
-                #Iterate through all rectangles up to the current index
-                for j in range(i + 1):
-                    rect_id = rectangles[j]
-
-                    #Retrieve the coordinates of the rectangle
-                    x0, y0, x1, y1 = self.canvas.coords(rect_id)
-
-                    #Retrieve fill color of the rectangle from the canvas
-                    fill_color = self.canvas.itemcget(rect_id, 'fill')
+                #Iterate through all rectangles up to the current layer
+                for j in range(i):
+                    #Draw rectangles from current layers
+                    rectangle_id = rectangles_on_canvas[j]
+                    rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(rectangle_id)           #Retrieve the coordinates of the rectangle
+                    fill_color = self.canvas.itemcget(rectangle_id, 'fill')     #Retrieve fill color of the rectangle from the canvas
 
                     #Construct an SVG <rect> element for rectangles
-                    svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(x0, y0, x1 - x0, y1 - y0, fill_color)
+                    svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, fill_color)
 
                     #Write the SVG representation of the rectangle to the file
                     f.write(svg_element)
 
-                    #Retrieve text on the rectangle
-                    text_item = self.canvas.find_overlapping(x0, y0, x1, y1)
-                    for text_id in text_item:
-                        if self.canvas.type(text_id) == "text":
-                            #Retrieve text content and coordinates
-                            text_content = self.canvas.itemcget(text_id, 'text')
-                            text_x, text_y = self.canvas.coords(text_id)
-                            #Construct an SVG <text> element for text on the rectangle
-                            svg_text_element = '<text x="{}" y="{}" fill="black">{}</text>\n'.format(text_x, text_y, text_content)
-                            #Write the SVG representation of the text to the file
-                            f.write(svg_text_element)
+                    #Write the labels on each rectangle
+                    label_id = labels_on_canvas[j]
+                    text_content = self.canvas.itemcget(label_id, 'text')   #retrieve text of label
+                    text_x, text_y = self.canvas.coords(label_id)           #retrieve coordinates of label
+
+                    #Construct an SVG <text> element for text on the rectangle
+                    svg_text_element = '<text x="{}" y="{}" fill="black">{}</text>\n'.format(text_x, text_y, text_content)
+                    
+                    #Write the SVG representation of the text to the file
+                    f.write(svg_text_element)
 
                 #Write the closing SVG tag to the file, completing the SVG file
                 f.write('</svg>\n')
+            
+            #Increment counter
+            i+=1
 
 
 #Main start point of program
