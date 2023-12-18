@@ -29,7 +29,7 @@
         -"export_all_as_jpg" takes incrementing screenshots of all the materials/layers in the rectangle stack
 
     BUGS:
-        -
+        -Det er noen få variabler som jeg har måtte legge inn manuelt fordi ting ikke passer på canvas. F.eks i draw_rectangle_stack() så må x0 og yo starte på 2
 
     NOTES:
         -The export_as_svg functions are heavily based on and taken from chatGPT
