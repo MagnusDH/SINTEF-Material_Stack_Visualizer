@@ -30,6 +30,8 @@
 
     BUGS:
         -Det er noen få variabler som jeg har måtte legge inn manuelt fordi ting ikke passer på canvas. F.eks i draw_rectangle_stack() så må x0 og yo starte på 2
+        -I "export_stack_as_svg": for at ikke tekst-boksen til hvert material skal være med i svg-filen, så er alle rectangler med en "black outline" filtrert ut og eksludert. Det er derfor viktig at man ikke endrer koden og legger til en svart kant på hvert rektangel.
+        .På min PC kan man kun ha 11 materialer før sliders blir for lang og sliders passer ikke inn i applikasjonen. Må dette endres?
 
     NOTES:
         -The export_as_svg functions are heavily based on and taken from chatGPT

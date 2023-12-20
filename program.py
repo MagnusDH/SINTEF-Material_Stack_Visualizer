@@ -101,25 +101,26 @@ class App:
 
         #Add padding for the widgets (x-padding is only applied once compared to Y-padding, because the slider frame doesn't get wider for each widget)
         self.total_padding_x += (5*2)
-
-        #Create button which calls "export_stack_as_jpg" function
-        self.export_stack_button = Button(self.slider_frame, text="Export stack-jpg", command=self.export_stack_as_jpg)
-        self.export_stack_button.grid(row=len(self.materials), column=1)
-
-        #Create button which calls "export_layers_as_jpg" function
-        self.export_layers_button = Button(self.slider_frame, text = "Export layers-jpg", command=self.export_layers_as_jpg)
-        self.export_layers_button.grid(row=len(self.materials), column=2, padx=5)
-        self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
-
+        
         #Create button which calls "export_stack_as_svg" function
         self.export_layers_button = Button(self.slider_frame, text = "Export stack-svg", command=self.export_stack_as_svg)
-        self.export_layers_button.grid(row=len(self.materials)+1, column=1, padx=5)
+        self.export_layers_button.grid(row=len(self.materials), column=1, padx=5)
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
 
          #Create button which calls "export_all_as_jpg" function
         self.export_layers_button = Button(self.slider_frame, text = "Export layers-svg", command=self.export_layers_as_svg)
-        self.export_layers_button.grid(row=len(self.materials)+1, column=2, padx=5)
+        self.export_layers_button.grid(row=len(self.materials), column=2, padx=5)
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+
+        # #Create button which calls "export_stack_as_jpg" function
+        # self.export_stack_button = Button(self.slider_frame, text="Export stack-jpg", command=self.export_stack_as_jpg)
+        # self.export_stack_button.grid(row=len(self.materials)+1, column=1)
+
+        # #Create button which calls "export_layers_as_jpg" function
+        # self.export_layers_button = Button(self.slider_frame, text = "Export layers-jpg", command=self.export_layers_as_jpg)
+        # self.export_layers_button.grid(row=len(self.materials)+1, column=2, padx=5)
+        # self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+
 
         
     """
@@ -207,7 +208,7 @@ class App:
 
             #Draw rectangles on top of the other
             rectangle_y0 = rectangle_y1 - rectangle_height
-            self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1])  # Draw rectangle and fill it with a color
+            self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")  # Draw rectangle and fill it with a color
 
 
             #####   DRAW TEXT, BOXES AND ARROW SOLUTIONS   ##### 
@@ -241,11 +242,11 @@ class App:
                         #Update the text coordinates so that the bounding box is not under the canvas
                         self.canvas.coords(text, label_x_pos, self.canvas_height - (text_bbox_height/2))
                         #Draw box around the text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black')
+                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
                         #Get new bounding box coordinates of text
                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(text) #Get bounding box of text
                         #Draw arrow from middle of text box to middle of rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST)
+                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
                         #Confirm that the first text is written
@@ -254,11 +255,11 @@ class App:
                     #The bounding box coordinates is NOT lower than the canvas line
                     else:
                         #Draw box around text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black')
+                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
                         #Get the height of the text's bounding box
                         text_bbox_height = text_bbox_y1 - text_bbox_y0
                         #Draw arrow from middle of text box to middle of rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST)
+                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
                         #Confirm that the first text is written
@@ -277,20 +278,20 @@ class App:
                         #Update the text coordinates so that the bounding box is not overlapping the previous text box
                         self.canvas.coords(text, label_x_pos, previous_text_bbox_y0 - (text_bbox_height/2))
                         #Draw box around text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black')
+                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
                         #Find the NEW bounding box coordinates of text
                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(text) #Get bounding box of text
                         #Draw arrow from box to rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST)
+                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
                     
                     #This text bbox is NOT overlapping with the previous text
                     else:
                         #Draw box around the text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black')
+                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
                         #Draw arrow from box to rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST)
+                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
 
@@ -427,7 +428,7 @@ class App:
             i += 1
 
 
-    """Exports the stack as svg file without material names"""
+    """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
         #Define the name of the svg file to be created
         filename = "stack-svg.svg"
@@ -436,10 +437,10 @@ class App:
         xml_declaration = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
 
         #Creates the opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-        svg_open = '<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight())
+        svg_open_tag = '<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight())
 
         #Represents the closing tag for the SVG file.
-        svg_close = '</svg>\n'
+        svg_close_tag = '</svg>\n'
 
         #Retrieve all elements on the canvas
         elements = self.canvas.find_all()
@@ -457,7 +458,7 @@ class App:
         #Open the file for writing using a context manager, ensuring proper handling and closure of the file
         with open(file_path, 'w') as f:
             f.write(xml_declaration)    #Writes the XML declaration to the file.
-            f.write(svg_open)           #Writes the opening SVG tag to the file
+            f.write(svg_open_tag)           #Writes the opening SVG tag to the file
 
             #Iterate through all the elements found in the canvas
             for element in elements:
@@ -466,8 +467,8 @@ class App:
                 item_type = self.canvas.type(element)
 
 
-                #Constructs an SVG <rect> element for rectangles. 
-                if item_type == "rectangle":
+                #Constructs an SVG <rect> element for rectangles. (If the outline of a rectangle is "black" then it is considered as a text-box rectangle and is NOT included)
+                if item_type == "rectangle" and self.canvas.itemcget(element, 'outline') != 'black':
                     svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(
                         self.canvas.coords(element)[0],                                     #Retrieves the coordinates of the rectangle
                         self.canvas.coords(element)[1],                                     #Retrieves the coordinates of the rectangle
@@ -480,79 +481,105 @@ class App:
                     f.write(svg_element)
 
             #Writes the closing SVG tag to the file, completing the SVG file.
-            f.write(svg_close)
+            f.write(svg_close_tag)
+
+        #Close the svg file
+        f.close()
 
 
-    """Exports each layer of the stack with names"""
+    """Exports each layer of the stack with names and arrows as SVG-file"""
     def export_layers_as_svg(self):
-        
         #Retrieve all elements on the canvas
         canvas_elements = self.canvas.find_all()
 
+        #Filter out the elements needed
+        rectangles_on_canvas = []
+        text_boxes_on_canvas = []
+        labels_on_canvas = []
+        arrows_on_canvas = []
+
+        #Filter out the elements needed
+        for element in canvas_elements:
+            #Get the tag for each element (when some of the elements were created, I set a tag for each item)
+            tags = self.canvas.gettags(element)
+            if(self.canvas.type(element) == "rectangle"):
+                if("material_rectangle" in tags):
+                    rectangles_on_canvas.append(element) 
+                elif("text_box" in tags):
+                    text_boxes_on_canvas.append(element)
+            elif(self.canvas.type(element) == "text"):
+                labels_on_canvas.append(element)
+            elif(self.canvas.type(element) == "line"):
+                if("arrow_line" in tags):
+                    arrows_on_canvas.append(element)
+
         #Specify a folder where the SVG-file should be saved
         folder_path = "svg_saves"
-
         #Create the folder if it doesn't exist
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-        #Filter elements to include only rectangles
-        rectangles_on_canvas = []
-        labels_on_canvas = []
-        for element in canvas_elements:
-            if self.canvas.type(element) == "rectangle":
-                rectangles_on_canvas.append(element) 
-            if(self.canvas.type(element) == "text"):
-                labels_on_canvas.append(element)
-
-        # Iterate through all the rectangles found in the canvas
-        i = 1
-        # for rect_id in enumerate(rectangles_on_canvas):
-        for rectangle in rectangles_on_canvas:
-            
-            # Create a name for the SVG file for the current layer
-            filename = f"{i}_layers.svg"
-
+        #Iterate through all the rectangles found in the canvas
+        for i in range(len(rectangles_on_canvas)):
+            #Create a name for the SVG file for the current layer
+            filename = f"{i+1}_layers.svg"
             #Create the file path by joining the folder path and the filename
             file_path = os.path.join(folder_path, filename)
 
-            #Open the file for writing using a context manager
+            #Open a file to create an svg-file
             with open(file_path, 'w') as f:
                 #Write the XML declaration to the file
                 f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-
                 #Write the opening SVG tag to the file
                 f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_width()+100, self.canvas.winfo_reqheight()))   #Added +100 because the rectangle was cropped without it
 
-                #Iterate through all rectangles up to the current layer
-                for j in range(i):
+                #Iterate through all rectangles up to the current layer and create SVG rectangles for each layer 
+                for j in range(i+1):
                     #Draw rectangles from current layers
                     rectangle_id = rectangles_on_canvas[j]
-                    rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(rectangle_id)           #Retrieve the coordinates of the rectangle
-                    fill_color = self.canvas.itemcget(rectangle_id, 'fill')     #Retrieve fill color of the rectangle from the canvas
+                    rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(rectangle_id)  # Retrieve the coordinates of the rectangle
+                    fill_color = self.canvas.itemcget(rectangle_id, 'fill')  # Retrieve fill color of the rectangle from the canvas
 
                     #Construct an SVG <rect> element for rectangles
-                    svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, fill_color)
+                    if self.canvas.itemcget(rectangle_id, 'outline') == 'black':
+                        svg_element = '<rect x="{}" y="{}" width="{}" height="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
+                    else:
+                        svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, fill_color)
 
-                    #Write the SVG representation of the rectangle to the file
+                    # Write the SVG representation of the rectangle to the file
                     f.write(svg_element)
 
-                    #Write the labels on each rectangle
-                    label_id = labels_on_canvas[j]
-                    text_content = self.canvas.itemcget(label_id, 'text')   #retrieve text of label
-                    text_x, text_y = self.canvas.coords(label_id)           #retrieve coordinates of label
+                
+                #Iterate through all text elements up to the current layer and create SVG text
+                for j in range(min(len(labels_on_canvas), i+1)):
+                    text_id = labels_on_canvas[j]
+                    label_x, label_y = self.canvas.coords(text_id)  # Retrieve the coordinates of the text
+                    text_content = self.canvas.itemcget(text_id, 'text')  # Retrieve text content from the canvas
 
-                    #Construct an SVG <text> element for text on the rectangle
-                    svg_text_element = '<text x="{}" y="{}" fill="black">{}</text>\n'.format(text_x, text_y, text_content)
-                    
-                    #Write the SVG representation of the text to the file
+                    # Construct an SVG <text> element for text
+                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="8" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(label_x+5, label_y, text_content)
+
+                    # Write the SVG representation of the text to the file
                     f.write(svg_text_element)
+                
+                #Iterate through all arrow_lines up to the current layer and create SVG lines
+                for j in range(min(len(arrows_on_canvas), i+1)):
+                    arrow_id = arrows_on_canvas[j]
+                    arrow_coords = self.canvas.coords(arrow_id)  # Retrieve the coordinates of the arrow
+
+                    # Construct an SVG <line> element for arrows
+                    svg_arrow_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(arrow_coords[0], arrow_coords[1], arrow_coords[2], arrow_coords[3])
+
+                    # Write the SVG representation of the arrow to the file
+                    f.write(svg_arrow_element)
+
+                    
 
                 #Write the closing SVG tag to the file, completing the SVG file
                 f.write('</svg>\n')
             
-            #Increment counter
-            i+=1
+                # #Close the svg file
+                f.close()
 
 
 #Main start point of program
