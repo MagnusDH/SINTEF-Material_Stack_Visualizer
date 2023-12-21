@@ -358,38 +358,38 @@ class App:
         screenshot.save(file_path)
 
 
-        # #Get window of app
-        # window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
+        #Get window of app
+        window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
 
-        # # #Find the height of the red part of open window
-        # # #Find the small padding between the end of the red part of window and the start of the canvas top
-        # # #find the width of the slider frame + total x-padding
-        # # #Find the width and heigh of the canvas
+        # #Find the height of the red part of open window
+        # #Find the small padding between the end of the red part of window and the start of the canvas top
+        # #find the width of the slider frame + total x-padding
+        # #Find the width and heigh of the canvas
 
-        # #Get current positions of open window
-        # main_window_x0_pos = window.topleft[0]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
-        # main_window_y0_pos = window.topleft[1]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
-        # main_window_x1_pos = window.bottomright[0]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
-        # main_window_y1_pos = window.bottomright[1]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+        #Get current positions of open window
+        main_window_x0_pos = window.topleft[0]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+        main_window_y0_pos = window.topleft[1]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+        main_window_x1_pos = window.bottomright[0]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
+        main_window_y1_pos = window.bottomright[1]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
 
-        # main_window_width = self.window.winfo_width()       #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
-        # main_window_height = window.height                  #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
-        # title_bar_height = window.height - self.window.winfo_height()   #FIGURE OUT THIS ONE LATER
+        main_window_width = self.window.winfo_width()       #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
+        main_window_height = window.height                  #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
+        title_bar_height = window.height - self.window.winfo_height()   #FIGURE OUT THIS ONE LATER
         
-        # #FROM HERE EVERYTHING SHOULD WORK
+        #FROM HERE EVERYTHING SHOULD WORK
 
-        # #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
-        # screenshot = ImageGrab.grab(bbox = (main_window_x0_pos, main_window_y0_pos, main_window_x1_pos, main_window_y1_pos))
+        #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
+        screenshot = ImageGrab.grab(bbox = (main_window_x0_pos, main_window_y0_pos, main_window_x1_pos, main_window_y1_pos))
 
-        # #Save screenshot as .jpg in specified folder
-        # folder_path = "screenshots"
+        #Save screenshot as .jpg in specified folder
+        folder_path = "screenshots"
 
-        # #Create folder to save screenshot to, if it doesn't exist
-        # if os.path.exists(folder_path) == False:
-        #     os.makedirs(folder_path)
+        #Create folder to save screenshot to, if it doesn't exist
+        if os.path.exists(folder_path) == False:
+            os.makedirs(folder_path)
             
-        # file_path = os.path.join(folder_path, "All_Materials.jpg")
-        # screenshot.save(file_path)
+        file_path = os.path.join(folder_path, "All_Materials.jpg")
+        screenshot.save(file_path)
 
 
     """Takes a screenshot of every layer in the rectangle in an ascending order and saves each screenshot as .jpg"""
