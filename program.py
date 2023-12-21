@@ -23,6 +23,9 @@ class App:
         #Dictionary for all materials. KEY: "material_name" ---VALUES: list of [thickness, color]
         self.materials = {}
 
+        #A dictionary containing data for each layer on the canvas. Key is the layer number, value is a list[rectangle_id, text_id, text_box, line_id]
+        self.canvas_layer_data = {}
+
         #Necessary to draw the rectangles correctly on the canvas. The padding values are added manually in the code
         self.total_padding_x = 0
         self.total_padding_y = 0
@@ -201,6 +204,9 @@ class App:
         #Variables to prevent text box overlapping
         previous_text_bbox_y0 = None                  #Keep track of the height of the text boxes so that they don't overlap each other
         first_material_drawn = False                #Keep track if the first material is created to draw the text boxes correctly
+        
+        #Counter for adding elements to canvas_layer_data
+        i = 0
 
         #Loop through all the materials and draw rectangle and labels for each
         for material in self.materials:
@@ -208,10 +214,9 @@ class App:
 
             #Draw rectangles on top of the other
             rectangle_y0 = rectangle_y1 - rectangle_height
-            self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")  # Draw rectangle and fill it with a color
-
-
-            #####   DRAW TEXT, BOXES AND ARROW SOLUTIONS   ##### 
+            created_rectangle = self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")  # Draw rectangle and fill it with a color
+            
+            #####   DRAW TEXT, BOXES AND ARROW SOLUTIONS   #####
             
             label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
             
@@ -219,8 +224,9 @@ class App:
             if(rectangle_height >=30):
                 label_x_pos = (rectangle_x0 + rectangle_x1) / 2                                                                         #X-position of label
                 label_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Y-position of label
-                self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
-
+                created_text = self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
+                created_arrow_line = None
+                created_text_box = None
             #if the rectangle height is to low to display text, write material name on side of box
             else:
                 #Calculate what the current text position should be
@@ -228,25 +234,25 @@ class App:
                 label_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Text y-position
                 
                 #Write text - might end up being modified by the code below
-                text = self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")
+                created_text = self.canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")
                                 
                 #if this is the first text to be written:
                 if(first_material_drawn == False):
                     #Find the bounding box coordinates of text
-                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(text) #Get bounding box of text
+                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
 
                     #if the bounding box coordinates of text are lower then the canvas line
                     if(text_bbox_y1 > self.canvas_height):
                         #Get the height of the text's bounding box
                         text_bbox_height = text_bbox_y1 - text_bbox_y0
                         #Update the text coordinates so that the bounding box is not under the canvas
-                        self.canvas.coords(text, label_x_pos, self.canvas_height - (text_bbox_height/2))
+                        self.canvas.coords(created_text, label_x_pos, self.canvas_height - (text_bbox_height/2))
                         #Draw box around the text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
                         #Get new bounding box coordinates of text
-                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(text) #Get bounding box of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
                         #Draw arrow from middle of text box to middle of rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
                         #Confirm that the first text is written
@@ -255,11 +261,11 @@ class App:
                     #The bounding box coordinates is NOT lower than the canvas line
                     else:
                         #Draw box around text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
                         #Get the height of the text's bounding box
                         text_bbox_height = text_bbox_y1 - text_bbox_y0
                         #Draw arrow from middle of text box to middle of rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
                         #Confirm that the first text is written
@@ -269,34 +275,40 @@ class App:
                 #This is not the first text to be written
                 else:
                     #Find the bounding box coordinates of text
-                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(text) #Get bounding box of text
+                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
                     #Get the height of the text's bounding box
                     text_bbox_height = text_bbox_y1 - text_bbox_y0
                     
                     #if this text's bounding box is overlapping the previous bounding box
                     if(text_bbox_y1 > previous_text_bbox_y0):
                         #Update the text coordinates so that the bounding box is not overlapping the previous text box
-                        self.canvas.coords(text, label_x_pos, previous_text_bbox_y0 - (text_bbox_height/2))
+                        self.canvas.coords(created_text, label_x_pos, previous_text_bbox_y0 - (text_bbox_height/2))
                         #Draw box around text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
                         #Find the NEW bounding box coordinates of text
-                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(text) #Get bounding box of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
                         #Draw arrow from box to rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
                     
                     #This text bbox is NOT overlapping with the previous text
                     else:
                         #Draw box around the text
-                        self.canvas.create_rectangle(self.canvas.bbox(text), outline='black', tags="text_box")
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
                         #Draw arrow from box to rectangle
-                        self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
                         #Set the "previous_bbox_y0" to whatever this bounding box y0 is
                         previous_text_bbox_y0 = text_bbox_y0
+            
+            #Add newly created rectangle, text, text_box and line to canvas_layer_data dictionary
+            self.canvas_layer_data[i] =[created_rectangle, created_text, created_text_box, created_arrow_line]
 
             #Update the rectangle coordinates so that the rectangles are not overlapping each other
             rectangle_y1 = rectangle_y0
+
+            #Increment counter for adding elements to canvas_layer_data dictionary
+            i+=1
 
 
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
@@ -489,6 +501,79 @@ class App:
 
     """Exports each layer of the stack with names and arrows as SVG-file"""
     def export_layers_as_svg(self):
+        #Retrieve all elements on the canvas
+        canvas_elements = self.canvas.find_all()
+
+        #Specify a folder where the SVG-file should be saved
+        folder_path = "svg_saves"
+        #Create the folder if it doesn't exist
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        #Iterate through all the rectangles found in the canvas
+        for i in range(len(self.canvas_layer_data)):
+            #Create a name for the SVG file for the current layer
+            filename = f"{i+1}_layers.svg"
+            #Create the file path by joining the folder path and the filename
+            file_path = os.path.join(folder_path, filename)
+
+            #Open a file to create an svg-file
+            with open(file_path, 'w') as f:
+                #Write the XML declaration to the file
+                f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+                #Write the opening SVG tag to the file
+                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_width()+100, self.canvas.winfo_reqheight()))   #Added +100 because the rectangle was cropped without it
+
+
+                #Iterate through all rectangles up to the current layer and create SVG rectangles for each layer 
+                for j in range(i+1):
+                    #Draw rectangles from current layers
+                    rectangle_id = self.canvas_layer_data[j][0]
+
+                    rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(rectangle_id)  # Retrieve the coordinates of the rectangle
+                    fill_color = self.canvas.itemcget(rectangle_id, 'fill')  # Retrieve fill color of the rectangle from the canvas
+                    svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, fill_color)
+
+                    #Write the SVG representation of the rectangle to the file
+                    f.write(svg_element)
+
+
+                #Iterate through all text elements up to the current layer and create SVG text
+                for j in range(i+1):
+                    text_id = self.canvas_layer_data[j][1]
+                    label_x, label_y = self.canvas.coords(text_id)  # Retrieve the coordinates of the text
+                    text_content = self.canvas.itemcget(text_id, 'text')  # Retrieve text content from the canvas
+
+                    #Construct an SVG <text> element for text
+                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="8" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(label_x+5, label_y, text_content)
+
+                    #Write the SVG representation of the text to the file
+                    f.write(svg_text_element)
+                
+                #Iterate through all arrow_lines up to the current layer and create SVG lines
+                for j in range(i+1):
+                    arrow_id = self.canvas_layer_data[j][3]
+                    if(arrow_id != None):
+                    
+                        arrow_coords = self.canvas.coords(arrow_id)  # Retrieve the coordinates of the arrow
+
+                        #Construct an SVG <line> element for arrows
+                        svg_arrow_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(arrow_coords[0], arrow_coords[1], arrow_coords[2], arrow_coords[3])
+
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_arrow_element)
+
+                    
+
+                #Write the closing SVG tag to the file, completing the SVG file
+                f.write('</svg>\n')
+            
+                #Close the svg file
+                f.close()
+
+
+
+    def export_layers_as_svg1(self):
         #Retrieve all elements on the canvas
         canvas_elements = self.canvas.find_all()
 
