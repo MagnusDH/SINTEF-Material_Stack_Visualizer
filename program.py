@@ -1,11 +1,17 @@
 import tkinter as tk
-from tkinter import Canvas, Scale, HORIZONTAL, Frame, Entry, StringVar, Label, Button
+from tkinter import Canvas, Scale, HORIZONTAL, Frame, Entry, StringVar, Label, Button, messagebox
 from PIL import ImageGrab, Image
 import pandas as pd
 import pygetwindow
 import pyautogui
 import os
 
+"""
+2. Subscript hvis mulig: eks. SiO2 -> SiO2 (ikke oppe men nede) (IKKE MULIG FORDI: ikke alle karakterer kan bli til subscript og svg støtter ikke subscripts)
+5. To avbildninger side om side:
+    -Stack inkl. BOX (Zoom-out)
+    -Close-up av øverste sjikt – firkant for AOI
+"""
 
 class App:
     def __init__(self, window):
@@ -13,11 +19,11 @@ class App:
         #SETTINGS
         self.app_title = "Material Measurements"
         self.window_width = 800                     #Start width of app window
-        self.window_height = 800                    #Start height of app window
+        self.window_height = 900                    #Start height of app window
         self.canvas_width = 800                     #Width of the canvas where things are drawn
         self.canvas_height = 800                    #Height of the canvas where things are drawn
         self.material_min_thickness = 0             #Minimum thickness of materials
-        self.material_max_thickness = 3000          #Maximum thickness of materials
+        self.material_max_thickness = 6000          #Maximum thickness of materials
         self.excel_file = "Materials.xlsx"          #Excel-file to load materials from
 
         #Dictionary for all materials. KEY: "material_name" ---VALUES: list of [thickness, color]
@@ -69,63 +75,75 @@ class App:
         self.total_padding_x += (10 * 2)  #Add padding for this widget (+10 for both sides of the widget)
         self.total_padding_y += (10 * 2)  #Add padding for this widget (+10 for both sides of the widget)
 
+        #Max material thickness entry box
+        max_thickness_label = Label(self.slider_frame, text="Max Thickness:", font="bold")                                                          #Creation of label in the slider frame
+        max_thickness_label.grid(row=0, column=0) 
+        max_thickness_variable = StringVar(value=str(self.material_max_thickness))
+        max_thickness_entry = Entry(self.slider_frame, textvariable=max_thickness_variable, justify=tk.CENTER, width=10)
+        max_thickness_entry.grid(row=0, column=1)                                                                     #Entry box placement
+        max_thickness_entry.bind("<Return>", lambda event, e=max_thickness_entry: self.update_max_thickness_entry(event, e))                #Listens to updates in the entry/input box
         
         #Create color boxes, sliders, input boxes and labels
-        i = 0 #Row counter
+        row_counter = 1 #Row counter
         for material in self.materials:
 
-            #Create color boxes and place them on grid
-            color_box = Label(self.slider_frame, bg=self.materials[material][1], width=2)                           #Creation of color box in the slider frame
-            color_box.grid(row=i, column=0, padx=5, pady=5)                                                         #Color box placement
-            self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
+            # Create color boxes and place them on grid
+            # color_box = Label(self.slider_frame, bg=self.materials[material][1], width=2, justify=tk.RIGHT)                           #Creation of color box in the slider frame
+            # color_box.grid(row=i, column=1)#, padx=5, pady=5)                                                         #Color box placement
+            # self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
             
 
             #Create sliders
             slider = Scale(self.slider_frame, from_=self.material_min_thickness, to=self.material_max_thickness,
                        orient=HORIZONTAL, label=material, resolution=1,
-                       command=lambda value, label=material: self.slider_updated(value, label))             #Creation of slider and listening to slider adjustments
-            slider.grid(row=i, column=1, pady=5, padx=5)                                                            #Slider placement
+                       command=lambda value, label=material: self.slider_updated(value, label), background=self.materials[material][1])             #Creation of slider and listening to slider adjustments
+            slider.grid(row=row_counter, column=0, pady=5, padx=5)                                                            #Slider placement
             slider.set(self.materials[material][0])                                                                 #Set the initial value of the slider
             self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
 
 
             #Create input boxes
             height_var = StringVar(value=str(self.materials[material][0]))                                          
-            entry = Entry(self.slider_frame, textvariable=height_var, width=6)                                      #Creation of entry box in the slider frame
-            entry.grid(row=i, column=2, padx=5)                                                                     #Entry box placement
+            entry = Entry(self.slider_frame, textvariable=height_var, width=6, justify=tk.CENTER)                                      #Creation of entry box in the slider frame
+            entry.grid(row=row_counter, column=1, padx=5)                                                                     #Entry box placement
             entry.bind("<Return>", lambda event, s=slider, e=entry: self.entry_updated(event, e, s))                #Listens to updates in the entry/input box
             
             #Create "nm" label next to slider
-            nm_label = Label(self.slider_frame, text="nm")                                                          #Creation of label in the slider frame
-            nm_label.grid(row=i, column=3)                                                                          #Label placement
+            nm_label = Label(self.slider_frame, text="nm", justify=tk.LEFT)                                                          #Creation of label in the slider frame
+            nm_label.grid(row=row_counter, column=2)                                                                          #Label placement
 
             #Increment row-counter
-            i += 1
+            row_counter += 1
 
         #Add padding for the widgets (x-padding is only applied once compared to Y-padding, because the slider frame doesn't get wider for each widget)
         self.total_padding_x += (5*2)
         
         #Create button which calls "export_stack_as_svg" function
         self.export_layers_button = Button(self.slider_frame, text = "Export stack-svg", command=self.export_stack_as_svg)
-        self.export_layers_button.grid(row=len(self.materials), column=1, padx=5)
+        self.export_layers_button.grid(row=row_counter, column=0, padx=5)
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
 
          #Create button which calls "export_all_as_jpg" function
         self.export_layers_button = Button(self.slider_frame, text = "Export layers-svg", command=self.export_layers_as_svg)
-        self.export_layers_button.grid(row=len(self.materials), column=2, padx=5)
+        self.export_layers_button.grid(row=row_counter, column=1, padx=5)
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+    
+    """Updates the Material_max_thickness variable and slider ranging values when the Max Thickness entry is updated"""
+    def update_max_thickness_entry(self, event, entry_box):
+        #Get the entered value
+        entry_value = int(entry_box.get())
 
-        # #Create button which calls "export_stack_as_jpg" function
-        # self.export_stack_button = Button(self.slider_frame, text="Export stack-jpg", command=self.export_stack_as_jpg)
-        # self.export_stack_button.grid(row=len(self.materials)+1, column=1)
+        #Set the new max thickness value
+        self.material_max_thickness = entry_value
 
-        # #Create button which calls "export_layers_as_jpg" function
-        # self.export_layers_button = Button(self.slider_frame, text = "Export layers-jpg", command=self.export_layers_as_jpg)
-        # self.export_layers_button.grid(row=len(self.materials)+1, column=2, padx=5)
-        # self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+        #Update slider ranging values
+        for element in self.slider_frame.winfo_children():
+            if isinstance(element, tk.Scale):
+                element.config(from_=self.material_min_thickness, to=self.material_max_thickness)
 
+        #Redraw the rectangle stack according to the current max_thickness value
+        self.draw_rectangle_stack()
 
-        
     """
     -Is called if the slider is adjusted
     -Updates the self.materials dictionary with the new slider value for its corresponding material
@@ -139,7 +157,7 @@ class App:
             self.materials[material_label][0] = slider_value                            #Assign the value of the slider to its position in the materials dictionary
             self.draw_rectangle_stack()                                                 #Redraw the rectangle stack with the new value
         else:
-            print("Error: Slider value is out of range")
+            messagebox.showerror("Error", "The slider value is out of range")
 
 
     """
@@ -159,7 +177,33 @@ class App:
             self.draw_rectangle_stack()                         #Redraw the rectangle stack
 
         else:
-            print("Error: Entry box value is out of range")
+            messagebox.showerror("Error", "The value you entered is out of range")
+
+
+    def entry_updated_test(self, event, entry_box, slider):
+        """
+        -Get the entry value
+        -Set the entry value to its materials
+        -Loop through the materials and find the one with the biggest thickness value
+        -Set the max_thickness value to this value
+        """
+
+        #Get the value entered in the entry box
+        entry_value = int(entry_box.get())
+
+        #Set the entry value to its material
+        slider_name = slider.cget("label")                  #Get the label/name of the slider
+        self.materials[slider_name][0] = entry_value        #Assign the value of the entry box to its position in the materials dictionary
+        slider.set(entry_value)                             #Apply the value change to the corresponding slider also
+
+        #Update the max_material_thickness value to the biggest value of the materials
+        biggest_thickness_value = 0
+        for material in self.materials:
+            if(self.materials[material][0] > biggest_thickness_value):
+                biggest_thickness_value = self.materials[material][0]
+                self.material_max_thickness = biggest_thickness_value
+
+        self.draw_rectangle_stack()                         #Redraw the rectangle stack
 
 
     """Calls draw_rectangle_stack when the program window is adjusted"""
@@ -199,8 +243,8 @@ class App:
         rectangle_y1 = self.canvas.winfo_reqheight() - 3    #Bottom-right Y-coordinate of rectangle (-3 is a manually added variable to keep the rectanlge inside the canvas)
        
         #Scaling factor decides the size of each rectangle when drawn. The current algorithm ensures that the rectangle stack is not drawn out of bounds 
-        scaling_factor = (self.canvas.winfo_reqheight()/(self.material_max_thickness+18))/len(self.materials)   #The +18 value is a manual fix so that the rectangle is not drawn outside the canvas
-        
+        scaling_factor = self.canvas.winfo_reqheight() / ((self.material_max_thickness+18)*len(self.materials))   #The +18 value is a manual fix so that the rectangle is not drawn outside the canvas
+
         #Variables to prevent text box overlapping
         previous_text_bbox_y0 = None                  #Keep track of the height of the text boxes so that they don't overlap each other
         first_material_drawn = False                #Keep track if the first material is created to draw the text boxes correctly
@@ -217,8 +261,9 @@ class App:
             created_rectangle = self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")  # Draw rectangle and fill it with a color
             
             #####   DRAW TEXT, BOXES AND ARROW SOLUTIONS   #####
-            
+
             label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
+            
             
             #if the rectangle height is big enough, write material name in middle of rectangle
             if(rectangle_height >=30):
@@ -311,6 +356,32 @@ class App:
             i+=1
 
 
+    """ -Detects and 'underscore' in the given string and converts what followins into subscript.
+        -Returns the original string with subscript"""
+    def convert_string_to_subscript(self, string):
+        #If there is an underscore in the given string
+        if("_" in string):
+            #Split string at the underscore
+            parts = string.split("_")
+            
+            #Get the different parts of the string
+            base_text = parts[0]
+            subscript_text = parts[1]
+
+            #Using Unicode to convert into subscript characters
+            subscript_chars = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+            subscript_string = subscript_text.translate(subscript_chars)
+
+            #Join strings
+            new_string = base_text + subscript_string
+
+            return new_string 
+
+        #There is not an underscore in the given string
+        else:
+            print("Error: Could not convert string into subscript")
+        
+
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
     def load_materials_from_excel(self, excel_file):
         try:
@@ -331,119 +402,10 @@ class App:
             print(f"Error loading materials from Excel: {error}")
 
 
-    """Takes a screenshot of the entire rectangle stack and saves it as .jpg"""
-    def export_stack_as_jpg(self):
-        #Get window of app
-        window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
-
-        #Get current positions of open window
-        window_x0_pos, window_y0_pos = window.topleft
-        window_x1_pos, window_y1_pos = window.bottomright
-
-        rec_stack_x0 = window_x0_pos + 260
-        rec_stack_y0 = window_y0_pos + 39
-        rec_stack_x1 = window_x1_pos 
-        rec_stack_y1 = window_y1_pos
-        
-        #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
-        screenshot = ImageGrab.grab(bbox = (rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
-        
-        #Save screenshot as .jpg in specified folder
-        folder_path = "jpg_saves"
-
-        if os.path.exists(folder_path) == False:    #Create the folder if it doesn't exist
-            os.makedirs(folder_path)
-            
-        file_path = os.path.join(folder_path, "Stack-jpg.jpg")
-        screenshot.save(file_path)
-
-
-        #Get window of app
-        window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
-
-        # #Find the height of the red part of open window
-        # #Find the small padding between the end of the red part of window and the start of the canvas top
-        # #find the width of the slider frame + total x-padding
-        # #Find the width and heigh of the canvas
-
-        #Get current positions of open window
-        main_window_x0_pos = window.topleft[0]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
-        main_window_y0_pos = window.topleft[1]              #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
-        main_window_x1_pos = window.bottomright[0]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
-        main_window_y1_pos = window.bottomright[1]          #FIGURE OUT IF THIS GIVES THE CORRECT COORDNIATE
-
-        main_window_width = self.window.winfo_width()       #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
-        main_window_height = window.height                  #FIGURE OUT WHICH FUNCTION ACTUALLY WORKS
-        title_bar_height = window.height - self.window.winfo_height()   #FIGURE OUT THIS ONE LATER
-        
-        #FROM HERE EVERYTHING SHOULD WORK
-
-        #Use the (x0,y0)(x1,y1) coordinates to screenshot the entire rectangle stack
-        screenshot = ImageGrab.grab(bbox = (main_window_x0_pos, main_window_y0_pos, main_window_x1_pos, main_window_y1_pos))
-
-        #Save screenshot as .jpg in specified folder
-        folder_path = "screenshots"
-
-        #Create folder to save screenshot to, if it doesn't exist
-        if os.path.exists(folder_path) == False:
-            os.makedirs(folder_path)
-            
-        file_path = os.path.join(folder_path, "All_Materials.jpg")
-        screenshot.save(file_path)
-
-
-    """Takes a screenshot of every layer in the rectangle in an ascending order and saves each screenshot as .jpg"""
-    def export_layers_as_jpg(self):
-        #Get window of app
-        window = pygetwindow.getWindowsWithTitle(self.app_title)[0]
-
-        #Get current positions of open window
-        window_x0_pos, window_y0_pos = window.topleft
-        window_x1_pos, window_y1_pos = window.bottomright
-
-        #Find positions of canvas/rectangles
-        rec_stack_x0 = window_x0_pos + 260
-        rec_stack_x1 = window_x1_pos 
-        rec_stack_y1 = window_y1_pos - 17   #Lowest line of rectangle stack
-        rec_stack_y0 = rec_stack_y1         #Must be the lowest line before the loop
-
-        #Find the height of the rectangle based on the scaling factor
-        scaling_factor = (self.canvas.winfo_reqheight()/(self.material_max_thickness+18))/len(self.materials)   #The +18 value is a manual fix because the rectangle would be drawn outside the canvas  (See the original line in draw_rectangle_stack)
-        
-        i = 1
-
-        #Loop through akk the materials in self.materials
-        for material in self.materials:
-
-            #Calculate the height of the material based on the scaling factor
-            rectangle_height = int(self.materials[material][0]) * scaling_factor
-
-            #Add height to take screenshot of incrementing rectangles
-            rec_stack_y0 -= rectangle_height
-
-            #The x0, x1 and y1 coordinates must always stay the same
-            #The y0 coordinate must change
-
-            #Take screenshot of layer(s)
-            screenshot = ImageGrab.grab(bbox=(rec_stack_x0, rec_stack_y0, rec_stack_x1, rec_stack_y1))
-
-            #Save screenshot as .jpg in specified folder
-            folder_path = "jpg_saves"
-
-            #Create the folder if it doesn't exist
-            if os.path.exists(folder_path) == False:
-                os.makedirs(folder_path)
-            
-            file_path = os.path.join(folder_path, f"{i}_Layers-jpg.jpg")
-            screenshot.save(file_path)
-
-            i += 1
-
-
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
         #Define the name of the svg file to be created
-        filename = "stack-svg.svg"
+        filename = "stack.svg"
         
         #XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
         xml_declaration = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
@@ -458,7 +420,7 @@ class App:
         elements = self.canvas.find_all()
 
         #Specify a folder where the SVG-file should be saved
-        folder_path = "svg_saves"
+        folder_path = "svg_exports"
 
         #Create the folder if it doesn't exist
         if not os.path.exists(folder_path):
@@ -505,7 +467,7 @@ class App:
         canvas_elements = self.canvas.find_all()
 
         #Specify a folder where the SVG-file should be saved
-        folder_path = "svg_saves"
+        folder_path = "svg_exports"
         #Create the folder if it doesn't exist
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
@@ -545,7 +507,7 @@ class App:
                     text_content = self.canvas.itemcget(text_id, 'text')  # Retrieve text content from the canvas
 
                     #Construct an SVG <text> element for text
-                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="8" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(label_x+5, label_y, text_content)
+                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="14" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(label_x+25, label_y, text_content)
 
                     #Write the SVG representation of the text to the file
                     f.write(svg_text_element)
@@ -572,99 +534,37 @@ class App:
                 f.close()
 
 
+    """
+    -Creates a text at a given position with a bounding box around it.
+    -Creates an arrow pointing from the box to a given point on the canvas
+    -Adds the text, bounding_box and arrow_line to canvas_layer_data
+    """
+    def create_PointingTextLabel(self, text, text_Xpos, text_Ypos, arrow_Xpoint=None, arrow_Ypoint=None):
+        #Write text
+        created_text = self.canvas.create_text(text_Xpos, text_Ypos, text=text, fill="black", font=("Arial", 8), anchor="center", tags="material_text")
+                                
+        #Find the bounding box coordinates of text and height of bounding box
+        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text)
+        text_bbox_height = text_bbox_y1 - text_bbox_y0
 
-    def export_layers_as_svg1(self):
-        #Retrieve all elements on the canvas
-        canvas_elements = self.canvas.find_all()
+        #Draw box around the text
+        created_bounding_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
 
-        #Filter out the elements needed
-        rectangles_on_canvas = []
-        text_boxes_on_canvas = []
-        labels_on_canvas = []
-        arrows_on_canvas = []
+        #Draw arrow line if coordinates are provided
+        if(arrow_Xpoint and arrow_Ypoint):
+            created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (arrow_Xpoint, arrow_Ypoint), arrow=tk.LAST, tags="arrow_line")
 
-        #Filter out the elements needed
-        for element in canvas_elements:
-            #Get the tag for each element (when some of the elements were created, I set a tag for each item)
-            tags = self.canvas.gettags(element)
-            if(self.canvas.type(element) == "rectangle"):
-                if("material_rectangle" in tags):
-                    rectangles_on_canvas.append(element) 
-                elif("text_box" in tags):
-                    text_boxes_on_canvas.append(element)
-            elif(self.canvas.type(element) == "text"):
-                labels_on_canvas.append(element)
-            elif(self.canvas.type(element) == "line"):
-                if("arrow_line" in tags):
-                    arrows_on_canvas.append(element)
+        # #Create a key in the canvas_layer_data for this layer if it does not exist
+        # if(not text in self.canvas_layer_data):
+        #     self.canvas_layer_data[text] = []
 
-        #Specify a folder where the SVG-file should be saved
-        folder_path = "svg_saves"
-        #Create the folder if it doesn't exist
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        #Iterate through all the rectangles found in the canvas
-        for i in range(len(rectangles_on_canvas)):
-            #Create a name for the SVG file for the current layer
-            filename = f"{i+1}_layers.svg"
-            #Create the file path by joining the folder path and the filename
-            file_path = os.path.join(folder_path, filename)
-
-            #Open a file to create an svg-file
-            with open(file_path, 'w') as f:
-                #Write the XML declaration to the file
-                f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-                #Write the opening SVG tag to the file
-                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_width()+100, self.canvas.winfo_reqheight()))   #Added +100 because the rectangle was cropped without it
-
-                #Iterate through all rectangles up to the current layer and create SVG rectangles for each layer 
-                for j in range(i+1):
-                    #Draw rectangles from current layers
-                    rectangle_id = rectangles_on_canvas[j]
-                    rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(rectangle_id)  # Retrieve the coordinates of the rectangle
-                    fill_color = self.canvas.itemcget(rectangle_id, 'fill')  # Retrieve fill color of the rectangle from the canvas
-
-                    #Construct an SVG <rect> element for rectangles
-                    if self.canvas.itemcget(rectangle_id, 'outline') == 'black':
-                        svg_element = '<rect x="{}" y="{}" width="{}" height="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
-                    else:
-                        svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, fill_color)
-
-                    # Write the SVG representation of the rectangle to the file
-                    f.write(svg_element)
-
-                
-                #Iterate through all text elements up to the current layer and create SVG text
-                for j in range(min(len(labels_on_canvas), i+1)):
-                    text_id = labels_on_canvas[j]
-                    label_x, label_y = self.canvas.coords(text_id)  # Retrieve the coordinates of the text
-                    text_content = self.canvas.itemcget(text_id, 'text')  # Retrieve text content from the canvas
-
-                    # Construct an SVG <text> element for text
-                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="8" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(label_x+5, label_y, text_content)
-
-                    # Write the SVG representation of the text to the file
-                    f.write(svg_text_element)
-                
-                #Iterate through all arrow_lines up to the current layer and create SVG lines
-                for j in range(min(len(arrows_on_canvas), i+1)):
-                    arrow_id = arrows_on_canvas[j]
-                    arrow_coords = self.canvas.coords(arrow_id)  # Retrieve the coordinates of the arrow
-
-                    # Construct an SVG <line> element for arrows
-                    svg_arrow_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(arrow_coords[0], arrow_coords[1], arrow_coords[2], arrow_coords[3])
-
-                    # Write the SVG representation of the arrow to the file
-                    f.write(svg_arrow_element)
-
-                    
-
-                #Write the closing SVG tag to the file, completing the SVG file
-                f.write('</svg>\n')
-            
-                # #Close the svg file
-                f.close()
+        # #Add newly created rectangle, text, text_box and line to canvas_layer_data dictionary
+        # self.canvas_layer_data[text].insert(1, created_text)
+        # self.canvas_layer_data[text].insert(2, created_bounding_box)
+        # if(created_arrow_line):
+        #     self.canvas_layer_data[text].insert(3, created_arrow_line)
+        # else:
+        #     self.canvas_layer_data[text].insert(3, None)
 
 
 #Main start point of program
@@ -682,3 +582,198 @@ if __name__ == "__main__":
     window.bind("<Configure>", app.window_resized)
 
     window.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+    """Draws rectangles in the rectangle stack for each material in self.materials"""
+    def draw_rectangle_stack_test(self):
+        #Clear all existing rectangles
+        self.canvas.delete("all")
+
+        #Draw lines around the new canvas
+        self.draw_canvas_boundaries()
+
+        #Main drawing point of stack and width of stack 
+        rectangle_x0 = 2                                    #Top-left X-coordinate of rectangle
+        rectangle_y0 = 2                                    #Top-left Y-coordinate of rectangle       
+        rectangle_x1 = self.canvas.winfo_reqwidth() - 100   #Bottom-right X-coordinate of rectangle (leave a little space for text
+        rectangle_y1 = self.canvas.winfo_reqheight() - 3    #Bottom-right Y-coordinate of rectangle (-3 is a manually added variable to keep the rectanlge inside the canvas)
+       
+        #Scaling factor decides the size of each rectangle when drawn. The current algorithm ensures that the rectangle stack is not drawn out of bounds 
+        scaling_factor = (self.canvas.winfo_reqheight()/(self.material_max_thickness+18))/len(self.materials)   #The +18 value is a manual fix so that the rectangle is not drawn outside the canvas
+        
+        #Variables to prevent text box overlapping
+        previous_text_bbox_y0 = None                 #Keep track of the height of the text boxes so that they don't overlap each other
+        first_material_drawn = False                 #Keep track if the first material is created to draw the text boxes correctly
+        
+        #Counter for adding elements to canvas_layer_data
+        i = 0
+
+        #Loop through all the materials and draw rectangle and labels for each
+        for material in self.materials:
+            rectangle_height = int(self.materials[material][0]) * scaling_factor        #How tall the rectangle should be drawn, adjusted by the scaling factor (thickness * scaling_factor)
+
+            #Draw rectangles on top of the other
+            rectangle_y0 = rectangle_y1 - rectangle_height
+            created_rectangle = self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")  # Draw rectangle and fill it with a color
+            
+            #####   DRAW TEXT, BOXES AND ARROW SOLUTIONS   #####
+
+            label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
+            
+            
+            #if the rectangle height is big enough, write material name in middle of rectangle
+            if(rectangle_height >=30):
+                text_x_pos = (rectangle_x0 + rectangle_x1) / 2                                                                         #X-position of label
+                text_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Y-position of label
+                created_text = self.canvas.create_text(text_x_pos, text_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
+                created_arrow_line = None
+                created_text_box = None
+            
+            
+            
+    
+            
+            
+            
+            
+            
+            #if the rectangle height is to low to display text, write material name on side of box
+            else:
+                #Calculate what the current text position should be
+                text_x_pos = rectangle_x1 + 60                                                                                         #Text x-position (+50 to leave a little space from the rectangle)
+                text_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Text y-position
+                
+                #Write text - might end up being modified by the code below
+                created_text = self.canvas.create_text(text_x_pos, text_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")
+                                
+                #if this is the first text to be written:
+                if(first_material_drawn == False):
+                    #Find the bounding box coordinates of text
+                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
+
+                    #if the bounding box coordinates of text are lower then the canvas line
+                    if(text_bbox_y1 > self.canvas_height):
+                        #Get the height of the text's bounding box
+                        text_bbox_height = text_bbox_y1 - text_bbox_y0
+                        #Update the text coordinates so that the bounding box is not under the canvas
+                        self.canvas.coords(created_text, text_x_pos, self.canvas_height - (text_bbox_height/2))
+                        #Draw box around the text
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Get new bounding box coordinates of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
+                        #Draw arrow from middle of text box to middle of rectangle
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,text_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        #Set the "previous_bbox_y0" to whatever this bounding box y0 is
+                        previous_text_bbox_y0 = text_bbox_y0
+                        #Confirm that the first text is written
+                        first_material_drawn = True
+
+                    #The bounding box coordinates is NOT lower than the canvas line
+                    else:
+                        #Draw box around text
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Get the height of the text's bounding box
+                        text_bbox_height = text_bbox_y1 - text_bbox_y0
+                        #Draw arrow from middle of text box to middle of rectangle
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,text_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        #Set the "previous_bbox_y0" to whatever this bounding box y0 is
+                        previous_text_bbox_y0 = text_bbox_y0
+                        #Confirm that the first text is written
+                        first_material_drawn = True
+
+
+                #This is not the first text to be written
+                else:
+                    #Find the bounding box coordinates of text
+                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
+                    #Get the height of the text's bounding box
+                    text_bbox_height = text_bbox_y1 - text_bbox_y0
+                    
+                    #if this text's bounding box is overlapping the previous bounding box
+                    if(text_bbox_y1 > previous_text_bbox_y0):
+                        #Update the text coordinates so that the bounding box is not overlapping the previous text box
+                        self.canvas.coords(created_text, text_x_pos, previous_text_bbox_y0 - (text_bbox_height/2))
+                        #Draw box around text
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Find the NEW bounding box coordinates of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text) #Get bounding box of text
+                        #Draw arrow from box to rectangle
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,text_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        #Set the "previous_bbox_y0" to whatever this bounding box y0 is
+                        previous_text_bbox_y0 = text_bbox_y0
+                    
+                    #This text bbox is NOT overlapping with the previous text
+                    else:
+                        #Draw box around the text
+                        created_text_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Draw arrow from box to rectangle
+                        created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,text_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        #Set the "previous_bbox_y0" to whatever this bounding box y0 is
+                        previous_text_bbox_y0 = text_bbox_y0
+            
+            #Add newly created rectangle, text, text_box and line to canvas_layer_data dictionary
+            self.canvas_layer_data[i] =[created_rectangle, created_text, created_text_box, created_arrow_line]
+
+            #Update the rectangle coordinates so that the rectangles are not overlapping each other
+            rectangle_y1 = rectangle_y0
+
+            #Increment counter for adding elements to canvas_layer_data dictionary
+            i+=1
