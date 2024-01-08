@@ -56,8 +56,9 @@ class App:
         #Draw the material stack
         self.draw_rectangle_stack()
 
-
-    """Creates a canvas to draw rectangle stack on"""
+    """
+    -Creates a canvas to draw rectangle stack on
+    -Detects click, drag and zoom events on the canvas"""
     def create_canvas(self, canvas_width, canvas_height):
         #Create canvas with the given height&width and attack it to the top of the window
         self.canvas = Canvas(self.window, width=canvas_width, height=canvas_height)
@@ -65,6 +66,49 @@ class App:
 
         #Draw lines around the created canvas
         self.draw_canvas_boundaries()
+
+        #Listen to mouse buttonpress, motion and zoom events
+        self.canvas.bind("<ButtonPress-1>", self.click_on_canvas)
+        self.canvas.bind("<B1-Motion>", self.canvas_drag)
+        self.canvas.bind("<MouseWheel>", self.canvas_zoom)
+    
+
+    """Draws lines around the canvas showing where things can be drawn"""
+    def draw_canvas_boundaries(self):
+        #Draw lines around canvas (top left x,y MUST be 2,2, some of the values must be manually adjusted to fit the window)
+        self.canvas.create_line(2,2, self.canvas.winfo_reqwidth(), 2, fill="black")
+        self.canvas.create_line(2,2, 2, self.canvas.winfo_reqheight(), fill="black")
+        self.canvas.create_line(2, self.canvas.winfo_reqheight()-3, self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()-3, fill="black")        
+        self.canvas.create_line(self.canvas.winfo_reqwidth()-3,2, self.canvas.winfo_reqwidth()-3, self.canvas.winfo_reqheight()-3, fill="black")
+
+
+    """Remembers the initial mouse click-position on the canvas"""
+    def click_on_canvas(self, event):
+        # Remember the initial click position for dragging
+        self.canvas.scan_mark(event.x, event.y)
+
+    """Moves the position of the canvas"""
+    def canvas_drag(self, event):
+        # Drag the canvas to a new position
+        self.canvas.scan_dragto(event.x, event.y, gain=1)
+
+    """Scales all the elements on the canvas up or down"""
+    def canvas_zoom(self, event):
+        #How fast the user can zoom in&out
+        zoom_factor = 1.05
+
+        #Check if the mouse wheel is scrolled up or down
+        if event.delta > 0:
+            # Zoom in: Scale all items on the canvas around the mouse cursor
+            self.canvas.scale("all", event.x, event.y, zoom_factor, zoom_factor)
+        elif event.delta < 0:
+            # Zoom out: Scale all items on the canvas around the mouse cursor
+            self.canvas.scale("all", event.x, event.y, 1.0 / zoom_factor, 1.0 / zoom_factor)
+
+    
+    def reset_canvas_position(self):
+        # Reset canvas position to the original coordinates
+        self.canvas.scan_dragto(10, 10, gain=1)
 
 
     """Creates sliders, input and color boxes based on the number of materials in self.materials"""
@@ -127,6 +171,12 @@ class App:
         self.export_layers_button = Button(self.slider_frame, text = "Export layers-svg", command=self.export_layers_as_svg)
         self.export_layers_button.grid(row=row_counter, column=1, padx=5)
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
+
+        row_counter += 1
+
+        self.reset_canvas_position_button = Button(self.slider_frame, text="Reset Canvas Position", command=self.reset_canvas_position)
+        self.reset_canvas_position_button.grid(row=row_counter, column=0)
+    
     
     """Updates the Material_max_thickness variable and slider ranging values when the Max Thickness entry is updated"""
     def update_max_thickness_entry(self, event, entry_box):
@@ -180,32 +230,6 @@ class App:
             messagebox.showerror("Error", "The value you entered is out of range")
 
 
-    def entry_updated_test(self, event, entry_box, slider):
-        """
-        -Get the entry value
-        -Set the entry value to its materials
-        -Loop through the materials and find the one with the biggest thickness value
-        -Set the max_thickness value to this value
-        """
-
-        #Get the value entered in the entry box
-        entry_value = int(entry_box.get())
-
-        #Set the entry value to its material
-        slider_name = slider.cget("label")                  #Get the label/name of the slider
-        self.materials[slider_name][0] = entry_value        #Assign the value of the entry box to its position in the materials dictionary
-        slider.set(entry_value)                             #Apply the value change to the corresponding slider also
-
-        #Update the max_material_thickness value to the biggest value of the materials
-        biggest_thickness_value = 0
-        for material in self.materials:
-            if(self.materials[material][0] > biggest_thickness_value):
-                biggest_thickness_value = self.materials[material][0]
-                self.material_max_thickness = biggest_thickness_value
-
-        self.draw_rectangle_stack()                         #Redraw the rectangle stack
-
-
     """Calls draw_rectangle_stack when the program window is adjusted"""
     def window_resized(self, event):        
         #Create the new canvas sizes        
@@ -217,15 +241,6 @@ class App:
 
         #Redraw the rectangle stack based on the new width and height of the program window
         self.draw_rectangle_stack()
-
-
-    """Draws lines around the canvas showing where things can be drawn"""
-    def draw_canvas_boundaries(self):
-        #Draw lines around canvas (top left x,y MUST be 2,2, some of the values must be manually adjusted to fit the window)
-        self.canvas.create_line(2,2, self.canvas.winfo_reqwidth(), 2, fill="green")
-        self.canvas.create_line(2,2, 2, self.canvas.winfo_reqheight(), fill="black")
-        self.canvas.create_line(2, self.canvas.winfo_reqheight()-3, self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()-3, fill="blue")        
-        self.canvas.create_line(self.canvas.winfo_reqwidth()-3,2, self.canvas.winfo_reqwidth()-3, self.canvas.winfo_reqheight()-3, fill="black")
 
 
     """Draws rectangles in the rectangle stack for each material in self.materials"""
@@ -534,38 +549,6 @@ class App:
                 f.close()
 
 
-    """
-    -Creates a text at a given position with a bounding box around it.
-    -Creates an arrow pointing from the box to a given point on the canvas
-    -Adds the text, bounding_box and arrow_line to canvas_layer_data
-    """
-    def create_PointingTextLabel(self, text, text_Xpos, text_Ypos, arrow_Xpoint=None, arrow_Ypoint=None):
-        #Write text
-        created_text = self.canvas.create_text(text_Xpos, text_Ypos, text=text, fill="black", font=("Arial", 8), anchor="center", tags="material_text")
-                                
-        #Find the bounding box coordinates of text and height of bounding box
-        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text)
-        text_bbox_height = text_bbox_y1 - text_bbox_y0
-
-        #Draw box around the text
-        created_bounding_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
-
-        #Draw arrow line if coordinates are provided
-        if(arrow_Xpoint and arrow_Ypoint):
-            created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (arrow_Xpoint, arrow_Ypoint), arrow=tk.LAST, tags="arrow_line")
-
-        # #Create a key in the canvas_layer_data for this layer if it does not exist
-        # if(not text in self.canvas_layer_data):
-        #     self.canvas_layer_data[text] = []
-
-        # #Add newly created rectangle, text, text_box and line to canvas_layer_data dictionary
-        # self.canvas_layer_data[text].insert(1, created_text)
-        # self.canvas_layer_data[text].insert(2, created_bounding_box)
-        # if(created_arrow_line):
-        #     self.canvas_layer_data[text].insert(3, created_arrow_line)
-        # else:
-        #     self.canvas_layer_data[text].insert(3, None)
-
 
 #Main start point of program
 if __name__ == "__main__":
@@ -633,13 +616,37 @@ if __name__ == "__main__":
 
 
 
+    """
+    -Creates a text at a given position with a bounding box around it.
+    -Creates an arrow pointing from the box to a given point on the canvas
+    -Adds the text, bounding_box and arrow_line to canvas_layer_data
+    """
+    def create_PointingTextLabel(self, text, text_Xpos, text_Ypos, arrow_Xpoint=None, arrow_Ypoint=None):
+        #Write text
+        created_text = self.canvas.create_text(text_Xpos, text_Ypos, text=text, fill="black", font=("Arial", 8), anchor="center", tags="material_text")
+                                
+        #Find the bounding box coordinates of text and height of bounding box
+        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text)
+        text_bbox_height = text_bbox_y1 - text_bbox_y0
 
+        #Draw box around the text
+        created_bounding_box = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_box")
 
+        #Draw arrow line if coordinates are provided
+        if(arrow_Xpoint and arrow_Ypoint):
+            created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (arrow_Xpoint, arrow_Ypoint), arrow=tk.LAST, tags="arrow_line")
 
+        # #Create a key in the canvas_layer_data for this layer if it does not exist
+        # if(not text in self.canvas_layer_data):
+        #     self.canvas_layer_data[text] = []
 
-
-
-    
+        # #Add newly created rectangle, text, text_box and line to canvas_layer_data dictionary
+        # self.canvas_layer_data[text].insert(1, created_text)
+        # self.canvas_layer_data[text].insert(2, created_bounding_box)
+        # if(created_arrow_line):
+        #     self.canvas_layer_data[text].insert(3, created_arrow_line)
+        # else:
+        #     self.canvas_layer_data[text].insert(3, None)
 
 
     """Draws rectangles in the rectangle stack for each material in self.materials"""
@@ -777,3 +784,29 @@ if __name__ == "__main__":
 
             #Increment counter for adding elements to canvas_layer_data dictionary
             i+=1
+
+
+    def entry_updated_test(self, event, entry_box, slider):
+        """
+        -Get the entry value
+        -Set the entry value to its materials
+        -Loop through the materials and find the one with the biggest thickness value
+        -Set the max_thickness value to this value
+        """
+
+        #Get the value entered in the entry box
+        entry_value = int(entry_box.get())
+
+        #Set the entry value to its material
+        slider_name = slider.cget("label")                  #Get the label/name of the slider
+        self.materials[slider_name][0] = entry_value        #Assign the value of the entry box to its position in the materials dictionary
+        slider.set(entry_value)                             #Apply the value change to the corresponding slider also
+
+        #Update the max_material_thickness value to the biggest value of the materials
+        biggest_thickness_value = 0
+        for material in self.materials:
+            if(self.materials[material][0] > biggest_thickness_value):
+                biggest_thickness_value = self.materials[material][0]
+                self.material_max_thickness = biggest_thickness_value
+
+        self.draw_rectangle_stack()                         #Redraw the rectangle stack
