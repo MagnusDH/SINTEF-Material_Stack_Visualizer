@@ -7,10 +7,6 @@ import pyautogui
 import os
 
 """
-2. Subscript hvis mulig: eks. SiO2 -> SiO2 (ikke oppe men nede) (IKKE MULIG FORDI: ikke alle karakterer kan bli til subscript og svg støtter ikke subscripts)
-5. To avbildninger side om side:
-    -Stack inkl. BOX (Zoom-out)
-    -Close-up av øverste sjikt – firkant for AOI
 -Ta en titt på hvorfor jeg har lagt til canvas_width og height i starten, fordi disse er unødvendig i starten
 
 -Krympt alt på programmet slik at det passer i programvinduet
@@ -20,7 +16,7 @@ class App:
     def __init__(self, window):
         
         #SETTINGS
-        self.app_title = "Material Measurements"
+        self.app_title = "Layer-stack visualizer"
         self.window_width = 800                     #Start width of app window
         self.window_height = 900                    #Start height of app window
         self.canvas_width = 600                     #Width of the canvas where things are drawn
@@ -37,16 +33,11 @@ class App:
         #A dictionary containing data for each layer on the canvas. Key is the layer number, value is a list[rectangle_id, text_id, text_box, line_id]
         self.canvas_layer_data = {}
 
+        self.initial_canvas_state = {}
+
         #Necessary to draw the rectangles correctly on the canvas. The padding values are added manually in the code
         self.total_padding_x = 0
         self.total_padding_y = 0
-
-        self.canvas = None
-        # self.zoom_canvas = None
-        self.current_scale = 1.0
-
-        
-
          
     """Calls all functions"""
     def run_application(self):        
@@ -65,78 +56,14 @@ class App:
         self.canvas = Canvas(self.window, width=self.canvas_width, height=self.canvas_height)   
         self.canvas.grid(row=0, column=1, sticky="n")
 
+        #Listen to mouse buttonpress, motion and zoom events
+        self.canvas.bind("<ButtonPress-1>", lambda event, canvas=self.canvas: self.click_on_canvas(event, self.canvas))
+        self.canvas.bind("<B1-Motion>", lambda event, canvas=self.canvas: self.canvas_drag(event, self.canvas))
+        self.canvas.bind("<MouseWheel>", lambda event, canvas=self.canvas: self.canvas_zoom(event, self.canvas))
+
         #Draw the material stack
         self.draw_rectangle_stack_filled(self.canvas)
     
-    """Draws lines around the canvas showing where things can be drawn"""
-    def draw_canvas_boundaries(self, canvas):
-        #Draw lines around canvas (top left x,y MUST be 2,2, some of the values must be manually adjusted to fit the window)
-        x0 = 2
-        y0 = 2
-        x1 = canvas.winfo_reqwidth()-3
-        y1 = canvas.winfo_reqheight()-3
-
-        canvas.create_rectangle(x0, y0, x1, y1, outline='black', tags="canvas_bbox")
-
-    """Remembers the initial mouse click-position on the canvas"""
-    def click_on_canvas(self, event, canvas):
-        # Remember the initial click position for dragging
-        canvas.scan_mark(event.x, event.y)
-
-    """Moves the position of the canvas"""
-    def canvas_drag(self, event, canvas):
-        # Drag the canvas to a new position
-        canvas.scan_dragto(event.x, event.y, gain=1)
-
-    """Scales all the elements on the canvas up or down"""
-    def canvas_zoom(self, event, canvas):
-        #How fast the user can zoom in&out
-        self.zoom_factor = 1.05
-
-        #Check if the mouse wheel is scrolled up or down
-        if event.delta > 0:
-            # Zoom in: Scale all items on the canvas around the mouse cursor
-            canvas.scale("all", event.x, event.y, self.zoom_factor, self.zoom_factor)
-            self.current_scale *= self.zoom_factor
-        elif event.delta < 0:
-            # Zoom out: Scale all items on the canvas around the mouse cursor
-            canvas.scale("all", event.x, event.y, 1.0 / self.zoom_factor, 1.0 / self.zoom_factor)
-            self.current_scale /= self.zoom_factor
-        
-        self.update_zoom_box()
-
-    def open_zoom_window(self):
-        zoom_window = tk.Toplevel(self.window)
-        zoom_window.title("Zoom")
-        zoom_window.geometry(f"{self.canvas_width+10}x{self.canvas_height}")
-
-        self.zoom_canvas = Canvas(zoom_window, width=self.canvas_width, height=self.canvas_height)
-        self.zoom_canvas.grid(row=0, column=0)
-
-        #Listen to mouse buttonpress, motion and zoom events
-        self.zoom_canvas.bind("<ButtonPress-1>", lambda event, canvas=self.zoom_canvas: self.click_on_canvas(event, self.zoom_canvas))
-        self.zoom_canvas.bind("<B1-Motion>", lambda event, canvas=self.zoom_canvas: self.canvas_drag(event, self.zoom_canvas))
-        self.zoom_canvas.bind("<MouseWheel>", lambda event, canvas=self.zoom_canvas: self.canvas_zoom(event, self.zoom_canvas))
-        
-        #Visualize where the canvas is
-        self.draw_canvas_boundaries(self.zoom_canvas)
-
-        #Draw rectangle stack in the new window
-        self.draw_rectangle_stack_filled(self.zoom_canvas)
-
-        self.update_zoom_box()
-
-    def update_zoom_box(self):
-
-        zoom_rec_x0 = 50 / self.current_scale
-        zoom_rec_y0 = 50 / self.current_scale
-        zoom_rec_x1 = 100 / self.current_scale
-        zoom_rec_y1 = 100 / self.current_scale
-
-
-        self.draw_rectangle_stack_filled(self.canvas)
-        self.canvas.create_rectangle(zoom_rec_x0, zoom_rec_y0, zoom_rec_x1, zoom_rec_y1, outline="red", width=5, tag="zoom_rectangle")
-
     """Creates sliders, input and color boxes based on the number of materials in self.materials"""
     def create_user_interface(self):
         #Create frame within the main window to contain sliders, color&input widgets
@@ -159,11 +86,6 @@ class App:
         #Create color boxes, sliders, input boxes and labels
         row_counter = 1 #Row counter
         for material in self.materials:
-            # Create color boxes and place them on grid
-            # color_box = Label(self.slider_frame, bg=self.materials[material][1], width=2, justify=tk.RIGHT)                           #Creation of color box in the slider frame
-            # color_box.grid(row=i, column=1)#, padx=5, pady=5)                                                         #Color box placement
-            # self.total_padding_y += (5*2)  #Add padding for this widget (+10 for both sides of the widget)
-
             #Create sliders
             slider = Scale(self.slider_frame, from_=self.material_min_thickness, to=self.material_max_thickness,
                        orient=HORIZONTAL, label=material, command=lambda value, 
@@ -194,16 +116,50 @@ class App:
         self.export_layers_button.grid(row=row_counter, column=0, padx=5)
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
 
-         #Create button which calls "export_all_as_jpg" function
+        #Create button which calls "export_all_as_jpg" function
         self.export_layers_button = Button(self.slider_frame, text = "Export layers-svg", command=self.export_layers_as_svg)
         self.export_layers_button.grid(row=row_counter, column=1, padx=5)
         self.total_padding_x += (5 * 2)  #Add padding for this widget (+10 for both sides of the widget)
 
         row_counter += 1
 
-        self.zoom_button = Button(self.slider_frame, text="Zoom", command=self.open_zoom_window)
-        self.zoom_button.grid(row=row_counter, column=0)
-    
+        #Reset canvas button
+        self.reset_canvas_button = Button(self.slider_frame, text="Reset", command=self.reset_canvas)
+        self.reset_canvas_button.grid(row=row_counter, column=0)
+
+    """Draws lines around the canvas showing where things can be drawn"""
+    def draw_canvas_boundaries(self, canvas):
+        #Draw lines around canvas (top left x,y MUST be 2,2, some of the values must be manually adjusted to fit the window)
+        x0 = 2
+        y0 = 2
+        x1 = canvas.winfo_reqwidth()-3
+        y1 = canvas.winfo_reqheight()-3
+
+        canvas.create_rectangle(x0, y0, x1, y1, outline='black', tags="canvas_bbox")
+
+    def reset_canvas(self):
+        print("reset canvas")
+
+    """Remembers the initial mouse click-position on the canvas"""
+    def click_on_canvas(self, event, canvas):
+        # Remember the initial click position for dragging
+        canvas.scan_mark(event.x, event.y)
+
+    """Moves the position of the canvas"""
+    def canvas_drag(self, event, canvas):
+        # Drag the canvas to a new position
+        canvas.scan_dragto(event.x, event.y, gain=1)
+
+    """Scales all the elements on the canvas up or down"""
+    def canvas_zoom(self, event, canvas):
+        #Check if the mouse wheel is scrolled up or down
+        if event.delta > 0:
+            # Zoom in: Scale all items on the canvas around the mouse cursor
+            canvas.scale("all", event.x, event.y, self.zoom_factor, self.zoom_factor)
+        elif event.delta < 0:
+            # Zoom out: Scale all items on the canvas around the mouse cursor
+            canvas.scale("all", event.x, event.y, 1.0 / self.zoom_factor, 1.0 / self.zoom_factor)
+        
     """Updates the Material_max_thickness variable and slider ranging values when the Max Thickness entry is updated"""
     def update_max_thickness_entry(self, event, entry_box):
         #Get the entered value
@@ -250,7 +206,6 @@ class App:
         else:
             messagebox.showerror("Error", "The slider value is out of range")
 
-
     """
     -Is called if the entry box is adjusted
     -Updates the self.materials dictionary with the new entry value for its corresponding material
@@ -269,7 +224,6 @@ class App:
 
         else:
             messagebox.showerror("Error", "The value you entered is out of range")
-
 
     """Calls draw_rectangle_stack when the program window is adjusted"""
     def window_resized(self, event):        
@@ -412,6 +366,13 @@ class App:
     
     """Draws the rectangle stack so that it fills the entire canvas"""
     def draw_rectangle_stack_filled(self, canvas):
+        #Variables to prevent text box overlapping
+        previous_text_bbox_y0 = None                #Keep track of the height of the text boxes so that they don't overlap each other
+        previous_text_bbox_y1 = None                #Keep track of the bottom of the text boxes so that they don't overlap each other
+        first_material_drawn = False                #Keep track if the first material is created to draw the text boxes correctly
+        #Counter for adding elements to canvas_layer_data
+        i = 0
+        
         #Clear all existing rectangles
         canvas.delete("all")
         
@@ -424,11 +385,6 @@ class App:
         canvas_bbox_x1 = canvas.bbox("all")[2] - 1
         canvas_bbox_y1 = canvas.bbox("all")[3] - 1
 
-        rectangle_x0 = canvas_bbox_x0
-        rectangle_y0 = canvas_bbox_y0
-        rectangle_x1 = canvas_bbox_x1 - 100
-        rectangle_y1 = canvas_bbox_y1
-
         #Get the height of the canvas
         canvas_height = canvas_bbox_y1 - canvas_bbox_y0
         
@@ -438,149 +394,191 @@ class App:
             rectangle_height = int(self.materials[material][0])
             sum_of_all_materials += rectangle_height
 
+        #Prepare rectangle drawing coordinates
+        rectangle_x0 = canvas_bbox_x0
+        rectangle_y0 = canvas_bbox_y0
+        rectangle_x1 = canvas_bbox_x1 - 150
+        rectangle_y1 = canvas_bbox_y1
+
         #Draw rectangles on canvas
         for material in self.materials:
+            #Create name to be displayed in or outside rectangle
+            material_text = str(material) + " " + str(self.materials[material][0]) + "nm"
             #find how many percent the current rectangle's height is of the total sum of materials
             rectangle_height = int(self.materials[material][0])
             rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
 
-            #How many pixels the rectangle_percentage would fill of the entire canvas
+            #Convert rectangle percentage to pixels
             rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
             
-            #draw rectangle from bottom of canvas to its number of pixles in height
-            created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y0+rectangle_height_pixels, fill=self.materials[material][1])
+            #draw rectangle from top of canvas to its number of pixles in height
+            rectangle_y1 = rectangle_y0 + rectangle_height_pixels
+            created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1])
             
-            #Write material name and thickness inside rectangle 
+            #If rectangle is high enough: Write material name and thickness inside rectangle
             if(rectangle_height_pixels > 35):
-                material_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"
                 label_x_pos = (rectangle_x0 + rectangle_x1) / 2
                 label_y_pos = (rectangle_y0 + rectangle_y0+rectangle_height_pixels) / 2
                 created_text = canvas.create_text(label_x_pos, label_y_pos, text=material_text, fill="black", font=("Arial", self.text_size), anchor="center", tags="Material_label")
+                created_arrow_line = None
+                created_text_box = None
             
-            #Write material name and thickness outside rectangle
+            #If rectangle is to small: Write material name and thickness outside rectangle
             else:
-                material_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"
+                label_x_pos = rectangle_x1 + 100                                                                                         #+50 to leave a little space from the rectangle
+                label_y_pos = (rectangle_y0 + rectangle_y0 + rectangle_height_pixels) / 2
+                
+                #Write text - might end up being modified by the code below
+                created_text = canvas.create_text(label_x_pos, label_y_pos, text=material_text, fill="black", font=("Arial", self.text_size), anchor="center")
 
+                #if this is the first text to be written:
+                if(first_material_drawn == False):
+                    #Find the bounding box coordinates of text
+                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text)
 
+                    #if the bounding box coordinates of text are higher than the top canvas line
+                    if(text_bbox_y0 < canvas_bbox_y0):
+                        #Find out how much of the bbox is over the canvas top line
+                        margin = canvas_bbox_y0 - text_bbox_y0
+                        #Move the text downwards with the calculated margin
+                        canvas.coords(created_text, label_x_pos, label_y_pos+margin)
+                        #Draw box around the text
+                        created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Get new bounding box coordinates of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text) #Get bounding box of text
+                        #Draw arrow from middle of text box to middle of rectangle
+                        created_arrow_line = canvas.create_line(text_bbox_x0, ((text_bbox_y1-text_bbox_y0)/2), rectangle_x1, ((rectangle_y1-rectangle_y0)/2), arrow=tk.LAST, tags="arrow_line")
 
+                        #Set the "previous_bbox_y1" to whatever this bounding box y1 is
+                        previous_text_bbox_y1 = text_bbox_y1
+                        previous_text_bbox_y0 = text_bbox_y0
+                        #Confirm that the first text is written
+                        first_material_drawn = True
 
+                    #If the bottom of bounding box is lower than the bottom of canvas
+                    elif(text_bbox_y1 > canvas_bbox_y1):
+                        #Find how much lower the bbox is than the canvas bottom line
+                        margin = text_bbox_y1 - canvas_bbox_y1
+                        #Move the text uppwards with the calculated margin
+                        canvas.coords(created_text, label_x_pos, label_y_pos-margin)
+                        #Draw box around the text
+                        created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Get new bounding box coordinates of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text)
+                        #Draw arrow from middle of text box to middle of rectangle
+                        created_arrow_line = canvas.create_line(text_bbox_x0, ((text_bbox_y1-text_bbox_y0)/2), rectangle_x1, ((rectangle_y1-rectangle_y0)/2), arrow=tk.LAST, tags="arrow_line")
+
+                        #Set the "previous_bbox_y1" to whatever this bounding box y1 is
+                        previous_text_bbox_y1 = text_bbox_y1
+                        previous_text_bbox_y0 = text_bbox_y0
+                        #Confirm that the first text is written
+                        first_material_drawn = True
+
+                    #The bounding box coordinates is NOT higher than the canvas line
+                    else:
+                        #Draw box around text
+                        created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
+                        # #Get the height of the text's bounding box
+                        text_bbox_height = text_bbox_y1 - text_bbox_y0
+                        #Draw arrow from middle of text box to middle of rectangle
+                        created_arrow_line = canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        #Set the "previous_bbox_y1" to whatever this bounding box y1 is
+                        previous_text_bbox_y1 = text_bbox_y1
+                        previous_text_bbox_y0 = text_bbox_y0
+                        #Confirm that the first text is written
+                        first_material_drawn = True
+
+                #If this is not the first text to be written
+                else:
+                    #Find the bounding box coordinates of text
+                    text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text) #Get bounding box of text
+                    #Get the height of the text's bounding box
+                    text_bbox_height = text_bbox_y1 - text_bbox_y0
+                    
+                    #if this text's bounding box bottom is overlapping the top of previous bounding box
+                    if(text_bbox_y0 < previous_text_bbox_y1):
+                        #Find how much of the bbox is overlapping
+                        margin = previous_text_bbox_y1 - text_bbox_y0
+                        #Update the text coordinates so that the bounding box is not overlapping the previous text box
+                        canvas.coords(created_text, label_x_pos, label_y_pos+margin)
+                        #Draw box around text
+                        created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Find the NEW bounding box coordinates of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text)
+                        #Draw arrow from box to rectangle
+                        created_arrow_line = canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        #Set the "previous_bbox_y0" to whatever this bounding box y0 is
+                        previous_text_bbox_y1 = text_bbox_y1
+                                    
+                    #This text bbox is NOT overlapping with the previous text
+                    else:
+                        #Draw box around the text
+                        created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Draw arrow from box to rectangle
+                        created_arrow_line = canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
+                        #Set the "previous_bbox_y0" to whatever this bounding box y0 is
+                        previous_text_bbox_y1 = text_bbox_y1
+                    
+
+                    #If the bottom of bounding box is lower than the bottom of canvas
+                    if(text_bbox_y1 > canvas_bbox_y1):
+                        print("SHIT")
+                        #Find how much lower the bbox is than the canvas bottom line
+                        margin = text_bbox_y1 - canvas_bbox_y1
+                        #Move the text uppwards with the calculated margin
+                        canvas.coords(created_text, label_x_pos, label_y_pos-margin)
+                        #Draw box around the text
+                        created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
+                        #Get new bounding box coordinates of text
+                        text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text)
+                        #Draw arrow from middle of text box to middle of rectangle
+                        created_arrow_line = canvas.create_line(text_bbox_x0, ((text_bbox_y1-text_bbox_y0)/2), rectangle_x1, ((rectangle_y1-rectangle_y0)/2), arrow=tk.LAST, tags="arrow_line")
+
+                        #Set the "previous_bbox_y1" to whatever this bounding box y1 is
+                        previous_text_bbox_y1 = text_bbox_y1
+                        previous_text_bbox_y0 = text_bbox_y0
+            
+            #Add newly created rectangle, text, text_box and line to canvas_layer_data dictionary
+            self.canvas_layer_data[i] = [created_rectangle, created_text, created_text_box, created_arrow_line]
+
+            #Increment counter for adding elements to canvas_layer_data dictionary
+            i+=1
 
             #Add the number of pixels so that the next rectangle does not overlap this one
             rectangle_y0 += rectangle_height_pixels
-        
-
-        
-
-            
-        # #Variables to prevent text box overlapping
-        # previous_text_bbox_y0 = None                  #Keep track of the height of the text boxes so that they don't overlap each other
-        # first_material_drawn = False                #Keep track if the first material is created to draw the text boxes correctly
-        
-        # #Counter for adding elements to canvas_layer_data
-        # i = 0
-
-        # #Loop through all the materials and draw rectangle and labels for each
-        # for material in self.materials:
-        #     rectangle_height = int(self.materials[material][0]) * scaling_factor        #How tall the rectangle should be drawn, adjusted by the scaling factor (thickness * scaling_factor)
-
-        #     #Draw rectangles on top of the other
-        #     rectangle_y0 = rectangle_y1 - rectangle_height
-        #     created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")  # Draw rectangle and fill it with a color
-            
-        #     #####   DRAW TEXT, BOXES AND ARROW SOLUTIONS   #####
-
-        #     label_text = str(material) + "\n" + str(self.materials[material][0]) + "nm"                                             #Text to be written
-            
-            
-        #     #if the rectangle height is big enough, write material name in middle of rectangle
-        #     if(rectangle_height >=30):
-        #         label_x_pos = (rectangle_x0 + rectangle_x1) / 2                                                                         #X-position of label
-        #         label_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Y-position of label
-        #         created_text = canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")    #Creation of text
-        #         created_arrow_line = None
-        #         created_text_box = None
-        #     #if the rectangle height is to low to display text, write material name on side of box
-        #     else:
-        #         #Calculate what the current text position should be
-        #         label_x_pos = rectangle_x1 + 60                                                                                         #Text x-position (+50 to leave a little space from the rectangle)
-        #         label_y_pos = (rectangle_y0 + rectangle_y1) / 2                                                                         #Text y-position
-                
-        #         #Write text - might end up being modified by the code below
-        #         created_text = canvas.create_text(label_x_pos, label_y_pos, text=label_text, fill="black", font=("Arial", 8), anchor="center")
-                                
-        #         #if this is the first text to be written:
-        #         if(first_material_drawn == False):
-        #             #Find the bounding box coordinates of text
-        #             text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text) #Get bounding box of text
-
-        #             #if the bounding box coordinates of text are lower then the canvas line
-        #             if(text_bbox_y1 > self.canvas_height):
-        #                 #Get the height of the text's bounding box
-        #                 text_bbox_height = text_bbox_y1 - text_bbox_y0
-        #                 #Update the text coordinates so that the bounding box is not under the canvas
-        #                 canvas.coords(created_text, label_x_pos, self.canvas_height - (text_bbox_height/2))
-        #                 #Draw box around the text
-        #                 created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
-        #                 #Get new bounding box coordinates of text
-        #                 text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text) #Get bounding box of text
-        #                 #Draw arrow from middle of text box to middle of rectangle
-        #                 created_arrow_line = canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
-        #                 #Set the "previous_bbox_y0" to whatever this bounding box y0 is
-        #                 previous_text_bbox_y0 = text_bbox_y0
-        #                 #Confirm that the first text is written
-        #                 first_material_drawn = True
-
-        #             #The bounding box coordinates is NOT lower than the canvas line
-        #             else:
-        #                 #Draw box around text
-        #                 created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
-        #                 #Get the height of the text's bounding box
-        #                 text_bbox_height = text_bbox_y1 - text_bbox_y0
-        #                 #Draw arrow from middle of text box to middle of rectangle
-        #                 created_arrow_line = canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
-        #                 #Set the "previous_bbox_y0" to whatever this bounding box y0 is
-        #                 previous_text_bbox_y0 = text_bbox_y0
-        #                 #Confirm that the first text is written
-        #                 first_material_drawn = True
 
 
-        #         #This is not the first text to be written
-        #         else:
-        #             #Find the bounding box coordinates of text
-        #             text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text) #Get bounding box of text
-        #             #Get the height of the text's bounding box
-        #             text_bbox_height = text_bbox_y1 - text_bbox_y0
-                    
-        #             #if this text's bounding box is overlapping the previous bounding box
-        #             if(text_bbox_y1 > previous_text_bbox_y0):
-        #                 #Update the text coordinates so that the bounding box is not overlapping the previous text box
-        #                 canvas.coords(created_text, label_x_pos, previous_text_bbox_y0 - (text_bbox_height/2))
-        #                 #Draw box around text
-        #                 created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
-        #                 #Find the NEW bounding box coordinates of text
-        #                 text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = canvas.bbox(created_text) #Get bounding box of text
-        #                 #Draw arrow from box to rectangle
-        #                 created_arrow_line = canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
-        #                 #Set the "previous_bbox_y0" to whatever this bounding box y0 is
-        #                 previous_text_bbox_y0 = text_bbox_y0
-                    
-        #             #This text bbox is NOT overlapping with the previous text
-        #             else:
-        #                 #Draw box around the text
-        #                 created_text_box = canvas.create_rectangle(canvas.bbox(created_text), outline='black', tags="text_box")
-        #                 #Draw arrow from box to rectangle
-        #                 created_arrow_line = canvas.create_line((text_bbox_x0, text_bbox_y0+text_bbox_height/2), (rectangle_x1,label_y_pos), arrow=tk.LAST, tags="arrow_line")
-        #                 #Set the "previous_bbox_y0" to whatever this bounding box y0 is
-        #                 previous_text_bbox_y0 = text_bbox_y0
-            
-        #     #Add newly created rectangle, text, text_box and line to canvas_layer_data dictionary
-        #     self.canvas_layer_data[i] =[created_rectangle, created_text, created_text_box, created_arrow_line]
 
-        #     #Update the rectangle coordinates so that the rectangles are not overlapping each other
-        #     rectangle_y1 = rectangle_y0
+            """
+            if(first material not drawn)
+                if(box is higher than canvas_top)
+                elif(box is lower than canvas_bottom)
 
-        #     #Increment counter for adding elements to canvas_layer_data dictionary
-        #     i+=1
+            else(first material is drawn)
+                if(box is higher than canvas_top)
+                elif(box_bottom is overlapping the next box_top)
+                elif(box_top is overlapping the next box_bottom)
+                elif(box is lower than canvas_bottom)
+            """
+
+
+            """
+            if(first_material_drawn == False)
+                if(text_bbox_y0 < canvas_bbox_y0)
+                    -adjust text downwards
+                elif(text_bbox_y1 > canvas_bbox_y1)
+                    -adjust text upwards
+
+            else(first_material_drawn == True)
+                if(text_bbox_y0 < canvas_bbox_y0)
+                    -adjust text downwards
+                elif(text_bbox_y1 > canvas_bbox_y1)
+                    -adjust text upwards
+                elif(text_bbox_y0 < previous_text_bbox_y1)
+                    -Adjust text downwards
+                elif(text_bbox_y1 > previous_text_bbox_y0)
+                    -Adjust text u
+            """
 
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
     def load_materials_from_excel(self, excel_file):
@@ -600,7 +598,6 @@ class App:
         #Handle errors
         except Exception as error:
             print(f"Error loading materials from Excel: {error}")
-
 
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
@@ -659,7 +656,6 @@ class App:
 
         #Close the svg file
         f.close()
-
 
     """Exports each layer of the stack with names and arrows as SVG-file"""
     def export_layers_as_svg(self):
