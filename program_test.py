@@ -79,9 +79,11 @@ class App:
         max_thickness_entry.bind("<Return>", lambda event, e=max_thickness_entry: self.update_max_thickness_entry(event, e))                #Listens to updates in the entry/input box
 
         #Slider for adjusting material_max_thickness
-        max_thickness_slider = Scale(self.slider_frame, from_=self.material_min_thickness, to=self.material_max_thickness, orient=HORIZONTAL, command=self.update_max_thickness_slider)
-        max_thickness_slider.grid(row=0, column=2)
-        # max_thickness_slider.set(self.initial_max_thickness)
+        self.max_thickness_slider = Scale(self.slider_frame, from_=self.material_min_thickness, to=self.material_max_thickness, orient=HORIZONTAL, command=self.update_max_thickness_slider)
+        self.max_thickness_slider.grid(row=0, column=2)
+        #Set slider to half the max_thickness
+        self.max_thickness_slider.set(self.material_max_thickness/2)
+
 
         #Create color boxes, sliders, input boxes and labels
         row_counter = 1 #Row counter
@@ -138,7 +140,26 @@ class App:
         canvas.create_rectangle(x0, y0, x1, y1, outline='black', tags="canvas_bbox")
 
     def reset_canvas(self):
-        print("reset canvas")
+        #Reload initial values from Excel file
+        self.load_materials_from_excel(self.excel_file)
+
+        #Delete canvas from program window
+        self.canvas.destroy()
+
+        #Create new canvas
+        self.canvas = Canvas(self.window, width=self.canvas_width, height=self.canvas_height)   
+        self.canvas.grid(row=0, column=1, sticky="n")
+
+        #Listen to mouse buttonpress, motion and zoom events
+        self.canvas.bind("<ButtonPress-1>", lambda event, canvas=self.canvas: self.click_on_canvas(event, self.canvas))
+        self.canvas.bind("<B1-Motion>", lambda event, canvas=self.canvas: self.canvas_drag(event, self.canvas))
+        self.canvas.bind("<MouseWheel>", lambda event, canvas=self.canvas: self.canvas_zoom(event, self.canvas))
+
+        # #Draw borders around new canvas
+        self.draw_canvas_boundaries(self.canvas)
+
+        #Redraw rectangle stack on canvas
+        self.draw_rectangle_stack_filled(self.canvas) 
 
     """Remembers the initial mouse click-position on the canvas"""
     def click_on_canvas(self, event, canvas):
@@ -168,6 +189,9 @@ class App:
         #Set the new max thickness value
         self.material_max_thickness = entry_value
 
+        #Set the max_thickness_slider to half of new value
+        self.max_thickness_slider.set(self.material_max_thickness/2)
+
         #Update slider ranging values
         for element in self.slider_frame.winfo_children():
             if isinstance(element, tk.Scale):
@@ -177,8 +201,10 @@ class App:
         self.draw_rectangle_stack_filled(self.canvas)
 
     def update_max_thickness_slider(self, slider_value):
+            pass
+            
             #Update material_max_thickness based on slider value
-            self.material_max_thickness = int(slider_value)
+            # self.material_max_thickness = int(slider_value)
 
             #Update the entry box to reflect the slider's value
             # self.max_thickness_entry.delete(0, tk.END)
@@ -413,7 +439,7 @@ class App:
             
             #draw rectangle from top of canvas to its number of pixles in height
             rectangle_y1 = rectangle_y0 + rectangle_height_pixels
-            created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1])
+            created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="Rectangle")
             
             #If rectangle is high enough: Write material name and thickness inside rectangle
             if(rectangle_height_pixels > 35):
@@ -601,60 +627,68 @@ class App:
 
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
-        #Define the name of the svg file to be created
+        # Define the name of the svg file to be created
         filename = "stack.svg"
-        
-        #XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
+
+        # XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
         xml_declaration = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
 
-        #Creates the opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
+        # Creates the opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
         svg_open_tag = '<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight())
 
-        #Represents the closing tag for the SVG file.
+        # Represents the closing tag for the SVG file.
         svg_close_tag = '</svg>\n'
 
-        #Retrieve all elements on the canvas
+        # Retrieve all elements on the canvas
         elements = self.canvas.find_all()
 
-        #Specify a folder where the SVG-file should be saved
+        # Specify a folder where the SVG-file should be saved
         folder_path = "svg_exports"
 
-        #Create the folder if it doesn't exist
+        # Create the folder if it doesn't exist
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-        #Create the file path by joining the folder path and the filename
+        # Create the file path by joining the folder path and the filename
         file_path = os.path.join(folder_path, filename)
 
-        #Open the file for writing using a context manager, ensuring proper handling and closure of the file
+        # Open the file for writing using a context manager, ensuring proper handling and closure of the file
         with open(file_path, 'w') as f:
-            f.write(xml_declaration)    #Writes the XML declaration to the file.
-            f.write(svg_open_tag)           #Writes the opening SVG tag to the file
+            f.write(xml_declaration)  # Writes the XML declaration to the file.
+            f.write(svg_open_tag)  # Writes the opening SVG tag to the file
 
-            #Iterate through all the elements found in the canvas
+            # Iterate through all the elements found in the canvas
             for element in elements:
-                
-                #Check the type of canvas item
+
+                # Check the type of canvas item
                 item_type = self.canvas.type(element)
 
-
-                #Constructs an SVG <rect> element for rectangles. (If the outline of a rectangle is "black" then it is considered as a text-box rectangle and is NOT included)
+                # Constructs an SVG <rect> element for rectangles. (If the outline of a rectangle is "black" then it is considered as a text-box rectangle and is NOT included)
                 if item_type == "rectangle" and self.canvas.itemcget(element, 'outline') != 'black':
-                    svg_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(
-                        self.canvas.coords(element)[0],                                     #Retrieves the coordinates of the rectangle
-                        self.canvas.coords(element)[1],                                     #Retrieves the coordinates of the rectangle
-                        self.canvas.coords(element)[2] - self.canvas.coords(element)[0],    #Retrieves the coordinates of the rectangle
-                        self.canvas.coords(element)[3] - self.canvas.coords(element)[1],    #Retrieves the coordinates of the rectangle
-                        self.canvas.itemcget(element, 'fill')                               #fill color of the rectangle from the canvas
+                    # Retrieve the coordinates of the rectangle
+                    rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(element)
+
+                    # Construct an SVG <rect> element for the rectangle
+                    svg_rect_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(
+                        rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, self.canvas.itemcget(element, 'fill')
                     )
 
-                    #Write the SVG representation of the rectangle to the file.
-                    f.write(svg_element)
+                    # Write the SVG representation of the rectangle to the file
+                    f.write(svg_rect_element)
 
-            #Writes the closing SVG tag to the file, completing the SVG file.
+                    # Construct an SVG <rect> element for the bounding box
+                    bbox_x0, bbox_y0, bbox_x1, bbox_y1 = rect_x0, rect_y0, rect_x1, rect_y1
+                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(
+                        bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0
+                    )
+
+                    # Write the SVG representation of the bounding box to the file
+                    f.write(svg_bbox_element)
+
+            # Writes the closing SVG tag to the file, completing the SVG file.
             f.write(svg_close_tag)
 
-        #Close the svg file
+        # Close the svg file
         f.close()
 
     """Exports each layer of the stack with names and arrows as SVG-file"""
@@ -695,6 +729,11 @@ class App:
                     #Write the SVG representation of the rectangle to the file
                     f.write(svg_element)
 
+                    #Construct an SVG <rect> element for the bounding box
+                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
+
+                    # Write the SVG representation of the bounding box to the file
+                    f.write(svg_bbox_element)
 
                 #Iterate through all text elements up to the current layer and create SVG text
                 for j in range(i+1):
@@ -702,8 +741,15 @@ class App:
                     label_x, label_y = self.canvas.coords(text_id)  # Retrieve the coordinates of the text
                     text_content = self.canvas.itemcget(text_id, 'text')  # Retrieve text content from the canvas
 
+                    # Construct an SVG <rect> element for the bounding box
+                    bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(text_id)
+                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+
+                    # Write the SVG representation of the bounding box to the file
+                    f.write(svg_bbox_element)
+
                     #Construct an SVG <text> element for text
-                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="14" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(label_x+25, label_y, text_content)
+                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="14" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(label_x, label_y, text_content)
 
                     #Write the SVG representation of the text to the file
                     f.write(svg_text_element)
