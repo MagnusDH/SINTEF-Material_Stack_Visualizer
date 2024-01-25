@@ -6,11 +6,6 @@ import pygetwindow
 import pyautogui
 import os
 
-"""
--Ta en titt på hvorfor jeg har lagt til canvas_width og height i starten, fordi disse er unødvendig i starten
-
--Krympt alt på programmet slik at det passer i programvinduet
-"""
 
 class App:
     def __init__(self, window):
@@ -19,8 +14,8 @@ class App:
         self.app_title = "Layer-stack visualizer"
         self.window_width = 800                     #Start width of app window
         self.window_height = 900                    #Start height of app window
-        self.canvas_width = 600                     #Width of the canvas where things are drawn
-        self.canvas_height = 600                    #Height of the canvas where things are drawn
+        self.canvas_width = 60                     #Width of the canvas where things are drawn
+        self.canvas_height = 60                    #Height of the canvas where things are drawn
         self.material_min_thickness = 1             #Minimum thickness of materials
         self.material_max_thickness = 6000          #Maximum thickness of materials
         self.excel_file = "Materials.xlsx"          #Excel-file to load materials from
@@ -126,8 +121,12 @@ class App:
         row_counter += 1
 
         #Reset canvas button
-        self.reset_canvas_button = Button(self.slider_frame, text="Reset", command=self.reset_canvas)
+        self.reset_canvas_button = Button(self.slider_frame, text="Reset canvas", command=self.reset_canvas)
         self.reset_canvas_button.grid(row=row_counter, column=0)
+
+        #Reset values button
+        self.reset_values_button = Button(self.slider_frame, text="Reset values", command=self.reset_values)
+        self.reset_values_button.grid(row=row_counter, column=1)
 
     """Draws lines around the canvas showing where things can be drawn"""
     def draw_canvas_boundaries(self, canvas):
@@ -139,10 +138,8 @@ class App:
 
         canvas.create_rectangle(x0, y0, x1, y1, outline='black', tags="canvas_bbox")
 
+    """Sets the canvas back to its original position"""
     def reset_canvas(self):
-        #Reload initial values from Excel file
-        self.load_materials_from_excel(self.excel_file)
-
         #Delete canvas from program window
         self.canvas.destroy()
 
@@ -155,11 +152,32 @@ class App:
         self.canvas.bind("<B1-Motion>", lambda event, canvas=self.canvas: self.canvas_drag(event, self.canvas))
         self.canvas.bind("<MouseWheel>", lambda event, canvas=self.canvas: self.canvas_zoom(event, self.canvas))
 
-        # #Draw borders around new canvas
+        #Draw borders around new canvas
         self.draw_canvas_boundaries(self.canvas)
 
         #Redraw rectangle stack on canvas
-        self.draw_rectangle_stack_filled(self.canvas) 
+        self.draw_rectangle_stack_filled(self.canvas)
+
+    """Sets the values in self.materials back to initial values and draws rectangle stack again"""
+    def reset_values(self):
+        #Reload initial values from Excel file
+        self.load_materials_from_excel(self.excel_file)
+
+        #Redraw rectangle stack on canvas
+        self.draw_rectangle_stack_filled(self.canvas)
+
+        #Get sliders from the slider_frame 
+        widgets = self.slider_frame.winfo_children()        
+        sliders = []
+        for widget in widgets:
+            if isinstance(widget, tk.Scale):
+                sliders.append(widget)
+
+        #Set slider values to initial value
+        i = 0
+        for material in self.materials:
+            sliders[i].set(self.materials[material][0])
+            i+=1
 
     """Remembers the initial mouse click-position on the canvas"""
     def click_on_canvas(self, event, canvas):
@@ -199,7 +217,7 @@ class App:
 
         #Redraw the rectangle stack according to the current max_thickness value
         self.draw_rectangle_stack_filled(self.canvas)
-
+        
     def update_max_thickness_slider(self, slider_value):
             pass
             
@@ -548,7 +566,7 @@ class App:
 
                     #If the bottom of bounding box is lower than the bottom of canvas
                     if(text_bbox_y1 > canvas_bbox_y1):
-                        print("SHIT")
+                        print("...")
                         #Find how much lower the bbox is than the canvas bottom line
                         margin = text_bbox_y1 - canvas_bbox_y1
                         #Move the text uppwards with the calculated margin
@@ -585,6 +603,16 @@ class App:
                 elif(box_bottom is overlapping the next box_top)
                 elif(box_top is overlapping the next box_bottom)
                 elif(box is lower than canvas_bottom)
+            """
+
+            """
+            -Draw all texts and bbox'es next to rectangle no matter what
+            -Get a list of all texts and bbox'es on canvas
+            -Go through each text element in list
+                -if(bbox'es y0 is lower than canvas top OR y1 is higher than canvas bottom)
+                    -adjust text up or down
+                -else:
+                    -
             """
 
 
