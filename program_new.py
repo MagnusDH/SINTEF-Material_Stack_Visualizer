@@ -22,11 +22,11 @@ class App:
     def __init__(self, window):
         self.program_title = "Layer stack visualizer"
         self.program_window_width = 600                 #Initial width of program window
-        self.program_window_height = 800                #Initial height of program window
+        self.program_window_height = 850                #Initial height of program window
         self.excel_file = "Materials.xlsx"              #Excel-file to load materials from
 
         #Dictionary containing all materials.
-        self.materials = {}                             #KEY["material_name"] -VALUE: list[thickness, color]
+        self.materials = {}                             #KEY["material_name"] -VALUE: list[thickness, color, rectangle_id, slider_id, entry_id]
 
         #Set program_window title and dimensions
         window.title(self.program_title)
@@ -50,9 +50,17 @@ class App:
         for material in self.materials:
             # Create label and place it
             label = Label(user_interface_frame, text=material)
-            label.grid(row=row_counter, column=0, sticky="nw", padx=(50,0))
-            label_height = label.winfo_reqheight()-7
+            label.grid(row=row_counter, column=0, sticky="nw", padx=(0,0))
+            label_height = label.winfo_reqheight()
            
+            #Create entry and place it
+            entry = Entry(user_interface_frame, 
+                textvariable=StringVar(value=str(self.materials[material][0])), 
+                bg="lightgrey"
+            )
+            entry.grid(row=row_counter, column=0, sticky="ne", pady=(2,0), padx=(0, 5))
+            entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(event, e))
+
             #Create slider and place it
             slider = Scale(user_interface_frame,
                 from_=1,
@@ -61,21 +69,45 @@ class App:
                 width=10, 
                 length=300, 
                 troughcolor=self.materials[material][1],
+                command=lambda value, identifier=material: self.material_slider_updated(value, identifier)
             )
-            slider.grid(row=row_counter, column=0, sticky="s", pady=(label_height, 0))
+            slider.grid(row=row_counter, column=0, sticky="s", pady=(label_height, 10))
             slider.set(self.materials[material][0])
 
-            #Create entry and place it
-            entry = Entry(user_interface_frame, 
-                textvariable=StringVar(value=str(self.materials[material][0])), 
-                bg="lightgrey"
-            )
-            entry.grid(row=row_counter, column=0, sticky="ne", pady=(2,0), padx=(0, 5))
-
+            #Add slider and entry to self.materials to current material
+            self.materials[material][3] = slider 
+            self.materials[material][4] = entry 
+                        
             #Increment row_counter
             row_counter+=1
-
+                
         return user_interface_frame
+
+    """Updates the thickness value in self.materials with the slider value and updates corresponding entry-widget"""
+    def material_slider_updated(self, value, identifier):       
+        #Update the thickness value in self.materials
+        self.materials[identifier][0] = value
+
+        #Update the entry corresponding to key
+        self.materials[identifier][4].delete(0, tk.END)
+        self.materials[identifier][4].insert(0, value)
+
+    """Updates the thickness value in self.materials with the entered value and updates corresponding slider-widget"""
+    def material_entry_updated(self, event, entry):
+        #Find key that corresponds to "entry"
+        for _key, value in self.materials.items():
+            if entry in value:
+                key = _key                          #This is not necessary but it makes it more readable
+                break
+        
+        #Find entered value
+        entered_value = int(entry.get())
+
+        #Update the thickness value in self.materials
+        self.materials[key][0] = entered_value
+
+        #Update the slider corresponding to the key
+        self.materials[key][3].set(entered_value)
 
     """Returns a canvas created in the given program window"""
     def create_canvas(self, window):
@@ -83,7 +115,7 @@ class App:
         window.update()
 
         #Create canvas and place it
-        canvas = Canvas(window, height=self.program_window_height-5, width=self.program_window_width-5-self.user_interface_frame.winfo_width(), bg="lightblue")
+        canvas = Canvas(window, height=self.user_interface_frame.winfo_reqheight(), width=self.program_window_width-5-self.user_interface_frame.winfo_width(), bg="lightblue")
         canvas.grid(row=0, column=1, sticky="n")
 
         #Set bbox coordinates for later use
@@ -96,13 +128,59 @@ class App:
         canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black")
 
         #Listen to mouse buttonpress, motion and zoom events
-        canvas.bind("<ButtonPress-1>", lambda event, canvas=canvas: self.click_on_canvas(event, self.canvas))
-        canvas.bind("<B1-Motion>", lambda event, canvas=canvas: self.canvas_drag(event, self.canvas))
-        canvas.bind("<MouseWheel>", lambda event, canvas=canvas: self.canvas_zoom(event, self.canvas))
+        canvas.bind("<ButtonPress-1>", lambda event, canvas=canvas: self.click_on_canvas(event, canvas))
+        canvas.bind("<B1-Motion>", lambda event, canvas=canvas: self.canvas_drag(event, canvas))
+        canvas.bind("<MouseWheel>", lambda event, canvas=canvas: self.canvas_zoom(event, canvas))
+
+        #Create reset-button under canvas
+        reset_canvas_button = Button(window, text="Reset canvas", command=lambda canvas=canvas: self.reset_canvas(canvas))
+        reset_canvas_button.grid(row=1, column=1, sticky="nw", padx=(10, 0))
+
+        #Create reset-values-button under canvas
+        reset_values_button = Button(window, text="Reset values", command=self.reset_values)
+        reset_values_button.grid(row=1, column=1, sticky="ne", padx=(0, 10))
 
         #Return canvas
         return canvas
 
+    """Deletes the given canvas and creates a new one in its original place"""
+    def reset_canvas(self, canvas):
+        #Delete canvas from program window
+        canvas.destroy()
+
+        #Create a new canvas
+        self.canvas = self.create_canvas(window)
+
+        #Draw rectangle stack
+
+    """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
+    def reset_values(self):
+        #Reload initial values from given excel file
+        try:
+            #Read given excel file into Pandas dataframe
+            excel_data = pd.read_excel(self.excel_file)
+
+            #Loop through the rows in excel_file and populate "self.materials"
+            for index, row in excel_data.iterrows():
+                material_name = row["Material"]
+                material_thickness = row["Thickness"]
+                
+                #Populate material dictionary
+                self.materials[material_name][0] = material_thickness
+                
+                #Update sliders and Entries
+                self.materials[material_name][3].set(material_thickness)
+
+                self.materials[material_name][4].delete(0, tk.END)
+                self.materials[material_name][4].insert(0, material_thickness)
+            
+            #Draw rectangle stack with original values
+
+        
+        #Handle errors
+        except Exception as error:
+            messagebox.showerror("Error", "Could not reset values\nMay be a issue with reading from excel-file")
+        
     """Remembers the initial mouse click-position on the canvas"""
     def click_on_canvas(self, event, canvas):
         canvas.scan_mark(event.x, event.y)
@@ -121,7 +199,6 @@ class App:
         elif event.delta < 0:
             canvas.scale("all", event.x, event.y, 1.0/zoom_factor, 1.0/zoom_factor)
         
-
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
     def load_materials_from_excel(self, excel_file):
         try:
@@ -133,9 +210,12 @@ class App:
                 material_name = row["Material"]
                 material_thickness = row["Thickness"]
                 material_color = row["Color"]
+                rectangle_id = None
+                slider_id = None
+                entry_id = None
                 
                 #Populate material dictionary
-                self.materials[material_name] = [material_thickness, material_color]
+                self.materials[material_name] = [material_thickness, material_color, rectangle_id, slider_id, entry_id]
             
             #Reverse dictionary so that the materials is drawn in correct order
             self.materials = dict(reversed(self.materials.items()))
@@ -144,6 +224,8 @@ class App:
         except Exception as error:
             messagebox.showerror("Error", "Could not load materials from Excel-file")
 
+    def draw_rectangle_stack_filled(self, canvas):
+        pass
 
 #Main start point of program
 if __name__ == "__main__":
