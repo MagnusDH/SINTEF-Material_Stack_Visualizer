@@ -41,6 +41,9 @@ class App:
         #Create a canvas supporting zoom and moving
         self.canvas = self.create_canvas(window)
 
+        #Draw rectangle stack
+        self.draw_rectangle_stack_filled(self.canvas)
+
     def create_user_interface(self, window):
         #Create Frame and place it
         user_interface_frame = Frame(window)
@@ -109,6 +112,9 @@ class App:
         #Update the slider corresponding to the key
         self.materials[key][3].set(entered_value)
 
+        #Draw rectangle stack
+        self.draw_rectangle_stack_filled(self.canvas)
+
     """Returns a canvas created in the given program window"""
     def create_canvas(self, window):
         #Update window to get updated values
@@ -144,14 +150,15 @@ class App:
         return canvas
 
     """Deletes the given canvas and creates a new one in its original place"""
-    def reset_canvas(self, canvas):
+    def reset_canvas(self):
         #Delete canvas from program window
-        canvas.destroy()
+        self.canvas.destroy()
 
         #Create a new canvas
         self.canvas = self.create_canvas(window)
 
         #Draw rectangle stack
+        self.draw_rectangle_stack_filled(self.canvas)
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
     def reset_values(self):
@@ -225,7 +232,66 @@ class App:
             messagebox.showerror("Error", "Could not load materials from Excel-file")
 
     def draw_rectangle_stack_filled(self, canvas):
+        #Clear all existing elements on canvas
+        canvas.delete("all")
+
+        #Draw bounding box around canvas
+        canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black")
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in self.materials:
+            if(material=="substrate"):
+                continue    #Skip substrate
+            rectangle_height = int(self.materials[material][0])
+            sum_of_all_materials += rectangle_height
+        
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0
+        rectangle_y0 = self.visible_canvas_bbox_y0
+        rectangle_x1 = self.visible_canvas_bbox_x1
+        rectangle_y1 = self.visible_canvas_bbox_y1
+
+        #Materials (except "substrate") will be drawn on 9/10 of the canvas
+        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0) * 0.9
+        
+        #Draw rectangles on canvas
+        for material in self.materials:
+            #"substrate" will be drawn on the bottom 1/10 of the canvas
+            if(material == "substrate"):
+                continue
+
+            #find how many percent the current rectangle's height is of the total sum of materials
+            rectangle_height = int(self.materials[material][0])
+            rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+            #Convert rectangle percentage to pixels
+            rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
+
+            #draw rectangle from top of canvas to its number of pixles in height
+            rectangle_y1 = rectangle_y0 + rectangle_height_pixels
+            created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="Rectangle")
+
+            #Add rectangle_id to its place in self.materials
+            self.materials[material][2] = created_rectangle
+
+            #Add rectangle height to prevent overlaping
+            rectangle_y0 += rectangle_height_pixels
+        
+        #Draw "substrate" on 1/10 of the canvas
+        created_rectangle = canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, fill=self.materials["substrate"][1], tags="Rectangle")
+        #Add rectangle_id to its place in self.materials
+        self.materials["substrate"][2] = created_rectangle
+
+    def draw_rectangle_stack_realistic(self, canvas):
         pass
+        #Loop through all materials in self.materials
+        #draw rectangle based on its original size
+
+        
+
+
+
+    
 
 #Main start point of program
 if __name__ == "__main__":

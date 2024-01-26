@@ -690,8 +690,6 @@ class App:
 
         self.write_text_on_rectangles()
 
-
-
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
     def load_materials_from_excel(self, excel_file):
         try:
