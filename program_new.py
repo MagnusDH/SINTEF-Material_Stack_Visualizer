@@ -12,7 +12,7 @@ class App:
         self.program_window_width = 800                 #Initial width of program window
         self.program_window_height = 850                #Initial height of program window
         self.excel_file = "Materials.xlsx"              #Excel-file to load materials from
-        self.switch_layout_counter = 0                  #Used to switch between "draw_rectangle_stack_filled" and "draw_rectangle_stack_realistic"
+        self.switch_layout_counter = 0                  #Used to switch between "draw_material_stack_filled" and "draw_material_stack_realistic"
         
         #Dictionary containing all materials.
         self.materials = {}                             #KEY["material_name"] -VALUE: list[thickness, color, rectangle_id, slider_id, entry_id]
@@ -31,7 +31,7 @@ class App:
         self.canvas = self.create_canvas(window)
 
         #Draw rectangle stack
-        self.draw_rectangle_stack()
+        self.draw_material_stack()
 
     def create_user_interface(self, window):
         #Create Frame and place it
@@ -85,7 +85,7 @@ class App:
         self.materials[identifier][4].insert(0, value)
 
         #Draw rectangle stack
-        self.draw_rectangle_stack()
+        self.draw_material_stack()
 
     """Updates the thickness value in self.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, event, entry):
@@ -105,7 +105,7 @@ class App:
         self.materials[key][3].set(entered_value)
 
         #Draw rectangle stack
-        self.draw_rectangle_stack()
+        self.draw_material_stack()
 
     """Returns a canvas created in the given program window"""
     def create_canvas(self, window):
@@ -154,7 +154,7 @@ class App:
         self.canvas = self.create_canvas(window)
 
         #Draw rectangle stack
-        self.draw_rectangle_stack()
+        self.draw_material_stack()
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
     def reset_values(self):
@@ -178,7 +178,7 @@ class App:
                 self.materials[material_name][4].insert(0, material_thickness)
             
             #Draw rectangle stack with original values
-            self.draw_rectangle_stack()
+            self.draw_material_stack()
         
         #Handle errors
         except Exception as error:
@@ -205,7 +205,7 @@ class App:
     def switch_layout(self):
         self.switch_layout_counter += 1
 
-        self.draw_rectangle_stack()
+        self.draw_material_stack()
 
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
     def load_materials_from_excel(self, excel_file):
@@ -232,13 +232,15 @@ class App:
         except Exception as error:
             messagebox.showerror("Error", "Could not load materials from Excel-file")
 
-    def draw_rectangle_stack(self):
+    """Draws the rectangle stack either filled or realistic based on the "switch_layout_counter"""
+    def draw_material_stack(self):
         if(self.switch_layout_counter % 2 == 0):
-            self.draw_rectangle_stack_filled(self.canvas)
+            self.draw_material_stack_filled(self.canvas)
         else:
-            self.draw_rectangle_stack_realistic(self.canvas)
+            self.draw_material_stack_realistic(self.canvas)
 
-    def draw_rectangle_stack_filled(self, canvas):
+    """Draws the rectangle stack with "substrate" as 1/10 of the canvas"""
+    def draw_material_stack_filled(self, canvas):
         #Clear all existing elements on canvas
         canvas.delete("all")
 
@@ -289,7 +291,8 @@ class App:
         #Add rectangle_id to its place in self.materials
         self.materials["substrate"][2] = created_rectangle
 
-    def draw_rectangle_stack_realistic(self, canvas):
+    """Draws the rectangle stack in a realistic way"""
+    def draw_material_stack_realistic(self, canvas):
         #Clear all existing elements on canvas
         canvas.delete("all")
 
