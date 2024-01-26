@@ -6,25 +6,14 @@ import pygetwindow
 import pyautogui
 import os
 
-"""
-Ide:
-    -legg til alt som tilhører et materiale i self.materials slik:
-        self.materials["name"] = [thickness, color, rectangle_id, slider, entry]
-        NB: husk da å initialiser den med "None" variabler i "load_materials_from_excel"
-            self.materials["name"] = [thickness, color, None, None, None] 
-    
-    -Når all informasjon ligger i self.materials kan det bli lettere å tegne stack, eksportere svg, oppdatere sliders/entries etc...
-
-    -Kanskje du kan bruke "entry.bind" og kalle på en generell update som vil oppdatere stack, sliders, entries basert på det som ligger i self.materials?
-"""
-
 class App:
     def __init__(self, window):
         self.program_title = "Layer stack visualizer"
-        self.program_window_width = 600                 #Initial width of program window
+        self.program_window_width = 800                 #Initial width of program window
         self.program_window_height = 850                #Initial height of program window
         self.excel_file = "Materials.xlsx"              #Excel-file to load materials from
-
+        self.switch_layout_counter = 0                  #Used to switch between "draw_rectangle_stack_filled" and "draw_rectangle_stack_realistic"
+        
         #Dictionary containing all materials.
         self.materials = {}                             #KEY["material_name"] -VALUE: list[thickness, color, rectangle_id, slider_id, entry_id]
 
@@ -42,7 +31,7 @@ class App:
         self.canvas = self.create_canvas(window)
 
         #Draw rectangle stack
-        self.draw_rectangle_stack_filled(self.canvas)
+        self.draw_rectangle_stack()
 
     def create_user_interface(self, window):
         #Create Frame and place it
@@ -95,6 +84,9 @@ class App:
         self.materials[identifier][4].delete(0, tk.END)
         self.materials[identifier][4].insert(0, value)
 
+        #Draw rectangle stack
+        self.draw_rectangle_stack()
+
     """Updates the thickness value in self.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, event, entry):
         #Find key that corresponds to "entry"
@@ -113,12 +105,12 @@ class App:
         self.materials[key][3].set(entered_value)
 
         #Draw rectangle stack
-        self.draw_rectangle_stack_filled(self.canvas)
+        self.draw_rectangle_stack()
 
     """Returns a canvas created in the given program window"""
     def create_canvas(self, window):
         #Update window to get updated values
-        window.update()
+        window.update_idletasks()
 
         #Create canvas and place it
         canvas = Canvas(window, height=self.user_interface_frame.winfo_reqheight(), width=self.program_window_width-5-self.user_interface_frame.winfo_width(), bg="lightblue")
@@ -139,12 +131,16 @@ class App:
         canvas.bind("<MouseWheel>", lambda event, canvas=canvas: self.canvas_zoom(event, canvas))
 
         #Create reset-button under canvas
-        reset_canvas_button = Button(window, text="Reset canvas", command=lambda canvas=canvas: self.reset_canvas(canvas))
-        reset_canvas_button.grid(row=1, column=1, sticky="nw", padx=(10, 0))
+        reset_canvas_button = Button(window, text="Reset canvas", command=self.reset_canvas)
+        reset_canvas_button.grid(row=1, column=1, sticky="nw", padx=(0, 5))
 
         #Create reset-values-button under canvas
         reset_values_button = Button(window, text="Reset values", command=self.reset_values)
-        reset_values_button.grid(row=1, column=1, sticky="ne", padx=(0, 10))
+        reset_values_button.grid(row=1, column=1, sticky="n", padx=(0, 0))
+
+        #Create switch-layout button under canvas
+        switch_layout_button = Button(window, text="Switch layout", command=self.switch_layout)
+        switch_layout_button.grid(row=1, column=1, sticky="ne", padx=(5, 0))
 
         #Return canvas
         return canvas
@@ -158,7 +154,7 @@ class App:
         self.canvas = self.create_canvas(window)
 
         #Draw rectangle stack
-        self.draw_rectangle_stack_filled(self.canvas)
+        self.draw_rectangle_stack()
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
     def reset_values(self):
@@ -182,7 +178,7 @@ class App:
                 self.materials[material_name][4].insert(0, material_thickness)
             
             #Draw rectangle stack with original values
-
+            self.draw_rectangle_stack()
         
         #Handle errors
         except Exception as error:
@@ -205,7 +201,12 @@ class App:
         #Zoom out: Scale all items on the canvas around the mouse cursor
         elif event.delta < 0:
             canvas.scale("all", event.x, event.y, 1.0/zoom_factor, 1.0/zoom_factor)
-        
+    
+    def switch_layout(self):
+        self.switch_layout_counter += 1
+
+        self.draw_rectangle_stack()
+
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
     def load_materials_from_excel(self, excel_file):
         try:
@@ -230,6 +231,12 @@ class App:
         #Handle errors
         except Exception as error:
             messagebox.showerror("Error", "Could not load materials from Excel-file")
+
+    def draw_rectangle_stack(self):
+        if(self.switch_layout_counter % 2 == 0):
+            self.draw_rectangle_stack_filled(self.canvas)
+        else:
+            self.draw_rectangle_stack_realistic(self.canvas)
 
     def draw_rectangle_stack_filled(self, canvas):
         #Clear all existing elements on canvas
@@ -283,16 +290,45 @@ class App:
         self.materials["substrate"][2] = created_rectangle
 
     def draw_rectangle_stack_realistic(self, canvas):
-        pass
-        #Loop through all materials in self.materials
-        #draw rectangle based on its original size
+        #Clear all existing elements on canvas
+        canvas.delete("all")
 
+        #Draw bounding box around canvas
+        canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black")
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in self.materials:
+            rectangle_height = int(self.materials[material][0])
+            sum_of_all_materials += rectangle_height
         
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0
+        rectangle_y0 = self.visible_canvas_bbox_y0
+        rectangle_x1 = self.visible_canvas_bbox_x1
+        rectangle_y1 = self.visible_canvas_bbox_y1
 
+        #Materials (except "substrate") will be drawn on 9/10 of the canvas
+        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
+        
+        #Draw rectangles on canvas
+        for material in self.materials:
+            #find how many percent the current rectangle's height is of the total sum of materials
+            rectangle_height = int(self.materials[material][0])
+            rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+            #Convert rectangle percentage to pixels
+            rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
 
+            #draw rectangle from top of canvas to its number of pixles in height
+            rectangle_y1 = rectangle_y0 + rectangle_height_pixels
+            created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="Rectangle")
 
-    
+            #Add rectangle_id to its place in self.materials
+            self.materials[material][2] = created_rectangle
 
+            #Add rectangle height to prevent overlaping
+            rectangle_y0 += rectangle_height_pixels
+        
 #Main start point of program
 if __name__ == "__main__":
     window = tk.Tk()
