@@ -46,7 +46,9 @@ class App:
         user_interface_frame.grid(row=0, column=0, sticky="n")
 
         row_counter = 0
-        for material in self.materials:
+        # for material in self.materials:
+        for material in dict(reversed(self.materials.items())):
+
             # Create label and place it
             label = Label(user_interface_frame, text=material)
             label.grid(row=row_counter, column=0, sticky="nw", padx=(0,0))
@@ -79,6 +81,13 @@ class App:
                         
             #Increment row_counter
             row_counter+=1
+
+        
+        #Disable slider and Entry if the material is "substrate"
+        self.materials["substrate"][3].config(state="disabled") #Disable slider
+        self.materials["substrate"][4].delete(0, tk.END)        #Disable Entry
+        self.materials["substrate"][4].insert(0, "Disabled")    #Disable Entry
+        self.materials["substrate"][4].config(state= "disabled")#Disable Entry
                 
         return user_interface_frame
 
@@ -148,6 +157,8 @@ class App:
         #Create switch-layout button under canvas
         switch_layout_button = Button(window, text="Switch layout", command=self.switch_layout)
         switch_layout_button.grid(row=1, column=1, sticky="ne", padx=(5, 0))
+        self.switch_layout_label = Label(window, text=" Filled ")
+        self.switch_layout_label.grid(row=2, column=1, sticky="e")
 
         #Create export_stack button under canvas
         export_stack_button = Button(window, text="Export stack", command=self.export_stack_as_svg)
@@ -217,11 +228,38 @@ class App:
         elif event.delta < 0:
             canvas.scale("all", event.x, event.y, 1.0/zoom_factor, 1.0/zoom_factor)
     
-    """Draws the material_stack either filled or realistic based on "self.switch_layout_counter"""
+    """
+    -Draws the material_stack either filled, realistic or stepped based on "self.switch_layout_counter
+    -Disables or enables the "substrate" slider&entry"""
     def switch_layout(self):
         self.switch_layout_counter += 1
 
+        #Draw different material_stacks
         self.draw_material_stack()
+
+        #Update the text of the switch_layout_label and disable "substrate" slider and entry
+        if(self.switch_layout_counter % 3 == 0):
+            self.switch_layout_label.config(text="Filled")
+            self.materials["substrate"][3].config(state="disabled") #Disable slider
+            self.materials["substrate"][4].delete(0, tk.END)        #Disable Entry
+            self.materials["substrate"][4].insert(0, "Disabled")    #Disable Entry
+            self.materials["substrate"][4].config(state= "disabled")#Disable Entry
+
+        #Update the text of switch_layout_label and enable "substrate" slider and entry
+        elif(self.switch_layout_counter % 3 == 1):
+            self.switch_layout_label.config(text="Realistic")
+            self.materials["substrate"][3].config(state="normal")                       #Enable slider
+            self.materials["substrate"][4].config(state= "normal")                      #Enable Entry
+            self.materials["substrate"][4].delete(0, tk.END)                            #Disable entry value
+            self.materials["substrate"][4].insert(0, self.materials["substrate"][0])    #Display entry value
+        
+        #Update the text of switch_layout_label and enable "substrate" slider and entry
+        else:
+            self.switch_layout_label.config(text="Stepped")
+            self.materials["substrate"][3].config(state="normal")                       #Enable slider
+            self.materials["substrate"][4].config(state= "normal")                      #Enable Entry
+            self.materials["substrate"][4].delete(0, tk.END)                            #Clear entry value
+            self.materials["substrate"][4].insert(0, self.materials["substrate"][0])    #Display entry value
 
     """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
     def load_materials_from_excel(self, excel_file):
@@ -242,7 +280,7 @@ class App:
                 self.materials[material_name] = [material_thickness, material_color, rectangle_id, slider_id, entry_id]
             
             #Reverse dictionary so that the materials is drawn in correct order
-            self.materials = dict(reversed(self.materials.items()))
+            # self.materials = dict(reversed(self.materials.items()))
             
         #Handle errors
         except Exception as error:
@@ -250,12 +288,14 @@ class App:
 
     """Draws the rectangle stack either filled or realistic based on the "switch_layout_counter"""
     def draw_material_stack(self):
-        if(self.switch_layout_counter % 2 == 0):
+        if(self.switch_layout_counter % 3 == 0):
             self.draw_material_stack_filled(self.canvas)
-        else:
+        elif(self.switch_layout_counter % 3 == 1):
             self.draw_material_stack_realistic(self.canvas)
+        else:
+            self.draw_material_stack_stepped(self.canvas)
         
-        self.write_text_on_materials()
+        # self.write_text_on_materials()
 
     """Draws the rectangle stack with "substrate" as 1/10 of the canvas"""
     def draw_material_stack_filled(self, canvas):
@@ -273,14 +313,14 @@ class App:
             rectangle_height = int(self.materials[material][0])
             sum_of_all_materials += rectangle_height
         
-        #Prepare first rectangle drawing coordinates
-        rectangle_x0 = self.visible_canvas_bbox_x0
-        rectangle_y0 = self.visible_canvas_bbox_y0
-        rectangle_x1 = self.visible_canvas_bbox_x1 - 150
-        rectangle_y1 = self.visible_canvas_bbox_y1
-
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
         canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0) * 0.9
+
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0
+        rectangle_y0 = canvas_height
+        rectangle_x1 = self.visible_canvas_bbox_x1 - 150
+        rectangle_y1 = None #Calculated later
         
         #Draw rectangles on canvas
         for material in self.materials:
@@ -295,19 +335,22 @@ class App:
             rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
 
             #draw rectangle from top of canvas to its number of pixles in height
-            rectangle_y1 = rectangle_y0 + rectangle_height_pixels
+            rectangle_y1 = rectangle_y0 - rectangle_height_pixels
             created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")
 
             #Add rectangle_id to its place in self.materials
             self.materials[material][2] = created_rectangle
 
             #Add rectangle height to prevent overlaping
-            rectangle_y0 += rectangle_height_pixels
+            rectangle_y0 -= rectangle_height_pixels
         
         #Draw "substrate" on 1/10 of the canvas
         created_rectangle = canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, fill=self.materials["substrate"][1], tags="material_rectangle")
         #Add rectangle_id to its place in self.materials
         self.materials["substrate"][2] = created_rectangle
+
+        #Draw text on rectangles
+        self.write_text_on_materials()
 
     """Draws the rectangle stack in a realistic way"""
     def draw_material_stack_realistic(self, canvas):
@@ -325,9 +368,9 @@ class App:
         
         #Prepare first rectangle drawing coordinates
         rectangle_x0 = self.visible_canvas_bbox_x0
-        rectangle_y0 = self.visible_canvas_bbox_y0
+        rectangle_y0 = self.visible_canvas_bbox_y1
         rectangle_x1 = self.visible_canvas_bbox_x1 - 150
-        rectangle_y1 = self.visible_canvas_bbox_y1
+        rectangle_y1 = None #Calculated later
 
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
         canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
@@ -341,15 +384,80 @@ class App:
             rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
 
             #draw rectangle from top of canvas to its number of pixles in height
-            rectangle_y1 = rectangle_y0 + rectangle_height_pixels
+            rectangle_y1 = rectangle_y0 - rectangle_height_pixels
             created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")
 
             #Add rectangle_id to its place in self.materials
             self.materials[material][2] = created_rectangle
 
             #Add rectangle height to prevent overlaping
-            rectangle_y0 += rectangle_height_pixels
+            rectangle_y0 -= rectangle_height_pixels
+        
+        #Draw text on rectangles
+        self.write_text_on_materials()
+
     
+    """Draws the rectangle stack with "substrate" as 1/10 of the canvas"""
+    def draw_material_stack_stepped(self, canvas):
+        print("STEPPED")
+        #Clear all existing elements on canvas
+        canvas.delete("all")
+
+        #Draw bounding box around canvas
+        canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black", tags="canvas_bounding_box_rectangle")
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in self.materials:
+            if(material=="substrate"):
+                continue    #Skip substrate
+            rectangle_height = int(self.materials[material][0])
+            sum_of_all_materials += rectangle_height
+        
+        #Materials (except "substrate") will be drawn on 9/10 of the canvas
+        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0) * 0.9
+        
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0
+        rectangle_y0 = canvas_height
+        rectangle_x1 = self.visible_canvas_bbox_x1 - 100
+        rectangle_y1 = None #Calculated later
+        material_stack_width = rectangle_x1 - rectangle_x0
+        
+        #Draw rectangles on canvas
+        for material in self.materials:
+            #"substrate" will be drawn on the bottom 1/10 of the canvas
+            if(material == "substrate"):
+                continue    #Skip "substrate"
+
+            #find how many percent the current rectangle's height is of the total sum of materials
+            rectangle_height = int(self.materials[material][0])
+            rectangle_height_percentage = (rectangle_height/sum_of_all_materials)*100
+            #Convert rectangle percentage to pixels
+            rectangle_height_pixels = (rectangle_height_percentage/100)*canvas_height
+
+            #Find out how wide the rectangle should be
+            rectangle_width = int(self.materials[material][0])
+            rectangle_width_percentage = (rectangle_width/material_stack_width)*100
+            #Convert width_percentage to pixels
+            rectangle_width_pixels = (rectangle_width_percentage/100)*material_stack_width
+
+            #draw rectangle from bottom of canvas to its number of pixles in height
+            rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+            rectangle_x1 = rectangle_x1 - rectangle_height_pixels
+            created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material][1], tags="material_rectangle")
+
+            #Add rectangle_id to its place in self.materials
+            self.materials[material][2] = created_rectangle
+
+            #Add rectangle height to prevent overlaping
+            rectangle_y0 -= rectangle_height_pixels
+        
+        #Draw "substrate" on 1/10 of the canvas
+        created_rectangle = canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, fill=self.materials["substrate"][1], tags="material_rectangle")
+        #Add rectangle_id to its place in self.materials
+        self.materials["substrate"][2] = created_rectangle
+
     """Writes text on rectangles in the material stack"""
     def write_text_on_materials(self):
         #Find out the height of a text's bounding box
