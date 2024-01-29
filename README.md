@@ -20,6 +20,26 @@
             -For taking correct screenshot of rectangle stack
             -" pip install pyautogui "
 
+    
+
+    self.materials layout:
+
+        Self.materials = {
+            "material_name":
+                {"layer" : value},
+                {"name"} : value},
+                {"thickness": value},
+                {"unit" : value},
+                {"indent" : value},
+                {"color" : value},
+                {"rectangle_id": value},
+                {"text_id": value},
+                {"line_id": value},
+                {"entry_id": value},
+                {"slider_id": value} 
+        }
+        self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "rectangle_id": None, "text_id": None, "line_id": None, "entry_id": None, "slider_id": None}
+
 
     FUNCTIONS OF PROGRAM:
         -Adjust the thickness of each layer by using the sliders or entry-boxes
@@ -29,8 +49,3 @@
         -"export_all_as_jpg" takes incrementing screenshots of all the materials/layers in the rectangle stack
 
     BUGS:
-        -Det er noen få variabler som jeg har måtte legge inn manuelt fordi ting ikke passer på canvas. F.eks i draw_rectangle_stack() så må x0 og yo starte på 2
-        -På min PC kan man kun ha 11 materialer før sliders blir for lang og sliders passer ikke inn i applikasjonen. Må dette endres?
-
-    NOTES:
-        -The export_as_svg functions are heavily based on and taken from chatGPT
