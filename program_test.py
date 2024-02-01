@@ -5,10 +5,12 @@ import pandas as pd
 import pygetwindow
 import pyautogui
 import os
+import math
 
 #Todo:
     #Sjekk om det er en metode for å lese en excel kolonne og hvis kolonnen har en spesiell farge så skal sliders, entries etc bli "disabled"
-    #Second: finish the draw_text_on_rectangles method
+    #Ferdigstill draw_text_on_rectangles funksjonen
+    #flytt tekst posisjon når man zoomer inn på canvas 
 
 class App:
     def __init__(self, window):       
@@ -16,10 +18,11 @@ class App:
         self.program_window_width = 800                 #Initial width of program window
         self.program_window_height = 850                #Initial height of program window
         self.excel_file = "Materials.xlsx"              #Excel-file to load materials from
-        self.text_size = 10
+        self.original_text_size = 10
+        self.current_text_size = self.original_text_size
         self.text_font = "Arial"
         self.switch_layout_counter = 0                  #Used to switch between "draw_material_stack_filled" and "draw_material_stack_realistic"
-        
+
         #Dictionary containing ALL info about materials. See README-file for info about the dictionary
         self.materials = {}
 
@@ -172,12 +175,15 @@ class App:
         return canvas
 
     """Deletes the given canvas and creates a new one in its original place"""
-    def reset_canvas(self):
+    def reset_canvas(self, *args):
         #Delete canvas from program window
         self.canvas.destroy()
 
         #Create a new canvas
         self.canvas = self.create_canvas(window)
+
+        #Reset the text size back to original
+        self.current_text_size = self.original_text_size
 
         #Draw rectangle stack
         self.draw_material_stack()
@@ -203,6 +209,9 @@ class App:
                 self.materials[material_name]["entry_id"].delete(0, tk.END)
                 self.materials[material_name]["entry_id"].insert(0, material_thickness)
             
+            #Reset text_size
+            self.current_text_size = self.original_text_size
+            
             #Draw rectangle stack with original values
             self.draw_material_stack()
         
@@ -221,13 +230,24 @@ class App:
     """Scales all the elements on the canvas up or down"""
     def canvas_zoom(self, event, canvas):
         zoom_factor = 1.05
+
         #Zoom in: Scale all items on the canvas around the mouse cursor
         if event.delta > 0:
             canvas.scale("all", event.x, event.y, zoom_factor, zoom_factor)
+            self.current_text_size *= zoom_factor
+            self.current_text_size = math.ceil(self.current_text_size)
+
         #Zoom out: Scale all items on the canvas around the mouse cursor
         elif event.delta < 0:
             canvas.scale("all", event.x, event.y, 1.0/zoom_factor, 1.0/zoom_factor)
-    
+            self.current_text_size /= zoom_factor
+            self.current_text_size = math.floor(self.current_text_size)
+
+        #Delete all texts on canvas and draw them again
+        for text in self.canvas.find_withtag("Material_label"):
+            self.canvas.delete(text)
+        self.write_text_on_materials(self.current_text_size)
+
     """
     -Draws the material_stack either filled, realistic or stepped based on "self.switch_layout_counter
     -Disables or enables the "substrate" slider&entry"""
@@ -244,6 +264,10 @@ class App:
             self.materials["substrate"]["entry_id"].delete(0, tk.END)        #Disable Entry
             self.materials["substrate"]["entry_id"].insert(0, "Disabled")    #Disable Entry
             self.materials["substrate"]["entry_id"].config(state= "disabled")#Disable Entry
+
+            #Update new slider ranges
+            for material in self.materials:
+                self.materials[material]["slider_id"].config(from_=1, to=int(self.materials["substrate"]["thickness"]))
 
         #Update the text of switch_layout_label and enable "substrate" slider and entry
         elif(self.switch_layout_counter % 3 == 1):
@@ -318,6 +342,9 @@ class App:
             self.materials[material]["text_id"] = None  #rectangle_text_id
             self.materials[material]["line_id"] = None  #arrow_line_id
 
+        #Reset text_size
+        self.current_text_size = self.original_text_size
+
         #Decide which type of stack should be drawn
         if(self.switch_layout_counter % 3 == 0):
             self.draw_material_stack_filled(self.canvas)
@@ -327,7 +354,7 @@ class App:
             self.draw_material_stack_stepped(self.canvas)
         
     """Draws the rectangle stack with "substrate" as 1/10 of the canvas"""
-    def draw_material_stack_filled(self, canvas):
+    def draw_material_stack_filled(self, canvas):       
         #Clear all existing elements on canvas
         canvas.delete("all")
 
@@ -343,7 +370,7 @@ class App:
             sum_of_all_materials += rectangle_height
         
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
-        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0) * 0.9
+        canvas_height = round((self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0) * 0.9)
 
         #Prepare first rectangle drawing coordinates
         rectangle_x0 = self.visible_canvas_bbox_x0
@@ -363,6 +390,7 @@ class App:
             #Convert rectangle percentage to pixels
             rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
 
+
             #draw rectangle from top of canvas to its number of pixles in height
             rectangle_y1 = rectangle_y0 - rectangle_height_pixels
             created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
@@ -379,7 +407,7 @@ class App:
         self.materials["substrate"]["rectangle_id"] = created_rectangle
 
         #Draw text on rectangles
-        self.write_text_on_materials()
+        self.write_text_on_materials(self.current_text_size)
 
     """Draws the rectangle stack in a realistic way"""
     def draw_material_stack_realistic(self, canvas):
@@ -423,7 +451,7 @@ class App:
             rectangle_y0 -= rectangle_height_pixels
         
         #Draw text on rectangles
-        self.write_text_on_materials()
+        self.write_text_on_materials(self.current_text_size)
 
     """Draws the rectangle stack with "substrate" as 1/10 of the canvas"""
     def draw_material_stack_stepped(self, canvas):
@@ -450,7 +478,7 @@ class App:
                 biggest_material = int(self.materials[material]["thickness"])
             
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
-        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0) * 0.9
+        canvas_height = round((self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0) * 0.9)
         canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
         
         #Prepare first rectangle drawing coordinates
@@ -493,12 +521,12 @@ class App:
         #Add rectangle_id to its place in self.materials
         self.materials["substrate"]["rectangle_id"] = created_rectangle
 
-        self.write_text_on_materials()
+        self.write_text_on_materials(self.current_text_size)
 
     """Writes text on rectangles in the material stack"""
-    def write_text_on_materials(self):
+    def write_text_on_materials(self, text_size):
         #Find out the height of a text's bounding box
-        text_font = font.Font(family=self.text_font, size=self.text_size)
+        text_font = font.Font(family=self.text_font, size=text_size)
         text_height = text_font.metrics()['linespace']
         
         for material in self.materials:
@@ -507,11 +535,17 @@ class App:
             rectangle_y0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[1]
             rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
             rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
-            rectangle_height = rectangle_y1-rectangle_y0           
+            rectangle_height = rectangle_y1-rectangle_y0
 
             #Text is drawn inside rectangle if it fits
             if(rectangle_height > text_height):
-                created_text = self.canvas.create_text((rectangle_x1-rectangle_x0)/2, rectangle_y1-(rectangle_height/2), text=f"{material} - {self.materials[material]['thickness']}nm", fill="black", font=(self.text_font, self.text_size), anchor="center", tags="Material_label")
+                text_y = (rectangle_y0 + rectangle_y1) / 2
+                created_text = self.canvas.create_text((rectangle_x0 + rectangle_x1)/2, text_y, text=f"{material} - {self.materials[material]['thickness']}nm", fill="black", font=(self.text_font, text_size), anchor="center", tags="Material_label")
+                
+                #If text is outside leftside of canvas, place it on the left canvas side
+                if(self.canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
+                    margin = self.visible_canvas_bbox_x0 - self.canvas.bbox(created_text)[0] 
+                    self.canvas.coords(created_text, ((rectangle_x0 + rectangle_x1)/2)+margin, text_y)
                 #Add text element to dictionary
                 self.materials[material]["text_id"] = created_text
 
@@ -589,7 +623,7 @@ class App:
                 #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
                 f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                 #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()))
+                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth()+1000, self.canvas.winfo_reqheight()))
                 
                 #DO STUFF
                 if(len(previously_created_elements) != 0):
@@ -614,15 +648,14 @@ class App:
                 if(self.materials[material]["text_id"] is not None):
                     text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
                     text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
-                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="14" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, text_content)
+                    # svg_text_element = '<text x="{}" y="{}" fill="black" font-size="14" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, text_content)
+                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, self.current_text_size, text_content)
                     f.write(svg_text_element)
                     previously_created_elements.append(svg_text_element)
                 
 
-                
-
-
-
+                #Add arrow lines
+                #Add text bounding boxes
 
                 #END STUFF
 
@@ -644,5 +677,7 @@ if __name__ == "__main__":
 
     #Closes the program if "esc" key is pressed
     window.bind("<Escape>", lambda event: window.destroy())
+
+    window.bind('<KeyPress-r>', app.reset_canvas)
 
     window.mainloop()
