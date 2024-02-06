@@ -6,6 +6,7 @@ import pygetwindow
 import pyautogui
 import os
 import math
+import openpyxl
 
 #Todo:
     #Sjekk om det er en metode for å lese en excel kolonne og hvis kolonnen har en spesiell farge så skal sliders, entries etc bli "disabled"
@@ -308,7 +309,7 @@ class App:
                 line_id = None
                 entry_id = None
                 slider_id = None
-                
+
                 #Populate material dictionary
                 self.materials[material_name] = [material_thickness, material_color, rectangle_id, slider_id, entry_id, text_id, line_id]
 
@@ -329,11 +330,32 @@ class App:
 
                 #Put "info" dictionary into self.materials
                 self.materials[material_name] = info
+            
+            self.get_cell_background_color(excel_file)
+            
                                 
         #Handle errors
         except Exception as error:
             messagebox.showerror("Error", "Could not load materials from Excel-file")
 
+    def get_cell_background_color(self, excel_file):
+        #Load the excel-file and activate it
+        wb = openpyxl.load_workbook(excel_file, data_only=True)
+        fs = wb.active
+
+        #Get the total number of rows and columns in the excel file
+        fs_count_row = fs.max_row
+        fs_count_col = fs.max_column
+
+        #Loop through each row in the excel-file
+        for row in range(1, fs_count_row):
+            for column in range(1, fs_count_col):
+                cell_color = fs.cell(column=column, row=row)
+                background_color = cell_color.fill.bgColor.index
+
+                if(background_color == "FFFFFF00"):
+                    print("YAYellow")
+                        
     """Draws the rectangle stack either filled or realistic based on the "switch_layout_counter"""
     def draw_material_stack(self):
         #Clear all rectangle, text, line elements in self.materials
