@@ -9,7 +9,6 @@ import math
 import openpyxl
 
 #Todo:
-    #Sjekk om det er en metode for å lese en excel kolonne og hvis kolonnen har en spesiell farge så skal sliders, entries etc bli "disabled"
     #Ferdigstill draw_text_on_rectangles funksjonen
     #flytt tekst posisjon når man zoomer inn på canvas 
 
@@ -86,7 +85,13 @@ class App:
             slider.grid(row=row_counter, column=0, sticky="s", pady=(label_height, 10))
             slider.set(self.materials[material]["thickness"])
             self.materials[material]["slider_id"] = slider 
-                        
+            #Disable slider and Entry if specified by the excel-file
+            if(self.materials[material]["status"] == "disabled"):
+                self.materials[material]["slider_id"].config(state="disabled") #Disable slider
+                self.materials[material]["entry_id"].delete(0, tk.END)        #Disable Entry
+                self.materials[material]["entry_id"].insert(0, "Disabled")    #Disable Entry
+                self.materials[material]["entry_id"].config(state= "disabled")#Disable Entry
+
             #Increment row_counter
             row_counter+=1
         
@@ -111,12 +116,6 @@ class App:
         #Create export_layers button under canvas
         export_layers_button = Button(window, text="Export layers", command=self.export_layers_as_svg)
         export_layers_button.grid(row=2, column=1, sticky="n", padx=(0, 0))
-                
-        #Disable slider and Entry if the material is "substrate"
-        self.materials["substrate"]["slider_id"].config(state="disabled") #Disable slider
-        self.materials["substrate"]["entry_id"].delete(0, tk.END)        #Disable Entry
-        self.materials["substrate"]["entry_id"].insert(0, "Disabled")    #Disable Entry
-        self.materials["substrate"]["entry_id"].config(state= "disabled")#Disable Entry
                 
         return user_interface_frame
 
@@ -261,10 +260,10 @@ class App:
         #Update the text of the switch_layout_label and disable "substrate" slider and entry
         if(self.switch_layout_counter % 3 == 0):
             self.switch_layout_label.config(text="Filled")
-            self.materials["substrate"]["slider_id"].config(state="disabled") #Disable slider
-            self.materials["substrate"]["entry_id"].delete(0, tk.END)        #Disable Entry
-            self.materials["substrate"]["entry_id"].insert(0, "Disabled")    #Disable Entry
-            self.materials["substrate"]["entry_id"].config(state= "disabled")#Disable Entry
+            # self.materials["substrate"]["slider_id"].config(state="disabled") #Disable slider
+            # self.materials["substrate"]["entry_id"].delete(0, tk.END)        #Disable Entry
+            # self.materials["substrate"]["entry_id"].insert(0, "Disabled")    #Disable Entry
+            # self.materials["substrate"]["entry_id"].config(state= "disabled")#Disable Entry
 
             #Update new slider ranges
             for material in self.materials:
@@ -273,10 +272,10 @@ class App:
         #Update the text of switch_layout_label and enable "substrate" slider and entry
         elif(self.switch_layout_counter % 3 == 1):
             self.switch_layout_label.config(text="Realistic")
-            self.materials["substrate"]["slider_id"].config(state="normal")                                 #Enable slider
-            self.materials["substrate"]["entry_id"].config(state= "normal")                                 #Enable Entry
-            self.materials["substrate"]["entry_id"].delete(0, tk.END)                                       #Disable entry value
-            self.materials["substrate"]["entry_id"].insert(0, self.materials["substrate"]["thickness"])     #Display entry value
+            # self.materials["substrate"]["slider_id"].config(state="normal")                                 #Enable slider
+            # self.materials["substrate"]["entry_id"].config(state= "normal")                                 #Enable Entry
+            # self.materials["substrate"]["entry_id"].delete(0, tk.END)                                       #Disable entry value
+            # self.materials["substrate"]["entry_id"].insert(0, self.materials["substrate"]["thickness"])     #Display entry value
 
             #Update new slider ranges
             for material in self.materials:
@@ -285,19 +284,24 @@ class App:
         #Update the text of switch_layout_label and enable "substrate" slider and entry
         else:
             self.switch_layout_label.config(text="Stepped")
-            self.materials["substrate"]["slider_id"].config(state="disabled") #Disable slider
-            self.materials["substrate"]["entry_id"].delete(0, tk.END)        #Disable Entry
-            self.materials["substrate"]["entry_id"].insert(0, "Disabled")    #Disable Entry
-            self.materials["substrate"]["entry_id"].config(state= "disabled")#Disable Entry
+            # self.materials["substrate"]["slider_id"].config(state="disabled") #Disable slider
+            # self.materials["substrate"]["entry_id"].delete(0, tk.END)        #Disable Entry
+            # self.materials["substrate"]["entry_id"].insert(0, "Disabled")    #Disable Entry
+            # self.materials["substrate"]["entry_id"].config(state= "disabled")#Disable Entry
 
-    """Reads the given excel-file and populates the self.materials dictionary with materials and thickness"""
+    """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self, excel_file):
         try:
             #Read given excel file into Pandas dataframe
             excel_data = pd.read_excel(excel_file)
 
+            #Open excel-file to read background colors of each cell
+            work_book = openpyxl.load_workbook(excel_file, data_only=True)
+            fs = work_book.active
+
             #Loop through the rows in excel_file and populate "self.materials"
-            for index, row in excel_data.iterrows():
+            i = 2
+            for column, row in excel_data.iterrows():
                 layer = row["Layer"]
                 material_name = row["Material"]
                 material_thickness = row["Thickness"]
@@ -310,8 +314,14 @@ class App:
                 entry_id = None
                 slider_id = None
 
-                #Populate material dictionary
-                self.materials[material_name] = [material_thickness, material_color, rectangle_id, slider_id, entry_id, text_id, line_id]
+                #Check the background color of the cell
+                background_color = fs.cell(column=2, row=i).fill.bgColor.index
+                if(background_color == "FFFFFF00"):
+                    status = "disabled"
+                else:
+                    status = "active"
+                
+                i+=1
 
                 #Create dictionary with these value
                 info = {
@@ -321,6 +331,7 @@ class App:
                     "unit": material_unit,
                     "indent": material_indent,
                     "color": material_color,
+                    "status": status,
                     "rectangle_id": rectangle_id,
                     "text_id": text_id,
                     "line_id": line_id,
@@ -330,31 +341,10 @@ class App:
 
                 #Put "info" dictionary into self.materials
                 self.materials[material_name] = info
-            
-            self.get_cell_background_color(excel_file)
-            
-                                
+                                            
         #Handle errors
         except Exception as error:
             messagebox.showerror("Error", "Could not load materials from Excel-file")
-
-    def get_cell_background_color(self, excel_file):
-        #Load the excel-file and activate it
-        wb = openpyxl.load_workbook(excel_file, data_only=True)
-        fs = wb.active
-
-        #Get the total number of rows and columns in the excel file
-        fs_count_row = fs.max_row
-        fs_count_col = fs.max_column
-
-        #Loop through each row in the excel-file
-        for row in range(1, fs_count_row):
-            for column in range(1, fs_count_col):
-                cell_color = fs.cell(column=column, row=row)
-                background_color = cell_color.fill.bgColor.index
-
-                if(background_color == "FFFFFF00"):
-                    print("YAYellow")
                         
     """Draws the rectangle stack either filled or realistic based on the "switch_layout_counter"""
     def draw_material_stack(self):
