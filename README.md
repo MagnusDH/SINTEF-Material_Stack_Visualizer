@@ -27,13 +27,15 @@
         Self.materials = {
             "material_name":
                 {"layer" : value},
-                {"name"} : value},
+                {"name"} : "value"},
                 {"thickness": value},
-                {"unit" : value},
+                {"unit" : "value"},
                 {"indent" : value},
-                {"color" : value},
+                {"color" : "value"},
+                {"status" : "value"},
                 {"rectangle_id": value},
                 {"text_id": value},
+                {"text_bbox_id" : value},
                 {"line_id": value},
                 {"entry_id": value},
                 {"slider_id": value} 
