@@ -9,15 +9,17 @@ class Settings:
     SLIDER_RANGE_MIN = None
     SLIDER_RANGE_MAX = None 
     
-
     #Stack settings
     TEXT_SIZE = 10                              #Text size on the canvas
     TEXT_FONT = "Arial"                         
     STACK_TEXT_INDENT = 150                     #How much the stack is minimized to leave space for text on the side
-    INDENT_RANGE = 80000                         #How much the indent will be between layers in the "stepped stack" 
+    INDENT_RANGE = 70000                        #How much the indent will be between layers in the "stepped stack" 
 
     #Color settings
     PROGRAM_BACKGROUND_COLOR = None
     CANVAS_BACKGROUND_COLOR = None
     FRAME_BACKGROUND_COLOR = None
     SLIDER_BACKGROUND_COLOR = None
+
+    #SVG-export settings
+    SVG_TEXT_SIZE = 14
