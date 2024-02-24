@@ -940,7 +940,9 @@ class App:
             f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
 
             #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()))
+            # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()))
+            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(window.winfo_reqwidth(), window.winfo_reqheight()))
+
 
             #Go through every rectangle found on canvas
             for rectangle in material_rectangles:
@@ -986,9 +988,11 @@ class App:
                 #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
                 f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                 #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth()+1000, self.canvas.winfo_reqheight()))
+                # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth()+1000, self.canvas.winfo_reqheight()))
+                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(window.winfo_reqwidth(), window.winfo_reqheight()))
+
                 
-                #DO STUFF
+                #Write the previous created elements to the current file
                 if(len(previously_created_elements) != 0):
                     for element in previously_created_elements:
                         f.write(element)
@@ -1007,24 +1011,36 @@ class App:
 
                 #Create SVG-element for text and write it to file
                 if(self.materials[material]["text_id"] is not None):
-                    text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
-                    text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
-                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
-                    
-                    f.write(svg_text_element)
-                    previously_created_elements.append(svg_text_element)
+                    if(self.switch_layout_counter % 3 == 2):    #The text is written on the right side of the stack
+                        text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
+                        text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
+                        svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="west">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+                        
+                        f.write(svg_text_element)
+                        previously_created_elements.append(svg_text_element)
+                    else:   
+                        text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
+                        text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
+                        svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+                        
+                        f.write(svg_text_element)
+                        previously_created_elements.append(svg_text_element)
                 
                 #Create SVG-element for text bounding box
                 if(self.materials[material]["text_bbox_id"] is not None):
-                    if(self.switch_layout_counter % 3 == 2):    #The text is written on the right side of the stack
+                    #The text is written on the left side of the stack
+                    if(self.switch_layout_counter % 3 == 2):
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0-(bbox_x1-bbox_x0)/2, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+                        
                         # Write the SVG representation of the bounding box to the file
                         f.write(svg_bbox_element)
                         previously_created_elements.append(svg_bbox_element)
+                    #The text is written on the right side of the stack
                     else:
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
                         svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0+(bbox_x1-bbox_x0)/2, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+                        
                         # Write the SVG representation of the bounding box to the file
                         f.write(svg_bbox_element)
                         previously_created_elements.append(svg_bbox_element)
@@ -1036,10 +1052,12 @@ class App:
                         line_coords = self.canvas.coords(self.materials[material]["line_id"])
                         #Construct an SVG <line> element for arrows
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1-(bbox_x1-bbox_x0)/2, line_coords[1], line_coords[2], line_coords[3])
+                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1, line_coords[1], line_coords[2], line_coords[3])
+                        
                         #Write the SVG representation of the arrow to the file
                         f.write(svg_line_element)
                         previously_created_elements.append(svg_line_element)
+                    #The text is written on the right side of the stack
                     else:
                         line_coords = self.canvas.coords(self.materials[material]["line_id"])
                         #Construct an SVG <line> element for arrows

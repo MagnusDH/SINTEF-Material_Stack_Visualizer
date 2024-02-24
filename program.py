@@ -21,6 +21,7 @@ class App:
         self.stack_text_indent = Settings.STACK_TEXT_INDENT
         self.stepped_stack_indent = Settings.INDENT_RANGE
         self.switch_layout_counter = 0                  #Used to switch between "draw_material_stack_filled" and "draw_material_stack_realistic"
+        self.resizing_window = False
 
         #Dictionary containing ALL info about materials. See README-file for info about the dictionary
         self.materials = {}
@@ -155,15 +156,18 @@ class App:
         window.update_idletasks()
 
         #Create canvas and place it
-        canvas = Canvas(window, height=self.user_interface_frame.winfo_reqheight(), width=self.program_window_width-5-self.user_interface_frame.winfo_width())
+        canvas = Canvas(window, 
+            height=self.user_interface_frame.winfo_reqheight(), 
+            width=self.program_window_width-self.user_interface_frame.winfo_width(), 
+            bg=Settings.CANVAS_BACKGROUND_COLOR
+            )
         canvas.grid(row=0, column=1, sticky="n")
-        canvas.configure(bg=Settings.CANVAS_BACKGROUND_COLOR)
 
         #Set bbox coordinates for later use
         self.visible_canvas_bbox_x0 = 2
         self.visible_canvas_bbox_y0 = 2
-        self.visible_canvas_bbox_x1 = canvas.winfo_reqwidth() - 3
-        self.visible_canvas_bbox_y1 = canvas.winfo_reqheight() - 3
+        self.visible_canvas_bbox_x1 = canvas.winfo_reqwidth() - 5 - Settings.CANVAS_PROGRAM_BORDER_WIDTH
+        self.visible_canvas_bbox_y1 = canvas.winfo_reqheight() - 3 - Settings.CANVAS_PROGRAM_BORDER_HEIGHT
         self.canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
         self.canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
 
@@ -179,18 +183,39 @@ class App:
         return canvas
 
     """Deletes the given canvas and creates a new one in its original place"""
-    def reset_canvas(self, *args):
+    def reset_canvas(self, *args):        
         #Delete canvas from program window
         self.canvas.destroy()
 
-        #Create a new canvas
-        self.canvas = self.create_canvas(window)
+        #Create new canvas
+        self.canvas = Canvas(window, 
+            height=self.user_interface_frame.winfo_reqheight(), 
+            width=self.program_window_width-self.user_interface_frame.winfo_width(), 
+            bg=Settings.CANVAS_BACKGROUND_COLOR
+            )
+        self.canvas.grid(row=0, column=1, sticky="n")
+
+        #Set bbox coordinates for later use
+        self.visible_canvas_bbox_x0 = 2
+        self.visible_canvas_bbox_y0 = 2
+        self.visible_canvas_bbox_x1 = self.canvas.winfo_reqwidth() - 5 - Settings.CANVAS_PROGRAM_BORDER_WIDTH
+        self.visible_canvas_bbox_y1 = self.canvas.winfo_reqheight() - 3 - Settings.CANVAS_PROGRAM_BORDER_HEIGHT
+        self.canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
+        self.canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
+
+        #Draw bounding box around canvas
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black")
+
+        #Listen to mouse buttonpress, motion and zoom events
+        self.canvas.bind("<ButtonPress-1>", lambda event, canvas=self.canvas: self.click_on_canvas(event, self.canvas))
+        self.canvas.bind("<B1-Motion>", lambda event, canvas=self.canvas: self.canvas_drag(event, self.canvas))
+        self.canvas.bind("<MouseWheel>", lambda event, canvas=self.canvas: self.canvas_zoom(event, self.canvas))
 
         #Reset the text size back to original
         self.current_text_size = self.original_text_size
-
-        #Draw rectangle stack
-        self.draw_material_stack()
+        
+        # #Draw rectangle stack
+        # self.draw_material_stack()
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
     def reset_values(self):
@@ -255,6 +280,21 @@ class App:
 
         self.write_text_on_stack(self.current_text_size)
 
+    """Scales the material stack according to the program window"""
+    def program_window_resized(self, event):
+        #Update the variable that tracks th window_width
+        self.program_window_width = window.winfo_width()
+
+        #Set the new width of the canvas
+        self.canvas.config(width=self.program_window_width-self.user_interface_frame.winfo_width())
+
+        #Update the variables that track the actual visible parts of the canvas
+        self.visible_canvas_bbox_x1 = self.program_window_width-self.user_interface_frame.winfo_width() - 5 - Settings.CANVAS_PROGRAM_BORDER_WIDTH
+        # self.visible_canvas_bbox_y1 = 
+
+        #Redraw the material stack
+        self.draw_material_stack()
+    
     """
     -Draws the material_stack either filled, realistic or stepped based on "self.switch_layout_counter
     -Disables or enables the "substrate" slider&entry"""
@@ -900,7 +940,9 @@ class App:
             f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
 
             #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()))
+            # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()))
+            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(window.winfo_reqwidth(), window.winfo_reqheight()))
+
 
             #Go through every rectangle found on canvas
             for rectangle in material_rectangles:
@@ -946,9 +988,11 @@ class App:
                 #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
                 f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                 #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth()+1000, self.canvas.winfo_reqheight()))
+                # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.canvas.winfo_reqwidth()+1000, self.canvas.winfo_reqheight()))
+                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(window.winfo_reqwidth(), window.winfo_reqheight()))
+
                 
-                #DO STUFF
+                #Write the previous created elements to the current file
                 if(len(previously_created_elements) != 0):
                     for element in previously_created_elements:
                         f.write(element)
@@ -967,29 +1011,61 @@ class App:
 
                 #Create SVG-element for text and write it to file
                 if(self.materials[material]["text_id"] is not None):
-                    text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
-                    text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
-                    # svg_text_element = '<text x="{}" y="{}" fill="black" font-size="14" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, text_content)
-                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0 + 50, text_y0, Settings.SVG_TEXT_SIZE, text_content)
-                    f.write(svg_text_element)
-                    previously_created_elements.append(svg_text_element)
+                    if(self.switch_layout_counter % 3 == 2):    #The text is written on the right side of the stack
+                        text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
+                        text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
+                        svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="west">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+                        
+                        f.write(svg_text_element)
+                        previously_created_elements.append(svg_text_element)
+                    else:   
+                        text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
+                        text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
+                        svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+                        
+                        f.write(svg_text_element)
+                        previously_created_elements.append(svg_text_element)
                 
                 #Create SVG-element for text bounding box
                 if(self.materials[material]["text_bbox_id"] is not None):
-                    bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
-                    # Write the SVG representation of the bounding box to the file
-                    f.write(svg_bbox_element)
-                    previously_created_elements.append(svg_bbox_element)
+                    #The text is written on the left side of the stack
+                    if(self.switch_layout_counter % 3 == 2):
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+                        
+                        # Write the SVG representation of the bounding box to the file
+                        f.write(svg_bbox_element)
+                        previously_created_elements.append(svg_bbox_element)
+                    #The text is written on the right side of the stack
+                    else:
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0+(bbox_x1-bbox_x0)/2, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+                        
+                        # Write the SVG representation of the bounding box to the file
+                        f.write(svg_bbox_element)
+                        previously_created_elements.append(svg_bbox_element)
 
                 #Create SVG-element for arrow line pointing from box to rectangle
                 if(self.materials[material]["line_id"] is not None):
-                    line_coords = self.canvas.coords(self.materials[material]["line_id"])
-                    #Construct an SVG <line> element for arrows
-                    svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(line_coords[0], line_coords[1], line_coords[2], line_coords[3])
-                    #Write the SVG representation of the arrow to the file
-                    f.write(svg_line_element)
-                    previously_created_elements.append(svg_line_element)
+                    #The text is written on the left side of the stack
+                    if(self.switch_layout_counter % 3 == 2):
+                        line_coords = self.canvas.coords(self.materials[material]["line_id"])
+                        #Construct an SVG <line> element for arrows
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1, line_coords[1], line_coords[2], line_coords[3])
+                        
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_line_element)
+                        previously_created_elements.append(svg_line_element)
+                    #The text is written on the right side of the stack
+                    else:
+                        line_coords = self.canvas.coords(self.materials[material]["line_id"])
+                        #Construct an SVG <line> element for arrows
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1-(bbox_x1-bbox_x0)/2, line_coords[1], line_coords[2], line_coords[3])
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_line_element)
+                        previously_created_elements.append(svg_line_element)
 
                 #Write the closing SVG tag to the file, completing the SVG file
                 f.write('</svg>\n')
@@ -1011,6 +1087,11 @@ if __name__ == "__main__":
     #Closes the program if "esc" key is pressed
     window.bind("<Escape>", lambda event: window.destroy())
 
+    #Resets the canvas position if "r" is pressed
     window.bind('<KeyPress-r>', app.reset_canvas)
+
+
+    #Checks if the program window is being resized
+    window.bind("<Configure>", app.program_window_resized)
 
     window.mainloop()
