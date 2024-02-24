@@ -51,4 +51,4 @@
         -"export_all_as_jpg" takes incrementing screenshots of all the materials/layers in the rectangle stack
 
     BUGS:
-        -Teksten i "Export_Layers_as_svg" blir ikke skrevet på korrekt plass i svg-filen. Dette kan fikses ved å hente koordinatene til rektanglet og plassere teksten i midten
+    the svg-layers-export of the stepped stack creates the text and bounding box outside the file (on the left side) 

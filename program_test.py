@@ -1009,27 +1009,45 @@ class App:
                 if(self.materials[material]["text_id"] is not None):
                     text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
                     text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
-                    # svg_text_element = '<text x="{}" y="{}" fill="black" font-size="14" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, text_content)
-                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0 + 50, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+                    svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+                    
                     f.write(svg_text_element)
                     previously_created_elements.append(svg_text_element)
                 
                 #Create SVG-element for text bounding box
                 if(self.materials[material]["text_bbox_id"] is not None):
-                    bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
-                    # Write the SVG representation of the bounding box to the file
-                    f.write(svg_bbox_element)
-                    previously_created_elements.append(svg_bbox_element)
+                    if(self.switch_layout_counter % 3 == 2):    #The text is written on the right side of the stack
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0-(bbox_x1-bbox_x0)/2, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+                        # Write the SVG representation of the bounding box to the file
+                        f.write(svg_bbox_element)
+                        previously_created_elements.append(svg_bbox_element)
+                    else:
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0+(bbox_x1-bbox_x0)/2, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+                        # Write the SVG representation of the bounding box to the file
+                        f.write(svg_bbox_element)
+                        previously_created_elements.append(svg_bbox_element)
 
                 #Create SVG-element for arrow line pointing from box to rectangle
                 if(self.materials[material]["line_id"] is not None):
-                    line_coords = self.canvas.coords(self.materials[material]["line_id"])
-                    #Construct an SVG <line> element for arrows
-                    svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(line_coords[0], line_coords[1], line_coords[2], line_coords[3])
-                    #Write the SVG representation of the arrow to the file
-                    f.write(svg_line_element)
-                    previously_created_elements.append(svg_line_element)
+                    #The text is written on the left side of the stack
+                    if(self.switch_layout_counter % 3 == 2):
+                        line_coords = self.canvas.coords(self.materials[material]["line_id"])
+                        #Construct an SVG <line> element for arrows
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1-(bbox_x1-bbox_x0)/2, line_coords[1], line_coords[2], line_coords[3])
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_line_element)
+                        previously_created_elements.append(svg_line_element)
+                    else:
+                        line_coords = self.canvas.coords(self.materials[material]["line_id"])
+                        #Construct an SVG <line> element for arrows
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1-(bbox_x1-bbox_x0)/2, line_coords[1], line_coords[2], line_coords[3])
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_line_element)
+                        previously_created_elements.append(svg_line_element)
 
                 #Write the closing SVG tag to the file, completing the SVG file
                 f.write('</svg>\n')
