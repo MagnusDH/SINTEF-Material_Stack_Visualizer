@@ -9,7 +9,9 @@ class Settings:
     SLIDER_RANGE_MIN = None
     SLIDER_RANGE_MAX = None 
     
-    #Stack settings
+    #Canvas settings
+    CANVAS_PROGRAM_BORDER_WIDTH = 3             #How big the gap between the canvas border and the program-window edge width is
+    CANVAS_PROGRAM_BORDER_HEIGHT = 0            #How big the gap between the canvas border and the program-window edge height is
     TEXT_SIZE = 10                              #Text size on the canvas
     TEXT_FONT = "Arial"                         
     STACK_TEXT_INDENT = 150                     #How much the stack is minimized to leave space for text on the side

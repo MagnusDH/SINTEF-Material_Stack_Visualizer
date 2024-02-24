@@ -21,6 +21,7 @@ class App:
         self.stack_text_indent = Settings.STACK_TEXT_INDENT
         self.stepped_stack_indent = Settings.INDENT_RANGE
         self.switch_layout_counter = 0                  #Used to switch between "draw_material_stack_filled" and "draw_material_stack_realistic"
+        self.resizing_window = False
 
         #Dictionary containing ALL info about materials. See README-file for info about the dictionary
         self.materials = {}
@@ -155,15 +156,18 @@ class App:
         window.update_idletasks()
 
         #Create canvas and place it
-        canvas = Canvas(window, height=self.user_interface_frame.winfo_reqheight(), width=self.program_window_width-5-self.user_interface_frame.winfo_width())
+        canvas = Canvas(window, 
+            height=self.user_interface_frame.winfo_reqheight(), 
+            width=self.program_window_width-self.user_interface_frame.winfo_width(), 
+            bg=Settings.CANVAS_BACKGROUND_COLOR
+            )
         canvas.grid(row=0, column=1, sticky="n")
-        canvas.configure(bg=Settings.CANVAS_BACKGROUND_COLOR)
 
         #Set bbox coordinates for later use
         self.visible_canvas_bbox_x0 = 2
         self.visible_canvas_bbox_y0 = 2
-        self.visible_canvas_bbox_x1 = canvas.winfo_reqwidth() - 3
-        self.visible_canvas_bbox_y1 = canvas.winfo_reqheight() - 3
+        self.visible_canvas_bbox_x1 = canvas.winfo_reqwidth() - 5 - Settings.CANVAS_PROGRAM_BORDER_WIDTH
+        self.visible_canvas_bbox_y1 = canvas.winfo_reqheight() - 3 - Settings.CANVAS_PROGRAM_BORDER_HEIGHT
         self.canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
         self.canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
 
@@ -179,18 +183,39 @@ class App:
         return canvas
 
     """Deletes the given canvas and creates a new one in its original place"""
-    def reset_canvas(self, *args):
+    def reset_canvas(self, *args):        
         #Delete canvas from program window
         self.canvas.destroy()
 
-        #Create a new canvas
-        self.canvas = self.create_canvas(window)
+        #Create new canvas
+        self.canvas = Canvas(window, 
+            height=self.user_interface_frame.winfo_reqheight(), 
+            width=self.program_window_width-self.user_interface_frame.winfo_width(), 
+            bg=Settings.CANVAS_BACKGROUND_COLOR
+            )
+        self.canvas.grid(row=0, column=1, sticky="n")
+
+        #Set bbox coordinates for later use
+        self.visible_canvas_bbox_x0 = 2
+        self.visible_canvas_bbox_y0 = 2
+        self.visible_canvas_bbox_x1 = self.canvas.winfo_reqwidth() - 5 - Settings.CANVAS_PROGRAM_BORDER_WIDTH
+        self.visible_canvas_bbox_y1 = self.canvas.winfo_reqheight() - 3 - Settings.CANVAS_PROGRAM_BORDER_HEIGHT
+        self.canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
+        self.canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
+
+        #Draw bounding box around canvas
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black")
+
+        #Listen to mouse buttonpress, motion and zoom events
+        self.canvas.bind("<ButtonPress-1>", lambda event, canvas=self.canvas: self.click_on_canvas(event, self.canvas))
+        self.canvas.bind("<B1-Motion>", lambda event, canvas=self.canvas: self.canvas_drag(event, self.canvas))
+        self.canvas.bind("<MouseWheel>", lambda event, canvas=self.canvas: self.canvas_zoom(event, self.canvas))
 
         #Reset the text size back to original
         self.current_text_size = self.original_text_size
-
-        #Draw rectangle stack
-        self.draw_material_stack()
+        
+        # #Draw rectangle stack
+        # self.draw_material_stack()
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
     def reset_values(self):
@@ -255,6 +280,21 @@ class App:
 
         self.write_text_on_stack(self.current_text_size)
 
+    """Scales the material stack according to the program window"""
+    def program_window_resized(self, event):
+        #Update the variable that tracks th window_width
+        self.program_window_width = window.winfo_width()
+
+        #Set the new width of the canvas
+        self.canvas.config(width=self.program_window_width-self.user_interface_frame.winfo_width())
+
+        #Update the variables that track the actual visible parts of the canvas
+        self.visible_canvas_bbox_x1 = self.program_window_width-self.user_interface_frame.winfo_width() - 5 - Settings.CANVAS_PROGRAM_BORDER_WIDTH
+        # self.visible_canvas_bbox_y1 = 
+
+        #Redraw the material stack
+        self.draw_material_stack()
+    
     """
     -Draws the material_stack either filled, realistic or stepped based on "self.switch_layout_counter
     -Disables or enables the "substrate" slider&entry"""
@@ -1011,6 +1051,11 @@ if __name__ == "__main__":
     #Closes the program if "esc" key is pressed
     window.bind("<Escape>", lambda event: window.destroy())
 
+    #Resets the canvas position if "r" is pressed
     window.bind('<KeyPress-r>', app.reset_canvas)
+
+
+    #Checks if the program window is being resized
+    window.bind("<Configure>", app.program_window_resized)
 
     window.mainloop()
