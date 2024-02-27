@@ -9,6 +9,9 @@ import math
 import openpyxl
 from settings import Settings
 
+#Indent skal være like stort som høyden til rektanglet i pixler. Er rektanglet 10pixler hlyt skal indent være 10pixler innover
+#Canvas må være litt tynnere i høyden, og det skal starte fra over knappene ikke fra toppen av program vinduet
+
 class App:
     def __init__(self, window):       
         self.program_title = Settings.PROGRAM_TITLE
@@ -501,7 +504,7 @@ class App:
         #Draw text on rectangles
         self.write_text_on_stack(self.current_text_size)
 
-    """Draws a stepped rectangle stack where "indent" decides the width of each rectangle"""
+    """Draws a stepped rectangle stack where the "indent" is equal to the rectangles height"""
     def draw_material_stack_stepped(self, canvas):
         #Clear all existing elements on canvas
         canvas.delete("all")
@@ -526,7 +529,7 @@ class App:
         stepped_stack_y1 = round(self.canvas_height * 0.9)
         stepped_stack_height = round(self.canvas_height * 0.9)
         stepped_stack_width = stepped_stack_x1 - stepped_stack_x0
-        previous_rectangle_width_pixels = stepped_stack_width
+        previous_rectangle_width_pixels = 0
 
         #Prepare first rectangle drawing coordinates (from bottom left corner)
         rectangle_x0 = stepped_stack_x0
@@ -547,20 +550,15 @@ class App:
                 rectangle_height_percentage = (rectangle_height/sum_of_all_materials)*100
                 #Convert rectangle percentage to pixels
                 rectangle_height_pixels = (rectangle_height_percentage/100)*stepped_stack_height
+
                 #Set the y1 coordinate of the rectangle
                 rectangle_y1 = rectangle_y0 - rectangle_height_pixels
 
-                #Calculate nanometers per pixel ratio from the "INDENT_RANGE" variable
-                nanometers_per_pixel = Settings.INDENT_RANGE/stepped_stack_width
-                    
-                #Calculate how many pixels the given material_indent is
-                indent_pixels = int(self.materials[material]["indent"]) / nanometers_per_pixel
+                #Calculate the width of the current material
+                rectangle_x1 = rectangle_x1 - previous_rectangle_width_pixels
 
-                rectangle_x1 = rectangle_x1 - indent_pixels
-
-                created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
-
-                previous_rectangle_width_pixels = rectangle_x1
+                #Store this width for the next rectangle (must be done now to get the height and the width of the rectangle to be equal)
+                previous_rectangle_width_pixels = rectangle_height_pixels
 
                 #Create rectangle
                 created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
@@ -907,7 +905,8 @@ class App:
                 #Create a two sided arrow line between the differense of the two rectangles
                 created_arrow_line = self.canvas.create_line(current_rectangle_x1, previous_rectangle_y1-5, previous_rectangle_x1, previous_rectangle_y1-5, arrow=tk.BOTH)
                 #Write indent number over line
-                created_indent_text = self.canvas.create_text(previous_rectangle_x1, previous_rectangle_y1-15, text=f"{self.materials[previous_material]['indent']}nm", fill="black", font=(self.text_font, self.original_text_size), anchor="w", tags="double_arrow_indent")
+                indent_number = abs(int(self.materials[material]["thickness"]) - int(self.materials[previous_material]["thickness"])) 
+                created_indent_text = self.canvas.create_text(previous_rectangle_x1, previous_rectangle_y1-15, text=f"{indent_number}nm", fill="black", font=(self.text_font, self.original_text_size), anchor="w", tags="double_arrow_indent")
 
             #Set new "previous_rectangle" coordinates
             previous_rectangle_x1 = current_rectangle_x1
@@ -1095,3 +1094,78 @@ if __name__ == "__main__":
     window.bind("<Configure>", app.program_window_resized)
 
     window.mainloop()
+
+
+
+
+
+
+    def draw_material_stack_stepped_orig(self, canvas):
+        #Clear all existing elements on canvas
+        canvas.delete("all")
+
+        #Draw bounding box around canvas
+        canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black", tags="canvas_bounding_box_rectangle")
+        
+        #Find the total height of all materials combined and the thickest material
+        sum_of_all_materials = 0
+        biggest_material = 0
+        for material in self.materials:
+            if(material=="substrate"):
+                continue    #Skip substrate
+            sum_of_all_materials += int(self.materials[material]["thickness"])
+            if(biggest_material < int(self.materials[material]["thickness"])):
+                biggest_material = int(self.materials[material]["thickness"])
+
+        #Create new boundaries within main canvas to draw stepped stack
+        stepped_stack_x0 = self.visible_canvas_bbox_x0 + self.stack_text_indent
+        stepped_stack_y0 = self.visible_canvas_bbox_y0
+        stepped_stack_x1 = self.visible_canvas_bbox_x1
+        stepped_stack_y1 = round(self.canvas_height * 0.9)
+        stepped_stack_height = round(self.canvas_height * 0.9)
+        stepped_stack_width = stepped_stack_x1 - stepped_stack_x0
+        previous_rectangle_width_pixels = stepped_stack_width
+
+        #Prepare first rectangle drawing coordinates (from bottom left corner)
+        rectangle_x0 = stepped_stack_x0
+        rectangle_y0 = self.visible_canvas_bbox_y0 + round(self.canvas_height*0.9)
+        rectangle_x1 = self.visible_canvas_bbox_x1
+        rectangle_y1 = self.visible_canvas_bbox_y0
+
+        #Draw rectangles on canvas
+        for material in self.materials:
+            #"substrate" will be drawn on the bottom 1/10 of the canvas
+            if(material == "substrate"):
+                created_rectangle = canvas.create_rectangle(stepped_stack_x0, round(self.canvas_height*0.9), stepped_stack_x1, self.visible_canvas_bbox_y1, fill="grey", tags="material_rectangle")
+                self.materials["substrate"]["rectangle_id"] = created_rectangle
+
+            else:
+                #find how many percent the current rectangle's height is of the total sum of materials
+                rectangle_height = int(self.materials[material]["thickness"])
+                rectangle_height_percentage = (rectangle_height/sum_of_all_materials)*100
+                #Convert rectangle percentage to pixels
+                rectangle_height_pixels = (rectangle_height_percentage/100)*stepped_stack_height
+                #Set the y1 coordinate of the rectangle
+                rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+
+                #Calculate nanometers per pixel ratio from the "INDENT_RANGE" variable
+                nanometers_per_pixel = Settings.INDENT_RANGE/stepped_stack_width
+                    
+                #Calculate how many pixels the given material_indent is
+                indent_pixels = int(self.materials[material]["indent"]) / nanometers_per_pixel
+
+                # rectangle_x1 = rectangle_x1 - indent_pixels
+                rectangle_x1 = rectangle_x1 - rectangle_height_pixels
+
+                previous_rectangle_width_pixels = rectangle_x1
+
+                #Create rectangle
+                created_rectangle = canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
+
+                #Add rectangle_id to its place in self.materials
+                self.materials[material]["rectangle_id"] = created_rectangle
+
+                #Add rectangle height to prevent overlaping
+                rectangle_y0 -= rectangle_height_pixels
+        
+        self.write_text_on_stepped_stack(self.current_text_size)

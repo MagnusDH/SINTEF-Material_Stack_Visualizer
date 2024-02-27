@@ -1,7 +1,7 @@
 class Settings:
     #Program settings
     PROGRAM_TITLE = "Layer stack visualizer"    #Title to be displayed on the program window
-    PROGRAM_WINDOW_WIDTH = 1000                 #Initial width of program window
+    PROGRAM_WINDOW_WIDTH = 1500                 #Initial width of program window
     PROGRAM_WINDOW_HEIGHT = 850                 #Initial height of program window
     EXCEL_FILE = "Materials.xlsx"               #Excel-file to load materials from
     
@@ -10,7 +10,8 @@ class Settings:
     SLIDER_RANGE_MAX = None 
     
     #Canvas settings
-    CANVAS_PROGRAM_BORDER_WIDTH = 3             #How big the gap between the canvas border and the program-window edge width is
+    CANVAS_HEIGHT = 400
+    CANVAS_PROGRAM_BORDER_WIDTH = 30             #How big the gap between the canvas border and the program-window edge width is
     CANVAS_PROGRAM_BORDER_HEIGHT = 0            #How big the gap between the canvas border and the program-window edge height is
     TEXT_SIZE = 10                              #Text size on the canvas
     TEXT_FONT = "Arial"                         
