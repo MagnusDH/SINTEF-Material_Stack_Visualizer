@@ -9,8 +9,6 @@ import math
 import openpyxl
 from settings import Settings
 
-#Canvas må være litt tynnere i høyden, og det skal starte fra over knappene ikke fra toppen av program vinduet
-
 class App:
     def __init__(self, window):       
         self.program_title = Settings.PROGRAM_TITLE
@@ -23,7 +21,6 @@ class App:
         self.stack_text_indent = Settings.STACK_TEXT_INDENT
         self.stepped_stack_indent = Settings.INDENT_RANGE
         self.switch_layout_counter = 0                  #Used to switch between "draw_material_stack_filled" and "draw_material_stack_realistic"
-        self.resizing_window = False
 
         #Dictionary containing ALL info about materials. See README-file for info about the dictionary
         self.materials = {}
@@ -365,8 +362,8 @@ class App:
 
                 #Create dictionary with these value
                 info = {
-                    "layer": layer,
                     "name": material_name,
+                    "layer": layer,
                     "thickness": material_thickness,
                     "unit": material_unit,
                     "indent": material_indent,
@@ -952,7 +949,7 @@ class App:
             previous_rectangle_x1 = current_rectangle_x1
             previous_rectangle_y1 = current_rectangle_y1
             previous_material = material
-            
+
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
         #Define the name of the svg file to be created
@@ -1036,6 +1033,7 @@ class App:
 
                 #Create SVG-element of rectangle and write it to file
                 rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(self.materials[material]["rectangle_id"])
+
                 fill_color = self.canvas.itemcget(self.materials[material]["rectangle_id"], 'fill')  # Retrieve fill color of the rectangle from the canvas
                 svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, fill_color)
                 f.write(svg_rectangle_element)
@@ -1157,7 +1155,6 @@ if __name__ == "__main__":
 
     #Resets the canvas position if "r" is pressed
     window.bind('<KeyPress-r>', app.reset_canvas)
-
 
     #Checks if the program window is being resized
     window.bind("<Configure>", app.program_window_resized)
