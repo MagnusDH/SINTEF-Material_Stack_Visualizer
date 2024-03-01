@@ -9,8 +9,6 @@ import math
 import openpyxl
 from settings import Settings
 
-#Canvas må være litt tynnere i høyden, og det skal starte fra over knappene ikke fra toppen av program vinduet
-
 class App:
     def __init__(self, window):       
         self.program_title = Settings.PROGRAM_TITLE
@@ -23,7 +21,6 @@ class App:
         self.stack_text_indent = Settings.STACK_TEXT_INDENT
         self.stepped_stack_indent = Settings.INDENT_RANGE
         self.switch_layout_counter = 0                  #Used to switch between "draw_material_stack_filled" and "draw_material_stack_realistic"
-        self.resizing_window = False
 
         #Dictionary containing ALL info about materials. See README-file for info about the dictionary
         self.materials = {}
@@ -48,7 +45,7 @@ class App:
     def create_user_interface(self, window):
         #Create Frame and place it
         user_interface_frame = Frame(window)
-        user_interface_frame.configure(bg=Settings.FRAME_BACKGROUND_COLOR)
+        user_interface_frame.configure(bg=Settings.UI_FRAME_BACKGROUND_COLOR)
         user_interface_frame.grid(row=0, column=0, sticky="n")
 
         biggest_material = 0
@@ -84,7 +81,7 @@ class App:
                 length=300, 
                 troughcolor=self.materials[material]["color"],
                 command=lambda value, identifier=material: self.material_slider_updated(value, identifier),
-                bg=Settings.SLIDER_BACKGROUND_COLOR 
+                bg=None#Settings.SLIDER_BACKGROUND_COLOR 
             )
             slider.grid(row=row_counter, column=0, sticky="s", pady=(label_height, 10))
             slider.set(self.materials[material]["thickness"])
@@ -365,8 +362,8 @@ class App:
 
                 #Create dictionary with these value
                 info = {
-                    "layer": layer,
                     "name": material_name,
+                    "layer": layer,
                     "thickness": material_thickness,
                     "unit": material_unit,
                     "indent": material_indent,
@@ -883,25 +880,24 @@ class App:
                     #Add the new line to dictionary
                     self.materials[material]["line_id"] = created_arrow_line
 
-                    # #if(Text bottom overlaps with previous text top):
-                    # if(previous_material is not None and text_bbox_y1 < previous_text_bbox_y1):
-                    #     #Find how much is overlapping
-                    #     overlap = previous_text_bbox_y1 - text_bbox_y1
-                    #     #Move text down
-                    #     self.canvas.move(self.materials[material]["text_id"], 0, overlap)
-                    #     self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
-                    #     #Find coordinates of text bounding box
-                    #     tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                    #     #Delete the arrow line
-                    #     self.canvas.delete(self.materials[material]["line_id"])
-                    #     #Create new arrow line
-                    #     created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
-                    #     #Add the new line to dictionary
-                    #     self.materials[material]["line_id"] = created_arrow_line
+                    #if(Text bottom overlaps with previous text top):
+                    if(previous_material is not None and text_bbox_y1 < previous_text_bbox_y1):
+                        #Find how much is overlapping
+                        overlap = previous_text_bbox_y1 - text_bbox_y1
+                        #Move text down
+                        self.canvas.move(self.materials[material]["text_id"], 0, overlap)
+                        self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                        #Find coordinates of text bounding box
+                        tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        #Delete the arrow line
+                        self.canvas.delete(self.materials[material]["line_id"])
+                        #Create new arrow line
+                        created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                        #Add the new line to dictionary
+                        self.materials[material]["line_id"] = created_arrow_line
 
                 #if text is overlaps with the left side of the canvas
-                if(text_bbox_x0 < self.visible_canvas_bbox_x0):
-                    print("SHIIIIIIT")
+                # if(text_bbox_x0 < self.visible_canvas_bbox_x0):
                     # self.canvas.move(self.materials[material]["text_id"], 100, 0)
                     # self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
                     # #Find coordinates of text bounding box
@@ -952,7 +948,7 @@ class App:
             previous_rectangle_x1 = current_rectangle_x1
             previous_rectangle_y1 = current_rectangle_y1
             previous_material = material
-            
+
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
         #Define the name of the svg file to be created
@@ -1036,6 +1032,7 @@ class App:
 
                 #Create SVG-element of rectangle and write it to file
                 rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(self.materials[material]["rectangle_id"])
+
                 fill_color = self.canvas.itemcget(self.materials[material]["rectangle_id"], 'fill')  # Retrieve fill color of the rectangle from the canvas
                 svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, fill_color)
                 f.write(svg_rectangle_element)
@@ -1157,7 +1154,6 @@ if __name__ == "__main__":
 
     #Resets the canvas position if "r" is pressed
     window.bind('<KeyPress-r>', app.reset_canvas)
-
 
     #Checks if the program window is being resized
     window.bind("<Configure>", app.program_window_resized)

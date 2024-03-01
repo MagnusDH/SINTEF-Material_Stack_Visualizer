@@ -1,7 +1,7 @@
 import customtkinter
 import tkinter
 import pyautogui
-from tkinter import messagebox, Frame, Label, Entry, StringVar, Scale
+from tkinter import messagebox, Frame, Label, Entry, StringVar, Scale, Canvas
 from settings import Settings
 import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
@@ -9,6 +9,7 @@ import openpyxl #Excel-file reading
 
 class Material_stack_visualizer_app:
     def __init__(self):
+        print("INIT()")
         #Create a dictionary to hold ALL the information about a material
         self.materials = {}
         #Read the given excel-file and populate the materials dictionary
@@ -16,9 +17,14 @@ class Material_stack_visualizer_app:
 
         #Create a user interface
         self.user_interface_frame = self.create_user_interface()
+
+        #Create canvas
+        self.canvas = self.create_canvas()
     
     """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self, excel_file):
+        print("LOAD_MATERIALS_FROM_EXCEL()")
+        
         try:
             #Read given excel file into Pandas dataframe
             excel_data = pandas.read_excel(excel_file)
@@ -65,14 +71,24 @@ class Material_stack_visualizer_app:
             messagebox.showerror("Error", "Could not load materials from Excel-file")
             window.destroy()
 
+    """Creates a Frame with sliders, entries and buttons"""
     def create_user_interface(self):
+        print("CREATE_USER_INTERFACE()")
+        
         #Create Frame and place it
         user_interface_frame = customtkinter.CTkScrollableFrame(
             master=window, 
             width=Settings.UI_FRAME_WIDTH, 
             height=Settings.UI_FRAME_HEIGHT,
-            fg_color=Settings.UI_FRAME_BACKGROUND_COLOR)
-        user_interface_frame.grid(row=0, column=0, padx=(0,0), pady=(0,0))
+            fg_color=Settings.UI_FRAME_BACKGROUND_COLOR
+        )
+        user_interface_frame.grid(
+            row=0, 
+            column=0, 
+            padx=(0,0), 
+            pady=(5,0),
+            sticky="n"
+        )
 
         #Create sliders, buttons etc for each material
         row_counter = 0
@@ -133,20 +149,106 @@ class Material_stack_visualizer_app:
             #Increment row_counter
             row_counter+=1
 
+        #Reset canvas button
         reset_canvas_button = customtkinter.CTkButton(
             master=window, 
             text="Reset canvas", 
-            fg_color=Settings.BUTTON_FG_COLOR, hover_color=Settings.BUTTON_HOVER_COLOR, text_color="white")
-        reset_canvas_button.grid(row=1, column=0, sticky="nw", padx=(0, 0))
+            fg_color=Settings.BUTTON_FG_COLOR, 
+            hover_color=Settings.BUTTON_HOVER_COLOR, 
+            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            width=15,
+            command=self.reset_canvas)
+        reset_canvas_button.grid(row=1, column=1, sticky="nw", padx=(0, 0))
 
-        # button = customtkinter.CTkButton(user_interface_frame, text="BUTTON", fg_color="green", hover_color="yellow", text_color="green")
-        # button.grid(row=row_counter, column=1, padx=20, pady=20)  
+        #Reset values button
+        reset_values_button = customtkinter.CTkButton(
+            master=window,
+            text="Reset values",
+            fg_color=Settings.BUTTON_FG_COLOR, 
+            hover_color=Settings.BUTTON_HOVER_COLOR, 
+            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            width=15,
+            command=self.reset_values
+        )
+        reset_values_button.grid(row=2, column=1, sticky="nw", padx=(0, 0), pady=(0,0))
 
+        #Export stack button
+        export_stack_button = customtkinter.CTkButton(
+            master=window,
+            text="Export stack",
+            fg_color=Settings.BUTTON_FG_COLOR, 
+            hover_color=Settings.BUTTON_HOVER_COLOR, 
+            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            width=15,
+            command=self.export_stack_as_svg
+        )
+        export_stack_button.grid(row=1, column=1, sticky="n", padx=(0, 0), pady=(0,0))
+        
+        #Export layers button
+        export_layers_button = customtkinter.CTkButton(
+            master=window,
+            text="Export layers",
+            fg_color=Settings.BUTTON_FG_COLOR, 
+            hover_color=Settings.BUTTON_HOVER_COLOR, 
+            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            width=15,
+            command=self.export_layers_as_svg
+        )
+        export_layers_button.grid(row=2, column=1, sticky="n", padx=(0, 0), pady=(5,0))
 
+        #Switch layout ComboBox
+        self.option_menu = customtkinter.CTkOptionMenu(
+            master=window, 
+            values=["Stacked", "Realistic", "Stepped"],
+            command=self.switch_layout
+        )
+        self.option_menu.grid(row=1, column=1, sticky="ne", padx=(0, 0), pady=(0,0))
+        
         return user_interface_frame
     
+    """Returns a canvas created in the program window"""
+    def create_canvas(self):
+        print("CREATE_CANVAS()")
+        
+        #Create canvas and place it
+        canvas = Canvas(
+            master=window, 
+            height=Settings.CANVAS_HEIGHT, 
+            width=Settings.CANVAS_WIDTH, # self.program_window_width-self.user_interface_frame.winfo_width(), 
+            bg=Settings.CANVAS_BACKGROUND_COLOR,
+            highlightbackground="black", 
+            highlightthickness=1
+            )
+        canvas.grid(
+            row=0, 
+            column=1, 
+            sticky="s", 
+            padx=(3,3), 
+            pady=(5,0)
+        )
+
+        #Set canvas_bbox coordniates for later use
+        self.visible_canvas_bbox_x0 = 2
+        self.visible_canvas_bbox_y0 = 2
+        self.visible_canvas_bbox_x1 = canvas.winfo_reqwidth() - 3 
+        self.visible_canvas_bbox_y1 = canvas.winfo_reqheight() - 3
+        self.canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
+        self.canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
+
+        #Draw bounding box around canvas
+        canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black")
+
+        #Listen to mouse: buttonpress, motion and zoom events
+        canvas.bind("<ButtonPress-1>", lambda event, canvas=canvas: self.click_on_canvas(event, canvas))
+        canvas.bind("<B1-Motion>", lambda event, canvas=canvas: self.canvas_drag(event, canvas))
+        canvas.bind("<MouseWheel>", lambda event, canvas=canvas: self.canvas_zoom(event, canvas))
+
+        return canvas
+
     """Updates the thickness value in self.materials with the slider value and updates corresponding entry-widget"""
     def material_slider_updated(self, value, identifier): 
+        print("MATERIAL_SLIDER_UPDATED()")
+        
         #Update the thickness value in self.materials
         self.materials[identifier]["thickness"] = value
 
@@ -156,6 +258,8 @@ class Material_stack_visualizer_app:
 
     """Updates the thickness value in self.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, entry):
+        print("MATERIAL_ENTRY_UPDATED()")
+        
         #Find material that corresponds to "entry"
         for material in self.materials:
             if(self.materials[material]["entry_id"] == entry):
@@ -166,7 +270,111 @@ class Material_stack_visualizer_app:
 
                 #Update the slider corresponding to the key
                 self.materials[material]["slider_id"].set(entered_value)
+    
+    """Deletes the current canvas and creates a new one in its original place"""
+    def reset_canvas(self, *args):
+        print("RESET_CANVAS")
+
+        #Delete canvas from program window
+        self.canvas.destroy()
+
+        #Create new canvas in its original position
+        self.canvas = self.create_canvas()
+
+    """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
+    def reset_values(self):
+        print("RESET_VALUES")
+
+        #Reload initial values from given excel file
+        try:
+            #Read given excel file into Pandas dataframe
+            excel_data = pandas.read_excel(Settings.EXCEL_FILE)
+
+            #Loop through the rows in excel_file and populate "self.materials"
+            for index, row in excel_data.iterrows():
+                material_name = row["Material"]
+                material_thickness = row["Thickness"]
+                
+                #Populate material dictionary
+                self.materials[material_name]["thickness"] = material_thickness
+                
+                #Update sliders and Entries
+                self.materials[material_name]["slider_id"].set(material_thickness)
+                self.materials[material_name]["entry_id"].delete(0, tkinter.END)
+                self.materials[material_name]["entry_id"].insert(0, material_thickness)
+            
+            # #Reset text_size
+            # self.current_text_size = self.original_text_size
+            
+            # #Draw rectangle stack with original values
+            # self.draw_material_stack()
         
+        #Handle errors
+        except Exception as error:
+            messagebox.showerror("Error", "Could not reset values\nMay be a issue with reading from excel-file")
+        
+    """Remembers the initial mouse click-position on the canvas"""
+    def click_on_canvas(self, event, canvas):
+        print("CLICK_ON_CANVAS()")
+        
+        canvas.scan_mark(event.x, event.y)
+    
+    """Moves the position of the canvas"""
+    def canvas_drag(self, event, canvas):
+        print("CANVAS_DRAG()")
+        
+        canvas.scan_dragto(event.x, event.y, gain=1)
+
+    """Scales all the elements on the canvas up or down"""
+    def canvas_zoom(self, event, canvas):
+        print("CANVAS_ZOOM()")
+        
+        zoom_factor = 1.05
+
+        #Zoom in: Scale all items on the canvas around the mouse cursor
+        if event.delta > 0:
+            canvas.scale("all", event.x, event.y, zoom_factor, zoom_factor)
+            # self.current_text_size *= zoom_factor
+            # self.current_text_size = math.ceil(self.current_text_size)
+
+        #Zoom out: Scale all items on the canvas around the mouse cursor
+        elif event.delta < 0:
+            canvas.scale("all", event.x, event.y, 1.0/zoom_factor, 1.0/zoom_factor)
+            # self.current_text_size /= zoom_factor
+            # self.current_text_size = math.floor(self.current_text_size)
+
+        #Redraw text on stack
+        # if(self.switch_layout_counter % 3 == 0):
+        #     self.write_text_on_stack(self.current_text_size)
+        # elif(self.switch_layout_counter % 3 == 1):
+        #     self.write_text_on_stack(self.current_text_size)
+        # else:
+        #     self.write_text_on_stepped_stack(self.current_text_size)
+
+    def program_window_resized(self):
+        print("PROGRAM_WINDOW_RESIZED() - NOT IMPLEMENTED")
+
+    def switch_layout(self, event):
+        print("SWITCH LAYOUT")
+        value = self.option_menu.get()
+        if(value == "Stacked"):
+            print("STAAAAACKED")
+        if(value == "Realistic"):
+            print("REALIIIISTIIIC")
+        if(value == "Stepped"):
+            print("STEEEEPPED")
+
+
+    def export_stack_as_svg(self):
+        print("EXPORT_STACK_AS_SVG")
+    
+    def export_layers_as_svg(self):
+        print("EXPORT_LAYERS_AS_SVG")
+
+
+
+    
+
 #Main starting point of program
 if __name__ == "__main__":
     #Create a host tkinter program window

@@ -20,6 +20,7 @@ class Settings:
     
     #Canvas settings
     CANVAS_HEIGHT = 400
+    CANVAS_WIDTH = 500
     CANVAS_PROGRAM_BORDER_WIDTH = 30             #How big the gap between the canvas border and the program-window edge width is
     CANVAS_PROGRAM_BORDER_HEIGHT = 0            #How big the gap between the canvas border and the program-window edge height is
     CANVAS_BACKGROUND_COLOR = None
