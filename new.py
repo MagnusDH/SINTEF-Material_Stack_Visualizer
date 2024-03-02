@@ -12,6 +12,7 @@ class Material_stack_visualizer_app:
         print("INIT()")
         #Create a dictionary to hold ALL the information about a material
         self.materials = {}
+
         #Read the given excel-file and populate the materials dictionary
         self.load_materials_from_excel(Settings.EXCEL_FILE)
 
@@ -20,7 +21,10 @@ class Material_stack_visualizer_app:
 
         #Create canvas
         self.canvas = self.create_canvas()
-    
+
+        #Draw material stack
+        self.draw_material_stack()
+
     """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self, excel_file):
         print("LOAD_MATERIALS_FROM_EXCEL()")
@@ -86,7 +90,7 @@ class Material_stack_visualizer_app:
             row=0, 
             column=0, 
             padx=(0,0), 
-            pady=(5,0),
+            pady=(0,0),
             sticky="n"
         )
 
@@ -100,7 +104,13 @@ class Material_stack_visualizer_app:
                 bg=Settings.UI_LABEL_BACKGROUND_COLOR,
                 fg=Settings.UI_FRAME_TEXT_COLOR
             )
-            label.grid(row=row_counter, column=0, sticky="nw", padx=(0,0))
+            label.grid(
+                row=row_counter, 
+                column=0, 
+                sticky="", 
+                padx=(0,0),
+                pady=(0,0)
+            )
 
             #Create Entry, customize it and add it to dictionary
             entry = customtkinter.CTkEntry(
@@ -115,8 +125,8 @@ class Material_stack_visualizer_app:
                 row=row_counter, 
                 column=1,
                 sticky="e",
-                pady=(0,0),
-                padx=(0,0)
+                padx=(0,0),
+                pady=(0,0)
             )
             entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
             self.materials[material]["entry_id"] = entry
@@ -133,8 +143,8 @@ class Material_stack_visualizer_app:
                 row=row_counter, 
                 column=2,
                 sticky="e",
-                pady=(0,0),
-                padx=(0,0)
+                padx=(0,0),
+                pady=(0,0)
             )
             slider.set(self.materials[material]["thickness"])
             self.materials[material]["slider_id"] = slider 
@@ -158,7 +168,7 @@ class Material_stack_visualizer_app:
             text_color=Settings.UI_FRAME_TEXT_COLOR,
             width=15,
             command=self.reset_canvas)
-        reset_canvas_button.grid(row=1, column=1, sticky="nw", padx=(0, 0))
+        reset_canvas_button.grid(row=1, column=1, sticky="nw", padx=(0, 0), pady=(0,0))
 
         #Reset values button
         reset_values_button = customtkinter.CTkButton(
@@ -194,13 +204,14 @@ class Material_stack_visualizer_app:
             width=15,
             command=self.export_layers_as_svg
         )
-        export_layers_button.grid(row=2, column=1, sticky="n", padx=(0, 0), pady=(5,0))
+        export_layers_button.grid(row=2, column=1, sticky="n", padx=(0, 0), pady=(0,0))
 
         #Switch layout ComboBox
         self.option_menu = customtkinter.CTkOptionMenu(
             master=window, 
             values=["Stacked", "Realistic", "Stepped"],
-            command=self.switch_layout
+            width=30,
+            command=self.draw_material_stack
         )
         self.option_menu.grid(row=1, column=1, sticky="ne", padx=(0, 0), pady=(0,0))
         
@@ -209,12 +220,12 @@ class Material_stack_visualizer_app:
     """Returns a canvas created in the program window"""
     def create_canvas(self):
         print("CREATE_CANVAS()")
-        
+
         #Create canvas and place it
         canvas = Canvas(
             master=window, 
             height=Settings.CANVAS_HEIGHT, 
-            width=Settings.CANVAS_WIDTH, # self.program_window_width-self.user_interface_frame.winfo_width(), 
+            width=Settings.CANVAS_WIDTH, 
             bg=Settings.CANVAS_BACKGROUND_COLOR,
             highlightbackground="black", 
             highlightthickness=1
@@ -223,13 +234,13 @@ class Material_stack_visualizer_app:
             row=0, 
             column=1, 
             sticky="s", 
-            padx=(3,3), 
-            pady=(5,0)
+            padx=(0,0), 
+            pady=(0,0)
         )
 
         #Set canvas_bbox coordniates for later use
-        self.visible_canvas_bbox_x0 = 2
-        self.visible_canvas_bbox_y0 = 2
+        self.visible_canvas_bbox_x0 = 0
+        self.visible_canvas_bbox_y0 = 0
         self.visible_canvas_bbox_x1 = canvas.winfo_reqwidth() - 3 
         self.visible_canvas_bbox_y1 = canvas.winfo_reqheight() - 3
         self.canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
@@ -256,6 +267,9 @@ class Material_stack_visualizer_app:
         self.materials[identifier]["entry_id"].delete(0, tkinter.END)
         self.materials[identifier]["entry_id"].insert(0, value)
 
+        #Redraw material stack
+        self.draw_material_stack()
+
     """Updates the thickness value in self.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, entry):
         print("MATERIAL_ENTRY_UPDATED()")
@@ -270,6 +284,9 @@ class Material_stack_visualizer_app:
 
                 #Update the slider corresponding to the key
                 self.materials[material]["slider_id"].set(entered_value)
+        
+        #Redraw material stack
+        self.draw_material_stack()
     
     """Deletes the current canvas and creates a new one in its original place"""
     def reset_canvas(self, *args):
@@ -280,6 +297,9 @@ class Material_stack_visualizer_app:
 
         #Create new canvas in its original position
         self.canvas = self.create_canvas()
+
+        #Redraw material stack
+        self.draw_material_stack()
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
     def reset_values(self):
@@ -306,8 +326,8 @@ class Material_stack_visualizer_app:
             # #Reset text_size
             # self.current_text_size = self.original_text_size
             
-            # #Draw rectangle stack with original values
-            # self.draw_material_stack()
+            #Draw rectangle stack with original values
+            self.draw_material_stack()
         
         #Handle errors
         except Exception as error:
@@ -350,30 +370,513 @@ class Material_stack_visualizer_app:
         #     self.write_text_on_stack(self.current_text_size)
         # else:
         #     self.write_text_on_stepped_stack(self.current_text_size)
+    
+    def program_window_resized(self, event):
+        #Only do something if the window size os actaully changed. (The <configure> method calls this function everytime something about the program window is changed)
+        if(event.width != Settings.PROGRAM_WINDOW_WIDTH or event.height != Settings.PROGRAM_WINDOW_HEIGHT):
+            print("PROGRAM_WINDOW_RESIZED()")
+            Settings.PROGRAM_WINDOW_WIDTH = event.width
+            Settings.PROGRAM_WINDOW_HEIGHT = event.height
+        
+        #     #Set the new width of the canvas
+        #     self.canvas.config(width=window.winfo_width() - self.user_interface_frame.winfo_reqwidth()-5)
 
-    def program_window_resized(self):
-        print("PROGRAM_WINDOW_RESIZED() - NOT IMPLEMENTED")
+        #     #Update the variables that track the actual visible parts of the canvas
+        #     self.visible_canvas_bbox_x1 = self.canvas.winfo_reqwidth() - 3
+        #     self.visible_canvas_bbox_y1 = self.canvas.winfo_reqheight() - 3
 
-    def switch_layout(self, event):
-        print("SWITCH LAYOUT")
+        #     #Redraw the material stack
+        #     self.draw_material_stack()
+
+    """Draws the material stack based on the value in the option box"""
+    def draw_material_stack(self, *event):
+        print("DRAW MATERIAL STACK()")
         value = self.option_menu.get()
+        
+        #Draw stack based on option
         if(value == "Stacked"):
-            print("STAAAAACKED")
+            self.draw_material_stack_stacked()
         if(value == "Realistic"):
-            print("REALIIIISTIIIC")
+            self.draw_material_stack_realistic()
         if(value == "Stepped"):
-            print("STEEEEPPED")
+            self.draw_material_stack_stepped()
 
+    """Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what"""
+    def draw_material_stack_stacked(self):       
+        #Clear all existing elements on canvas
+        self.canvas.delete("all")
+
+        #Draw bounding box around canvas
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black", tags="canvas_bounding_box_rectangle")
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in self.materials:
+            if(material=="substrate"):
+                continue    #Skip substrate
+            rectangle_height = int(self.materials[material]["thickness"])
+            sum_of_all_materials += rectangle_height
+        
+        #Materials (except "substrate") will be drawn on 9/10 of the canvas
+        canvas_height = round(self.canvas_height * 0.9)
+
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0
+        rectangle_y0 = self.visible_canvas_bbox_y0 + (self.canvas_height*0.9)
+        rectangle_x1 = self.visible_canvas_bbox_x1 - Settings.STACK_TEXT_INDENT
+        rectangle_y1 = None #Calculated later
+        
+        #Draw rectangles on canvas
+        for material in self.materials:
+            #"substrate" will be drawn on the bottom 1/10 of the canvas
+            if(material == "substrate"):
+                continue    #Skip "substrate"
+
+            #find how many percent the current rectangle's height is of the total sum of materials
+            rectangle_height = int(self.materials[material]["thickness"])
+            rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+            #Convert rectangle percentage to pixels
+            rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
+
+            #draw rectangle from top of canvas to its number of pixles in height
+            rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+            created_rectangle = self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
+
+            #Add rectangle_id to its place in self.materials
+            self.materials[material]["rectangle_id"] = created_rectangle
+
+            #Add rectangle height to prevent overlaping
+            rectangle_y0 -= rectangle_height_pixels
+        
+        #Draw "substrate" on 1/10 of the canvas
+        created_rectangle = self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, fill=self.materials["substrate"]["color"], tags="material_rectangle")
+        #Add rectangle_id to its place in self.materials
+        self.materials["substrate"]["rectangle_id"] = created_rectangle
+
+        #Draw text on rectangles
+        # self.write_text_on_stack(self.current_text_size)
+
+    """Draws a realistic version of the rectangle stack"""
+    def draw_material_stack_realistic(self):
+        #Clear all existing elements on canvas
+        self.canvas.delete("all")
+
+        #Draw bounding box around canvas
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black", tags="canvas_bounding_box_rectangle")
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in self.materials:
+            rectangle_height = int(self.materials[material]["thickness"])
+            sum_of_all_materials += rectangle_height
+        
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0
+        rectangle_y0 = self.visible_canvas_bbox_y1
+        rectangle_x1 = self.visible_canvas_bbox_x1 - Settings.STACK_TEXT_INDENT
+        rectangle_y1 = None #Calculated later
+
+        #Materials (except "substrate") will be drawn on 9/10 of the canvas
+        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
+        
+        #Draw rectangles on canvas
+        for material in self.materials:
+            #find how many percent the current rectangle's height is of the total sum of materials
+            rectangle_height = int(self.materials[material]["thickness"])
+            rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+            #Convert rectangle percentage to pixels
+            rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
+
+            #draw rectangle from top of canvas to its number of pixles in height
+            rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+            created_rectangle = self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
+
+            #Add rectangle_id to its place in self.materials
+            self.materials[material]["rectangle_id"] = created_rectangle
+
+            #Add rectangle height to prevent overlaping
+            rectangle_y0 -= rectangle_height_pixels
+        
+        #Draw text on rectangles
+        # self.write_text_on_stack(self.current_text_size)
+    
+    """Draws a stepped rectangle stack where the "indent" is equal to the rectangles height"""
+    def draw_material_stack_stepped(self):
+        #Clear all existing elements on canvas
+        self.canvas.delete("all")
+
+        #Draw bounding box around canvas
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline="black", tags="canvas_bounding_box_rectangle")
+        
+        #Find the total height of all materials combined and the thickest material
+        sum_of_all_materials = 0
+        biggest_material = 0
+        for material in self.materials:
+            if(material=="substrate"):
+                continue    #Skip substrate
+            sum_of_all_materials += int(self.materials[material]["thickness"])
+            if(biggest_material < int(self.materials[material]["thickness"])):
+                biggest_material = int(self.materials[material]["thickness"])
+
+        #Create new boundaries within main canvas to draw stepped stack
+        stepped_stack_x0 = self.visible_canvas_bbox_x0 + Settings.STACK_TEXT_INDENT
+        stepped_stack_y0 = self.visible_canvas_bbox_y0
+        stepped_stack_x1 = self.visible_canvas_bbox_x1
+        stepped_stack_y1 = round(self.canvas_height * 0.9)
+        stepped_stack_height = round(self.canvas_height * 0.9)
+        stepped_stack_width = stepped_stack_x1 - stepped_stack_x0
+        previous_rectangle_width_pixels = 0
+
+        #Prepare first rectangle drawing coordinates (from bottom left corner)
+        rectangle_x0 = stepped_stack_x0
+        rectangle_y0 = self.visible_canvas_bbox_y0 + round(self.canvas_height*0.9)
+        rectangle_x1 = self.visible_canvas_bbox_x1
+        rectangle_y1 = self.visible_canvas_bbox_y0
+
+        #Draw rectangles on canvas
+        for material in self.materials:
+            #"substrate" will be drawn on the bottom 1/10 of the canvas
+            if(material == "substrate"):
+                created_rectangle = self.canvas.create_rectangle(stepped_stack_x0, round(self.canvas_height*0.9), stepped_stack_x1, self.visible_canvas_bbox_y1, fill="grey", tags="material_rectangle")
+                self.materials["substrate"]["rectangle_id"] = created_rectangle
+
+            else:
+                #find how many percent the current rectangle's height is of the total sum of materials
+                rectangle_height = int(self.materials[material]["thickness"])
+                rectangle_height_percentage = (rectangle_height/sum_of_all_materials)*100
+                #Convert rectangle percentage to pixels
+                rectangle_height_pixels = (rectangle_height_percentage/100)*stepped_stack_height
+
+                #Set the y1 coordinate of the rectangle
+                rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+
+                #Calculate the width of the current material
+                rectangle_x1 = rectangle_x1 - previous_rectangle_width_pixels
+
+                #Store this width for the next rectangle (must be done now to get the height and the width of the rectangle to be equal)
+                previous_rectangle_width_pixels = rectangle_height_pixels
+
+                #Create rectangle
+                created_rectangle = self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
+
+                #Add rectangle_id to its place in self.materials
+                self.materials[material]["rectangle_id"] = created_rectangle
+
+                #Add rectangle height to prevent overlaping
+                rectangle_y0 -= rectangle_height_pixels
+        
+        # self.write_text_on_stepped_stack(self.current_text_size)
+
+    def write_text_on_stack(self, text_size):
+        #Delete all texts on canvas and draw them again
+        for material in self.materials:
+            self.canvas.delete(self.materials[material]["text_id"])
+            self.canvas.delete(self.materials[material]["text_bbox_id"])
+            self.canvas.delete(self.materials[material]["line_id"])
+        
+        #Find out the height of a potential text's bounding box
+        text_font = font.Font(family=self.text_font, size=text_size)
+        text_height = text_font.metrics()['linespace']
+        previous_material = None
+        
+        #for material in self.materials:
+        for material in dict(reversed(self.materials.items())):
+            #Find coordinates and height of current material_rectangle
+            rectangle_x0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[0]
+            rectangle_y0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[1]
+            rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
+            rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
+            rectangle_height = rectangle_y1-rectangle_y0
+            rectangle_middle_x = (rectangle_x0 + rectangle_x1)/2
+            rectangle_middle_y = (rectangle_y0 + rectangle_y1) / 2
+
+            #Text is drawn inside rectangle if it fits
+            if(text_height < rectangle_height):
+                created_text = self.canvas.create_text(rectangle_middle_x, rectangle_middle_y, text=f"{material} - {self.materials[material]['thickness']}nm", fill="black", font=(self.text_font, text_size), anchor="center", tags="Material_label")
+                
+                #If text is outside leftside of canvas, place it on the left canvas side
+                if(self.canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
+                    margin = self.visible_canvas_bbox_x0 - self.canvas.bbox(created_text)[0] 
+                    self.canvas.coords(created_text, rectangle_middle_x+margin, rectangle_middle_y)
+                
+                #If text is outside rightside of canvas, place it on the right canvas side
+                if(self.canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
+                    margin = self.canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
+                    self.canvas.coords(created_text, rectangle_middle_x-margin, rectangle_middle_y)
+                #Add text element to dictionary
+                self.materials[material]["text_id"] = created_text
+
+            #Text must be drawn outside rectangle
+            else:
+                created_text = self.canvas.create_text(self.visible_canvas_bbox_x1-5, rectangle_middle_y, text=f"{material} - {self.materials[material]['thickness']}nm", fill="black", font=(self.text_font, text_size), anchor="e", tags="Material_label")
+                created_text_bbox = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_bbox")     
+                text_bbox_x0 = self.canvas.bbox(created_text)[0]
+                text_bbox_y0 = self.canvas.bbox(created_text)[1]
+                text_bbox_x1 = self.canvas.bbox(created_text)[2]
+                text_bbox_y1 = self.canvas.bbox(created_text)[3]
+                text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                created_arrow_line = self.canvas.create_line((text_bbox_x0, text_bbox_middle_y), (rectangle_x1, rectangle_middle_y), arrow=tk.LAST, tags="arrow_line")
+
+                self.materials[material]["text_id"] = created_text
+                self.materials[material]["text_bbox_id"] = created_text_bbox
+                self.materials[material]["line_id"] = created_arrow_line
+
+                #Get the bounding box of the previous materials text
+                if(previous_material is not None):
+                    previous_text_bbox_x0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[0]
+                    previous_text_bbox_y0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[1]
+                    previous_text_bbox_x1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[2]
+                    previous_text_bbox_y1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[3]
+
+                #if(text overlaps with canvas top):
+                if(text_bbox_y0 < self.visible_canvas_bbox_y0):
+                    #Find how much is overlapping
+                    overlap = self.visible_canvas_bbox_y0 - text_bbox_y0
+                    #Move text and bbox down
+                    self.canvas.move(self.materials[material]["text_id"], 0, overlap)
+                    self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                    #Find coordinates of text bounding box
+                    tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    #Delete the arrow line
+                    self.canvas.delete(self.materials[material]["line_id"])
+                    #Create new arrow line
+                    created_arrow_line = self.canvas.create_line(tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    #Add the new line to dictionary
+                    self.materials[material]["line_id"] = created_arrow_line
+
+                #if(Text overlaps with canvas bottom):
+                if(text_bbox_y1 > self.visible_canvas_bbox_y1):
+                    #Find how much is overlapping
+                    overlap = text_bbox_y1 - self.visible_canvas_bbox_y1
+                    #Move text up
+                    self.canvas.move(self.materials[material]["text_id"], 0, -overlap)
+                    self.canvas.move(self.materials[material]["text_bbox_id"], 0, -overlap)
+                    #Find coordinates of text bounding box
+                    tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    #Delete the arrow line
+                    self.canvas.delete(self.materials[material]["line_id"])
+                    #Create new arrow line
+                    created_arrow_line = self.canvas.create_line(tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    #Add the new line to dictionary
+                    self.materials[material]["line_id"] = created_arrow_line
+
+                # if(Text top overlaps with previous text bottom):
+                if(previous_material is not None and text_bbox_y0 < previous_text_bbox_y1):
+                    #Find how much is overlapping
+                    overlap = previous_text_bbox_y1 - text_bbox_y0
+                    #Move text down
+                    self.canvas.move(self.materials[material]["text_id"], 0, overlap)
+                    self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                    #Find coordinates of text bounding box
+                    tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    #Delete the arrow line
+                    self.canvas.delete(self.materials[material]["line_id"])
+                    #Create new arrow line
+                    created_arrow_line = self.canvas.create_line(tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    #Add the new line to dictionary
+                    self.materials[material]["line_id"] = created_arrow_line
+
+                    # #if(Text bottom overlaps with previous text top):
+                    # if(previous_material is not None and text_bbox_y1 < previous_text_bbox_y1):
+                    #     #Find how much is overlapping
+                    #     overlap = previous_text_bbox_y1 - text_bbox_y1
+                    #     #Move text down
+                    #     self.canvas.move(self.materials[material]["text_id"], 0, overlap)
+                    #     self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                    #     #Find coordinates of text bounding box
+                    #     tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    #     #Delete the arrow line
+                    #     self.canvas.delete(self.materials[material]["line_id"])
+                    #     #Create new arrow line
+                    #     created_arrow_line = self.canvas.create_line(tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    #     #Add the new line to dictionary
+                    #     self.materials[material]["line_id"] = created_arrow_line
+
+                previous_material = material
+
+    def write_text_on_stepped_stack(self, text_size):
+        #Delete all texts on canvas and draw them again
+        for material in self.materials:
+            self.canvas.delete(self.materials[material]["text_id"])
+            self.canvas.delete(self.materials[material]["text_bbox_id"])
+            self.canvas.delete(self.materials[material]["line_id"])
+
+        #Find out the height of a potential text's bounding box
+        text_font = font.Font(family=self.text_font, size=text_size)
+        text_height = text_font.metrics()['linespace']
+        previous_material = None
+        
+        #for material in self.materials:
+        for material in dict(reversed(self.materials.items())):
+            #Find coordinates and height of current material_rectangle
+            rectangle_x0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[0]
+            rectangle_y0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[1]
+            rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
+            rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
+            rectangle_height = rectangle_y1-rectangle_y0
+            rectangle_middle_x = (rectangle_x0 + rectangle_x1)/2
+            rectangle_middle_y = (rectangle_y0 + rectangle_y1) / 2
+
+            #Text is drawn inside rectangle if it fits
+            if(text_height < rectangle_height):
+                created_text = self.canvas.create_text(rectangle_middle_x, rectangle_middle_y, text=f"{material} - {self.materials[material]['thickness']}nm", fill="black", font=(self.text_font, text_size), anchor="center", tags="Material_label")
+                
+                #If text is outside leftside of canvas, place it on the left canvas side
+                if(self.canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
+                    margin = self.visible_canvas_bbox_x0 - self.canvas.bbox(created_text)[0] 
+                    self.canvas.coords(created_text, rectangle_middle_x+margin, rectangle_middle_y)
+                
+                #If text is outside rightside of canvas, place it on the right canvas side
+                if(self.canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
+                    margin = self.canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
+                    self.canvas.coords(created_text, rectangle_middle_x-margin, rectangle_middle_y)
+                #Add text element to dictionary
+                self.materials[material]["text_id"] = created_text
+
+            #Text must be drawn outside rectangle
+            else:
+                created_text = self.canvas.create_text(self.visible_canvas_bbox_x0+5, rectangle_middle_y, text=f"{material} - {self.materials[material]['thickness']}nm", fill="black", font=(self.text_font, text_size), anchor="w", tags="Material_label")
+                created_text_bbox = self.canvas.create_rectangle(self.canvas.bbox(created_text), outline='black', tags="text_bbox")     
+                text_bbox_x0 = self.canvas.bbox(created_text)[0]
+                text_bbox_y0 = self.canvas.bbox(created_text)[1]
+                text_bbox_x1 = self.canvas.bbox(created_text)[2]
+                text_bbox_y1 = self.canvas.bbox(created_text)[3]
+                text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                created_arrow_line = self.canvas.create_line((text_bbox_x1, text_bbox_middle_y), (rectangle_x0, rectangle_middle_y), arrow=tk.LAST, tags="arrow_line")
+
+                #Add text ID, bbox ID and arrow line ID to dictionary 
+                self.materials[material]["text_id"] = created_text
+                self.materials[material]["text_bbox_id"] = created_text_bbox
+                self.materials[material]["line_id"] = created_arrow_line
+
+                #Get the bounding box of the previous materials text
+                if(previous_material is not None):
+                    previous_text_bbox_x0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[0]
+                    previous_text_bbox_y0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[1]
+                    previous_text_bbox_x1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[2]
+                    previous_text_bbox_y1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[3]
+
+                #if(text overlaps with canvas top):
+                if(text_bbox_y0 < self.visible_canvas_bbox_y0):
+                    #Find how much is overlapping
+                    overlap = self.visible_canvas_bbox_y0 - text_bbox_y0
+                    #Move text and bbox down
+                    self.canvas.move(self.materials[material]["text_id"], 0, overlap)
+                    self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                    #Find coordinates of text bounding box
+                    tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    #Delete the arrow line
+                    self.canvas.delete(self.materials[material]["line_id"])
+                    #Create new arrow line
+                    created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    #Add the new line to dictionary
+                    self.materials[material]["line_id"] = created_arrow_line
+
+                #if(Text overlaps with canvas bottom):
+                if(text_bbox_y1 > self.visible_canvas_bbox_y1):
+                    #Find how much is overlapping
+                    overlap = text_bbox_y1 - self.visible_canvas_bbox_y1
+                    #Move text up
+                    self.canvas.move(self.materials[material]["text_id"], 0, -overlap)
+                    self.canvas.move(self.materials[material]["text_bbox_id"], 0, -overlap)
+                    #Find coordinates of text bounding box
+                    tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    #Delete the arrow line
+                    self.canvas.delete(self.materials[material]["line_id"])
+                    #Create new arrow line
+                    created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    #Add the new line to dictionary
+                    self.materials[material]["line_id"] = created_arrow_line
+
+                #if(Text top overlaps with previous text bottom):
+                if(previous_material is not None and text_bbox_y0 < previous_text_bbox_y1):
+                    #Find how much is overlapping
+                    overlap = previous_text_bbox_y1 - text_bbox_y0
+                    #Move text down
+                    self.canvas.move(self.materials[material]["text_id"], 0, overlap)
+                    self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                    #Find coordinates of text bounding box
+                    tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    #Delete the arrow line
+                    self.canvas.delete(self.materials[material]["line_id"])
+                    #Create new arrow line
+                    created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    #Add the new line to dictionary
+                    self.materials[material]["line_id"] = created_arrow_line
+
+                    #if(Text bottom overlaps with previous text top):
+                    if(previous_material is not None and text_bbox_y1 < previous_text_bbox_y1):
+                        #Find how much is overlapping
+                        overlap = previous_text_bbox_y1 - text_bbox_y1
+                        #Move text down
+                        self.canvas.move(self.materials[material]["text_id"], 0, overlap)
+                        self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                        #Find coordinates of text bounding box
+                        tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                        #Delete the arrow line
+                        self.canvas.delete(self.materials[material]["line_id"])
+                        #Create new arrow line
+                        created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                        #Add the new line to dictionary
+                        self.materials[material]["line_id"] = created_arrow_line
+
+                #if text is overlaps with the left side of the canvas
+                # if(text_bbox_x0 < self.visible_canvas_bbox_x0):
+                    # self.canvas.move(self.materials[material]["text_id"], 100, 0)
+                    # self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                    # #Find coordinates of text bounding box
+                    # tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                    # #Delete the arrow line
+                    # self.canvas.delete(self.materials[material]["line_id"])
+                    # #Create new arrow line
+                    # created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
+                    # #Add the new line to dictionary
+                    # self.materials[material]["line_id"] = created_arrow_line
+
+
+                previous_material = material
+        
+        #Write the given indent ranges    
+        self.write_indent_range_on_stepped_stack()
+
+    def write_indent_range_on_stepped_stack(self):
+        #Delete all texts on canvas and draw them again
+        for material in self.materials:
+            self.canvas.delete(self.materials[material]["indent_text_id"])
+            self.canvas.delete(self.materials[material]["indent_arrow_id"])
+        
+        previous_rectangle_x1 = None
+        previous_rectangle_y1 = None
+        previous_material = None
+
+        #Loop through all the materials
+        for material in dict(reversed(self.materials.items())):
+            #Find x1 and y1 coordinates of current material_rectangle
+            current_rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
+            current_rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
+
+            if(previous_rectangle_x1 is not None): #and previous_rectangle_x1-current_rectangle_x1 != 0):
+                #Create a two sided arrow line between the differense of the two rectangles
+                created_arrow_line = self.canvas.create_line(current_rectangle_x1, previous_rectangle_y1-5, previous_rectangle_x1, previous_rectangle_y1-5, arrow=tk.BOTH)
+                #Write indent number over line
+                indent_number = int(self.materials[material]["indent"])
+
+                created_indent_text = self.canvas.create_text(previous_rectangle_x1, previous_rectangle_y1-15, text=f"{indent_number}nm", fill="black", font=(self.text_font, self.current_text_size), anchor="w", tags="double_arrow_indent")
+                
+                #Add created elements to dictionary
+                self.materials[material]["indent_text_id"] = created_indent_text
+                self.materials[material]["indent_arrow_id"] = created_arrow_line
+
+            #Set new "previous_rectangle" coordinates
+            previous_rectangle_x1 = current_rectangle_x1
+            previous_rectangle_y1 = current_rectangle_y1
+            previous_material = material
 
     def export_stack_as_svg(self):
         print("EXPORT_STACK_AS_SVG")
     
     def export_layers_as_svg(self):
         print("EXPORT_LAYERS_AS_SVG")
-
-
-
-    
 
 #Main starting point of program
 if __name__ == "__main__":
@@ -391,5 +894,9 @@ if __name__ == "__main__":
     #Create instance of Layer_stack_vizualiser class and run it
     material_stack_visualizer_app = Material_stack_visualizer_app()
 
+    #Checks if the program window is being resized
+    # window.update_idletasks()
+    window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
+    
     #Start the main loop of the program
     window.mainloop()
