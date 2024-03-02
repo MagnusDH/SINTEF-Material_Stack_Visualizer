@@ -10,15 +10,19 @@
     *Required libraries:
         1. Pandas: 
             -to read from .excel file
-            -" pip install pandas "
+            -"pip install pandas"
 
         2. openpyxl:
             -required to read from excel files.
-            -" pip install openpyxl "
+            -"pip install openpyxl"
     
         3. pyautogui
             -For taking correct screenshot of rectangle stack
-            -" pip install pyautogui "
+            -"pip install pyautogui"
+        
+        4.CustomTkinter
+            -For a more modern look of the app
+            -"pip install customtkinter"
 
     
 
@@ -38,17 +42,10 @@
                 {"text_bbox_id" : value},
                 {"line_id": value},
                 {"entry_id": value},
-                {"slider_id": value} 
+                {"slider_id": value},
+                {"indent_text_id": value},
+                {"indent_arrow_id": value}
         }
-        self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "rectangle_id": None, "text_id": None, "line_id": None, "entry_id": None, "slider_id": None}
-
-
-    FUNCTIONS OF PROGRAM:
-        -Adjust the thickness of each layer by using the sliders or entry-boxes
-        -Rectangle stack gets redrawn acording to the size of the app-window
-        -Close program by pressing "esc" or closing app-window manually
-        -"export_recStack_as_jpg" takes a screenshot of the entire rectangle stack
-        -"export_all_as_jpg" takes incrementing screenshots of all the materials/layers in the rectangle stack
+        self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "rectangle_id": None, "text_id": None, "line_id": None, "entry_id": None, "slider_id": None, "indent_text_id": None, "indent_arrow_id": None}
 
     BUGS:
-    the svg-layers-export of the stepped stack creates the text and bounding box outside the file (on the left side) 
