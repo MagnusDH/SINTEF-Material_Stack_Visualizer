@@ -49,3 +49,4 @@
         self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "rectangle_id": None, "text_id": None, "line_id": None, "entry_id": None, "slider_id": None, "indent_text_id": None, "indent_arrow_id": None}
 
     BUGS:
+        -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
