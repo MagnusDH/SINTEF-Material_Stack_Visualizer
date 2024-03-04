@@ -7,6 +7,8 @@ import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
 import os
 
+#Stepped skal bare endre på "indent range"
+
 class Material_stack_visualizer_app:
     def __init__(self):
         print("INIT()")
@@ -428,17 +430,15 @@ class Material_stack_visualizer_app:
         match self.option_menu.get():
             case "Stacked":
                 self.draw_material_stack_stacked()
-                self.write_text_on_stack()
             case "Realistic":
                 self.draw_material_stack_realistic()
-                self.write_text_on_stack()
             case "Stepped":
                 self.draw_material_stack_stepped()
-                self.write_text_on_stack()
-                self.write_indent_on_stepped_stack()
 
     """Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what"""
     def draw_material_stack_stacked(self):       
+        print("DRAW_MATERIAL_STACK_STACKED()")
+        
         #Clear all existing elements on canvas
         self.canvas.delete("all")
 
@@ -499,8 +499,13 @@ class Material_stack_visualizer_app:
                 #Add rectangle height to prevent overlaping
                 rectangle_y0 -= rectangle_height_pixels
             
+        #Write text on the stack
+        self.write_text_on_stack()
+        
     """Draws a realistic version of the rectangle stack"""
     def draw_material_stack_realistic(self):
+        print("DRAW_MATERIAL_STACK_REALISTIC()")
+        
         #Clear all existing elements on canvas
         self.canvas.delete("all")
 
@@ -540,11 +545,13 @@ class Material_stack_visualizer_app:
             #Add rectangle height to prevent overlaping
             rectangle_y0 -= rectangle_height_pixels
         
-        #Draw text on rectangles
-        # self.write_text_on_stack(self.current_text_size)
+        #Write text on the stack
+        self.write_text_on_stack()
     
-    """Draws a stepped rectangle stack where the "indent" is equal to the rectangles height"""
+    """Draws a stepped rectangle stack where "indent" decide the width of each rectangle"""
     def draw_material_stack_stepped(self):
+        print("DRAW_MATERIAL_STACK_STEPPED()")
+
         #Clear all existing elements on canvas
         self.canvas.delete("all")
 
@@ -560,57 +567,64 @@ class Material_stack_visualizer_app:
             sum_of_all_materials += int(self.materials[material]["thickness"])
             if(biggest_material < int(self.materials[material]["thickness"])):
                 biggest_material = int(self.materials[material]["thickness"])
-
-        #Create new boundaries within main canvas to draw stepped stack
-        stepped_stack_x0 = self.visible_canvas_bbox_x0 + Settings.STACK_TEXT_INDENT
-        stepped_stack_y0 = self.visible_canvas_bbox_y0
-        stepped_stack_x1 = self.visible_canvas_bbox_x1
-        stepped_stack_y1 = round(self.canvas_height * 0.9)
-        stepped_stack_height = round(self.canvas_height * 0.9)
-        stepped_stack_width = stepped_stack_x1 - stepped_stack_x0
-        previous_rectangle_width_pixels = 0
+        
+        #Find how many nanometers 1 pixel should represent
+        nanometers_per_pixel = sum_of_all_materials/round(self.canvas_height * 0.9)
 
         #Prepare first rectangle drawing coordinates (from bottom left corner)
-        rectangle_x0 = stepped_stack_x0
-        rectangle_y0 = self.visible_canvas_bbox_y0 + round(self.canvas_height*0.9)
+        rectangle_x0 = self.visible_canvas_bbox_x0 + Settings.STACK_TEXT_INDENT
+        rectangle_y0 = round(self.canvas_height*0.9) + 10
         rectangle_x1 = self.visible_canvas_bbox_x1
-        rectangle_y1 = self.visible_canvas_bbox_y0
+        rectangle_y1 = None #calculated later
+        previous_rectangle_x1 = self.visible_canvas_bbox_x1      
 
         #Draw rectangles on canvas
         for material in self.materials:
-            #"substrate" will be drawn on the bottom 1/10 of the canvas
+            #Draw "substrate" on the bottom 1/10 of the canvas
             if(material == "substrate"):
+                #Find how many pixels is needed to represent the indent of the current material
+                indent_width_pixels = int(self.materials[material]["indent"])/nanometers_per_pixel
+
+                #Set the width of the rectangle
+                rectangle_x1 = rectangle_x1-indent_width_pixels
+
                 created_rectangle = self.canvas.create_rectangle(
-                    stepped_stack_x0, round(self.canvas_height*0.9), stepped_stack_x1, self.visible_canvas_bbox_y1, 
+                    rectangle_x0, rectangle_y0, rectangle_x1, self.visible_canvas_bbox_y1,
                     fill=self.materials[material]["color"], 
                     tags="material_rectangle"
                 )
                 self.materials["substrate"]["rectangle_id"] = created_rectangle
 
+            #Draw rectangles except "substrate"
             else:
-                #find how many percent the current rectangle's height is of the total sum of materials
-                rectangle_height = int(self.materials[material]["thickness"])
-                rectangle_height_percentage = (rectangle_height/sum_of_all_materials)*100
-                #Convert rectangle percentage to pixels
-                rectangle_height_pixels = (rectangle_height_percentage/100)*stepped_stack_height
-
+                #Find how many pixels is needed to represent the height of the current material
+                rectangle_height_pixels = int(self.materials[material]["thickness"])/nanometers_per_pixel
+                
                 #Set the y1 coordinate of the rectangle
                 rectangle_y1 = rectangle_y0 - rectangle_height_pixels
 
-                #Calculate the width of the current material
-                rectangle_x1 = rectangle_x1 - previous_rectangle_width_pixels
+                #Find how many pixels is needed to represent the indent of the current material
+                indent_width_pixels = int(self.materials[material]["indent"])/nanometers_per_pixel
 
-                #Store this width for the next rectangle (must be done now to get the height and the width of the rectangle to be equal)
-                previous_rectangle_width_pixels = rectangle_height_pixels
+                #Set the indent width for the current rectangle
+                rectangle_x1 =  rectangle_x1 - indent_width_pixels  
 
                 #Create rectangle
-                created_rectangle = self.canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=self.materials[material]["color"], tags="material_rectangle")
-
+                created_rectangle = self.canvas.create_rectangle(
+                    rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
+                    fill=self.materials[material]["color"], 
+                    outline=Settings.RECTANGLE_OUTLINE_COLOR,
+                    tags="material_rectangle"
+                )
                 #Add rectangle_id to its place in self.materials
                 self.materials[material]["rectangle_id"] = created_rectangle
 
                 #Add rectangle height to prevent overlaping
                 rectangle_y0 -= rectangle_height_pixels
+
+        #Write text and indent on stack
+        self.write_text_on_stack()
+        self.write_indent_on_stepped_stack()
     
     """Writes text on rectangles in the material stack"""
     def write_text_on_stack(self):
@@ -986,39 +1000,76 @@ class Material_stack_visualizer_app:
 
                         previous_material = material
                 
+    """Writes the indent ranges on the stepped material stack"""
     def write_indent_on_stepped_stack(self):
         print("WRITE_INDENT_ON_STEPPED_STACK()")
-        #Delete all texts on canvas and draw them again
-        # for material in self.materials:
-        #     self.canvas.delete(self.materials[material]["indent_text_id"])
-        #     self.canvas.delete(self.materials[material]["indent_arrow_id"])
+        #Delete indent texts from canvas and dictionary
+        for material in self.materials:
+            self.canvas.delete(self.materials[material]["indent_text_id"])
+            self.canvas.delete(self.materials[material]["indent_arrow_id"])
+
+            self.materials[material]["indent_text_id"] = None
+            self.materials[material]["indent_arrow_id"] = None
         
-        # previous_rectangle_x1 = None
-        # previous_rectangle_y1 = None
-        # previous_material = None
+        previous_rectangle_x1 = self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
+        previous_rectangle_y1 = self.visible_canvas_bbox_y1
+        previous_material = None
 
-        # #Loop through all the materials
-        # for material in dict(reversed(self.materials.items())):
-        #     #Find x1 and y1 coordinates of current material_rectangle
-        #     current_rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
-        #     current_rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
+        #Loop through all the materials
+        for material in self.materials:
+            #Find x1 and y1 coordinates of current material_rectangle
+            current_rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
+            current_rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
 
-        #     if(previous_rectangle_x1 is not None): #and previous_rectangle_x1-current_rectangle_x1 != 0):
-        #         #Create a two sided arrow line between the differense of the two rectangles
-        #         created_arrow_line = self.canvas.create_line(current_rectangle_x1, previous_rectangle_y1-5, previous_rectangle_x1, previous_rectangle_y1-5, arrow=tk.BOTH)
-        #         #Write indent number over line
-        #         indent_number = int(self.materials[material]["indent"])
+            #Create a two sided arrow line between the differense of the two rectangles
+            created_indent_line = self.canvas.create_line(
+                current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, current_rectangle_y1-5, 
+                fill=Settings.TEXT_COLOR,
+                arrow=tkinter.BOTH
+            )
 
-        #         created_indent_text = self.canvas.create_text(previous_rectangle_x1, previous_rectangle_y1-15, text=f"{indent_number}nm", fill="black", font=(self.text_font, self.current_text_size), anchor="w", tags="double_arrow_indent")
+            previous_rectangle_x1 = current_rectangle_x1
+            previous_rectangle_y1 = current_rectangle_y1
+
+            #Write indent number over line
+            indent_number = int(self.materials[material]["indent"])
+            created_indent_text = self.canvas.create_text(
+                current_rectangle_x1, current_rectangle_y1-15, 
+                text=f"{indent_number}nm", 
+                fill=Settings.TEXT_COLOR, 
+                font=(Settings.TEXT_FONT, Settings.TEXT_SIZE), 
+                anchor="w", 
+            )
+
+
+
+
+
+            # if(previous_rectangle_x1 is not None):
+            #     #Create a two sided arrow line between the differense of the two rectangles
+            #     created_indent_line = self.canvas.create_line(
+            #         current_rectangle_x1, previous_rectangle_y1-5, previous_rectangle_x1, previous_rectangle_y1-5, 
+            #         fill=Settings.TEXT_COLOR,
+            #         arrow=tkinter.BOTH
+            #     )
+            #     #Write indent number over line
+            #     indent_number = int(self.materials[material]["indent"])
+            #     created_indent_text = self.canvas.create_text(
+            #         previous_rectangle_x1, previous_rectangle_y1-15, 
+            #         text=f"{indent_number}nm", 
+            #         fill=Settings.TEXT_COLOR, 
+            #         font=(Settings.TEXT_FONT, Settings.TEXT_SIZE), 
+            #         anchor="w", 
+            #     )
                 
-        #         #Add created elements to dictionary
-        #         self.materials[material]["indent_text_id"] = created_indent_text
-        #         self.materials[material]["indent_arrow_id"] = created_arrow_line
+            #Add created elements to dictionary
+            self.materials[material]["indent_text_id"] = created_indent_text
+            self.materials[material]["indent_arrow_id"] = created_indent_line
 
-        #     #Set new "previous_rectangle" coordinates
-        #     previous_rectangle_x1 = current_rectangle_x1
-        #     previous_rectangle_y1 = current_rectangle_y1
-        #     previous_material = material
+            #Set new "previous_rectangle" coordinates
+            # previous_rectangle_x1 = current_rectangle_x1
+            # previous_rectangle_y1 = current_rectangle_y1
+            # previous_material = material
 
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
@@ -1066,148 +1117,149 @@ class Material_stack_visualizer_app:
     def export_layers_as_svg(self):
         print("EXPORT_LAYERS_AS_SVG")
 
-        #Specify a folder where the SVG-files should be saved
-        folder_path = "svg_exports"
-        #Create the folder if it doesn't exist
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+        # #Specify a folder where the SVG-files should be saved
+        # folder_path = "svg_exports"
+        # #Create the folder if it doesn't exist
+        # if not os.path.exists(folder_path):
+        #     os.makedirs(folder_path)
 
-        #Each SVG-file is assigned a number based on how many layers are in each file
-        layer_counter = 1
-        previously_created_elements = []
+        # #Each SVG-file is assigned a number based on how many layers are in each file
+        # layer_counter = 1
+        # previously_created_elements = []
 
-        #Iterate through all the materials
-        for material in self.materials:
-            #Create a name for the SVG file for the current layer
-            filename = f"{layer_counter}_layers.svg"
+        # #Iterate through all the materials
+        # for material in self.materials:
+        #     #Create a name for the SVG file for the current layer
+        #     filename = f"{layer_counter}_layers.svg"
 
-            #Create the file path by joining the folder path and the filename
-            file_path = os.path.join(folder_path, filename)
+        #     #Create the file path by joining the folder path and the filename
+        #     file_path = os.path.join(folder_path, filename)
 
-            #Open file for writing
-            with open(file_path, 'w') as f:
-                #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
-                f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-                #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(window.winfo_reqwidth(), window.winfo_reqheight()))
+        #     #Open file for writing
+        #     with open(file_path, 'w') as f:
+        #         #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
+        #         f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+        #         #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
+        #         f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(window.winfo_reqwidth(), window.winfo_reqheight()))
 
-                #Write the previous created elements to the current file
-                if(len(previously_created_elements) != 0):
-                    for element in previously_created_elements:
-                        f.write(element)
+        #         #Write the previous created elements to the current file
+        #         if(len(previously_created_elements) != 0):
+        #             for element in previously_created_elements:
+        #                 f.write(element)
 
-                #Create SVG-element of rectangle and write it to file
-                rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(self.materials[material]["rectangle_id"])
+        #         #Create SVG-element of rectangle and write it to file
+        #         rect_x0, rect_y0, rect_x1, rect_y1 = self.canvas.coords(self.materials[material]["rectangle_id"])
 
-                svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, self.materials[material]["color"])
-                f.write(svg_rectangle_element)
-                previously_created_elements.append(svg_rectangle_element)
+        #         svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, self.materials[material]["color"])
+        #         f.write(svg_rectangle_element)
+        #         previously_created_elements.append(svg_rectangle_element)
 
-                #Create SVG-element for the rectangle bounding box and write it to file
-                svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
-                f.write(svg_bbox_element)
-                previously_created_elements.append(svg_bbox_element)
+        #         #Create SVG-element for the rectangle bounding box and write it to file
+        #         svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
+        #         f.write(svg_bbox_element)
+        #         previously_created_elements.append(svg_bbox_element)
 
-                #Create SVG-element for text and write it to file
-                if(self.materials[material]["text_id"] is not None):
-                    if(self.option_menu.get() == "Stacked"):    #The text is written on the right side of the stack
-                        text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
-                        text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
-                        svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="west">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+        #         #Create SVG-element for text and write it to file
+        #         if(self.materials[material]["text_id"] is not None):
+        #             if(self.option_menu.get() == "Stacked"):    #The text is written on the right side of the stack
+        #                 text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
+        #                 text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
+        #                 svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="west">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
                         
-                        f.write(svg_text_element)
-                        previously_created_elements.append(svg_text_element)
-                    else:   
-                        text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
-                        text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
-                        svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
+        #                 f.write(svg_text_element)
+        #                 previously_created_elements.append(svg_text_element)
+        #             else:   
+        #                 text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
+        #                 text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
+        #                 svg_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, Settings.SVG_TEXT_SIZE, text_content)
                         
-                        f.write(svg_text_element)
-                        previously_created_elements.append(svg_text_element)
+        #                 f.write(svg_text_element)
+        #                 previously_created_elements.append(svg_text_element)
                 
-                #Create SVG-element for text bounding box
-                if(self.materials[material]["text_bbox_id"] is not None):
-                    #The text is written on the left side of the stack
-                    if(self.switch_layout_counter % 3 == 2):
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+        #         #Create SVG-element for text bounding box
+        #         if(self.materials[material]["text_bbox_id"] is not None):
+        #             #The text is written on the left side of the stack
+        #             if(self.switch_layout_counter % 3 == 2):
+        #                 bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+        #                 svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
                         
-                        # Write the SVG representation of the bounding box to the file
-                        f.write(svg_bbox_element)
-                        previously_created_elements.append(svg_bbox_element)
-                    #The text is written on the right side of the stack
-                    else:
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0+(bbox_x1-bbox_x0)/2, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
+        #                 # Write the SVG representation of the bounding box to the file
+        #                 f.write(svg_bbox_element)
+        #                 previously_created_elements.append(svg_bbox_element)
+        #             #The text is written on the right side of the stack
+        #             else:
+        #                 bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+        #                 svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(bbox_x0+(bbox_x1-bbox_x0)/2, bbox_y0, bbox_x1 - bbox_x0, bbox_y1 - bbox_y0)
                         
-                        # Write the SVG representation of the bounding box to the file
-                        f.write(svg_bbox_element)
-                        previously_created_elements.append(svg_bbox_element)
+        #                 # Write the SVG representation of the bounding box to the file
+        #                 f.write(svg_bbox_element)
+        #                 previously_created_elements.append(svg_bbox_element)
 
-                #Create SVG-element for arrow line pointing from box to rectangle
-                if(self.materials[material]["line_id"] is not None):
-                    #The text is written on the left side of the stack
-                    if(self.switch_layout_counter % 3 == 2):
-                        line_coords = self.canvas.coords(self.materials[material]["line_id"])
-                        #Construct an SVG <line> element for arrows
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1, line_coords[1], line_coords[2], line_coords[3])
+        #         #Create SVG-element for arrow line pointing from box to rectangle
+        #         if(self.materials[material]["line_id"] is not None):
+        #             #The text is written on the left side of the stack
+        #             if(self.switch_layout_counter % 3 == 2):
+        #                 line_coords = self.canvas.coords(self.materials[material]["line_id"])
+        #                 #Construct an SVG <line> element for arrows
+        #                 bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+        #                 svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1, line_coords[1], line_coords[2], line_coords[3])
                         
-                        #Write the SVG representation of the arrow to the file
-                        f.write(svg_line_element)
-                        previously_created_elements.append(svg_line_element)
-                    #The text is written on the right side of the stack
-                    else:
-                        line_coords = self.canvas.coords(self.materials[material]["line_id"])
-                        #Construct an SVG <line> element for arrows
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1-(bbox_x1-bbox_x0)/2, line_coords[1], line_coords[2], line_coords[3])
-                        #Write the SVG representation of the arrow to the file
-                        f.write(svg_line_element)
-                        previously_created_elements.append(svg_line_element)
+        #                 #Write the SVG representation of the arrow to the file
+        #                 f.write(svg_line_element)
+        #                 previously_created_elements.append(svg_line_element)
+        #             #The text is written on the right side of the stack
+        #             else:
+        #                 line_coords = self.canvas.coords(self.materials[material]["line_id"])
+        #                 #Construct an SVG <line> element for arrows
+        #                 bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+        #                 svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" />\n'.format(bbox_x1-(bbox_x1-bbox_x0)/2, line_coords[1], line_coords[2], line_coords[3])
+        #                 #Write the SVG representation of the arrow to the file
+        #                 f.write(svg_line_element)
+        #                 previously_created_elements.append(svg_line_element)
 
-                #Create SVG-element for indent_text
-                if(self.materials[material]["indent_text_id"] is not None):
-                    indent_text_x0, indent_text_y0 = self.canvas.coords(self.materials[material]["indent_text_id"])
-                    indent_text_content = self.canvas.itemcget(self.materials[material]["indent_text_id"], 'text')
-                    svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(rect_x1-10, indent_text_y0, Settings.SVG_TEXT_SIZE, indent_text_content)
+        #         #Create SVG-element for indent_text
+        #         if(self.materials[material]["indent_text_id"] is not None):
+        #             indent_text_x0, indent_text_y0 = self.canvas.coords(self.materials[material]["indent_text_id"])
+        #             indent_text_content = self.canvas.itemcget(self.materials[material]["indent_text_id"], 'text')
+        #             svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(rect_x1-10, indent_text_y0, Settings.SVG_TEXT_SIZE, indent_text_content)
                         
-                    f.write(svg_indent_text_element)
-                    previously_created_elements.append(svg_indent_text_element)
+        #             f.write(svg_indent_text_element)
+        #             previously_created_elements.append(svg_indent_text_element)
 
-                #Create SVG-element for indent_arrow_line
-                if(self.materials[material]["indent_arrow_id"] is not None):
-                    indent_line_coords = self.canvas.coords(self.materials[material]["indent_arrow_id"])
-                    #Construct an SVG <line> element for arrows
-                    svg_indent_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(indent_line_coords[0]-10, indent_line_coords[1], indent_line_coords[2]+10, indent_line_coords[3])
+        #         #Create SVG-element for indent_arrow_line
+        #         if(self.materials[material]["indent_arrow_id"] is not None):
+        #             indent_line_coords = self.canvas.coords(self.materials[material]["indent_arrow_id"])
+        #             #Construct an SVG <line> element for arrows
+        #             svg_indent_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(indent_line_coords[0]-10, indent_line_coords[1], indent_line_coords[2]+10, indent_line_coords[3])
                     
-                    #Add arrowheads on both sides of the line
-                    svg_indent_line_element += (
-                        '<defs>\n'
-                        '    <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="0" markerUnits="userSpaceOnUse">\n'
-                        '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
-                        '    </marker>\n'
-                        '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="0" markerUnits="userSpaceOnUse">\n'
-                        '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
-                        '    </marker>\n'
-                        '</defs>\n'
-                    )
+        #             #Add arrowheads on both sides of the line
+        #             svg_indent_line_element += (
+        #                 '<defs>\n'
+        #                 '    <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="0" markerUnits="userSpaceOnUse">\n'
+        #                 '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
+        #                 '    </marker>\n'
+        #                 '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="0" markerUnits="userSpaceOnUse">\n'
+        #                 '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
+        #                 '    </marker>\n'
+        #                 '</defs>\n'
+        #             )
                     
-                    #Write the SVG representation of the arrow to the file
-                    f.write(svg_indent_line_element)
-                    previously_created_elements.append(svg_indent_line_element)
+        #             #Write the SVG representation of the arrow to the file
+        #             f.write(svg_indent_line_element)
+        #             previously_created_elements.append(svg_indent_line_element)
 
-                #Write the closing SVG tag to the file, completing the SVG file
-                f.write('</svg>\n')
+        #         #Write the closing SVG tag to the file, completing the SVG file
+        #         f.write('</svg>\n')
 
-            #Close the svg file
-            f.close()
+        #     #Close the svg file
+        #     f.close()
 
-            #Increment layer_counter
-            layer_counter += 1
+        #     #Increment layer_counter
+        #     layer_counter += 1
 
 #Main starting point of program
 if __name__ == "__main__":
+
     #Create a host tkinter program window
     window = tkinter.Tk()
 
@@ -1223,8 +1275,7 @@ if __name__ == "__main__":
     material_stack_visualizer_app = Material_stack_visualizer_app()
 
     #Checks if the program window is being resized
-    # window.update_idletasks()
-    window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
+    # window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
     
     #Start the main loop of the program
     window.mainloop()

@@ -1,7 +1,7 @@
 class Settings:
     #Program settings
     PROGRAM_TITLE = "Layer stack visualizer"    #Title to be displayed on the program window
-    PROGRAM_WINDOW_WIDTH = 1100                 #Initial width of program window
+    PROGRAM_WINDOW_WIDTH = 1500                 #Initial width of program window
     PROGRAM_WINDOW_HEIGHT = 600                 #Initial height of program window
     PROGRAM_BACKGROUND_COLOR = "#00192c"
     PROGRAM_BACKGROUND_PHOTO = "bg.jpg"
@@ -22,7 +22,7 @@ class Settings:
     
     #Canvas settings
     CANVAS_HEIGHT = 400
-    CANVAS_WIDTH = 600
+    CANVAS_WIDTH = 1000
     CANVAS_PROGRAM_BORDER_WIDTH = 0             #How big the gap between the canvas border and the program-window edge width is
     CANVAS_PROGRAM_BORDER_HEIGHT = 0            #How big the gap between the canvas border and the program-window edge height is
     CANVAS_BACKGROUND_COLOR = "#284154"
