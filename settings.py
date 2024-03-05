@@ -1,7 +1,7 @@
 class Settings:
     #Program settings
     PROGRAM_TITLE = "Layer stack visualizer"    #Title to be displayed on the program window
-    PROGRAM_WINDOW_WIDTH = 1500                 #Initial width of program window
+    PROGRAM_WINDOW_WIDTH = 500                 #Initial width of program window
     PROGRAM_WINDOW_HEIGHT = 600                 #Initial height of program window
     PROGRAM_BACKGROUND_COLOR = "#00192c"
     PROGRAM_BACKGROUND_PHOTO = "bg.jpg"
@@ -29,9 +29,8 @@ class Settings:
     CANVAS_OUTLINE_COLOR = "#666666"
     TEXT_SIZE = 10                              #Text size on the canvas
     TEXT_FONT = "Arial"                         
-    TEXT_COLOR = "white"
+    TEXT_COLOR = "black"
     STACK_TEXT_INDENT = 150                     #How much space is left in the side of the stack for text
-    INDENT_RANGE = 70000                        #How much the indent will be between layers in the "stepped stack" 
     RECTANGLE_OUTLINE_COLOR = "black"
 
     #SVG-export settings
