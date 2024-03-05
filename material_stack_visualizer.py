@@ -95,9 +95,43 @@ class Material_stack_visualizer_app:
             pady=(0,5),
             sticky="n"
         )
-
-        #Create sliders, buttons etc for each material
+        #Used to avoid overlaping of widgets
         row_counter = 0
+
+        #Create label to display material name
+        label = customtkinter.CTkLabel(
+            master=user_interface_frame, 
+            text="Material", 
+            fg_color=Settings.UI_FRAME_BACKGROUND_COLOR,
+            text_color="#55b6ff",
+            font=(Settings.TEXT_FONT, 20, "bold")
+        )
+        label.grid(
+            row=row_counter,
+            column=0,
+            sticky="n",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        #Create label to display slider functionality
+        self.slider_label = customtkinter.CTkLabel(
+            master=user_interface_frame, 
+            text="Thickness", 
+            fg_color=Settings.UI_FRAME_BACKGROUND_COLOR,
+            text_color="#55b6ff",
+            font=(Settings.TEXT_FONT, 20, "bold")
+        )
+        self.slider_label.grid(
+            row=row_counter,
+            column=2,
+            sticky="n",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        row_counter+=1
+        #Create sliders, buttons etc for each material
         for material in dict(reversed(self.materials.items())):
             #Create label and place it
             label = tkinter.Label(
@@ -241,7 +275,7 @@ class Material_stack_visualizer_app:
             width=30,
             fg_color=Settings.BUTTON_FG_COLOR, 
             button_hover_color=Settings.BUTTON_HOVER_COLOR,
-            command=self.draw_material_stack
+            command=self.switch_layout
         )
         self.option_menu.grid(
             row=1, 
@@ -297,12 +331,23 @@ class Material_stack_visualizer_app:
     def material_slider_updated(self, value, identifier): 
         #print("MATERIAL_SLIDER_UPDATED()")
         
-        #Update the thickness value in self.materials
-        self.materials[identifier]["thickness"] = value
+        #Update different values in self.materials based on option value
+        match self.option_menu.get():
+            case "Stacked"|"Realistic":
+                #Update the thickness value in self.materials
+                self.materials[identifier]["thickness"] = value
 
-        #Update the entry corresponding to key
-        self.materials[identifier]["entry_id"].delete(0, tkinter.END)
-        self.materials[identifier]["entry_id"].insert(0, value)
+                #Update the entry corresponding to key
+                self.materials[identifier]["entry_id"].delete(0, tkinter.END)
+                self.materials[identifier]["entry_id"].insert(0, value)
+            
+            case "Stepped":
+                #Update the "indent" value in self.materials
+                self.materials[identifier]["indent"] = value
+
+                #Update the entry corresponding to key
+                self.materials[identifier]["entry_id"].delete(0, tkinter.END)
+                self.materials[identifier]["entry_id"].insert(0, value)
 
         #Redraw material stack
         self.draw_material_stack()
@@ -310,17 +355,33 @@ class Material_stack_visualizer_app:
     """Updates the thickness value in self.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, entry):
         #print("MATERIAL_ENTRY_UPDATED()")
-        
-        #Find material that corresponds to "entry"
-        for material in self.materials:
-            if(self.materials[material]["entry_id"] == entry):
-                #Find entered value
-                entered_value = int(entry.get())
-                #Update the thickness value in self.materials
-                self.materials[material]["thickness"] = entered_value
 
-                #Update the slider corresponding to the key
-                self.materials[material]["slider_id"].set(entered_value)
+        #Update different values in self.materials based on option value
+        match self.option_menu.get():
+            case "Stacked"|"Realistic":
+                #Find material that corresponds to "entry"
+                for material in self.materials:
+                    if(self.materials[material]["entry_id"] == entry):
+                        #Find entered value
+                        entered_value = int(entry.get())
+                        #Update the thickness value in self.materials
+                        self.materials[material]["thickness"] = entered_value
+
+                        #Update the slider corresponding to the key
+                        self.materials[material]["slider_id"].set(entered_value)
+
+            case "Stepped":
+                #Find material that corresponds to "entry"
+                for material in self.materials:
+                    if(self.materials[material]["entry_id"] == entry):
+                        #Find entered value
+                        entered_value = int(entry.get())
+                        #Update the thickness value in self.materials
+                        self.materials[material]["indent"] = entered_value
+
+                        #Update the slider corresponding to the key
+                        self.materials[material]["slider_id"].set(entered_value)
+        
         
         #Redraw material stack
         self.draw_material_stack()
@@ -382,9 +443,9 @@ class Material_stack_visualizer_app:
         
         canvas.scan_dragto(event.x, event.y, gain=1)
 
+    """Scales all the elements on the canvas up or down"""
     def canvas_zoom(self, event, canvas):
         #print("CANVAS_ZOOM()")
-        
         zoom_factor = 1.05
 
         #Zoom in: Scale all items on the canvas around the mouse cursor
@@ -422,10 +483,50 @@ class Material_stack_visualizer_app:
         #     #Redraw the material stack
         #     self.draw_material_stack()
 
+    """ -Changes the Label explaining what is being modified by sliders and entries in the UI-frame
+        -Changes the values for sliders and entries"""
+    def switch_layout(self, *event):
+        #Switch UI layout based on option value
+        match self.option_menu.get():
+            case "Stacked":
+                #Change the label in UI frame
+                self.slider_label.configure(text="Thickness")
+
+                #Set all material entry and slider values to "indent" value
+                for material in self.materials:
+                    if(self.materials[material]["status"] != "disabled"):
+                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["thickness"]))),
+                        self.materials[material]["slider_id"].set(self.materials[material]["thickness"])
+                
+                self.draw_material_stack_stacked()
+            case "Realistic":
+                #Change the label in UI frame
+                self.slider_label.configure(text="Thickness")
+
+                #Set all material entry and slider values to "indent" value
+                for material in self.materials:
+                    if(self.materials[material]["status"] != "disabled"):
+                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["thickness"]))),
+                        self.materials[material]["slider_id"].set(self.materials[material]["thickness"])
+
+                self.draw_material_stack_realistic()
+            case "Stepped":
+                #Change the label in UI frame
+                self.slider_label.configure(text="Indent")
+
+                #Set all material entry and slider values to "indent" value
+                for material in self.materials:
+                    if(self.materials[material]["status"] != "disabled"):
+                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["indent"]))),
+                        self.materials[material]["slider_id"].set(self.materials[material]["indent"])
+
+                #Set slider to adjust indent
+                self.draw_material_stack_stepped()
+
     """Draws the material stack based on the value in the option box"""
     def draw_material_stack(self, *event):
         #print("DRAW MATERIAL STACK()")
-        
+                
         #Draw stack based on option
         match self.option_menu.get():
             case "Stacked":
