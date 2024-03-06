@@ -1,22 +1,21 @@
-import customtkinter
 import tkinter
-import pyautogui
 from tkinter import messagebox, Frame, Label, Entry, StringVar, Scale, font
-from settings import Settings
+import customtkinter
+import pyautogui
 import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
 import os
-
-#Stepped skal bare endre på "indent range"
+import json
 
 class Material_stack_visualizer_app:
     def __init__(self):
-        #print("INIT()")
+        # print("INIT()")
+
         #Create a dictionary to hold ALL the information about a material
         self.materials = {}
 
         #Read the given excel-file and populate the materials dictionary
-        self.load_materials_from_excel(Settings.EXCEL_FILE)
+        self.load_materials_from_excel(SETTINGS["EXCEL_FILE"])
 
         #Create a user interface
         self.user_interface_frame = self.create_user_interface()
@@ -84,9 +83,9 @@ class Material_stack_visualizer_app:
         #Create Frame and place it
         user_interface_frame = customtkinter.CTkScrollableFrame(
             master=window, 
-            width=Settings.UI_FRAME_WIDTH, 
-            height=Settings.UI_FRAME_HEIGHT,
-            fg_color=Settings.UI_FRAME_BACKGROUND_COLOR
+            width=SETTINGS["UI_FRAME_WIDTH"], 
+            height=SETTINGS["UI_FRAME_HEIGHT"],
+            fg_color=SETTINGS["UI_FRAME_BACKGROUND_COLOR"]
         )
         user_interface_frame.grid(
             row=0, 
@@ -102,9 +101,9 @@ class Material_stack_visualizer_app:
         label = customtkinter.CTkLabel(
             master=user_interface_frame, 
             text="Material", 
-            fg_color=Settings.UI_FRAME_BACKGROUND_COLOR,
+            fg_color=SETTINGS["UI_FRAME_BACKGROUND_COLOR"],
             text_color="#55b6ff",
-            font=(Settings.TEXT_FONT, 20, "bold")
+            font=(SETTINGS["TEXT_FONT"], 20, "bold")
         )
         label.grid(
             row=row_counter,
@@ -118,9 +117,9 @@ class Material_stack_visualizer_app:
         self.slider_label = customtkinter.CTkLabel(
             master=user_interface_frame, 
             text="Thickness", 
-            fg_color=Settings.UI_FRAME_BACKGROUND_COLOR,
+            fg_color=SETTINGS["UI_FRAME_BACKGROUND_COLOR"],
             text_color="#55b6ff",
-            font=(Settings.TEXT_FONT, 20, "bold")
+            font=(SETTINGS["TEXT_FONT"], 20, "bold")
         )
         self.slider_label.grid(
             row=row_counter,
@@ -137,8 +136,8 @@ class Material_stack_visualizer_app:
             label = tkinter.Label(
                 user_interface_frame, 
                 text=material, 
-                bg=Settings.UI_LABEL_BACKGROUND_COLOR,
-                fg=Settings.UI_FRAME_TEXT_COLOR
+                bg=SETTINGS["UI_LABEL_BACKGROUND_COLOR"],
+                fg=SETTINGS["UI_FRAME_TEXT_COLOR"]
             )
             label.grid(
                 row=row_counter, 
@@ -152,7 +151,7 @@ class Material_stack_visualizer_app:
             entry = customtkinter.CTkEntry(
                 master=user_interface_frame,
                 textvariable=StringVar(value=str(self.materials[material]["thickness"])),
-                fg_color = Settings.UI_ENTRY_BACKGROUND_COLOR,
+                fg_color = SETTINGS["UI_ENTRY_BACKGROUND_COLOR"],
                 text_color="black",
                 width=70,
                 justify="center"
@@ -170,11 +169,11 @@ class Material_stack_visualizer_app:
             #Create Slider, customize it and add it to dictionary
             slider = customtkinter.CTkSlider(
                 master=user_interface_frame, 
-                from_=Settings.SLIDER_RANGE_MIN, 
-                to=Settings.SLIDER_RANGE_MAX,
+                from_=SETTINGS["UI_SLIDER_RANGE_MIN"], 
+                to=SETTINGS["UI_SLIDER_RANGE_MAX"],
                 progress_color=self.materials[material]["color"],
-                fg_color=Settings.SLIDER_LINE_COLOR,
-                button_hover_color=Settings.BUTTON_HOVER_COLOR,
+                fg_color=SETTINGS["UI_SLIDER_LINE_COLOR"],
+                button_hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"],
                 command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
             )
             slider.grid(
@@ -201,9 +200,9 @@ class Material_stack_visualizer_app:
         reset_canvas_button = customtkinter.CTkButton(
             master=window, 
             text="Reset canvas", 
-            fg_color=Settings.BUTTON_FG_COLOR, 
-            hover_color=Settings.BUTTON_HOVER_COLOR, 
-            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            fg_color=SETTINGS["UI_BUTTON_FG_COLOR"], 
+            hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"], 
+            text_color=SETTINGS["UI_FRAME_TEXT_COLOR"],
             width=15,
             command=self.reset_canvas)
         reset_canvas_button.grid(
@@ -218,9 +217,9 @@ class Material_stack_visualizer_app:
         reset_values_button = customtkinter.CTkButton(
             master=window,
             text="Reset values",
-            fg_color=Settings.BUTTON_FG_COLOR, 
-            hover_color=Settings.BUTTON_HOVER_COLOR, 
-            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            fg_color=SETTINGS["UI_BUTTON_FG_COLOR"], 
+            hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"], 
+            text_color=SETTINGS["UI_FRAME_TEXT_COLOR"],
             width=15,
             command=self.reset_values
         )
@@ -236,9 +235,9 @@ class Material_stack_visualizer_app:
         export_stack_button = customtkinter.CTkButton(
             master=window,
             text="Export stack",
-            fg_color=Settings.BUTTON_FG_COLOR, 
-            hover_color=Settings.BUTTON_HOVER_COLOR, 
-            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            fg_color=SETTINGS["UI_BUTTON_FG_COLOR"], 
+            hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"], 
+            text_color=SETTINGS["UI_FRAME_TEXT_COLOR"],
             width=15,
             command=self.export_stack_as_svg
         )
@@ -254,9 +253,9 @@ class Material_stack_visualizer_app:
         export_layers_button = customtkinter.CTkButton(
             master=window,
             text="Export layers",
-            fg_color=Settings.BUTTON_FG_COLOR, 
-            hover_color=Settings.BUTTON_HOVER_COLOR, 
-            text_color=Settings.UI_FRAME_TEXT_COLOR,
+            fg_color=SETTINGS["UI_BUTTON_FG_COLOR"], 
+            hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"], 
+            text_color=SETTINGS["UI_FRAME_TEXT_COLOR"],
             width=15,
             command=self.export_layers_as_svg
         )
@@ -273,8 +272,8 @@ class Material_stack_visualizer_app:
             master=window, 
             values=["Stacked", "Realistic", "Stepped"],
             width=30,
-            fg_color=Settings.BUTTON_FG_COLOR, 
-            button_hover_color=Settings.BUTTON_HOVER_COLOR,
+            fg_color=SETTINGS["UI_BUTTON_FG_COLOR"], 
+            button_hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"],
             command=self.switch_layout
         )
         self.option_menu.grid(
@@ -294,9 +293,9 @@ class Material_stack_visualizer_app:
         #Create canvas and place it
         canvas = tkinter.Canvas(
             master=window, 
-            height=Settings.CANVAS_HEIGHT, 
-            width=Settings.CANVAS_WIDTH, 
-            bg=Settings.CANVAS_BACKGROUND_COLOR,
+            height=SETTINGS["CANVAS_HEIGHT"], 
+            width=SETTINGS["CANVAS_WIDTH"], 
+            bg=SETTINGS["CANVAS_BACKGROUND_COLOR"],
             highlightbackground="red", 
             highlightthickness=0,
             )
@@ -318,7 +317,7 @@ class Material_stack_visualizer_app:
 
 
         #Draw bounding box around canvas
-        canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=Settings.CANVAS_OUTLINE_COLOR, width=1)
+        canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], width=1)
 
         #Listen to mouse: buttonpress, motion and zoom events
         canvas.bind("<ButtonPress-1>", lambda event, canvas=canvas: self.click_on_canvas(event, canvas))
@@ -406,7 +405,7 @@ class Material_stack_visualizer_app:
         #Reload initial values from given excel file
         try:
             #Read given excel file into Pandas dataframe
-            excel_data = pandas.read_excel(Settings.EXCEL_FILE)
+            excel_data = pandas.read_excel(SETTINGS["EXCEL_FILE"])
 
             #Loop through the rows in excel_file and populate "self.materials"
             for index, row in excel_data.iterrows():
@@ -468,10 +467,10 @@ class Material_stack_visualizer_app:
     
     def program_window_resized(self, event):
         #Only do something if the window size os actaully changed. (The <configure> method calls this function everytime something about the program window is changed)
-        if(event.width != Settings.PROGRAM_WINDOW_WIDTH or event.height != Settings.PROGRAM_WINDOW_HEIGHT):
+        if(event.width != SETTINGS["PROGRAM_WINDOW_WIDTH"] or event.height != SETTINGS["PROGRAM_WINDOW_HEIGHT"]):
             #print("PROGRAM_WINDOW_RESIZED()")
-            Settings.PROGRAM_WINDOW_WIDTH = event.width
-            Settings.PROGRAM_WINDOW_HEIGHT = event.height
+            SETTINGS["PROGRAM_WINDOW_WIDTH"] = event.width
+            SETTINGS["PROGRAM_WINDOW_HEIGHT"] = event.height
         
         #     #Set the new width of the canvas
         #     self.canvas.config(width=window.winfo_width() - self.user_interface_frame.winfo_reqwidth()-5)
@@ -544,7 +543,7 @@ class Material_stack_visualizer_app:
         self.canvas.delete("all")
 
         #Draw bounding box around canvas
-        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=Settings.CANVAS_OUTLINE_COLOR, tags="canvas_bounding_box_rectangle")
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
 
         #Find the total height of all materials combined
         sum_of_all_materials = 0
@@ -560,7 +559,7 @@ class Material_stack_visualizer_app:
         #Prepare first rectangle drawing coordinates
         rectangle_x0 = self.visible_canvas_bbox_x0
         rectangle_y0 = self.visible_canvas_bbox_y0 + (self.canvas_height*0.9)
-        rectangle_x1 = self.visible_canvas_bbox_x1 - Settings.STACK_TEXT_INDENT
+        rectangle_x1 = self.visible_canvas_bbox_x1 - SETTINGS["CANVAS_STACK_TEXT_INDENT"]
         rectangle_y1 = None #Calculated later
         
         #Draw rectangles on canvas
@@ -572,7 +571,7 @@ class Material_stack_visualizer_app:
                     # self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, 
                     self.visible_canvas_bbox_x0, round(self.canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
                     fill=self.materials["substrate"]["color"], 
-                    outline=Settings.RECTANGLE_OUTLINE_COLOR,
+                    outline=SETTINGS["CANVAS_RECTANGLE_OUTLINE_COLOR"],
                     tags="material_rectangle"
                 )
                 #Add rectangle_id to its place in self.materials
@@ -590,7 +589,7 @@ class Material_stack_visualizer_app:
                 created_rectangle = self.canvas.create_rectangle(
                     rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
                     fill=self.materials[material]["color"],
-                    outline=Settings.RECTANGLE_OUTLINE_COLOR, 
+                    outline=SETTINGS["CANVAS_RECTANGLE_OUTLINE_COLOR"], 
                     tags="material_rectangle"
                 )
 
@@ -611,7 +610,7 @@ class Material_stack_visualizer_app:
         self.canvas.delete("all")
 
         #Draw bounding box around canvas
-        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=Settings.CANVAS_OUTLINE_COLOR, tags="canvas_bounding_box_rectangle")
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
 
         #Find the total height of all materials combined
         sum_of_all_materials = 0
@@ -622,7 +621,7 @@ class Material_stack_visualizer_app:
         #Prepare first rectangle drawing coordinates
         rectangle_x0 = self.visible_canvas_bbox_x0
         rectangle_y0 = self.visible_canvas_bbox_y1
-        rectangle_x1 = self.visible_canvas_bbox_x1 - Settings.STACK_TEXT_INDENT
+        rectangle_x1 = self.visible_canvas_bbox_x1 - SETTINGS["CANVAS_STACK_TEXT_INDENT"]
         rectangle_y1 = None #Calculated later
 
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
@@ -657,7 +656,7 @@ class Material_stack_visualizer_app:
         self.canvas.delete("all")
 
         #Draw bounding box around canvas
-        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=Settings.CANVAS_OUTLINE_COLOR, tags="canvas_bounding_box_rectangle")
+        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
         
         #Find the total height of all materials combined and the thickest material
         sum_of_all_materials = 0
@@ -673,7 +672,7 @@ class Material_stack_visualizer_app:
         nanometers_per_pixel = sum_of_all_materials/round(self.canvas_height * 0.9)
 
         #Prepare first rectangle drawing coordinates (from bottom left corner)
-        rectangle_x0 = self.visible_canvas_bbox_x0 + Settings.STACK_TEXT_INDENT
+        rectangle_x0 = self.visible_canvas_bbox_x0 + SETTINGS["CANVAS_STACK_TEXT_INDENT"]
         rectangle_y0 = round(self.canvas_height*0.9) + 10
         rectangle_x1 = self.visible_canvas_bbox_x1
         rectangle_y1 = None #calculated later
@@ -714,7 +713,7 @@ class Material_stack_visualizer_app:
                 created_rectangle = self.canvas.create_rectangle(
                     rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
                     fill=self.materials[material]["color"], 
-                    outline=Settings.RECTANGLE_OUTLINE_COLOR,
+                    outline=SETTINGS["CANVAS_RECTANGLE_OUTLINE_COLOR"],
                     tags="material_rectangle"
                 )
                 #Add rectangle_id to its place in self.materials
@@ -748,7 +747,7 @@ class Material_stack_visualizer_app:
         match self.option_menu.get():
             case "Stacked" | "Realistic":
                 #Find out the height of a potential text's bounding box
-                text_font = font.Font(family=Settings.TEXT_FONT, size=Settings.TEXT_SIZE)
+                text_font = font.Font(family=SETTINGS["TEXT_FONT"], size=SETTINGS["TEXT_SIZE"])
                 text_height = text_font.metrics()['linespace']
                 previous_material = None
                 
@@ -768,8 +767,8 @@ class Material_stack_visualizer_app:
                         created_text = self.canvas.create_text(
                             rectangle_middle_x, rectangle_middle_y, 
                             text=f"{material} - {self.materials[material]['thickness']}nm", 
-                            fill=Settings.TEXT_COLOR, 
-                            font=(Settings.TEXT_FONT, Settings.TEXT_SIZE), 
+                            fill=SETTINGS["TEXT_COLOR"], 
+                            font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
                             anchor="center", 
                             tags="Material_label"
                         )
@@ -793,13 +792,13 @@ class Material_stack_visualizer_app:
                         created_text = self.canvas.create_text(
                             self.visible_canvas_bbox_x1, rectangle_middle_y, 
                             text=f"{material} - {self.materials[material]['thickness']}nm", 
-                            fill=Settings.TEXT_COLOR, 
-                            font=(Settings.TEXT_FONT, Settings.TEXT_SIZE), 
+                            fill=SETTINGS["TEXT_COLOR"], 
+                            font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
                             tags="Material_label"
                         )
                         created_text_bbox = self.canvas.create_rectangle(
                             self.canvas.bbox(created_text), 
-                            outline=Settings.TEXT_COLOR, 
+                            outline=SETTINGS["TEXT_COLOR"], 
                             tags="text_bbox"
                         )
                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1  = self.canvas.bbox(created_text)
@@ -808,7 +807,7 @@ class Material_stack_visualizer_app:
                         created_arrow_line = self.canvas.create_line(
                             (text_bbox_x0, text_bbox_middle_y), (rectangle_x1, rectangle_middle_y), 
                             arrow=tkinter.LAST, 
-                            fill=Settings.TEXT_COLOR,
+                            fill=SETTINGS["TEXT_COLOR"],
                             tags="arrow_line"
                         )
 
@@ -838,7 +837,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST, 
-                                fill=Settings.TEXT_COLOR,
+                                fill=SETTINGS["TEXT_COLOR"],
                                 tags="arrow_line")
                             #Add the new line to dictionary
                             self.materials[material]["line_id"] = created_arrow_line
@@ -858,7 +857,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST, 
-                                fill=Settings.TEXT_COLOR,
+                                fill=SETTINGS["TEXT_COLOR"],
                                 tags="arrow_line")
                             #Add the new line to dictionary
                             self.materials[material]["line_id"] = created_arrow_line
@@ -878,7 +877,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST, 
-                                fill=Settings.TEXT_COLOR,
+                                fill=SETTINGS["TEXT_COLOR"],
                                 tags="arrow_line")
                             #Add the new line to dictionary
                             self.materials[material]["line_id"] = created_arrow_line
@@ -898,7 +897,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST,
-                                fill=Settings.TEXT_COLOR,                                
+                                fill=SETTINGS["TEXT_COLOR"],                                
                                 tags="arrow_line")
                             #Add the new line to dictionary
                             self.materials[material]["line_id"] = created_arrow_line
@@ -923,7 +922,7 @@ class Material_stack_visualizer_app:
 
             case "Stepped":
                 #Find out the height of a potential text's bounding box
-                text_font = font.Font(family=Settings.TEXT_FONT, size=Settings.TEXT_SIZE)
+                text_font = font.Font(family=SETTINGS["TEXT_FONT"], size=SETTINGS["TEXT_SIZE"])
                 text_height = text_font.metrics()['linespace']
                 previous_material = None
                 
@@ -943,8 +942,8 @@ class Material_stack_visualizer_app:
                         created_text = self.canvas.create_text(
                             rectangle_middle_x, rectangle_middle_y, 
                             text=f"{material} - {self.materials[material]['thickness']}nm", 
-                            fill=Settings.TEXT_COLOR, 
-                            font=(Settings.TEXT_FONT, Settings.TEXT_SIZE), 
+                            fill=SETTINGS["TEXT_COLOR"], 
+                            font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
                             anchor="center", 
                             tags="Material_label"
                         )
@@ -966,13 +965,13 @@ class Material_stack_visualizer_app:
                         created_text = self.canvas.create_text(
                             self.visible_canvas_bbox_x0, rectangle_middle_y, 
                             text=f"{material} - {self.materials[material]['thickness']}nm", 
-                            fill=Settings.TEXT_COLOR, 
-                            font=(Settings.TEXT_FONT, Settings.TEXT_SIZE), 
+                            fill=SETTINGS["TEXT_COLOR"], 
+                            font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
                             tags="Material_label"
                         )
                         created_text_bbox = self.canvas.create_rectangle(
                             self.canvas.bbox(created_text), 
-                            outline=Settings.TEXT_COLOR, 
+                            outline=SETTINGS["TEXT_COLOR"], 
                             tags="text_bbox"
                         )     
                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text)
@@ -980,7 +979,7 @@ class Material_stack_visualizer_app:
                         created_arrow_line = self.canvas.create_line(
                             (text_bbox_x1, text_bbox_middle_y), (rectangle_x0, rectangle_middle_y), 
                             arrow=tkinter.LAST,
-                            fill=Settings.TEXT_COLOR,
+                            fill=SETTINGS["TEXT_COLOR"],
                             tags="arrow_line"
                         )
 
@@ -1011,7 +1010,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST, 
-                                fill=Settings.TEXT_COLOR,
+                                fill=SETTINGS["TEXT_COLOR"],
                                 tags="arrow_line"
                             )
                             #Add the new line to dictionary
@@ -1032,7 +1031,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST, 
-                                fill=Settings.TEXT_COLOR,
+                                fill=SETTINGS["TEXT_COLOR"],
                                 tags="arrow_line"
                             )
                             #Add the new line to dictionary
@@ -1053,7 +1052,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST, 
-                                fill=Settings.TEXT_COLOR,
+                                fill=SETTINGS["TEXT_COLOR"],
                                 tags="arrow_line"
                             )
                             #Add the new line to dictionary
@@ -1075,7 +1074,7 @@ class Material_stack_visualizer_app:
                             created_arrow_line = self.canvas.create_line(
                                 tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
                                 arrow=tkinter.LAST, 
-                                fill=Settings.TEXT_COLOR,
+                                fill=SETTINGS["TEXT_COLOR"],
                                 tags="arrow_line"
                             )
                             #Add the new line to dictionary
@@ -1123,7 +1122,7 @@ class Material_stack_visualizer_app:
             #Create a two sided arrow line between the differense of the two rectangles
             created_indent_line = self.canvas.create_line(
                 current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, current_rectangle_y1-5, 
-                fill=Settings.TEXT_COLOR,
+                fill=SETTINGS["TEXT_COLOR"],
                 arrow=tkinter.BOTH
             )
 
@@ -1132,8 +1131,8 @@ class Material_stack_visualizer_app:
             created_indent_text = self.canvas.create_text(
                 (current_rectangle_x1+previous_rectangle_x1)/2, current_rectangle_y1-15,
                 text=f"{indent_number}nm", 
-                fill=Settings.TEXT_COLOR, 
-                font=(Settings.TEXT_FONT, Settings.TEXT_SIZE), 
+                fill=SETTINGS["TEXT_COLOR"], 
+                font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
             )
                 
             #Add created elements to dictionary
@@ -1230,7 +1229,7 @@ class Material_stack_visualizer_app:
                     previously_created_elements.append(svg_rectangle_element)
 
                     #Create SVG-element for the rectangle bounding box and write it to file
-                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, Settings.RECTANGLE_OUTLINE_COLOR)
+                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, SETTINGS["CANVAS_RECTANGLE_OUTLINE_COLOR"])
                     f.write(svg_bbox_element)
                     previously_created_elements.append(svg_bbox_element)
 
@@ -1238,14 +1237,14 @@ class Material_stack_visualizer_app:
                 if(self.materials[material]["text_id"] is not None):
                     text_x0, text_y0 = self.canvas.coords(self.materials[material]["text_id"])
                     text_content = self.canvas.itemcget(self.materials[material]["text_id"], 'text')
-                    svg_text_element = '<text x="{}" y="{}" fill="{}" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, Settings.TEXT_COLOR, Settings.SVG_TEXT_SIZE, text_content)
+                    svg_text_element = '<text x="{}" y="{}" fill="{}" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, SETTINGS["TEXT_COLOR"], SETTINGS["SVG_TEXT_SIZE"], text_content)
                     f.write(svg_text_element)
                     previously_created_elements.append(svg_text_element)
 
                 #Create SVG-element for text bounding box
                 if(self.materials[material]["text_bbox_id"] is not None):
                     bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, Settings.TEXT_COLOR)
+                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, SETTINGS["TEXT_COLOR"])
                         
                     #Write the SVG representation of the bounding box to the file
                     f.write(svg_bbox_element)
@@ -1258,7 +1257,7 @@ class Material_stack_visualizer_app:
                         line_coords = self.canvas.coords(self.materials[material]["line_id"])
                         #Construct an SVG <line> element for arrows
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], Settings.TEXT_COLOR)
+                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], SETTINGS["TEXT_COLOR"])
 
                         #Add arrowhead on the left side of the line
                         svg_line_element += (
@@ -1274,7 +1273,7 @@ class Material_stack_visualizer_app:
                         line_x0, line_y0, line_x1, line_y1 = self.canvas.coords(self.materials[material]["line_id"])
                         #Construct an SVG <line> element for arrows
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x1, line_y0, line_x1-7, line_y1, Settings.TEXT_COLOR)
+                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x1, line_y0, line_x1-7, line_y1, SETTINGS["TEXT_COLOR"])
                         
                         #Add arrowhead on right side of the line
                         svg_line_element += (
@@ -1292,7 +1291,7 @@ class Material_stack_visualizer_app:
                 if(self.materials[material]["indent_text_id"] is not None):
                     indent_text_x0, indent_text_y0 = self.canvas.coords(self.materials[material]["indent_text_id"])
                     indent_text_content = self.canvas.itemcget(self.materials[material]["indent_text_id"], 'text')
-                    svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(indent_text_x0, indent_text_y0, Settings.SVG_TEXT_SIZE, indent_text_content)
+                    svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(indent_text_x0, indent_text_y0, SETTINGS["SVG_TEXT_SIZE"], indent_text_content)
                         
                     f.write(svg_indent_text_element)
                     previously_created_elements.append(svg_indent_text_element)
@@ -1334,16 +1333,20 @@ if __name__ == "__main__":
     #Create a host tkinter program window
     window = tkinter.Tk()
 
+    with open('settings.json', 'r') as file:
+            SETTINGS = json.load(file)
+
+    #Create instance of Layer_stack_vizualiser class and run it
+    material_stack_visualizer_app = Material_stack_visualizer_app()
+
     #Set program window title, dimensions and color
-    window.title(Settings.PROGRAM_TITLE)
-    window.geometry(f"{Settings.PROGRAM_WINDOW_WIDTH}x{Settings.PROGRAM_WINDOW_HEIGHT}")
-    window.configure(bg=Settings.PROGRAM_BACKGROUND_COLOR)
+    window.title(SETTINGS["PROGRAM_TITLE"])
+    window.geometry(f"{SETTINGS['PROGRAM_WINDOW_WIDTH']}x{SETTINGS['PROGRAM_WINDOW_HEIGHT']}")
+    window.configure(bg=SETTINGS["PROGRAM_BACKGROUND_COLOR"])
 
     #Create keyboard shortcuts for program window
     window.bind("<Escape>", lambda event: window.destroy())
 
-    #Create instance of Layer_stack_vizualiser class and run it
-    material_stack_visualizer_app = Material_stack_visualizer_app()
 
     #Checks if the program window is being resized
     # window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
