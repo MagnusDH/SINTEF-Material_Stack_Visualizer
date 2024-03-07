@@ -9,7 +9,7 @@ import json
 
 class Material_stack_visualizer_app:
     def __init__(self):
-        # print("INIT()")
+        print("INIT()")
 
         #Create a dictionary to hold ALL the information about a material
         self.materials = {}
@@ -28,7 +28,7 @@ class Material_stack_visualizer_app:
 
     """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self, excel_file):
-        #print("LOAD_MATERIALS_FROM_EXCEL()")
+        print("LOAD_MATERIALS_FROM_EXCEL()")
         
         try:
             #Read given excel file into Pandas dataframe
@@ -78,7 +78,7 @@ class Material_stack_visualizer_app:
 
     """Creates a Frame with sliders, entries and buttons"""
     def create_user_interface(self):
-        #print("CREATE_USER_INTERFACE()")
+        print("CREATE_USER_INTERFACE()")
         
         #Create Frame and place it
         user_interface_frame = customtkinter.CTkScrollableFrame(
@@ -94,6 +94,7 @@ class Material_stack_visualizer_app:
             pady=(0,5),
             sticky="n"
         )
+
         #Used to avoid overlaping of widgets
         row_counter = 0
 
@@ -227,7 +228,7 @@ class Material_stack_visualizer_app:
             row=1, 
             column=0, 
             sticky="n", 
-            padx=(0, 0), 
+            padx=(0,0), 
             pady=(0,0)
         )
 
@@ -245,7 +246,7 @@ class Material_stack_visualizer_app:
             row=1, 
             column=1, 
             sticky="n", 
-            padx=(0, 0), 
+            padx=(0,0), 
             pady=(0,0)
         )
         
@@ -288,13 +289,13 @@ class Material_stack_visualizer_app:
     
     """Returns a canvas created in the program window"""
     def create_canvas(self):
-        #print("CREATE_CANVAS()")
-
+        print("CREATE_CANVAS()")
+        
         #Create canvas and place it
         canvas = tkinter.Canvas(
             master=window, 
             height=SETTINGS["CANVAS_HEIGHT"], 
-            width=SETTINGS["CANVAS_WIDTH"], 
+            width=SETTINGS["CANVAS_WIDTH"],
             bg=SETTINGS["CANVAS_BACKGROUND_COLOR"],
             highlightbackground="red", 
             highlightthickness=0,
@@ -304,7 +305,7 @@ class Material_stack_visualizer_app:
             column=1, 
             sticky="s", 
             padx=(0,0), 
-            pady=(0,5)
+            pady=(0,0)
         )
 
         #Set canvas_bbox coordniates for later use
@@ -328,7 +329,7 @@ class Material_stack_visualizer_app:
 
     """Updates the thickness value in self.materials with the slider value and updates corresponding entry-widget"""
     def material_slider_updated(self, value, identifier): 
-        #print("MATERIAL_SLIDER_UPDATED()")
+        print("MATERIAL_SLIDER_UPDATED()")
         
         #Update different values in self.materials based on option value
         match self.option_menu.get():
@@ -353,7 +354,7 @@ class Material_stack_visualizer_app:
 
     """Updates the thickness value in self.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, entry):
-        #print("MATERIAL_ENTRY_UPDATED()")
+        print("MATERIAL_ENTRY_UPDATED()")
 
         #Update different values in self.materials based on option value
         match self.option_menu.get():
@@ -387,7 +388,7 @@ class Material_stack_visualizer_app:
     
     """Deletes the current canvas and creates a new one in its original place"""
     def reset_canvas(self, *args):
-        #print("RESET_CANVAS")
+        print("RESET_CANVAS")
 
         #Delete canvas from program window
         self.canvas.destroy()
@@ -400,51 +401,82 @@ class Material_stack_visualizer_app:
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
     def reset_values(self):
-        #print("RESET_VALUES")
+        print("RESET_VALUES")
 
-        #Reload initial values from given excel file
-        try:
-            #Read given excel file into Pandas dataframe
-            excel_data = pandas.read_excel(SETTINGS["EXCEL_FILE"])
+        match self.option_menu.get():
+            case "Stacked" | "Realistic":
+                #Reload initial thickness values from given excel file
+                try:
+                    #Read given excel file into Pandas dataframe
+                    excel_data = pandas.read_excel(SETTINGS["EXCEL_FILE"])
 
-            #Loop through the rows in excel_file and populate "self.materials"
-            for index, row in excel_data.iterrows():
-                material_name = row["Material"]
-                material_thickness = row["Thickness"]
-                
-                #Populate material dictionary
-                self.materials[material_name]["thickness"] = material_thickness
-                
-                #Update sliders and Entries
-                self.materials[material_name]["slider_id"].set(material_thickness)
-                self.materials[material_name]["entry_id"].delete(0, tkinter.END)
-                self.materials[material_name]["entry_id"].insert(0, material_thickness)
-            
-            # #Reset text_size
-            # self.current_text_size = self.original_text_size
-            
-            #Draw rectangle stack with original values
-            self.draw_material_stack()
+                    #Loop through the rows in excel_file and populate "self.materials"
+                    for index, row in excel_data.iterrows():
+                        material_name = row["Material"]
+                        material_thickness = row["Thickness"]
+                        
+                        #Populate material dictionary
+                        self.materials[material_name]["thickness"] = material_thickness
+                        
+                        #Update sliders and Entries
+                        self.materials[material_name]["slider_id"].set(material_thickness)
+                        self.materials[material_name]["entry_id"].delete(0, tkinter.END)
+                        self.materials[material_name]["entry_id"].insert(0, material_thickness)
+                    
+                    # #Reset text_size
+                    # self.current_text_size = self.original_text_size
+                    
+                    #Draw rectangle stack with original values
+                    self.draw_material_stack()
         
-        #Handle errors
-        except Exception as error:
-            messagebox.showerror("Error", "Could not reset values\nMay be a issue with reading from excel-file")
+                #Handle errors
+                except Exception as error:
+                    messagebox.showerror("Error", "Could not reset 'thickness' values\nMay be a issue with reading from excel-file")
         
+            case "Stepped":
+                #Reload initial thickness values from given excel file
+                try:
+                    #Read given excel file into Pandas dataframe
+                    excel_data = pandas.read_excel(SETTINGS["EXCEL_FILE"])
+
+                    #Loop through the rows in excel_file and populate "self.materials"
+                    for index, row in excel_data.iterrows():
+                        material_name = row["Material"]
+                        material_indent = row["Indent"]
+                        
+                        #Populate material dictionary
+                        self.materials[material_name]["indent"] = material_indent
+                        
+                        #Update sliders and Entries
+                        self.materials[material_name]["slider_id"].set(material_indent)
+                        self.materials[material_name]["entry_id"].delete(0, tkinter.END)
+                        self.materials[material_name]["entry_id"].insert(0, material_indent)
+                    
+                    # #Reset text_size
+                    # self.current_text_size = self.original_text_size
+                    
+                    #Draw rectangle stack with original values
+                    self.draw_material_stack()
+        
+                #Handle errors
+                except Exception as error:
+                    messagebox.showerror("Error", "Could not reset 'thickness' values\nMay be a issue with reading from excel-file")
+
     """Remembers the initial mouse click-position on the canvas"""
     def click_on_canvas(self, event, canvas):
-        #print("CLICK_ON_CANVAS()")
+        print("CLICK_ON_CANVAS()")
         
         canvas.scan_mark(event.x, event.y)
     
     """Moves the position of the canvas"""
     def canvas_drag(self, event, canvas):
-        #print("CANVAS_DRAG()")
+        print("CANVAS_DRAG()")
         
         canvas.scan_dragto(event.x, event.y, gain=1)
 
     """Scales all the elements on the canvas up or down"""
     def canvas_zoom(self, event, canvas):
-        #print("CANVAS_ZOOM()")
+        print("CANVAS_ZOOM()")
         zoom_factor = 1.05
 
         #Zoom in: Scale all items on the canvas around the mouse cursor
@@ -466,11 +498,17 @@ class Material_stack_visualizer_app:
                 self.write_indent_on_stepped_stack()
     
     def program_window_resized(self, event):
-        #Only do something if the window size os actaully changed. (The <configure> method calls this function everytime something about the program window is changed)
-        if(event.width != SETTINGS["PROGRAM_WINDOW_WIDTH"] or event.height != SETTINGS["PROGRAM_WINDOW_HEIGHT"]):
-            #print("PROGRAM_WINDOW_RESIZED()")
-            SETTINGS["PROGRAM_WINDOW_WIDTH"] = event.width
-            SETTINGS["PROGRAM_WINDOW_HEIGHT"] = event.height
+        pass
+        #Only do something if the window size is changed. (The <configure> method calls this function everytime something about the program window is changed)
+        # if event.widget.master.master == window:
+            # print("toplevel window")
+            
+            # if(event.width != SETTINGS["PROGRAM_WINDOW_WIDTH"] or event.height != SETTINGS["PROGRAM_WINDOW_HEIGHT"]):
+            #     print("WINDOW RESIZED")
+            
+            # print("PROGRAM_WINDOW_RESIZED()")
+            # SETTINGS["PROGRAM_WINDOW_WIDTH"] = event.width
+            # SETTINGS["PROGRAM_WINDOW_HEIGHT"] = event.height
         
         #     #Set the new width of the canvas
         #     self.canvas.config(width=window.winfo_width() - self.user_interface_frame.winfo_reqwidth()-5)
@@ -485,46 +523,55 @@ class Material_stack_visualizer_app:
     """ -Changes the Label explaining what is being modified by sliders and entries in the UI-frame
         -Changes the values for sliders and entries"""
     def switch_layout(self, *event):
+        print("SWITCH_LAYOUT()")
+
         #Switch UI layout based on option value
         match self.option_menu.get():
             case "Stacked":
-                #Change the label in UI frame
+                #Change the label in user_interface_frame
                 self.slider_label.configure(text="Thickness")
 
-                #Set all material entry and slider values to "indent" value
+                #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
                 for material in self.materials:
+                    self.materials[material]["slider_id"].set(self.materials[material]["thickness"])
+                    
                     if(self.materials[material]["status"] != "disabled"):
-                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["thickness"]))),
-                        self.materials[material]["slider_id"].set(self.materials[material]["thickness"])
+                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["thickness"])))
                 
+                #Draw material stack                
                 self.draw_material_stack_stacked()
+
             case "Realistic":
-                #Change the label in UI frame
+                #Change the label in user_interface_frame
                 self.slider_label.configure(text="Thickness")
 
-                #Set all material entry and slider values to "indent" value
+                #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
                 for material in self.materials:
+                    self.materials[material]["slider_id"].set(self.materials[material]["thickness"])
+                    
                     if(self.materials[material]["status"] != "disabled"):
-                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["thickness"]))),
-                        self.materials[material]["slider_id"].set(self.materials[material]["thickness"])
+                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["thickness"])))
 
+                #Draw the material stack
                 self.draw_material_stack_realistic()
+            
             case "Stepped":
                 #Change the label in UI frame
                 self.slider_label.configure(text="Indent")
 
-                #Set all material entry and slider values to "indent" value
+                #Set all material entry and slider values to "indent" value, except the entries that are "disabled"
                 for material in self.materials:
-                    if(self.materials[material]["status"] != "disabled"):
-                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["indent"]))),
-                        self.materials[material]["slider_id"].set(self.materials[material]["indent"])
+                    self.materials[material]["slider_id"].set(self.materials[material]["indent"])
 
-                #Set slider to adjust indent
+                    if(self.materials[material]["status"] != "disabled"):
+                        self.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(self.materials[material]["indent"])))
+                    
+                #Draw the material stack
                 self.draw_material_stack_stepped()
 
     """Draws the material stack based on the value in the option box"""
     def draw_material_stack(self, *event):
-        #print("DRAW MATERIAL STACK()")
+        print("DRAW MATERIAL STACK()")
                 
         #Draw stack based on option
         match self.option_menu.get():
@@ -537,7 +584,7 @@ class Material_stack_visualizer_app:
 
     """Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what"""
     def draw_material_stack_stacked(self):       
-        #print("DRAW_MATERIAL_STACK_STACKED()")
+        print("DRAW_MATERIAL_STACK_STACKED()")
         
         #Clear all existing elements on canvas
         self.canvas.delete("all")
@@ -604,7 +651,7 @@ class Material_stack_visualizer_app:
         
     """Draws a realistic version of the rectangle stack"""
     def draw_material_stack_realistic(self):
-        #print("DRAW_MATERIAL_STACK_REALISTIC()")
+        print("DRAW_MATERIAL_STACK_REALISTIC()")
         
         #Clear all existing elements on canvas
         self.canvas.delete("all")
@@ -650,7 +697,7 @@ class Material_stack_visualizer_app:
     
     """Draws a stepped rectangle stack where "indent" decide the width of each rectangle"""
     def draw_material_stack_stepped(self):
-        #print("DRAW_MATERIAL_STACK_STEPPED()")
+        print("DRAW_MATERIAL_STACK_STEPPED()")
 
         #Clear all existing elements on canvas
         self.canvas.delete("all")
@@ -728,7 +775,7 @@ class Material_stack_visualizer_app:
     
     """Writes text on rectangles in the material stack"""
     def write_text_on_stack(self):
-        #print("WRITE_TEXT_ON_STACK()")
+        print("WRITE_TEXT_ON_STACK()")
         #Delete all texts from canvas and dictionary
         for material in self.materials:
             self.canvas.delete(self.materials[material]["text_id"])
@@ -1100,7 +1147,7 @@ class Material_stack_visualizer_app:
                 
     """Writes the indent ranges on the stepped material stack"""
     def write_indent_on_stepped_stack(self):
-        #print("WRITE_INDENT_ON_STEPPED_STACK()")
+        print("WRITE_INDENT_ON_STEPPED_STACK()")
         #Delete indent texts from canvas and dictionary
         for material in self.materials:
             self.canvas.delete(self.materials[material]["indent_text_id"])
@@ -1145,7 +1192,7 @@ class Material_stack_visualizer_app:
 
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
-        #print("EXPORT_STACK_AS_SVG")
+        print("EXPORT_STACK_AS_SVG")
         #Define the name of the svg file
         filename = "stack.svg"
 
@@ -1188,7 +1235,7 @@ class Material_stack_visualizer_app:
     
     """Exports every layer of the stack with text and arrows as SVG-file"""
     def export_layers_as_svg(self):
-        #print("EXPORT_LAYERS_AS_SVG")
+        print("EXPORT_LAYERS_AS_SVG")
 
         #Specify a folder where the SVG-files should be saved
         folder_path = "svg_exports"
@@ -1333,6 +1380,7 @@ if __name__ == "__main__":
     #Create a host tkinter program window
     window = tkinter.Tk()
 
+    #Load settings from json-file
     with open('settings.json', 'r') as file:
             SETTINGS = json.load(file)
 
@@ -1349,7 +1397,7 @@ if __name__ == "__main__":
 
 
     #Checks if the program window is being resized
-    # window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
+    window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
     
     #Start the main loop of the program
     window.mainloop()
