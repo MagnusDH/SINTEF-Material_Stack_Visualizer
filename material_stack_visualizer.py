@@ -7,6 +7,8 @@ import openpyxl #Excel-file reading
 import os
 import json
 
+# self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
+
 class Material_stack_visualizer_app:
     def __init__(self):
         print("INIT()")
@@ -719,11 +721,11 @@ class Material_stack_visualizer_app:
         nanometers_per_pixel = sum_of_all_materials/round(self.canvas_height * 0.9)
 
         #Prepare first rectangle drawing coordinates (from bottom left corner)
-        rectangle_x0 = self.visible_canvas_bbox_x0 + SETTINGS["CANVAS_STACK_TEXT_INDENT"]
-        rectangle_y0 = round(self.canvas_height*0.9) + 10
-        rectangle_x1 = self.visible_canvas_bbox_x1
+        rectangle_x0 = self.visible_canvas_bbox_x0 + SETTINGS["STEPPED_CANVAS_INDENT_LEFT_SIDE"]
+        rectangle_y0 = round(self.canvas_height*0.9) + SETTINGS["STEPPED_CANVAS_INDENT_TOP"]
+        rectangle_x1 = self.visible_canvas_bbox_x1 - SETTINGS["STEPPED_CANVAS_INDENT_RIGHT_SIDE"]
         rectangle_y1 = None #calculated later
-        previous_rectangle_x1 = self.visible_canvas_bbox_x1      
+        previous_rectangle_x1 = self.visible_canvas_bbox_x1
 
         #Draw rectangles on canvas
         for material in self.materials:
@@ -1148,7 +1150,7 @@ class Material_stack_visualizer_app:
     """Writes the indent ranges on the stepped material stack"""
     def write_indent_on_stepped_stack(self):
         print("WRITE_INDENT_ON_STEPPED_STACK()")
-        #Delete indent texts from canvas and dictionary
+        #Delete indent texts and arrows from canvas and dictionary
         for material in self.materials:
             self.canvas.delete(self.materials[material]["indent_text_id"])
             self.canvas.delete(self.materials[material]["indent_arrow_id"])
@@ -1156,39 +1158,50 @@ class Material_stack_visualizer_app:
             self.materials[material]["indent_text_id"] = None
             self.materials[material]["indent_arrow_id"] = None
         
-        previous_rectangle_x1 = self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
-        previous_rectangle_y1 = self.visible_canvas_bbox_y1
         previous_material = None
 
         #Loop through all the materials
         for material in self.materials:
-            #Find x1 and y1 coordinates of current material_rectangle
-            current_rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
-            current_rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
+            #Do not write "indent" on the first rectangle or if the "indent" value i zero
+            if(previous_material == None or int(self.materials[material]["indent"]) == 0):
+                previous_material = material
+                continue
+            
+            #Write indent text and arrow next to rectangle
+            else:
+                #Find coordinates of current material_rectangle
+                current_rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
+                current_rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
 
-            #Create a two sided arrow line between the differense of the two rectangles
-            created_indent_line = self.canvas.create_line(
-                current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, current_rectangle_y1-5, 
-                fill=SETTINGS["TEXT_COLOR"],
-                arrow=tkinter.BOTH
-            )
+                #Find x1 coordinate of previous rectangle
+                previous_rectangle_x1 = self.canvas.bbox(self.materials[previous_material]["rectangle_id"])[2]
 
-            #Write indent number over line
-            indent_number = int(self.materials[material]["indent"])
-            created_indent_text = self.canvas.create_text(
-                (current_rectangle_x1+previous_rectangle_x1)/2, current_rectangle_y1-15,
-                text=f"{indent_number}nm", 
-                fill=SETTINGS["TEXT_COLOR"], 
-                font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
-            )
-                
-            #Add created elements to dictionary
-            self.materials[material]["indent_text_id"] = created_indent_text
-            self.materials[material]["indent_arrow_id"] = created_indent_line
+                #Create a two sided arrow line between the differense of the two rectangles
+                created_indent_line = self.canvas.create_line(
+                    current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, current_rectangle_y1-5, 
+                    fill=SETTINGS["TEXT_COLOR"],
+                    arrow=tkinter.BOTH
+                )
 
-            #Set new "previous_rectangle" coordinates
-            previous_rectangle_x1 = current_rectangle_x1
-            previous_rectangle_y1 = current_rectangle_y1
+                #Write indent number over line
+                indent_number = int(self.materials[material]["indent"])
+                created_indent_text = self.canvas.create_text(
+                    (current_rectangle_x1+previous_rectangle_x1)/2, current_rectangle_y1-15,
+                    text=f"{indent_number}nm", 
+                    fill=SETTINGS["TEXT_COLOR"], 
+                    font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
+                )
+                #if indent number overlaps with the rectangle_x1, then move it to the right
+                if(self.canvas.bbox(created_indent_text)[0] < current_rectangle_x1):
+                    overlap = current_rectangle_x1 - self.canvas.bbox(created_indent_text)[0]
+                    self.canvas.move(created_indent_text, overlap, 0)
+                    
+                #Add created elements to dictionary
+                self.materials[material]["indent_text_id"] = created_indent_text
+                self.materials[material]["indent_arrow_id"] = created_indent_line
+
+                #Set the "previous material" for use in the next loop
+                previous_material = material
 
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
