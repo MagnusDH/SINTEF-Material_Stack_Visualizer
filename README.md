@@ -50,6 +50,7 @@
 
     BUGS:
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
+        -If the UI_FRAME_WIDTH is changed, then the CANVAS_PROGRAM_BORDER_WIDTH must also be changed so that it fits the program window correctly
 
     #HOW TO CREATE AN EXECUTABLE FILE:
         -Navigate to the folder containing the python program

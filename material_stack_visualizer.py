@@ -101,14 +101,14 @@ class Material_stack_visualizer_app:
         row_counter = 0
 
         #Create label to display material name
-        label = customtkinter.CTkLabel(
+        material_label = customtkinter.CTkLabel(
             master=user_interface_frame, 
             text="Material", 
             fg_color=SETTINGS["UI_FRAME_BACKGROUND_COLOR"],
             text_color="#55b6ff",
             font=(SETTINGS["TEXT_FONT"], 20, "bold")
         )
-        label.grid(
+        material_label.grid(
             row=row_counter,
             column=0,
             sticky="n",
@@ -270,6 +270,20 @@ class Material_stack_visualizer_app:
             pady=(0,0)
         )
 
+        view_label = customtkinter.CTkLabel(
+            master=window, 
+            text="View", 
+            fg_color=SETTINGS["PROGRAM_BACKGROUND_COLOR"],
+            text_color="#55b6ff",
+            font=(SETTINGS["TEXT_FONT"], 20)
+        )
+        view_label.grid(
+            row=1,
+            column=1,
+            sticky="ne",
+            padx=(0,5),
+            pady=(0,0)
+        )
         #Switch layout ComboBox
         self.option_menu = customtkinter.CTkOptionMenu(
             master=window, 
@@ -280,7 +294,7 @@ class Material_stack_visualizer_app:
             command=self.switch_layout
         )
         self.option_menu.grid(
-            row=1, 
+            row=2, 
             column=1, 
             sticky="ne", 
             padx=(0,0), 
@@ -499,28 +513,21 @@ class Material_stack_visualizer_app:
                 self.write_text_on_stack()
                 self.write_indent_on_stepped_stack()
     
+    """Scales the material stack according to the program window"""
     def program_window_resized(self, event):
-        pass
         #Only do something if the window size is changed. (The <configure> method calls this function everytime something about the program window is changed)
-        # if event.widget.master.master == window:
-            # print("toplevel window")
-            
-            # if(event.width != SETTINGS["PROGRAM_WINDOW_WIDTH"] or event.height != SETTINGS["PROGRAM_WINDOW_HEIGHT"]):
-            #     print("WINDOW RESIZED")
-            
-            # print("PROGRAM_WINDOW_RESIZED()")
-            # SETTINGS["PROGRAM_WINDOW_WIDTH"] = event.width
-            # SETTINGS["PROGRAM_WINDOW_HEIGHT"] = event.height
+        if(event.width != SETTINGS["PROGRAM_WINDOW_WIDTH"] or event.height != SETTINGS["PROGRAM_WINDOW_HEIGHT"]):
+            print("WINDOW RESIZED")
         
-        #     #Set the new width of the canvas
-        #     self.canvas.config(width=window.winfo_width() - self.user_interface_frame.winfo_reqwidth()-5)
+            #Set the new width of the canvas
+            self.canvas.config(width=window.winfo_width() - self.user_interface_frame.winfo_reqwidth() - SETTINGS["CANVAS_PROGRAM_BORDER_WIDTH"])
 
-        #     #Update the variables that track the actual visible parts of the canvas
-        #     self.visible_canvas_bbox_x1 = self.canvas.winfo_reqwidth() - 3
-        #     self.visible_canvas_bbox_y1 = self.canvas.winfo_reqheight() - 3
+            #Update the variables that track the actual visible parts of the canvas
+            self.visible_canvas_bbox_x1 = self.canvas.winfo_reqwidth() - 1
+            self.visible_canvas_bbox_y1 = self.canvas.winfo_reqheight() - 1
 
-        #     #Redraw the material stack
-        #     self.draw_material_stack()
+            #Redraw the material stack
+            self.draw_material_stack()
 
     """ -Changes the Label explaining what is being modified by sliders and entries in the UI-frame
         -Changes the values for sliders and entries"""
@@ -824,13 +831,13 @@ class Material_stack_visualizer_app:
 
                         #If text is outside leftside of canvas, place it on the left canvas side
                         if(self.canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
-                            margin = self.visible_canvas_bbox_x0 - self.canvas.bbox(created_text)[0] 
-                            self.canvas.coords(created_text, rectangle_middle_x+margin, rectangle_middle_y)
+                            overlap = self.visible_canvas_bbox_x0 - self.canvas.bbox(created_text)[0] 
+                            self.canvas.coords(created_text, rectangle_middle_x+overlap, rectangle_middle_y)
                         
                         #If text is outside rightside of canvas, place it on the right canvas side
                         if(self.canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
-                            margin = self.canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
-                            self.canvas.coords(created_text, rectangle_middle_x-margin, rectangle_middle_y)
+                            overlap = self.canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
+                            self.canvas.coords(created_text, rectangle_middle_x-overlap, rectangle_middle_y)
                         
                         #Add text element to dictionary
                         self.materials[material]["text_id"] = created_text
@@ -871,7 +878,7 @@ class Material_stack_visualizer_app:
                             previous_text_bbox_x1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[2]
                             previous_text_bbox_y1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[3]
 
-                        # if(text overlaps with canvas top):
+                        #if(text top overlaps with canvas top):
                         if(text_bbox_y0 < self.visible_canvas_bbox_y0):
                             #Find how much is overlapping
                             overlap = self.visible_canvas_bbox_y0 - text_bbox_y0
@@ -879,57 +886,38 @@ class Material_stack_visualizer_app:
                             self.canvas.move(self.materials[material]["text_id"], 0, overlap)
                             self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST, 
-                                fill=SETTINGS["TEXT_COLOR"],
-                                tags="arrow_line")
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
-
-                        #if(Text overlaps with canvas bottom):
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
+                            
+                        #if(Text bottom overlaps with canvas bottom):
                         if(text_bbox_y1 > self.visible_canvas_bbox_y1):
                             #Find how much is overlapping
                             overlap = text_bbox_y1 - self.visible_canvas_bbox_y1
                             #Move text up
                             self.canvas.move(self.materials[material]["text_id"], 0, -overlap)
                             self.canvas.move(self.materials[material]["text_bbox_id"], 0, -overlap)
+                            
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST, 
-                                fill=SETTINGS["TEXT_COLOR"],
-                                tags="arrow_line")
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
-
-                        #if(text right side overlaps with canvas left side)
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
+                            
+                        #if(text right side overlaps with canvas right side)
                         if(text_bbox_x1 > self.visible_canvas_bbox_x1):
                             #Find how much is overlapping
                             overlap = text_bbox_x1 - self.visible_canvas_bbox_x1
                             #Move text left
                             self.canvas.move(self.materials[material]["text_id"], -overlap, 0)
                             self.canvas.move(self.materials[material]["text_bbox_id"], -overlap, 0)
+                            
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST, 
-                                fill=SETTINGS["TEXT_COLOR"],
-                                tags="arrow_line")
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
 
                         #if(Text top overlaps with previous text bottom):
                         if(previous_material is not None and text_bbox_y0 < previous_text_bbox_y1):
@@ -938,34 +926,12 @@ class Material_stack_visualizer_app:
                             #Move text down
                             self.canvas.move(self.materials[material]["text_id"], 0, overlap)
                             self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
+                            
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST,
-                                fill=SETTINGS["TEXT_COLOR"],                                
-                                tags="arrow_line")
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
-
-                        # #if(Text bottom overlaps with previous text top):
-                        # if(previous_material is not None and text_bbox_y1 < previous_text_bbox_y1):
-                        #     #Find how much is overlapping
-                        #     overlap = previous_text_bbox_y1 - text_bbox_y1
-                        #     #Move text down
-                        #     self.canvas.move(self.materials[material]["text_id"], 0, overlap)
-                        #     self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
-                        #     #Find coordinates of text bounding box
-                        #     tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        #     #Delete the arrow line
-                        #     self.canvas.delete(self.materials[material]["line_id"])
-                        #     #Create new arrow line
-                        #     created_arrow_line = self.canvas.create_line(tx0, (ty0+ty1)/2, rectangle_x1, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
-                        #     #Add the new line to dictionary
-                        #     self.materials[material]["line_id"] = created_arrow_line
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
 
                         previous_material = material
 
@@ -1044,7 +1010,7 @@ class Material_stack_visualizer_app:
                             previous_text_bbox_x1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[2]
                             previous_text_bbox_y1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[3]
 
-                        #if(text overlaps with canvas top):
+                        #if(text top overlaps with canvas top):
                         if(text_bbox_y0 < self.visible_canvas_bbox_y0):
                             #Find how much is overlapping
                             overlap = self.visible_canvas_bbox_y0 - text_bbox_y0
@@ -1052,20 +1018,12 @@ class Material_stack_visualizer_app:
                             self.canvas.move(self.materials[material]["text_id"], 0, overlap)
                             self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST, 
-                                fill=SETTINGS["TEXT_COLOR"],
-                                tags="arrow_line"
-                            )
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
 
-                        #if(Text overlaps with canvas bottom):
+                        #if(Text bottom overlaps with canvas bottom):
                         if(text_bbox_y1 > self.visible_canvas_bbox_y1):
                             #Find how much is overlapping
                             overlap = text_bbox_y1 - self.visible_canvas_bbox_y1
@@ -1073,18 +1031,10 @@ class Material_stack_visualizer_app:
                             self.canvas.move(self.materials[material]["text_id"], 0, -overlap)
                             self.canvas.move(self.materials[material]["text_bbox_id"], 0, -overlap)
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST, 
-                                fill=SETTINGS["TEXT_COLOR"],
-                                tags="arrow_line"
-                            )
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
 
                         #if(text left side overlaps with canvas left side)
                         if(text_bbox_x0 < self.visible_canvas_bbox_x0):
@@ -1094,19 +1044,10 @@ class Material_stack_visualizer_app:
                             self.canvas.move(self.materials[material]["text_id"], overlap, 0)
                             self.canvas.move(self.materials[material]["text_bbox_id"], overlap, 0)
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST, 
-                                fill=SETTINGS["TEXT_COLOR"],
-                                tags="arrow_line"
-                            )
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
-
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
 
                         #if(Text top overlaps with previous text bottom):
                         if(previous_material is not None and text_bbox_y0 < previous_text_bbox_y1):
@@ -1116,34 +1057,10 @@ class Material_stack_visualizer_app:
                             self.canvas.move(self.materials[material]["text_id"], 0, overlap)
                             self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
                             #Find coordinates of text bounding box
-                            tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                            #Delete the arrow line
-                            self.canvas.delete(self.materials[material]["line_id"])
-                            #Create new arrow line
-                            created_arrow_line = self.canvas.create_line(
-                                tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, 
-                                arrow=tkinter.LAST, 
-                                fill=SETTINGS["TEXT_COLOR"],
-                                tags="arrow_line"
-                            )
-                            #Add the new line to dictionary
-                            self.materials[material]["line_id"] = created_arrow_line
-
-                        # #if(Text bottom overlaps with previous text top):
-                        # if(previous_material is not None and text_bbox_y1 < previous_text_bbox_y1):
-                        #     #Find how much is overlapping
-                        #     overlap = previous_text_bbox_y1 - text_bbox_y1
-                        #     #Move text down
-                        #     self.canvas.move(self.materials[material]["text_id"], 0, overlap)
-                        #     self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
-                        #     #Find coordinates of text bounding box
-                        #     tx0, ty0, tx1, ty1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-                        #     #Delete the arrow line
-                        #     self.canvas.delete(self.materials[material]["line_id"])
-                        #     #Create new arrow line
-                        #     created_arrow_line = self.canvas.create_line(tx1, (ty0+ty1)/2, rectangle_x0, (rectangle_y0+rectangle_y1)/2, arrow=tk.LAST, tags="arrow_line")
-                        #     #Add the new line to dictionary
-                        #     self.materials[material]["line_id"] = created_arrow_line
+                            text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
+                            text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
+                            #Move the arrow line
+                            self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
 
                         previous_material = material
                 
@@ -1408,9 +1325,11 @@ if __name__ == "__main__":
     #Create keyboard shortcuts for program window
     window.bind("<Escape>", lambda event: window.destroy())
 
+    #Resets the canvas position if "r" is pressed
+    window.bind('<KeyPress-r>', material_stack_visualizer_app.reset_canvas)
 
     #Checks if the program window is being resized
     window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
     
     #Start the main loop of the program
-    window.mainloop()
+    window.mainloop()               
