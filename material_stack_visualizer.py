@@ -7,8 +7,6 @@ import openpyxl #Excel-file reading
 import os
 import json
 
-# self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
-
 class Material_stack_visualizer_app:
     def __init__(self):
         print("INIT()")
@@ -331,7 +329,7 @@ class Material_stack_visualizer_app:
         self.visible_canvas_bbox_y1 = canvas.winfo_reqheight() - 1
         self.canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
         self.canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
-
+        #This is just a usefull function to find the bbox of the canvas: self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
 
         #Draw bounding box around canvas
         canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], width=1)
@@ -359,9 +357,7 @@ class Material_stack_visualizer_app:
             
             case "Stepped":
                 #Update the "indent" value in self.materials
-                # self.materials[identifier]["indent"] = value
-                self.materials[identifier]["thickness"] = value
-
+                self.materials[identifier]["indent"] = value
 
                 #Update the entry corresponding to key
                 self.materials[identifier]["entry_id"].delete(0, tkinter.END)
@@ -801,9 +797,7 @@ class Material_stack_visualizer_app:
             self.materials[material]["line_id"] = None
             self.materials[material]["indent_text_id"] = None
             self.materials[material]["indent_arrow_id"] = None
-
-         #Write different texts based on current stack option
-        
+       
         #Write different texts based on current stack option
         match self.option_menu.get():
             case "Stacked" | "Realistic":
@@ -1078,63 +1072,60 @@ class Material_stack_visualizer_app:
 
     """Writes the indent ranges on the stepped material stack"""
     def write_indent_on_stepped_stack(self):
-        #DO NOT WRITE INDENT IF "THICKNESS" OF MATERIAL IS ZERO!!!!
-
-        
         print("WRITE_INDENT_ON_STEPPED_STACK()")
-        #Delete indent texts and arrows from canvas and dictionary
+
+        #Delete all indet texts and arrows from canvas and dictionary
         for material in self.materials:
             self.canvas.delete(self.materials[material]["indent_text_id"])
             self.canvas.delete(self.materials[material]["indent_arrow_id"])
-
             self.materials[material]["indent_text_id"] = None
             self.materials[material]["indent_arrow_id"] = None
-        
+       
         previous_material = None
 
-        #Loop through all the materials
+        #Loop through all the materials:
         for material in self.materials:
-            #Do not write "indent" on the first rectangle or if the "indent" value i zero
-            if(previous_material == None or int(self.materials[material]["indent"]) == 0):
-                previous_material = material
-                continue
-            
-            #Write indent text and arrow next to rectangle
-            else:
-                #Find coordinates of current material_rectangle
-                current_rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
-                current_rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
+            #Do not create indent or text on the first rectangle
+            if(previous_material != None):
+                #Only create text and lines if the "thickness" is not zero
+                if(int(self.materials[material]["thickness"]) > 0):
+                    #Only create texts and lines if the "indent" is not zero
+                    if(int(self.materials[material]["indent"]) > 0):
+                        #Find usefull coordinates of current material_rectangle
+                        current_rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
+                        current_rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
+        
+                        #Find x1 coordinate of previous rectangle
+                        previous_rectangle_x1 = self.canvas.bbox(self.materials[previous_material]["rectangle_id"])[2]
+        
+                        #Create a two sided arrow line between the differense of the two rectangles
+                        created_indent_line = self.canvas.create_line(
+                            current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, current_rectangle_y1-5, 
+                            fill=SETTINGS["TEXT_COLOR"],
+                            arrow=tkinter.BOTH
+                        )
 
-                #Find x1 coordinate of previous rectangle
-                previous_rectangle_x1 = self.canvas.bbox(self.materials[previous_material]["rectangle_id"])[2]
+                        #Write indent number over line
+                        indent_number = int(self.materials[material]["indent"])
+                        created_indent_text = self.canvas.create_text(
+                            (current_rectangle_x1+previous_rectangle_x1)/2, current_rectangle_y1-15,
+                            text=f"{indent_number}nm", 
+                            fill=SETTINGS["TEXT_COLOR"], 
+                            font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
+                        )
+        
+                        #if indent number overlaps with the rectangle_x1, then move it to the right
+                        if(self.canvas.bbox(created_indent_text)[0] < current_rectangle_x1):
+                            overlap = current_rectangle_x1 - self.canvas.bbox(created_indent_text)[0]
+                            self.canvas.move(created_indent_text, overlap, 0)
+                        
+                        #Add created elements to dictionary
+                        self.materials[material]["indent_text_id"] = created_indent_text
+                        self.materials[material]["indent_arrow_id"] = created_indent_line
 
-                #Create a two sided arrow line between the differense of the two rectangles
-                created_indent_line = self.canvas.create_line(
-                    current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, current_rectangle_y1-5, 
-                    fill=SETTINGS["TEXT_COLOR"],
-                    arrow=tkinter.BOTH
-                )
-
-                #Write indent number over line
-                indent_number = int(self.materials[material]["indent"])
-                created_indent_text = self.canvas.create_text(
-                    (current_rectangle_x1+previous_rectangle_x1)/2, current_rectangle_y1-15,
-                    text=f"{indent_number}nm", 
-                    fill=SETTINGS["TEXT_COLOR"], 
-                    font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
-                )
-                #if indent number overlaps with the rectangle_x1, then move it to the right
-                if(self.canvas.bbox(created_indent_text)[0] < current_rectangle_x1):
-                    overlap = current_rectangle_x1 - self.canvas.bbox(created_indent_text)[0]
-                    self.canvas.move(created_indent_text, overlap, 0)
-                    
-                #Add created elements to dictionary
-                self.materials[material]["indent_text_id"] = created_indent_text
-                self.materials[material]["indent_arrow_id"] = created_indent_line
-
-                #Set the "previous material" for use in the next loop
-                previous_material = material
-
+            #Set the "previous material" for use in the next loop
+            previous_material = material
+        
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):
         print("EXPORT_STACK_AS_SVG")
@@ -1344,313 +1335,7 @@ if __name__ == "__main__":
     window.bind('<KeyPress-r>', material_stack_visualizer_app.reset_canvas)
 
     #Checks if the program window is being resized
-    # window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
+    window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
     
     #Start the main loop of the program
     window.mainloop()
-
-
-
-
-
-
-
-
-
-
-    
-                
-
-
-
-
-
-
-
-
-
-
-
-
-    # def write_text_on_stack(self):
-    #     print("WRITE_TEXT_ON_STACK()")
-    #     #Delete all texts from canvas and dictionary
-    #     for material in self.materials:
-    #         self.canvas.delete(self.materials[material]["text_id"])
-    #         self.canvas.delete(self.materials[material]["text_bbox_id"])
-    #         self.canvas.delete(self.materials[material]["line_id"])
-    #         self.canvas.delete(self.materials[material]["indent_text_id"])
-    #         self.canvas.delete(self.materials[material]["indent_arrow_id"])
-
-    #         self.materials[material]["text_id"] = None
-    #         self.materials[material]["text_bbox_id"] = None
-    #         self.materials[material]["line_id"] = None
-    #         self.materials[material]["indent_text_id"] = None
-    #         self.materials[material]["indent_arrow_id"] = None
-
-    #     #Write different texts based on current stack option
-    #     match self.option_menu.get():
-    #         case "Stacked" | "Realistic":
-    #             #Find out the height of a potential text's bounding box
-    #             text_font = font.Font(family=SETTINGS["TEXT_FONT"], size=SETTINGS["TEXT_SIZE"])
-    #             text_height = text_font.metrics()['linespace']
-    #             previous_material = None
-                
-    #             #Loop through all the materials:
-    #             for material in dict(reversed(self.materials.items())):
-    #                 #Find coordinates and height of current material_rectangle
-    #                 rectangle_x0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[0]
-    #                 rectangle_y0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[1]
-    #                 rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
-    #                 rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
-    #                 rectangle_height = rectangle_y1-rectangle_y0
-    #                 rectangle_middle_x = (rectangle_x0 + rectangle_x1)/2
-    #                 rectangle_middle_y = (rectangle_y0 + rectangle_y1)/2
-
-    #                 #Text is drawn inside rectangle if it fits
-    #                 if(text_height < rectangle_height):
-    #                     #Do not write "thickness" if the "thickness" value i zero                    
-    #                     if(int(self.materials[material]["thickness"]) != 0):
-    #                         created_text = self.canvas.create_text(
-    #                             rectangle_middle_x, rectangle_middle_y, 
-    #                             text=f"{material} - {self.materials[material]['thickness']}nm", 
-    #                             fill=SETTINGS["TEXT_COLOR"], 
-    #                             font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
-    #                             anchor="center", 
-    #                             tags="Material_label"
-    #                         )
-
-    #                         #If text is outside leftside of canvas, place it on the left canvas side
-    #                         if(self.canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
-    #                             overlap = self.visible_canvas_bbox_x0 - self.canvas.bbox(created_text)[0] 
-    #                             self.canvas.coords(created_text, rectangle_middle_x+overlap, rectangle_middle_y)
-                            
-    #                         #If text is outside rightside of canvas, place it on the right canvas side
-    #                         if(self.canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
-    #                             overlap = self.canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
-    #                             self.canvas.coords(created_text, rectangle_middle_x-overlap, rectangle_middle_y)
-                            
-    #                         #Add text element to dictionary
-    #                         self.materials[material]["text_id"] = created_text
-
-    #                 #Text must be drawn outside rectangle
-    #                 else:
-    #                     #Create text, bbox and line and place them
-    #                     created_text = self.canvas.create_text(
-    #                         self.visible_canvas_bbox_x1, rectangle_middle_y, 
-    #                         text=f"{material} - {self.materials[material]['thickness']}nm", 
-    #                         fill=SETTINGS["TEXT_COLOR"], 
-    #                         font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
-    #                         tags="Material_label"
-    #                     )
-    #                     created_text_bbox = self.canvas.create_rectangle(
-    #                         self.canvas.bbox(created_text), 
-    #                         outline=SETTINGS["TEXT_COLOR"], 
-    #                         tags="text_bbox"
-    #                     )
-    #                     text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1  = self.canvas.bbox(created_text)
-    #                     text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-                        
-    #                     created_arrow_line = self.canvas.create_line(
-    #                         (text_bbox_x0, text_bbox_middle_y), (rectangle_x1, rectangle_middle_y), 
-    #                         arrow=tkinter.LAST, 
-    #                         fill=SETTINGS["TEXT_COLOR"],
-    #                         tags="arrow_line"
-    #                     )
-
-    #                     self.materials[material]["text_id"] = created_text
-    #                     self.materials[material]["text_bbox_id"] = created_text_bbox
-    #                     self.materials[material]["line_id"] = created_arrow_line
-
-    #                     #Get the bounding box of the previous materials text
-    #                     if(previous_material is not None):
-    #                         previous_text_bbox_x0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[0]
-    #                         previous_text_bbox_y0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[1]
-    #                         previous_text_bbox_x1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[2]
-    #                         previous_text_bbox_y1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[3]
-
-    #                     #if(text top overlaps with canvas top):
-    #                     if(text_bbox_y0 < self.visible_canvas_bbox_y0):
-    #                         #Find how much is overlapping
-    #                         overlap = self.visible_canvas_bbox_y0 - text_bbox_y0
-    #                         #Move text and bbox down
-    #                         self.canvas.move(self.materials[material]["text_id"], 0, overlap)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
-                            
-    #                     #if(Text bottom overlaps with canvas bottom):
-    #                     if(text_bbox_y1 > self.visible_canvas_bbox_y1):
-    #                         #Find how much is overlapping
-    #                         overlap = text_bbox_y1 - self.visible_canvas_bbox_y1
-    #                         #Move text up
-    #                         self.canvas.move(self.materials[material]["text_id"], 0, -overlap)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], 0, -overlap)
-                            
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
-                            
-    #                     #if(text right side overlaps with canvas right side)
-    #                     if(text_bbox_x1 > self.visible_canvas_bbox_x1):
-    #                         #Find how much is overlapping
-    #                         overlap = text_bbox_x1 - self.visible_canvas_bbox_x1
-    #                         #Move text left
-    #                         self.canvas.move(self.materials[material]["text_id"], -overlap, 0)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], -overlap, 0)
-                            
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
-
-    #                     #if(Text top overlaps with previous text bottom):
-    #                     if(previous_material is not None and text_bbox_y0 < previous_text_bbox_y1):
-    #                         #Find how much is overlapping
-    #                         overlap = previous_text_bbox_y1 - text_bbox_y0
-    #                         #Move text down
-    #                         self.canvas.move(self.materials[material]["text_id"], 0, overlap)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
-                            
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x0, text_bbox_middle_y, rectangle_x1, rectangle_middle_y)
-
-    #                     previous_material = material
-
-    #         case "Stepped":
-    #             #Find out the height of a potential text's bounding box
-    #             text_font = font.Font(family=SETTINGS["TEXT_FONT"], size=SETTINGS["TEXT_SIZE"])
-    #             text_height = text_font.metrics()['linespace']
-    #             previous_material = None
-                
-    #             #for material in self.materials:
-    #             for material in dict(reversed(self.materials.items())):
-    #                 #Find coordinates and height of current material_rectangle
-    #                 rectangle_x0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[0]
-    #                 rectangle_y0 = self.canvas.bbox(self.materials[material]["rectangle_id"])[1]
-    #                 rectangle_x1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[2]
-    #                 rectangle_y1 = self.canvas.bbox(self.materials[material]["rectangle_id"])[3]
-    #                 rectangle_height = rectangle_y1-rectangle_y0
-    #                 rectangle_middle_x = (rectangle_x0 + rectangle_x1)/2
-    #                 rectangle_middle_y = (rectangle_y0 + rectangle_y1)/2
-
-    #                 #Text is drawn inside rectangle if it fits
-    #                 if(text_height < rectangle_height):
-    #                     created_text = self.canvas.create_text(
-    #                         rectangle_middle_x, rectangle_middle_y, 
-    #                         text=f"{material} - {self.materials[material]['thickness']}nm", 
-    #                         fill=SETTINGS["TEXT_COLOR"], 
-    #                         font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
-    #                         anchor="center", 
-    #                         tags="Material_label"
-    #                     )
-                        
-    #                     #If text is outside leftside of canvas, place it on the left canvas side
-    #                     if(self.canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
-    #                         margin = self.visible_canvas_bbox_x0 - self.canvas.bbox(created_text)[0] 
-    #                         self.canvas.coords(created_text, rectangle_middle_x+margin, rectangle_middle_y)
-                        
-    #                     #If text is outside rightside of canvas, place it on the right canvas side
-    #                     if(self.canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
-    #                         margin = self.canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
-    #                         self.canvas.coords(created_text, rectangle_middle_x-margin, rectangle_middle_y)
-    #                     #Add text element to dictionary
-    #                     self.materials[material]["text_id"] = created_text
-
-    #                 #Text must be drawn outside rectangle
-    #                 else:
-    #                     created_text = self.canvas.create_text(
-    #                         self.visible_canvas_bbox_x0, rectangle_middle_y, 
-    #                         text=f"{material} - {self.materials[material]['thickness']}nm", 
-    #                         fill=SETTINGS["TEXT_COLOR"], 
-    #                         font=(SETTINGS["TEXT_FONT"], SETTINGS["TEXT_SIZE"]), 
-    #                         tags="Material_label"
-    #                     )
-    #                     created_text_bbox = self.canvas.create_rectangle(
-    #                         self.canvas.bbox(created_text), 
-    #                         outline=SETTINGS["TEXT_COLOR"], 
-    #                         tags="text_bbox"
-    #                     )     
-    #                     text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(created_text)
-    #                     text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                     created_arrow_line = self.canvas.create_line(
-    #                         (text_bbox_x1, text_bbox_middle_y), (rectangle_x0, rectangle_middle_y), 
-    #                         arrow=tkinter.LAST,
-    #                         fill=SETTINGS["TEXT_COLOR"],
-    #                         tags="arrow_line"
-    #                     )
-
-    #                     #Add text ID, bbox ID and arrow line ID to dictionary 
-    #                     self.materials[material]["text_id"] = created_text
-    #                     self.materials[material]["text_bbox_id"] = created_text_bbox
-    #                     self.materials[material]["line_id"] = created_arrow_line
-
-    #                     #Get the bounding box of the previous materials text
-    #                     if(previous_material is not None):
-    #                         previous_text_bbox_x0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[0]
-    #                         previous_text_bbox_y0 = self.canvas.bbox(self.materials[previous_material]["text_id"])[1]
-    #                         previous_text_bbox_x1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[2]
-    #                         previous_text_bbox_y1 = self.canvas.bbox(self.materials[previous_material]["text_id"])[3]
-
-    #                     #if(text top overlaps with canvas top):
-    #                     if(text_bbox_y0 < self.visible_canvas_bbox_y0):
-    #                         #Find how much is overlapping
-    #                         overlap = self.visible_canvas_bbox_y0 - text_bbox_y0
-    #                         #Move text and bbox down
-    #                         self.canvas.move(self.materials[material]["text_id"], 0, overlap)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
-
-    #                     #if(Text bottom overlaps with canvas bottom):
-    #                     if(text_bbox_y1 > self.visible_canvas_bbox_y1):
-    #                         #Find how much is overlapping
-    #                         overlap = text_bbox_y1 - self.visible_canvas_bbox_y1
-    #                         #Move text up
-    #                         self.canvas.move(self.materials[material]["text_id"], 0, -overlap)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], 0, -overlap)
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
-
-    #                     #if(text left side overlaps with canvas left side)
-    #                     if(text_bbox_x0 < self.visible_canvas_bbox_x0):
-    #                         #Find how much is overlapping
-    #                         overlap = self.visible_canvas_bbox_x0 - text_bbox_x0 
-    #                         #Move text to the right
-    #                         self.canvas.move(self.materials[material]["text_id"], overlap, 0)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], overlap, 0)
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
-
-    #                     #if(Text top overlaps with previous text bottom):
-    #                     if(previous_material is not None and text_bbox_y0 < previous_text_bbox_y1):
-    #                         #Find how much is overlapping
-    #                         overlap = previous_text_bbox_y1 - text_bbox_y0
-    #                         #Move text down
-    #                         self.canvas.move(self.materials[material]["text_id"], 0, overlap)
-    #                         self.canvas.move(self.materials[material]["text_bbox_id"], 0, overlap)
-    #                         #Find coordinates of text bounding box
-    #                         text_bbox_x0, text_bbox_y0, text_bbox_x1, text_bbox_y1 = self.canvas.bbox(self.materials[material]["text_bbox_id"])
-    #                         text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2
-    #                         #Move the arrow line
-    #                         self.canvas.coords(self.materials[material]["line_id"], text_bbox_x1, text_bbox_middle_y, rectangle_x0, rectangle_middle_y)
-
-    #                     previous_material = material
