@@ -16,12 +16,7 @@ import matplotlib.pyplot as matplot #For creating graphs
     #Lag en slidebar som endrer "h_s" (h underopphøyd i s) som går fra (fra 1*10 opphøyd i minus9 til 10000*10 opphøyd i minus9)
     #Lag en funksjon i koden som regner ut funksjonen fra Runar
 
-
 #"h" og "h_s" er tykkelse på et lag ("h_s" er substrat og "h" er ett valgfritt lag som ligger oppå substratet)
-
-
-
-
 #Spør om jeg skal ta bort boksene rundt navn på materialene?
 
 
@@ -40,11 +35,11 @@ class Material_stack_visualizer_app:
         #Create a user interface
         self.user_interface_frame = self.create_user_interface()
 
-        #Create canvas
-        self.canvas = self.create_canvas()
+        #Create material stack
+        self.material_stack_frame = self.create_material_stack()
 
-        #Draw material stack
-        self.draw_material_stack()
+        #Create wavelengths-graph frame
+        self.wavelengths_graph_frame = self.create_wavelengths_graph()
 
     """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self, excel_file):
@@ -318,28 +313,155 @@ class Material_stack_visualizer_app:
             padx=(0,0), 
             pady=(0,0)
         )
+
+        #Graph hs value
+        graph_label_hs = customtkinter.CTkLabel(
+            master=window,
+            text="hs value",
+            fg_color=SETTINGS["PROGRAM_BACKGROUND_COLOR"],
+            text_color="#55b6ff",
+            font=(SETTINGS["TEXT_FONT"], 20)
+        )
+
+        graph_label_hs.grid(
+            row=1,
+            column=2,
+            sticky="nw",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        graph_slider_hs = customtkinter.CTkSlider(
+            master=window, 
+            from_=SETTINGS["GRAPH_Hs_SLIDER_RANGE_MIN"], 
+            to=SETTINGS["GRAPH_Hs_SLIDER_RANGE_MAX"],
+            border_color=SETTINGS["GRAPH_Hs_SLIDER_BACKGROUND_COLOR"],
+            fg_color=SETTINGS["GRAPH_Hs_SLIDER_FOREGROUND_COLOR"],
+            button_hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"],
+            # command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+        )
+
+        graph_slider_hs.grid(
+            row=2, 
+            column=2,
+            sticky="nw",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        #Graph h value
+        graph_label_h = customtkinter.CTkLabel(
+            master=window,
+            text="h value",
+            fg_color=SETTINGS["PROGRAM_BACKGROUND_COLOR"],
+            text_color="#55b6ff",
+            font=(SETTINGS["TEXT_FONT"], 20)
+        )
+        graph_label_h.grid(
+            row=1,
+            column=2,
+            sticky="ne",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        graph_slider_h = customtkinter.CTkSlider(
+            master=window, 
+            from_=SETTINGS["GRAPH_h_SLIDER_RANGE_MIN"], 
+            to=SETTINGS["GRAPH_h_SLIDER_RANGE_MAX"],
+            border_color=SETTINGS["GRAPH_h_SLIDER_BACKGROUND_COLOR"],
+            fg_color=SETTINGS["GRAPH_h_SLIDER_FOREGROUND_COLOR"],
+            button_hover_color=SETTINGS["UI_BUTTON_HOVER_COLOR"],
+            # command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+        )
+        graph_slider_h.grid(
+            row=2, 
+            column=2,
+            sticky="ne",
+            padx=(0,0),
+            pady=(0,0)
+        )
         
         return user_interface_frame
     
+    def create_material_stack(self):
+        #Initial creation of frame
+        material_stack_frame = customtkinter.CTkFrame(
+            master=window, 
+            width=SETTINGS["MS_FRAME_WIDTH"], 
+            height=SETTINGS["MS_FRAME_HEIGHT"],
+            fg_color=SETTINGS["MS_FRAME_BACKGROUND_COLOR"]
+        )
+
+        #Placement of frame
+        material_stack_frame.grid(
+            row=0, 
+            column=1, 
+            padx=(5,0), 
+            pady=(5,0),
+            sticky="n"
+        )
+        #Stop frame from resizing to fit widgets within
+        material_stack_frame.grid_propagate (False)
+
+        #Create canvas within frame to draw material stack on
+        self.canvas = self.create_canvas(material_stack_frame) 
+
+        #Draw material stack
+        self.draw_material_stack()
+
+        return material_stack_frame
+
+    def create_wavelengths_graph(self):
+        wavelengths_graph_frame = customtkinter.CTkFrame(
+            master=window, 
+            width=SETTINGS["GRAPH_FRAME_WIDTH"], 
+            height=SETTINGS["GRAPH_FRAME_HEIGHT"],
+            fg_color=SETTINGS["GRAPH_FRAME_BACKGROUND_COLOR"]
+        )
+
+        wavelengths_graph_frame.grid(
+            row=0, 
+            column=2, 
+            padx=(5,0), 
+            pady=(5,0),
+            sticky="n"
+        )
+        #Stop frame from resizing to fit widgets within
+        wavelengths_graph_frame.grid_propagate (False)
+
+        return wavelengths_graph_frame
+
+    def calculate_wavelengths(self, temprature):
+        E_s = 1.6E11 #1.6 * 10^11
+        V_s = 0.23
+        R = 47
+        R0 = 20
+
+        h = 0 #"slider value from 1E-9 to 10000E-9 (1*10 opphøyd i minus9 to 1000000*10 opphøyd i minus 9)"
+        h_s = 0 #"slider value from 1E-9 to 10000000E-9 (1*10 opphøyd i minus9 til 10000*10 opphøyd i minus9)
+
+        result = (E_s*(h_s**2)) / (6*(1-V_s)*h)
+
     """Returns a canvas created in the program window"""
-    def create_canvas(self):
+    def create_canvas(self, master_window):
         #print("CREATE_CANVAS()")
         
         #Create canvas and place it
         canvas = tkinter.Canvas(
-            master=window,
+            master=master_window,
             height=SETTINGS["CANVAS_HEIGHT"], 
             width=SETTINGS["CANVAS_WIDTH"],
             bg=SETTINGS["CANVAS_BACKGROUND_COLOR"],
             highlightbackground="red", 
             highlightthickness=0,
-            )
+        )
         canvas.grid(
             row=0, 
-            column=1, 
-            sticky="s", 
-            padx=(0,0), 
-            pady=(0,5)
+            column=0, 
+            sticky="n", 
+            padx=(5,5), 
+            pady=(5,5)
         )
 
         #Set canvas_bbox coordniates for later use
@@ -428,7 +550,7 @@ class Material_stack_visualizer_app:
         self.canvas.destroy()
 
         #Create new canvas in its original position
-        self.canvas = self.create_canvas()
+        self.canvas = self.create_canvas(self.material_stack_frame)
 
         #Redraw material stack
         self.draw_material_stack()
@@ -617,7 +739,7 @@ class Material_stack_visualizer_app:
         self.canvas.delete("all")
 
         #Draw bounding box around canvas
-        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
+        # self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
 
         #Find the total height of all materials combined
         sum_of_all_materials = 0
@@ -684,7 +806,7 @@ class Material_stack_visualizer_app:
         self.canvas.delete("all")
 
         #Draw bounding box around canvas
-        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
+        # self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
 
         #Find the total height of all materials combined
         sum_of_all_materials = 0
@@ -730,7 +852,7 @@ class Material_stack_visualizer_app:
         self.canvas.delete("all")
 
         #Draw bounding box around canvas
-        self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
+        # self.canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=SETTINGS["CANVAS_OUTLINE_COLOR"], tags="canvas_bounding_box_rectangle")
         
         #Find the total height of all materials combined and the thickest material
         sum_of_all_materials = 0
@@ -1355,7 +1477,7 @@ if __name__ == "__main__":
     window.bind('<KeyPress-r>', material_stack_visualizer_app.reset_canvas)
 
     #Checks if the program window is being resized
-    window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
+    # window.bind("<Configure>", lambda event: material_stack_visualizer_app.program_window_resized(event))
     
     #Start the main loop of the program
     window.mainloop()
