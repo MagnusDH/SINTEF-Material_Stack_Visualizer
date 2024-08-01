@@ -1,10 +1,10 @@
 # GUI program for visualizing thickness of materials in Python
 
     *How to run program:
-        1. Open a terminal in the folder containing the "program.py" file
+        1. Open a terminal in the folder containing the "material_stack_visualizer.py" file
         2. Run one of the following commands:
-            "python program.py"
-            "python3 program.py"
+            "python material_stack_visualizer.py"
+            "python3 material_stack_visualizer.py"
 
 
     *Required libraries:
