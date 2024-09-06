@@ -1,10 +1,10 @@
 # GUI program for visualizing thickness of materials in Python
 
     *How to run program:
-        1. Open a terminal in the folder containing the "program.py" file
+        1. Open a terminal in the folder containing the "app.py" file
         2. Run one of the following commands:
-            "python program.py"
-            "python3 program.py"
+            "python app.py"
+            "python3 app.py"
 
 
     *Required libraries:
@@ -48,9 +48,11 @@
         }
         self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "rectangle_id": None, "text_id": None, "line_id": None, "entry_id": None, "slider_id": None, "indent_text_id": None, "indent_arrow_id": None}
 
+
     *Class Organization and inheritance
         -The main class "Layer_Stack_Visualizer" creates ONE instance of each class which is stored in the "globals.py" file
         -From this "globals.py" file you can access the attributes and methods of each class
+
 
     *Window/Frame hierarchy of the application:
         #To be able to have scrolling functionality in the application I had to have this hierarchy of windows and frames:
