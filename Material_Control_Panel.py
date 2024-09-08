@@ -34,7 +34,7 @@ class Material_Control_Panel:
             column=0,
             padx=(settings.material_control_panel_padding_left, settings.material_control_panel_padding_right),
             pady=(settings.material_control_panel_padding_top, settings.material_control_panel_padding_bottom),
-            sticky=""
+            sticky="nw"
         )
 
         #Labels for "material", "thickness" and "add material" button
@@ -105,7 +105,7 @@ class Material_Control_Panel:
                     text_color=settings.material_control_panel_text_color,
                     width=20,
                     height=10,
-                    command=self.delete_material
+                    command=lambda material=material: self.delete_material(material)
                 )
 
                 delete_material_button.grid(
@@ -170,6 +170,7 @@ class Material_Control_Panel:
                 )
                 slider.set(globals.materials[material]["thickness"])
                 globals.materials[material]["slider_id"] = slider 
+
                 #Disable slider and Entry if specified by the excel-file
                 if(globals.materials[material]["status"] == "disabled"):
                     globals.materials[material]["slider_id"].configure(state="disabled") #Disable slider
@@ -423,15 +424,24 @@ class Material_Control_Panel:
         )
 
 
-    def delete_material(self):
-        # print("DELETE_MATERIAL()")
-
-        #Get the value of which material that should be deleted
-        #Delete this material from the materials dictionary
-        #Call update_material_control_panel() 
-        print("NOT IMPLEMENTED!!!!!!!!")
+    """Deletes a material from the materials{} dictionary and updates the material_control_panel"""
+    def delete_material(self, material):
+        #print("DELETE_MATERIAL()")
         
+        #check if given material key is in dictionary
+        if material in globals.materials:
+            #Delete the key
+            del globals.materials[material]
 
+            #You might have to Update the "layer" values in globals.materials{}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            #Update the material_control_panel
+            self.update_material_control_panel()
+        
+        else:
+            messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
+
+            
     """
     Checks if the inputs from the entries are valid.
     Calls 'add_material_to_dictionary' if inputs are valid
@@ -580,7 +590,7 @@ class Material_Control_Panel:
                     text_color=settings.material_control_panel_text_color,
                     width=20,
                     height=10,
-                    command=self.delete_material
+                    command=lambda material=material: self.delete_material(material)
                 )
 
                 delete_material_button.grid(

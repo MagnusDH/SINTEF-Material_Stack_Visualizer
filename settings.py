@@ -21,7 +21,7 @@ scrollbar_background_color = "#4c4c4c"
 
 
 #MAIN FRAME
-main_frame_width = program_window_width * 0.75      #Scaling for widgets is different, and is around 75% of the main program_window
+main_frame_width = program_window_width * 0.8      #Scaling for widgets is different, and is around 75% of the main program_window
 main_frame_height = program_window_height * 0.75    #Scaling for widgets is different, and is around 75% of the main program_window
 main_frame_background_color = "#00192c"
 
@@ -30,8 +30,8 @@ main_frame_background_color = "#00192c"
 material_control_panel_width = 340
 material_control_panel_height = 340
 material_control_panel_padding_top = 5
-material_control_panel_padding_bottom = 5
-material_control_panel_padding_right = 5
+material_control_panel_padding_bottom = 0
+material_control_panel_padding_right = 0
 material_control_panel_padding_left = 5
 material_control_panel_background_color = "#284154"
 material_control_panel_text_color = "white"
@@ -58,11 +58,11 @@ add_material_window_button_hover_color = "#009ffb"
 
 
 #LAYER STACK CANVAS
-layer_stack_canvas_width = 800
+layer_stack_canvas_width = 500
 layer_stack_canvas_height = 440
 layer_stack_canvas_padding_top = 5
 layer_stack_canvas_padding_bottom = 0
-layer_stack_canvas_padding_left = 0
+layer_stack_canvas_padding_left = 5
 layer_stack_canvas_padding_right = 0
 layer_stack_canvas_background_color = "#a1e9ff"
 layer_stack_canvas_outline_color = "#666666"
@@ -73,17 +73,38 @@ layer_stack_canvas_indent_left_side = 150
 layer_stack_canvas_indent_top = 20
 
 
-#Layer STACK CANVAS CONTROL PANEL
-layer_stack_canvas_control_panel_width = 280
+#LAYER STACK CANVAS CONTROL PANEL
+layer_stack_canvas_control_panel_width = 400
 layer_stack_canvas_control_panel_height = 100
-layer_stack_canvas_control_panel_padding_top = 0
+layer_stack_canvas_control_panel_padding_top = 5
 layer_stack_canvas_control_panel_padding_bottom = 0
 layer_stack_canvas_control_panel_padding_right = 0
-layer_stack_canvas_control_panel_padding_left = 0
+layer_stack_canvas_control_panel_padding_left = 5
 layer_stack_canvas_control_panel_background_color = "#284154"
 layer_stack_canvas_control_panel_text_color = "white"
 layer_stack_canvas_control_panel_button_color = "#0080ca"
 layer_stack_canvas_control_panel_button_hover_color = "#009ffb"
-  
+
+
+#GRAPH
+graph_frame_width = 400
+graph_frame_height = 352
+graph_frame_background_color = layer_stack_canvas_background_color
+graph_frame_padding_top = 5
+graph_frame_padding_bottom = 0
+graph_frame_padding_left = 5
+graph_frame_padding_right = 0
+
+
+#GRAPH CONTROL PANEL
+graph_control_panel_width = 400
+graph_control_panel_height = 100
+graph_control_panel_background_color = material_control_panel_background_color
+graph_control_panel_padding_top = 5
+graph_control_panel_padding_bottom = 0
+graph_control_panel_padding_left = 5
+graph_control_panel_padding_right = 0
+
+
 #SVG
 svg_text_size = 14

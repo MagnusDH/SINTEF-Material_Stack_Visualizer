@@ -10,6 +10,12 @@ layer_stack_canvas = None
 #Instance of class
 canvas_control_panel = None
 
+#Instance of class
+graph = None
+
+#Instance of class
+graph_control_panel = None
+
 #Reference to the dropdown menu in Canvas_Control_Panel
 option_menu = "Stacked"
 

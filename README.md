@@ -63,6 +63,8 @@
 
 
     BUGS:
+        -If you delete a material then you can not "reset values". Must be fixed
+        -When you "add material" you have to check if the "color" value is valid. This currently gives an error, must be fixed
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
         -If the UI_FRAME_WIDTH is changed, then the CANVAS_PROGRAM_BORDER_WIDTH must also be changed so that it fits the program window correctly
 
