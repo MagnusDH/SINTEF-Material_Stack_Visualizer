@@ -30,23 +30,23 @@
 
         materials = {
             "material_name":
-                {"layer" : value},
-                {"name"} : "value"},
-                {"thickness": value},
-                {"unit" : "value"},
-                {"indent" : value},
-                {"color" : "value"},
-                {"status" : "value"},
-                {"rectangle_id": value},
-                {"text_id": value},
-                {"text_bbox_id" : value},
-                {"line_id": value},
-                {"entry_id": value},
-                {"slider_id": value},
-                {"indent_text_id": value},
-                {"indent_arrow_id": value}
+                {"layer" : int(value)},
+                {"name"} : str(value)},
+                {"thickness": int(value)},
+                {"unit" : str(value)},
+                {"indent" : int(value)},
+                {"color" : str(value)},
+                {"status" : str(value)},
+                {"rectangle_id": tkinter(value)},
+                {"text_id": tkinter(value)},
+                {"text_bbox_id" : tkinter(value)},
+                {"line_id": tkinter(value)},
+                {"entry_id": tkinter(value)},
+                {"slider_id": tkinter(value)},
+                {"indent_text_id": tkinter(value)},
+                {"indent_arrow_id": tkinter(value)}
         }
-        self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "rectangle_id": None, "text_id": None, "line_id": None, "entry_id": None, "slider_id": None, "indent_text_id": None, "indent_arrow_id": None}
+        self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "status": "active/disabled", "rectangle_id": None, "text_id": None, "text_bbox_id": None, line_id": None, "entry_id": None, "slider_id": None, "indent_text_id": None, "indent_arrow_id": None}
 
 
     *Class Organization and inheritance
@@ -63,10 +63,12 @@
 
 
     BUGS:
+        -Materialene i Stepped_canvas går i minus og tegnes feil vei. Finn en fix på dette 
         -If you delete a material then you can not "reset values". Must be fixed
-        -When you "add material" you have to check if the "color" value is valid. This currently gives an error, must be fixed
+        -When  "delete_material" is called then the "material_control_panel" is not rendered correctly if the mode is in "stepped" mode
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
         -If the UI_FRAME_WIDTH is changed, then the CANVAS_PROGRAM_BORDER_WIDTH must also be changed so that it fits the program window correctly
+            
 
     #HOW TO CREATE AN EXECUTABLE FILE:
         -Navigate to the folder containing the python program

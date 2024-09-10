@@ -290,7 +290,20 @@ class Canvas_Control_Panel:
         # print("EXPORT_STACK_AS_SVG()")
 
         #Define the name of the svg file
-        filename = "stack.svg"
+        match globals.option_menu:
+            case "Stacked":
+                filename = "stack.svg"
+
+            case "Realistic":
+                filename = "stack_realistic.svg"
+
+            case "Stepped":
+                filename = "stack_stepped.svg"
+            
+            #Default case
+            case _:
+                filename = "stack.svg"
+        
 
         #Specify a folder where the SVG-file should be saved
         folder_path = "svg_exports"
@@ -349,7 +362,19 @@ class Canvas_Control_Panel:
         #Iterate through all the materials
         for material in globals.materials:
             #Create a name for the SVG file for the current layer
-            filename = f"{layer_counter}_layers.svg"
+            match globals.option_menu:
+                case "Stacked":
+                    filename = f"{layer_counter}_layer_stacked.svg"
+
+                case "Realistic":
+                    filename = f"{layer_counter}_layer_realistic.svg"
+
+                case "Stepped":
+                    filename = f"{layer_counter}_layer_stepped.svg"
+                
+                #Default case
+                case _:
+                    filename = f"{layer_counter}_layer.svg"
 
             #Create the file path by joining the folder path and the filename
             file_path = os.path.join(folder_path, filename)

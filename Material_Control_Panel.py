@@ -314,36 +314,36 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
-        #Unit
-        self.material_unit_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
-            text="Measurement unit", 
-            text_color=settings.add_material_window_text_color,
-            fg_color=settings.add_material_window_background_color,
-        )
+        # #Unit
+        # self.material_unit_label = customtkinter.CTkLabel(
+        #     master=self.add_material_window, 
+        #     text="Measurement unit", 
+        #     text_color=settings.add_material_window_text_color,
+        #     fg_color=settings.add_material_window_background_color,
+        # )
         
-        self.material_unit_label.grid(
-            row=2, 
-            column=0, 
-            sticky="", 
-            padx=(0,0),
-            pady=(0,0)
-        )
+        # self.material_unit_label.grid(
+        #     row=2, 
+        #     column=0, 
+        #     sticky="", 
+        #     padx=(0,0),
+        #     pady=(0,0)
+        # )
 
-        self.material_unit_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
-            width=70,
-            justify="center"
-        )
-        self.material_unit_entry.grid(
-            row=2, 
-            column=1,
-            sticky="e",
-            padx=(0,0),
-            pady=(0,0)
-        )
+        # self.material_unit_entry = customtkinter.CTkEntry(
+        #     master=self.add_material_window,
+        #     fg_color = "white",
+        #     text_color="black",
+        #     width=70,
+        #     justify="center"
+        # )
+        # self.material_unit_entry.grid(
+        #     row=2, 
+        #     column=1,
+        #     sticky="e",
+        #     padx=(0,0),
+        #     pady=(0,0)
+        # )
 
         #Indent
         self.material_indent_label = customtkinter.CTkLabel(
@@ -454,35 +454,19 @@ class Material_Control_Panel:
             messagebox.showerror("ERROR", "Material name can not be empty", parent=self.add_material_window)
             self.add_material_window.lift()
             return
-
-        if(not self.material_thickness_entry.get()):
-            messagebox.showerror("ERROR", "Material thickness can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
-
-        if(not self.material_unit_entry.get()):
-            messagebox.showerror("ERROR", "Material unit can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
-
-        if(not self.material_indent_entry.get()):
-            messagebox.showerror("ERROR", "Material indent can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()      
-            return 
-
-        if(not self.material_color_entry.get()):
-            messagebox.showerror("ERROR", "Material color can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
-
-
+        
         #Check if material_name already exists in materials dictionary
         if(self.material_name_entry.get() in globals.materials):
             messagebox.showerror("ERROR", "Material name already exists", parent=self.add_material_window)
             return
 
-        #Check if input values are correct
         #Thickness
+        if(not self.material_thickness_entry.get()):
+            messagebox.showerror("ERROR", "Material thickness can not be empty", parent=self.add_material_window)
+            self.add_material_window.lift()
+            return 
+
+        #Check if value is (int)
         try:
             thickness_value = self.material_thickness_entry.get() 
             thickness_value = int(thickness_value)
@@ -490,7 +474,18 @@ class Material_Control_Panel:
             messagebox.showerror("ERROR", "Material thickness value has to be an integer", parent=self.add_material_window)
             return
 
+        # if(not self.material_unit_entry.get()):
+        #     messagebox.showerror("ERROR", "Material unit can not be empty", parent=self.add_material_window)
+        #     self.add_material_window.lift()
+        #     return 
+
         #Indent
+        if(not self.material_indent_entry.get()):
+            messagebox.showerror("ERROR", "Material indent can not be empty", parent=self.add_material_window)
+            self.add_material_window.lift()      
+            return
+
+        #Check if value is (int)
         try:
             indent_value = self.material_indent_entry.get() 
             indent_value = int(indent_value)
@@ -498,11 +493,37 @@ class Material_Control_Panel:
             messagebox.showerror("ERROR", "Material indent value has to be an integer", parent=self.add_material_window)
             return
 
+        #Color
+        if(not self.material_color_entry.get()):
+            messagebox.showerror("ERROR", "Material color can not be empty", parent=self.add_material_window)
+            self.add_material_window.lift()
+            return
+        
+        #Check if input color is valis
+        if(self.is_valid_color(self.material_color_entry.get()) == False):
+            messagebox.showerror("ERROR", "Given color is not valid.\nValue must be valid string or hex-value ('#123456)", parent=self.add_material_window)
+            self.add_material_window.lift()
+            return
+
         #All inputs have been validated, add it to dictionary
         self.add_material_to_dictionary()
         self.add_material_window.destroy()
         self.update_material_control_panel()
+
+    """Returns True if given color string is a valid color. Return False if invalid"""
+    def is_valid_color(self, color):
+        #Check if color is accepted by tkinter
+        try:
+            self.window.winfo_rgb(color)
+            return True
         
+        except:
+            #Check if color is valid hexadecimal value
+            if(type(color)==str and color.startswith('#') and len(color)==7):
+                return True
+            else:
+                return False
+
 
     """Adds values from entries to 'materials' dictionary"""
     def add_material_to_dictionary(self):
@@ -513,7 +534,7 @@ class Material_Control_Panel:
             "name": str(self.material_name_entry.get()),
             "layer": int(len(globals.materials)),
             "thickness": int(self.material_thickness_entry.get()),
-            "unit": str(self.material_unit_entry.get()),
+            "unit": "nm",
             "indent": int(self.material_indent_entry.get()),
             "color": str(self.material_color_entry.get()),
             "status": "active",

@@ -50,7 +50,7 @@ material_control_panel_button_hover_color = "#009ffb"
 
 #POP UP WINDOW FOR ADDING MATERIAL
 add_material_window_width = 300
-add_material_window_height = 300
+add_material_window_height = 200
 add_material_window_background_color = "#284154"
 add_material_window_text_color = "white"
 add_material_window_button_color = "#0080ca"
