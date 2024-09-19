@@ -3,6 +3,10 @@ import customtkinter
 import settings
 import globals
 
+from matplotlib.figure import Figure                            #For creating graphs
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #For creating graphs
+
+import numpy
 
 class Graph:
     def __init__(self, window):
@@ -11,43 +15,127 @@ class Graph:
         self.window = window
 
         self.graph = self.create_graph()
-    
-    def create_graph(self):
 
-        #Create Frame for the graph and place it within given window
-        graph_frame = customtkinter.CTkFrame(
-            master=self.window,
-            width=settings.graph_frame_width,
-            height=settings.graph_frame_height,
-            fg_color=settings.graph_frame_background_color
+        # self.draw_circle_function()
+
+        # self.update_graph()
+
+
+    """Decalration of a function to be displayed"""
+    def function(self, x):
+        return x**2
+        
+
+    def create_graph(self):
+        # print("CREATE_GRAPH()")
+
+        #Create a figure object
+        figure = Figure(
+            figsize=(settings.graph_width/100, settings.graph_height/100),
+            dpi=100 #Dots Per Inch in the graph
         )
-        graph_frame.grid(
+
+        #Create a canvas to draw the graph on and place it
+        figure_canvas = FigureCanvasTkAgg(figure, master=self.window)
+        figure_canvas.get_tk_widget().grid(
             row=0,
             column=2,
-            padx=(settings.graph_frame_padding_left, settings.graph_frame_padding_right),
-            pady=(settings.graph_frame_padding_top, settings.graph_frame_padding_bottom),
-            sticky="nw"
+            sticky="nw",
+            padx=(5, 0),
+            pady=(5,0)
         )
 
-        #Prevent the frame to downsize itself to fit widgets placed inside
-        graph_frame.grid_propagate(False)
-        graph_frame.grid_rowconfigure(0, weight=1)
-        graph_frame.grid_columnconfigure(0, weight=1)
 
-        #TEMPORARY LABEL
-        temporary_label = customtkinter.CTkLabel(
-            master=graph_frame, 
-            text="GRAPH", 
-            fg_color=settings.graph_frame_background_color,
-            text_color="black",
-            font=(settings.text_font, 20, "bold")
-        )
-        temporary_label.grid(
-            # row=0,
-            # column=0,
-            sticky="nsew",
-            padx=(0,0),
-            pady=(0,0)
-        )
+        #????????????????
+        self.ax = figure.add_subplot(111)    #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left
 
-        return graph_frame
+        #Set labels for the graph
+        self.ax.set_title("This is a simple graph")
+        self.ax.set_xlabel("This is the x line")
+        self.ax.set_ylabel("This is the y line")
+        
+        #Set the display limits of the x and y axises 
+        self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+        self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
+
+        #Display the grid of the graph
+        self.ax.grid(True)
+
+        #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        self.ax.axhline(0, color="black", linewidth=1)
+        self.ax.axvline(0, color="black", linewidth=1)
+
+        return figure_canvas
+    
+
+    def draw_circle_function(self, val=None):
+        #Formel for sirkel: (x^2 - h) + (y^2 - k) = r^2
+
+        print("DRAW_CIRCLE_FUNCTION()")
+        
+        #Clear the graph
+        self.ax.clear()
+
+        #Set the display limits of the x and y axises 
+        self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+        self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
+
+        print(globals.graph_control_panel.r_slider.get())
+        radius = globals.graph_control_panel.r_slider.get()
+
+        #Create a range of values for x
+        x = numpy.linspace(-radius, radius, 100)
+
+        #Find the positive and negative values for y
+        y_positive = numpy.sqrt(radius**2 - x**2)
+        y_negative = -numpy.sqrt(radius**2 - x**2)
+
+        #Plot the values in the graph
+        self.ax.plot(x, y_positive, marker="o", label="This is where the line name is put")
+        self.ax.plot(x, y_negative, marker="o", label="This is where the line name is put")
+
+        # Redraw grid and axes
+        self.ax.grid(True)
+        self.ax.axhline(0, color="black", linewidth=1)
+        self.ax.axvline(0, color="black", linewidth=1)
+
+        #Redraw the canvas to update the graph
+        self.graph.draw_idle()
+
+
+
+    def update_graph(self, val=None):
+        print("UPDATE_GRAPH()")
+
+        #Clear the graph
+        self.ax.clear()
+        
+        #Create som e values for x
+        x = [-10, -5, 0, 5, 10, 15, 20]
+
+        #Get the current x and y values from sliders
+        # print(globals.graph_control_panel.y_slider.get())
+        # x = globals.graph_control_panel.x_slider.get()
+        y = []
+        
+        #Calculate the corresponding y values using the function(x)
+        for value in x:
+            y.append(self.function(value))
+
+        #Plot the values in the graph
+        self.ax.plot(
+            x, 
+            y,
+            marker="o", 
+            label="This is where the line name is put")
+
+        # Redraw grid and axes
+        self.ax.grid(True)
+        self.ax.axhline(0, color="black", linewidth=1)
+        self.ax.axvline(0, color="black", linewidth=1)
+
+        # Redraw the canvas to update the graph
+        self.graph.draw_idle()
+
+        
+        

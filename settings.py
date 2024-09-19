@@ -86,14 +86,23 @@ layer_stack_canvas_control_panel_button_color = "#0080ca"
 layer_stack_canvas_control_panel_button_hover_color = "#009ffb"
 
 
-#GRAPH
+#GRAPH FRAME
 graph_frame_width = 400
 graph_frame_height = 352
-graph_frame_background_color = layer_stack_canvas_background_color
+graph_frame_background_color = material_control_panel_background_color
 graph_frame_padding_top = 5
 graph_frame_padding_bottom = 0
 graph_frame_padding_left = 5
 graph_frame_padding_right = 0
+
+
+#GRAPH
+graph_width = 400
+graph_height = 352
+graph_x_axis_range_min = -100
+graph_x_axis_range_max = 100
+graph_y_axis_range_min = -100
+graph_y_axis_range_max = 100
 
 
 #GRAPH CONTROL PANEL
@@ -104,6 +113,14 @@ graph_control_panel_padding_top = 5
 graph_control_panel_padding_bottom = 0
 graph_control_panel_padding_left = 5
 graph_control_panel_padding_right = 0
+graph_control_panel_slider_width = 300
+graph_control_panel_slider_height = 20
+graph_control_panel_slider_range_min = graph_x_axis_range_min
+graph_control_panel_slider_range_max = graph_x_axis_range_max
+graph_control_panel_slider_background_color = main_frame_background_color
+graph_control_panel_slider_progress_color = main_frame_background_color
+graph_control_panel_slider_button_color = material_control_panel_button_color
+graph_control_panel_slider_hover_color = material_control_panel_button_hover_color
 
 
 #SVG
