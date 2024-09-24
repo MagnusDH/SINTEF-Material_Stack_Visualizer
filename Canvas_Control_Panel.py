@@ -180,18 +180,20 @@ class Canvas_Control_Panel:
                             material_thickness = row["Thickness"]
                                 
                             #Populate material dictionary
-                            globals.materials[material_name]["thickness"] = material_thickness
+                            if(material_name in globals.materials):
+
+                                globals.materials[material_name]["thickness"] = material_thickness
                                 
-                            #Update sliders and Entries
-                            globals.materials[material_name]["slider_id"].set(material_thickness)
-                            globals.materials[material_name]["entry_id"].delete(0, tkinter.END)
-                            globals.materials[material_name]["entry_id"].insert(0, material_thickness)
+                                #Update sliders and Entries
+                                globals.materials[material_name]["slider_id"].set(material_thickness)
+                                globals.materials[material_name]["entry_id"].delete(0, tkinter.END)
+                                globals.materials[material_name]["entry_id"].insert(0, material_thickness)
                             
                             #Reset text_size
                             # self.current_text_size = self.original_text_size
                             
-                            #Draw rectangle stack with original values
-                            globals.layer_stack_canvas.draw_material_stack()
+                        #Draw rectangle stack with original values
+                        globals.layer_stack_canvas.draw_material_stack()
                 
             
                 
@@ -206,18 +208,20 @@ class Canvas_Control_Panel:
                             material_indent = row["Indent"]
                                 
                             #Populate material dictionary
-                            globals.materials[material_name]["indent"] = material_indent
-                                
-                            #Update sliders and Entries
-                            globals.materials[material_name]["slider_id"].set(material_indent)
-                            globals.materials[material_name]["entry_id"].delete(0, tkinter.END)
-                            globals.materials[material_name]["entry_id"].insert(0, material_indent)
+                            if(material_name in globals.materials):
+
+                                globals.materials[material_name]["indent"] = material_indent
+                                    
+                                #Update sliders and Entries
+                                globals.materials[material_name]["slider_id"].set(material_indent)
+                                globals.materials[material_name]["entry_id"].delete(0, tkinter.END)
+                                globals.materials[material_name]["entry_id"].insert(0, material_indent)
                             
-                            #Reset text_size
-                            # self.current_text_size = self.original_text_size
+                                #Reset text_size
+                                # self.current_text_size = self.original_text_size
                             
-                            #Draw rectangle stack with original values
-                            globals.layer_stack_canvas.draw_material_stack()
+                        #Draw rectangle stack with original values
+                        globals.layer_stack_canvas.draw_material_stack()
                 
             #Handle errors
             except Exception as error:

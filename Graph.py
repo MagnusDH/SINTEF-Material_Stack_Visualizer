@@ -102,6 +102,58 @@ class Graph:
         #Redraw the canvas to update the graph
         self.graph.draw_idle()
 
+    #Radius of curvature from fitting:
+    def draw_curvature(self):
+        ############
+        
+        #Formula
+        """
+        1/r = (y'') / ( sqrt(   (1+ (y')^2 ) ^3    ) )
+        
+        find: 
+        - y''
+        - (y')^2
+        - r        
+        """
+
+
+
+        # Generate x values
+        x = np.linspace(-10, 10, 400)
+        
+        # Compute y values for the curve and curvature values
+        y_values = x**2
+
+        # Define the function and its derivatives
+        y_prime = 2*x
+
+        y_double_prime = 2
+
+        # Curvature formula
+        curvature = y_double_prime / (1 + (y_prime**2)**(3/2))
+
+
+        curvature_values = curvature(x)
+
+        # Plot the original function (y = x^2)
+        plt.plot(x, y_values, label='y = x^2', color='blue')
+
+        # Plot the curvature (1/r) values on the same plot
+        plt.plot(x, curvature_values, label='Curvature 1/r', color='red')
+
+        # Add labels and title
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Plot of y = x^2 and Curvature (1/r)')
+        plt.axhline(0, color='black',linewidth=0.5)
+        plt.axvline(0, color='black',linewidth=0.5)
+        plt.grid(True)
+        plt.legend()
+
+        # Show the plot
+        plt.show()
+
+        ############
 
 
     def update_graph(self, val=None):

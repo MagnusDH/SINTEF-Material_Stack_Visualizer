@@ -50,7 +50,7 @@
 
 
     *Class Organization and inheritance
-        -The main class "Layer_Stack_Visualizer" creates ONE instance of each class which is stored in the "globals.py" file
+        -The main class "App" creates ONE instance of each class which is stored in the "globals.py" file
         -From this "globals.py" file you can access the attributes and methods of each class
 
 
@@ -64,10 +64,7 @@
 
     BUGS:
         -Materialene i Stepped_canvas går i minus og tegnes feil vei. Finn en fix på dette 
-        -If you delete a material then you can not "reset values". Must be fixed
-        -When  "delete_material" is called then the "material_control_panel" is not rendered correctly if the mode is in "stepped" mode
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
-        -If the UI_FRAME_WIDTH is changed, then the CANVAS_PROGRAM_BORDER_WIDTH must also be changed so that it fits the program window correctly
             
 
     #HOW TO CREATE AN EXECUTABLE FILE:

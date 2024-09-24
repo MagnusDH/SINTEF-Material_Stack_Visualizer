@@ -109,7 +109,7 @@ class Layer_Stack_Canvas:
 
     """Draws the material stack based on the value in the option box"""
     def draw_material_stack(self, *event):
-        # print("DRAW MATERIAL STACK()")
+        print("DRAW MATERIAL STACK()")
                 
         #Draw stack based on value in option menu
         match globals.option_menu:

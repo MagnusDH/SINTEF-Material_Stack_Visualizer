@@ -21,7 +21,7 @@ class Material_Control_Panel:
     """Creates a Frame in the given window"""
     def create_material_control_panel(self):
         # print("CREATE_MATERIAL_CONTROL_PANEL()")
-        
+
         #Create Frame from the control panel and place it within given window
         self.material_control_panel_frame = customtkinter.CTkScrollableFrame(
             master=self.window,
@@ -37,7 +37,7 @@ class Material_Control_Panel:
             sticky="nw"
         )
 
-        #Labels for "material", "thickness" and "add material" button
+        #Labels for "material", "thickness"/"Indent" and "add material" button
         material_label = customtkinter.CTkLabel(
             master=self.material_control_panel_frame, 
             text="Material", 
@@ -54,13 +54,26 @@ class Material_Control_Panel:
         )
 
         #Create label to display slider functionality
-        self.slider_label = customtkinter.CTkLabel(
-            master=self.material_control_panel_frame, 
-            text="Thickness", 
-            fg_color=settings.material_control_panel_background_color,
-            text_color="#55b6ff",
-            font=(settings.text_font, 20, "bold")
-        )
+        match globals.option_menu:
+            case "Stacked" | "Realistic":
+                self.slider_label = customtkinter.CTkLabel(
+                    master=self.material_control_panel_frame, 
+                    text="Thickness (nm)", 
+                    fg_color=settings.material_control_panel_background_color,
+                    text_color="#55b6ff",
+                    font=(settings.text_font, 20, "bold")
+                )
+            
+            case "Stepped":
+                self.slider_label = customtkinter.CTkLabel(
+                    master=self.material_control_panel_frame, 
+                    text="Indent", 
+                    fg_color=settings.material_control_panel_background_color,
+                    text_color="#55b6ff",
+                    font=(settings.text_font, 20, "bold")
+                )
+            
+
         self.slider_label.grid(
             row=self.row_counter,
             column=3,
@@ -181,6 +194,7 @@ class Material_Control_Panel:
 
                 #Increment row_counter
                 self.row_counter+=1
+
     
     
     """Updates the thickness value in globals.materials with the entered value and updates corresponding slider-widget"""
@@ -556,16 +570,17 @@ class Material_Control_Panel:
     def update_material_control_panel(self):
         # print("UPDATE_MATERIAL_CONTROL_PANEL")
 
-        #IF there are widgets in the frame, delete all widgets in the materials control panel frame
-        #Copy most stuff from create_material_control_panel for the materials in materials{}
+        """"  
+        problemet her er at når modusen er i 'stepped' og man da trykker 'delete_material' så vil ikke 'indent' verdiene bli vist i 'material_control_panel'. 
+        Det er da 'thickness' verdiene som blir vist og dette er feil 
+        """
 
-        #delete all objects in frame
+        #delete all widgets in frame
         for widget in self.material_control_panel_frame.winfo_children():
             widget.destroy()
             self.row_counter = 0
-
-        #Create new widgets for each material currently in "materials{}"
-        #Labels for "material", "thickness" and "add material" button
+        
+        #Labels for "material", "thickness"/"Indent" and "add material" button
         material_label = customtkinter.CTkLabel(
             master=self.material_control_panel_frame, 
             text="Material", 
@@ -584,11 +599,12 @@ class Material_Control_Panel:
         #Create label to display slider functionality
         self.slider_label = customtkinter.CTkLabel(
             master=self.material_control_panel_frame, 
-            text="Thickness", 
+            text="Thickness (nm)", 
             fg_color=settings.material_control_panel_background_color,
             text_color="#55b6ff",
             font=(settings.text_font, 20, "bold")
-        )
+        )          
+
         self.slider_label.grid(
             row=self.row_counter,
             column=3,
@@ -596,6 +612,28 @@ class Material_Control_Panel:
             padx=(0,0),
             pady=(0,0)
         )
+
+        #Button to add material
+        add_material_button = customtkinter.CTkButton(
+            master = self.window,
+            width=40,
+            height=40,
+            text="+",
+            bg_color=settings.material_control_panel_background_color,
+            hover_color=settings.material_control_panel_button_hover_color,
+            text_color=settings.material_control_panel_text_color,
+            font=(settings.text_font, 30),
+            command=self.add_material
+        )
+
+        add_material_button.grid(
+            row=0,
+            column=0,
+            sticky="se",
+            padx=(0,20),
+            pady=(0,10)
+        )
+
 
         self.row_counter += 1
         
@@ -676,6 +714,7 @@ class Material_Control_Panel:
                 )
                 slider.set(globals.materials[material]["thickness"])
                 globals.materials[material]["slider_id"] = slider 
+
                 #Disable slider and Entry if specified by the excel-file
                 if(globals.materials[material]["status"] == "disabled"):
                     globals.materials[material]["slider_id"].configure(state="disabled") #Disable slider
@@ -686,6 +725,21 @@ class Material_Control_Panel:
 
                 #Increment row_counter
                 self.row_counter+=1
+
+        #Based on canvas-mode, values for entries, sliders and labels must change
+        match globals.option_menu:
+            case "Stacked" | "Realistic":
+                self.slider_label.configure(text="Thickness (nm)")
+                for material in globals.materials:
+                    globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"]))),
+                    globals.materials[material]["slider_id"].set(globals.materials[material]["thickness"])
         
+            case "Stepped":
+                self.slider_label.configure(text="Indent")
+                for material in globals.materials:
+                    globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["indent"]))),
+                    globals.materials[material]["slider_id"].set(globals.materials[material]["indent"])
+
+
         #Draw the material stack
         globals.layer_stack_canvas.draw_material_stack()
