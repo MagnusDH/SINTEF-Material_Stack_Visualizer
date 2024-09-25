@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import StringVar
 import customtkinter
 import settings
 import globals
@@ -57,7 +58,7 @@ class Graph_Control_Panel:
             progress_color=settings.graph_control_panel_slider_progress_color,
             fg_color=settings.graph_control_panel_slider_background_color,
             button_hover_color=settings.graph_control_panel_slider_hover_color,
-            command=globals.graph.update_graph
+            command=globals.graph.draw_simple_graph
         )
         self.x_slider.grid(
             row=0, 
@@ -90,7 +91,7 @@ class Graph_Control_Panel:
             progress_color=settings.graph_control_panel_slider_progress_color,
             fg_color=settings.graph_control_panel_slider_background_color,
             button_hover_color=settings.graph_control_panel_slider_hover_color,
-            command=globals.graph.update_graph
+            command=globals.graph.draw_simple_graph
         )
         self.y_slider.grid(
             row=1, 
@@ -124,7 +125,7 @@ class Graph_Control_Panel:
             progress_color=settings.graph_control_panel_slider_progress_color,
             fg_color=settings.graph_control_panel_slider_background_color,
             button_hover_color=settings.graph_control_panel_slider_hover_color,
-            command=globals.graph.draw_circle_function
+            command=globals.graph.draw_curvature_graph
         )
         self.r_slider.grid(
             row=2, 

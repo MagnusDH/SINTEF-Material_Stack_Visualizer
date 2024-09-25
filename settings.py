@@ -1,6 +1,6 @@
 #PROGRAM WINDOW
 program_window_title = "Layer stack visualizer"
-program_window_width = 1500
+program_window_width = 1550
 program_window_height = 650
 program_window_background_color = "#4c4c4c"
 text_size = 10
@@ -97,8 +97,9 @@ graph_frame_padding_right = 0
 
 
 #GRAPH
-graph_width = 400
-graph_height = 352
+graph_width = 580
+graph_height = 470
+graph_dpi = 75                  #resolution (100 = 100% original size)
 graph_x_axis_range_min = -100
 graph_x_axis_range_max = 100
 graph_y_axis_range_min = -100

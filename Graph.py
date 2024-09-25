@@ -32,7 +32,7 @@ class Graph:
         #Create a figure object
         figure = Figure(
             figsize=(settings.graph_width/100, settings.graph_height/100),
-            dpi=100 #Dots Per Inch in the graph
+            dpi=settings.graph_dpi
         )
 
         #Create a canvas to draw the graph on and place it
@@ -68,7 +68,7 @@ class Graph:
         return figure_canvas
     
 
-    def draw_circle_function(self, val=None):
+    def draw_circle_graph(self, val=None):
         #Formel for sirkel: (x^2 - h) + (y^2 - k) = r^2
 
         print("DRAW_CIRCLE_FUNCTION()")
@@ -96,68 +96,58 @@ class Graph:
 
         # Redraw grid and axes
         self.ax.grid(True)
-        self.ax.axhline(0, color="black", linewidth=1)
+        # self.ax.axhline(0, color="black", linewidth=1)
         self.ax.axvline(0, color="black", linewidth=1)
 
         #Redraw the canvas to update the graph
         self.graph.draw_idle()
 
-    #Radius of curvature from fitting:
-    def draw_curvature(self):
-        ############
+
+    def draw_curvature_graph(self, val=None):
+        print("DRAW_CURVATURE_GRAPH()")
+        # Clear the graph
+        self.ax.clear()
+
+        #Set title and names for x/y axes
+        self.ax.set_title("This is a curvature graph")
+        self.ax.set_xlabel("Some name for x line")
+        self.ax.set_ylabel("Some name for y line")
+
+        #Set the display limits of the x and y axes
+        self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+        self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
+
+        #Create a fixed range of values for x (from, to, number of spots)
+        x = numpy.linspace(settings.graph_x_axis_range_min, settings.graph_x_axis_range_max, 50)
+
+        #Calculate y values
+        # y = numpy.linspace(0, globals.graph_control_panel.r_slider.get(), 50)
+        # print(globals.graph_control_panel.r_slider.get())
         
-        #Formula
-        """
-        1/r = (y'') / ( sqrt(   (1+ (y')^2 ) ^3    ) )
+    #CHATGPT#
         
-        find: 
-        - y''
-        - (y')^2
-        - r        
-        """
+        # Adjust 'a' based on the slider value
+        a = globals.graph_control_panel.r_slider.get() / (100 ** 2)  # Scaling factor to make the curve fit the range
+
+        # Calculate y values - peak in the middle, and y = 0 at x = -100 and x = 100
+        y = a * (x ** 2) - a * (100 ** 2)  # Subtract constant to ensure y=0 at x=-100 and x=100
+
+    #END CHATGPT#
+
+        #Plot the values in the graph
+        self.ax.plot(x, y, marker="o", label="This should be the Y line", color="black")
+
+        #Redraw grid and axes
+        self.ax.grid(True)
+        self.ax.axhline(0, color="black", linewidth=1)
+        self.ax.axvline(0, color="black", linewidth=1)
+
+        #Redraw the graph
+        self.graph.draw_idle()
 
 
-
-        # Generate x values
-        x = np.linspace(-10, 10, 400)
-        
-        # Compute y values for the curve and curvature values
-        y_values = x**2
-
-        # Define the function and its derivatives
-        y_prime = 2*x
-
-        y_double_prime = 2
-
-        # Curvature formula
-        curvature = y_double_prime / (1 + (y_prime**2)**(3/2))
-
-
-        curvature_values = curvature(x)
-
-        # Plot the original function (y = x^2)
-        plt.plot(x, y_values, label='y = x^2', color='blue')
-
-        # Plot the curvature (1/r) values on the same plot
-        plt.plot(x, curvature_values, label='Curvature 1/r', color='red')
-
-        # Add labels and title
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.title('Plot of y = x^2 and Curvature (1/r)')
-        plt.axhline(0, color='black',linewidth=0.5)
-        plt.axvline(0, color='black',linewidth=0.5)
-        plt.grid(True)
-        plt.legend()
-
-        # Show the plot
-        plt.show()
-
-        ############
-
-
-    def update_graph(self, val=None):
-        print("UPDATE_GRAPH()")
+    def draw_simple_graph(self, val=None):
+        print("DRAW_SIMPLE_GRAPH()")
 
         #Clear the graph
         self.ax.clear()
