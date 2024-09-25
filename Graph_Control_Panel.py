@@ -58,7 +58,7 @@ class Graph_Control_Panel:
             progress_color=settings.graph_control_panel_slider_progress_color,
             fg_color=settings.graph_control_panel_slider_background_color,
             button_hover_color=settings.graph_control_panel_slider_hover_color,
-            command=globals.graph.draw_simple_graph
+            command=globals.graph.draw_curvature_graph
         )
         self.x_slider.grid(
             row=0, 
@@ -91,7 +91,7 @@ class Graph_Control_Panel:
             progress_color=settings.graph_control_panel_slider_progress_color,
             fg_color=settings.graph_control_panel_slider_background_color,
             button_hover_color=settings.graph_control_panel_slider_hover_color,
-            command=globals.graph.draw_simple_graph
+            command=globals.graph.draw_curvature_graph
         )
         self.y_slider.grid(
             row=1, 

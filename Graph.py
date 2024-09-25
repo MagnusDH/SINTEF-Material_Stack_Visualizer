@@ -16,15 +16,6 @@ class Graph:
 
         self.graph = self.create_graph()
 
-        # self.draw_circle_function()
-
-        # self.update_graph()
-
-
-    """Decalration of a function to be displayed"""
-    def function(self, x):
-        return x**2
-        
 
     def create_graph(self):
         # print("CREATE_GRAPH()")
@@ -45,23 +36,22 @@ class Graph:
             pady=(5,0)
         )
 
-
-        #????????????????
-        self.ax = figure.add_subplot(111)    #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left
+        #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left
+        self.ax = figure.add_subplot(111)    
 
         #Set labels for the graph
-        self.ax.set_title("This is a simple graph")
-        self.ax.set_xlabel("This is the x line")
-        self.ax.set_ylabel("This is the y line")
+        # self.ax.set_title("This is a simple graph")
+        # self.ax.set_xlabel("This is the x line")
+        # self.ax.set_ylabel("This is the y line")
         
-        #Set the display limits of the x and y axises 
+        # #Set the display limits of the x and y axises 
         self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
         self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
 
-        #Display the grid of the graph
+        # #Display the grid of the graph
         self.ax.grid(True)
 
-        #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
         self.ax.axhline(0, color="black", linewidth=1)
         self.ax.axvline(0, color="black", linewidth=1)
 
@@ -144,40 +134,3 @@ class Graph:
 
         #Redraw the graph
         self.graph.draw_idle()
-
-
-    def draw_simple_graph(self, val=None):
-        print("DRAW_SIMPLE_GRAPH()")
-
-        #Clear the graph
-        self.ax.clear()
-        
-        #Create som e values for x
-        x = [-10, -5, 0, 5, 10, 15, 20]
-
-        #Get the current x and y values from sliders
-        # print(globals.graph_control_panel.y_slider.get())
-        # x = globals.graph_control_panel.x_slider.get()
-        y = []
-        
-        #Calculate the corresponding y values using the function(x)
-        for value in x:
-            y.append(self.function(value))
-
-        #Plot the values in the graph
-        self.ax.plot(
-            x, 
-            y,
-            marker="o", 
-            label="This is where the line name is put")
-
-        # Redraw grid and axes
-        self.ax.grid(True)
-        self.ax.axhline(0, color="black", linewidth=1)
-        self.ax.axvline(0, color="black", linewidth=1)
-
-        # Redraw the canvas to update the graph
-        self.graph.draw_idle()
-
-        
-        
