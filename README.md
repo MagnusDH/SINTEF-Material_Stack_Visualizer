@@ -63,10 +63,14 @@
 
 
     BUGS:
-        -Materialene i Stepped_canvas går i minus og tegnes feil vei. Finn en fix på dette 
+        -Materialene i Stepped_canvas går i minus og tegnes feil vei. Finn en fix på dette (sett en stopper når materialet er mindre enn 0, de skal rett og slett ikke tegnes når de er i minus)
+        -I stepped_canvas, finn en løsning slik at teksten ikke overlapper andre tekster
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
             
 
     #HOW TO CREATE AN EXECUTABLE FILE:
         -Navigate to the folder containing the python program
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
+
+    PATCH NOTES:
+        -

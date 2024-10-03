@@ -58,63 +58,40 @@ class Graph:
         return figure_canvas
     
 
-    def draw_circle_graph(self, val=None):
-        #Formel for sirkel: (x^2 - h) + (y^2 - k) = r^2
+    
 
-        print("DRAW_CIRCLE_FUNCTION()")
+    """
+    RUNAR
+    """
+    def draw_curvature_graph(self, val=None):
+        print("DRAW_CURVATURE_GRAPH()")
         
         #Clear the graph
         self.ax.clear()
 
-        #Set the display limits of the x and y axises 
-        self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
-        self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
-
-        print(globals.graph_control_panel.r_slider.get())
-        radius = globals.graph_control_panel.r_slider.get()
-
-        #Create a range of values for x
-        x = numpy.linspace(-radius, radius, 100)
-
-        #Find the positive and negative values for y
-        y_positive = numpy.sqrt(radius**2 - x**2)
-        y_negative = -numpy.sqrt(radius**2 - x**2)
-
-        #Plot the values in the graph
-        self.ax.plot(x, y_positive, marker="o", label="This is where the line name is put")
-        self.ax.plot(x, y_negative, marker="o", label="This is where the line name is put")
-
-        # Redraw grid and axes
-        self.ax.grid(True)
-        # self.ax.axhline(0, color="black", linewidth=1)
-        self.ax.axvline(0, color="black", linewidth=1)
-
-        #Redraw the canvas to update the graph
-        self.graph.draw_idle()
-
-
-    def draw_curvature_graph(self, val=None):
-        print("DRAW_CURVATURE_GRAPH()")
-        # Clear the graph
-        self.ax.clear()
-
         #Set title and names for x/y axes
-        self.ax.set_title("This is a curvature graph")
+        self.ax.set_title("Curvature")
         self.ax.set_xlabel("Some name for x line")
         self.ax.set_ylabel("Some name for y line")
 
-        #Set the display limits of the x and y axes
+        #Set the limit for the x and y axes
         self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
         self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
 
-        #Create a fixed range of values for x (from, to, number of spots)
+
+
+    ######################  CALCULATE VALUES FOR X AND Y ########################
+
+        #Fetch values from excel sheet
+        E = globals.materials["substrate"]["E"]
+        rho = globals.materials["substrate"]["rho"]
+        sigma = globals.materials["substrate"]["sigma"]
+        nu =  globals.materials["substrate"]["nu"]
+        
+        
+        #Create an array of fixed values for x (from, to, number of spots)
         x = numpy.linspace(settings.graph_x_axis_range_min, settings.graph_x_axis_range_max, 50)
 
-        #Calculate y values
-        # y = numpy.linspace(0, globals.graph_control_panel.r_slider.get(), 50)
-        # print(globals.graph_control_panel.r_slider.get())
-        
-    #CHATGPT#
         
         # Adjust 'a' based on the slider value
         a = globals.graph_control_panel.r_slider.get() / (100 ** 2)  # Scaling factor to make the curve fit the range
@@ -122,7 +99,8 @@ class Graph:
         # Calculate y values - peak in the middle, and y = 0 at x = -100 and x = 100
         y = a * (x ** 2) - a * (100 ** 2)  # Subtract constant to ensure y=0 at x=-100 and x=100
 
-    #END CHATGPT#
+    ############################################################################
+
 
         #Plot the values in the graph
         self.ax.plot(x, y, marker="o", label="This should be the Y line", color="black")
@@ -134,3 +112,58 @@ class Graph:
 
         #Redraw the graph
         self.graph.draw_idle()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # def draw_circle_graph(self, val=None):
+    # #Formel for sirkel: (x^2 - h) + (y^2 - k) = r^2
+
+    # # print("DRAW_CIRCLE_FUNCTION()")
+    
+    # #Clear the graph
+    # self.ax.clear()
+
+    # #Set the display limits of the x and y axises 
+    # self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+    # self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
+
+    # print(globals.graph_control_panel.r_slider.get())
+    # radius = globals.graph_control_panel.r_slider.get()
+
+    # #Create a range of values for x
+    # x = numpy.linspace(-radius, radius, 100)
+
+    # #Find the positive and negative values for y
+    # y_positive = numpy.sqrt(radius**2 - x**2)
+    # y_negative = -numpy.sqrt(radius**2 - x**2)
+
+    # #Plot the values in the graph
+    # self.ax.plot(x, y_positive, marker="o", label="This is where the line name is put")
+    # self.ax.plot(x, y_negative, marker="o", label="This is where the line name is put")
+
+    # # Redraw grid and axes
+    # self.ax.grid(True)
+    # # self.ax.axhline(0, color="black", linewidth=1)
+    # self.ax.axvline(0, color="black", linewidth=1)
+
+    # #Redraw the canvas to update the graph
+    # self.graph.draw_idle()
