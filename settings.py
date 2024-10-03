@@ -26,7 +26,7 @@ main_frame_height = program_window_height * 0.75    #Scaling for widgets is diff
 main_frame_background_color = "#00192c"
 
 
-# #MATERIAL CONTROL PANEL
+#MATERIAL CONTROL PANEL
 material_control_panel_width = 340
 material_control_panel_height = 340
 material_control_panel_padding_top = 5
@@ -70,7 +70,8 @@ layer_stack_canvas_text_indent = 150
 layer_stack_canvas_rectangle_outline_color = "black"
 layer_stack_canvas_indent_right_side = 100
 layer_stack_canvas_indent_left_side = 150
-layer_stack_canvas_indent_top = 20
+# layer_stack_canvas_indent_top = 0
+layer_stack_canvas_stepped_indent_top = 0
 
 
 #LAYER STACK CANVAS CONTROL PANEL

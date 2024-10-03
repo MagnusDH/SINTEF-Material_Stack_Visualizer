@@ -419,6 +419,130 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
+
+        #E value
+        self.E_value_label = customtkinter.CTkLabel(
+            master=self.add_material_window, 
+            text="'E' value", 
+            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_background_color,
+        )
+        self.E_value_label.grid(
+            row=5, 
+            column=0, 
+            sticky="", 
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        self.E_value_entry = customtkinter.CTkEntry(
+            master=self.add_material_window,
+            fg_color = "white",
+            text_color="black",
+            width=70,
+            justify="center"
+        )
+        self.E_value_entry.grid(
+            row=5, 
+            column=1,
+            sticky="e",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+
+        #"rho" value
+        self.rho_value_label = customtkinter.CTkLabel(
+            master=self.add_material_window, 
+            text="'rho' value", 
+            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_background_color,
+        )
+        self.rho_value_label.grid(
+            row=6, 
+            column=0, 
+            sticky="", 
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        self.rho_value_entry = customtkinter.CTkEntry(
+            master=self.add_material_window,
+            fg_color = "white",
+            text_color="black",
+            width=70,
+            justify="center"
+        )
+        self.rho_value_entry.grid(
+            row=6, 
+            column=1,
+            sticky="e",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        
+        #"sigma" value
+        self.sigma_value_label = customtkinter.CTkLabel(
+            master=self.add_material_window, 
+            text="'sigma' value", 
+            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_background_color,
+        )
+        self.sigma_value_label.grid(
+            row=7, 
+            column=0, 
+            sticky="", 
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        self.sigma_value_entry = customtkinter.CTkEntry(
+            master=self.add_material_window,
+            fg_color = "white",
+            text_color="black",
+            width=70,
+            justify="center"
+        )
+        self.sigma_value_entry.grid(
+            row=7, 
+            column=1,
+            sticky="e",
+            padx=(0,0),
+            pady=(0,0)
+        )
+            
+
+        #'nu' value
+        self.nu_value_label = customtkinter.CTkLabel(
+            master=self.add_material_window, 
+            text="'nu' value", 
+            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_background_color,
+        )
+        self.nu_value_label.grid(
+            row=8, 
+            column=0, 
+            sticky="", 
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        self.nu_value_entry = customtkinter.CTkEntry(
+            master=self.add_material_window,
+            fg_color = "white",
+            text_color="black",
+            width=70,
+            justify="center"
+        )
+        self.nu_value_entry.grid(
+            row=8, 
+            column=1,
+            sticky="e",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
         #Confirm button
         confirm_button = customtkinter.CTkButton(
             master=self.add_material_window,
@@ -430,7 +554,7 @@ class Material_Control_Panel:
             command=self.validate_inputs
         )
         confirm_button.grid(
-            row=6,
+            row=9,
             column=2,
             sticky="n",
             padx=(0,0),
@@ -513,16 +637,77 @@ class Material_Control_Panel:
             self.add_material_window.lift()
             return
         
-        #Check if input color is valis
+        #Check if input color is valid
         if(self.is_valid_color(self.material_color_entry.get()) == False):
             messagebox.showerror("ERROR", "Given color is not valid.\nValue must be valid string or hex-value ('#123456)", parent=self.add_material_window)
             self.add_material_window.lift()
             return
 
+        #'E' value 
+        if(not self.E_value_entry.get()):
+            messagebox.showerror("ERROR", "'E' value can not be empty", parent=self.add_material_window)
+            self.add_material_window.lift()
+            return 
+
+        #Check if 'E' value is (int)
+        try:
+            E_value = self.E_value_entry.get() 
+            E_value = int(E_value)
+        except ValueError:
+            messagebox.showerror("ERROR", "'E' value has to be an integer", parent=self.add_material_window)
+            return
+        
+        
+        #'rho' value 
+        if(not self.rho_value_entry.get()):
+            messagebox.showerror("ERROR", "'rho' value can not be empty", parent=self.add_material_window)
+            self.add_material_window.lift()
+            return 
+
+        #Check if 'rho' value is (int)
+        try:
+            rho_value = self.rho_value_entry.get() 
+            rho_value = int(rho_value)
+        except ValueError:
+            messagebox.showerror("ERROR", "'rho' value has to be an integer", parent=self.add_material_window)
+            return
+
+
+        #'sigma' value 
+        if(not self.sigma_value_entry.get()):
+            messagebox.showerror("ERROR", "'sigma' value can not be empty", parent=self.add_material_window)
+            self.add_material_window.lift()
+            return 
+
+        #Check if 'sigma' value is (int)
+        try:
+            sigma_value = self.sigma_value_entry.get() 
+            sigma_value = int(sigma_value)
+        except ValueError:
+            messagebox.showerror("ERROR", "'sigma' value has to be an integer", parent=self.add_material_window)
+            return
+
+
+        #'nu' value 
+        if(not self.nu_value_entry.get()):
+            messagebox.showerror("ERROR", "'nu' value can not be empty", parent=self.add_material_window)
+            self.add_material_window.lift()
+            return 
+
+        #Check if 'nu' value is (int)
+        try:
+            nu_value = self.nu_value_entry.get() 
+            nu_value = int(nu_value)
+        except ValueError:
+            messagebox.showerror("ERROR", "'nu' value has to be an integer", parent=self.add_material_window)
+            return
+
+
         #All inputs have been validated, add it to dictionary
         self.add_material_to_dictionary()
         self.add_material_window.destroy()
         self.update_material_control_panel()
+
 
     """Returns True if given color string is a valid color. Return False if invalid"""
     def is_valid_color(self, color):
@@ -552,6 +737,10 @@ class Material_Control_Panel:
             "indent": int(self.material_indent_entry.get()),
             "color": str(self.material_color_entry.get()),
             "status": "active",
+            "E": int(self.E_value_entry.get()),
+            "rho": int(self.rho_value_entry.get()),
+            "sigma": int(self.sigma_value_entry.get()),
+            "nu": int(self.nu_value_entry.get()),
             "rectangle_id": None,
             "text_id": None,
             "text_bbox_id" : None,
@@ -559,8 +748,14 @@ class Material_Control_Panel:
             "entry_id": None,
             "slider_id": None,
             "indent_text_id": None,
-            "indent_arrow_id": None
+            "indent_text_bbox_id": None,
+            "indent_line_id": None,
+            "indent_arrow_pointer_id": None
         }
+
+
+
+                        
         
         #Put "info" dictionary into self.materials dictionary
         globals.materials[self.material_name_entry.get()] = info

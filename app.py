@@ -194,7 +194,9 @@ class App:
                         "entry_id": None,
                         "slider_id": None,
                         "indent_text_id": None,
-                        "indent_arrow_id": None
+                        "indent_text_bbox_id": None,
+                        "indent_line_id": None,
+                        "indent_arrow_pointer_id": None
                     }
 
                     #Put "info" dictionary into self.materials dictionary

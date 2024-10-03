@@ -474,8 +474,8 @@ class Canvas_Control_Panel:
                     previously_created_elements.append(svg_indent_text_element)
 
                 #Create SVG-element for indent_arrow_line
-                if(globals.materials[material]["indent_arrow_id"] is not None):
-                    indent_line_x0, indent_line_y0, indent_line_x1, indent_line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_arrow_id"])
+                if(globals.materials[material]["indent_line_id"] is not None):
+                    indent_line_x0, indent_line_y0, indent_line_x1, indent_line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_line_id"])
                     #Construct an SVG <line> element for arrows
                     svg_indent_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(indent_line_x0+8, indent_line_y0, indent_line_x1-10, indent_line_y1)
                     

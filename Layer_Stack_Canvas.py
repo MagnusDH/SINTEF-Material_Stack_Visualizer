@@ -4,6 +4,10 @@ import customtkinter
 import settings
 import globals
 
+#BUGS write indent on stepped stack
+    #Når du zoomer inn og ut, tegnes ting flere gang
+    #SVG export er ikke korrekt
+    #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
 
 #This class handles everything that happens on the canvas 
 class Layer_Stack_Canvas:
@@ -16,6 +20,7 @@ class Layer_Stack_Canvas:
         #Draw material stack
         self.draw_material_stack()
     
+
     """Returns a canvas created in the program window"""
     def create_canvas(self):
         #print("CREATE_CANVAS()")
@@ -282,7 +287,7 @@ class Layer_Stack_Canvas:
 
         #Prepare first rectangle drawing coordinates (from bottom left corner)
         rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_indent_left_side
-        rectangle_y0 = round(self.layer_stack_canvas_height*0.9) + settings.layer_stack_canvas_indent_top
+        rectangle_y0 = round(self.layer_stack_canvas_height*0.9) + settings.layer_stack_canvas_stepped_indent_top
         rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_indent_right_side
         rectangle_y1 = None #calculated later
         previous_rectangle_x1 = self.visible_canvas_bbox_x1
@@ -355,13 +360,13 @@ class Layer_Stack_Canvas:
             self.layer_stack_canvas.delete(globals.materials[material]["text_bbox_id"])
             self.layer_stack_canvas.delete(globals.materials[material]["line_id"])
             self.layer_stack_canvas.delete(globals.materials[material]["indent_text_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["indent_arrow_id"])
+            self.layer_stack_canvas.delete(globals.materials[material]["indent_line_id"])
 
             globals.materials[material]["text_id"] = None
             globals.materials[material]["text_bbox_id"] = None
             globals.materials[material]["line_id"] = None
             globals.materials[material]["indent_text_id"] = None
-            globals.materials[material]["indent_arrow_id"] = None
+            globals.materials[material]["indent_line_id"] = None
        
         #Write different texts based on current stack option
         match globals.option_menu:
@@ -649,9 +654,14 @@ class Layer_Stack_Canvas:
         #Delete all indet texts and arrows from canvas and dictionary
         for material in globals.materials:
             self.layer_stack_canvas.delete(globals.materials[material]["indent_text_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["indent_arrow_id"])
+            self.layer_stack_canvas.delete(globals.materials[material]["indent_text_bbox_id"])
+            self.layer_stack_canvas.delete(globals.materials[material]["indent_line_id"])
+            self.layer_stack_canvas.delete(globals.materials[material]["indent_arrow_pointer_id"])
+
             globals.materials[material]["indent_text_id"] = None
-            globals.materials[material]["indent_arrow_id"] = None
+            globals.materials[material]["indent_text_bbox_id"] = None
+            globals.materials[material]["indent_line_id"] = None
+            globals.materials[material]["indent_arrow_pointer_id"] = None 
        
         #Save necessary information about current material and previous_material
         current_material_rect_coordinates = None              #[left,top, right,bottom]
@@ -766,9 +776,8 @@ class Layer_Stack_Canvas:
                     #Add created elements to dictionary
                     globals.materials[material]["indent_line_id"] = indent_line
                     globals.materials[material]["indent_text_id"] = indent_text
-
-                    # globals.materials[material]["indent_text_bbox_id"] = 
-                    # globals.materials[material]["indent_arrow_pointer_id"] = indent_arrow_pointer 
+                    globals.materials[material]["indent_text_bbox_id"] = indent_text_bbox
+                    globals.materials[material]["indent_arrow_pointer_id"] = indent_arrow_pointer 
                     
 
                     #Save necessary information about previous_material for next loop iteration
@@ -836,7 +845,7 @@ class Layer_Stack_Canvas:
                         
         #                 #Add created elements to dictionary
         #                 globals.materials[material]["indent_text_id"] = created_indent_text
-        #                 globals.materials[material]["indent_arrow_id"] = created_indent_line
+        #                 globals.materials[material]["indent_line_id"] = created_indent_line
 
         #     #Set the "previous material" for use in the next loop
         #     previous_material = material
