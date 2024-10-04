@@ -5,8 +5,7 @@ import settings
 import globals
 
 #BUGS write indent on stepped stack
-    #Når du zoomer inn og ut, tegnes ting flere gang
-    #SVG export er ikke korrekt
+    #Stegene må ikke tegnes i minus
     #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
 
 #This class handles everything that happens on the canvas 
@@ -175,9 +174,7 @@ class Layer_Stack_Canvas:
         #Draw rectangles on canvas
         for material in globals.materials:
             #"substrate" will be drawn on the bottom 1/10 of the canvas
-            if(material == "substrate"):
-                # continue    #Skip "substrate"
-            
+            if(material == "substrate"):            
                 created_rectangle = self.layer_stack_canvas.create_rectangle(
                     # self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, 
                     self.visible_canvas_bbox_x0, round(self.layer_stack_canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
@@ -329,14 +326,23 @@ class Layer_Stack_Canvas:
                 #Set the indent width for the current rectangle
                 rectangle_x1 =  rectangle_x1 - indent_width_pixels
 
-                #Only draw rectangle if the "indent" is not less than the original rectangle drawing point 
-                # if(rectangle_x1 > original_rectangle_x0):
-                created_rectangle = self.layer_stack_canvas.create_rectangle(
-                    rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                    fill=globals.materials[material]["color"], 
-                    outline=settings.layer_stack_canvas_rectangle_outline_color,
-                    tags="material_rectangle"
-                )
+                #Draw rectangle if the "indent" is not less than the original rectangle drawing point 
+                if(rectangle_x1 > original_rectangle_x0):
+                    created_rectangle = self.layer_stack_canvas.create_rectangle(
+                        rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
+                        fill=globals.materials[material]["color"], 
+                        outline=settings.layer_stack_canvas_rectangle_outline_color,
+                        tags="material_rectangle"
+                    )
+                #Just draw a line if the rectangle is supposed to be drawn in the negative direction
+                else:
+                    # created_rectangle = None
+                    created_rectangle = self.layer_stack_canvas.create_rectangle(
+                        original_rectangle_x0, rectangle_y0, original_rectangle_x0+1, rectangle_y1, 
+                        fill=globals.materials[material]["color"], 
+                        outline=settings.layer_stack_canvas_rectangle_outline_color,
+                        tags="material_rectangle"
+                    )
                 
 
                 #Add rectangle_id to its place in globals.materials{}
@@ -515,7 +521,7 @@ class Layer_Stack_Canvas:
 
                 #Loop through all the materials:
                 for material in dict(reversed(globals.materials.items())):
-                    #Only create text, bounding boxes and lines if the "thickness" and the "indent" is not zero
+                    #Only create text, bounding boxes and lines if the "thickness" is not zero
                     if(globals.materials[material]["thickness"] > 0):
                         #Find coordinates and height of current material_rectangle
                         current_rectangle_x0, current_rectangle_y0, current_rectangle_x1, current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["rectangle_id"])
@@ -722,12 +728,6 @@ class Layer_Stack_Canvas:
                         fill=settings.text_color, 
                         font=(settings.text_font, settings.text_size)
                     )
-    #TODO
-        #check if indent text overlaps with previous indent text
-            #move or not move
-        #when indent text is placed, then draw a bbox around it
-        #draw an arrow line pointing to the indent_line from the text bbox
-        #add things to dictionary
 
                     #Save information about indent_text bounding box
                     current_material_indent_textbox_coordinates = [
@@ -767,7 +767,7 @@ class Layer_Stack_Canvas:
                         current_material_indent_textbox_coordinates[0],
                         self.layer_stack_canvas.bbox(indent_text_bbox)[3] - ((self.layer_stack_canvas.bbox(indent_text_bbox)[3] - self.layer_stack_canvas.bbox(indent_text_bbox)[1]) / 2),
                         current_material_indent_line_coordinates[2],
-                        current_material_indent_line_coordinates[3],
+                        current_material_indent_line_coordinates[3] - 5,
                         arrow=tkinter.LAST, 
                         fill=settings.text_color,
                         tags="indent_pointer_arrow"
