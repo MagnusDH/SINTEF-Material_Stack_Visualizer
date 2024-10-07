@@ -331,16 +331,19 @@ class Canvas_Control_Panel:
 
             #Go through every rectangle found on canvas
             for material in globals.materials:
-                #Find the coordinates of the rectangle
-                rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["rectangle_id"])
-                #Construct an SVG <rect> element for the rectangle
-                svg_rect_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["color"])
-                #Write the SVG representation of the rectangle to the file
-                f.write(svg_rect_element)
-                #Construct an SVG <rect> element for the bounding box
-                svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
-                # Write the SVG representation of the bounding box to the file
-                f.write(svg_bbox_element)
+                #Only create element of rectangle if it is not "None"
+                if(globals.materials[material]["rectangle_id"] != None):
+
+                    #Find the coordinates of the rectangle
+                    rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["rectangle_id"])
+                    #Construct an SVG <rect> element for the rectangle
+                    svg_rect_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["color"])
+                    #Write the SVG representation of the rectangle to the file
+                    f.write(svg_rect_element)
+                    #Construct an SVG <rect> element for the bounding box
+                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
+                    # Write the SVG representation of the bounding box to the file
+                    f.write(svg_bbox_element)
 
             #Write the closing SVG tag to the file, completing the SVG file.
             f.write('</svg>\n')
@@ -365,171 +368,175 @@ class Canvas_Control_Panel:
 
         #Iterate through all the materials
         for material in globals.materials:
-            #Create a name for the SVG file for the current layer
-            match globals.option_menu:
-                case "Stacked":
-                    filename = f"{layer_counter}_layer_stacked.svg"
+            #Only create svg element if there is a rectangle
+            if(globals.materials[material]["rectangle_id"] != None):
 
-                case "Realistic":
-                    filename = f"{layer_counter}_layer_realistic.svg"
+                #Create a name for the SVG file for the current layer
+                match globals.option_menu:
+                    case "Stacked":
+                        filename = f"{layer_counter}_layer_stacked.svg"
 
-                case "Stepped":
-                    filename = f"{layer_counter}_layer_stepped.svg"
-                
-                #Default case
-                case _:
-                    filename = f"{layer_counter}_layer.svg"
+                    case "Realistic":
+                        filename = f"{layer_counter}_layer_realistic.svg"
 
-            #Create the file path by joining the folder path and the filename
-            file_path = os.path.join(folder_path, filename)
+                    case "Stepped":
+                        filename = f"{layer_counter}_layer_stepped.svg"
+                    
+                    #Default case
+                    case _:
+                        filename = f"{layer_counter}_layer.svg"
 
-            #Open file for writing
-            with open(file_path, 'w') as f:
-                #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
-                f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-                #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-                # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_reqwidth(), globals.program_window.winfo_reqheight()))
-                f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_width(), globals.program_window.winfo_height())) 
+                #Create the file path by joining the folder path and the filename
+                file_path = os.path.join(folder_path, filename)
+
+                #Open file for writing
+                with open(file_path, 'w') as f:
+                    #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
+                    f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+                    #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
+                    # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_reqwidth(), globals.program_window.winfo_reqheight()))
+                    f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_width(), globals.program_window.winfo_height())) 
 
 
-                #Write the previous created elements to the current file
-                if(len(previously_created_elements) != 0):
-                    for element in previously_created_elements:
-                        f.write(element)
+                    #Write the previous created elements to the current file
+                    if(len(previously_created_elements) != 0):
+                        for element in previously_created_elements:
+                            f.write(element)
 
-                #Create SVG-element of material rectangle
-                if(globals.materials[material]["rectangle_id"] is not None):
-                    rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["rectangle_id"])
+                    #Create SVG-element of material rectangle
+                    if(globals.materials[material]["rectangle_id"] != None):
+                        rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["rectangle_id"])
 
-                    svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["color"])
-                    f.write(svg_rectangle_element)
-                    previously_created_elements.append(svg_rectangle_element)
+                        svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["color"])
+                        f.write(svg_rectangle_element)
+                        previously_created_elements.append(svg_rectangle_element)
 
-                    #Create SVG-element for the rectangle bounding box and write it to file
-                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, settings.layer_stack_canvas_rectangle_outline_color)
-                    f.write(svg_bbox_element)
-                    previously_created_elements.append(svg_bbox_element)
+                        #Create SVG-element for the rectangle bounding box and write it to file
+                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, settings.layer_stack_canvas_rectangle_outline_color)
+                        f.write(svg_bbox_element)
+                        previously_created_elements.append(svg_bbox_element)
+                    else: 
+                        break
 
-                #Create SVG-element for material text
-                if(globals.materials[material]["text_id"] is not None):
-                    text_x0, text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["text_id"])
-                    text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["text_id"], 'text')
-                    svg_text_element = '<text x="{}" y="{}" fill="{}" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, settings.text_color, settings.svg_text_size, text_content)
-                    f.write(svg_text_element)
-                    previously_created_elements.append(svg_text_element)
+                    #Create SVG-element for material text
+                    if(globals.materials[material]["text_id"] is not None):
+                        text_x0, text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["text_id"])
+                        text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["text_id"], 'text')
+                        svg_text_element = '<text x="{}" y="{}" fill="{}" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, settings.text_color, settings.svg_text_size, text_content)
+                        f.write(svg_text_element)
+                        previously_created_elements.append(svg_text_element)
 
-                #Create SVG-element for text bounding box
-                if(globals.materials[material]["text_bbox_id"] is not None):
-                    bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
-                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
-                        
-                    #Write the SVG representation of the bounding box to the file
-                    f.write(svg_bbox_element)
-                    previously_created_elements.append(svg_bbox_element)
-
-                #Create SVG-element for arrow line pointing from box to rectangle
-                if(globals.materials[material]["line_id"] is not None):
-                    #Line must be drawn from the right side of stack to left side of text
-                    if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic"):
-                        line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["line_id"])
-                        #Construct an SVG <line> element for arrows
+                    #Create SVG-element for text bounding box
+                    if(globals.materials[material]["text_bbox_id"] is not None):
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
-                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
+                        svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
+                            
+                        #Write the SVG representation of the bounding box to the file
+                        f.write(svg_bbox_element)
+                        previously_created_elements.append(svg_bbox_element)
 
-                        #Add arrowhead on the left side of the line
-                        svg_line_element += (
-                        '<defs>\n'
-                        '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="180">\n'
-                        '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
-                        '    </marker>\n'
-                        '</defs>\n'
-                        )
+                    #Create SVG-element for arrow line pointing from box to rectangle
+                    if(globals.materials[material]["line_id"] != None):
+                        #Line must be drawn from the right side of stack to left side of text
+                        if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic"):
+                            line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["line_id"])
+                            #Construct an SVG <line> element for arrows
+                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
+                            svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
 
-                    # Line must be drawn from the left side of stack to right side of text
-                    elif(globals.option_menu == "Stepped"):
-                        line_x0, line_y0, line_x1, line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["line_id"])
-                        #Construct an SVG <line> element for arrows
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
-                        svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x1, line_y0, line_x1-7, line_y1, settings.text_color)
-                        
-                        #Add arrowhead on right side of the line
-                        svg_line_element += (
+                            #Add arrowhead on the left side of the line
+                            svg_line_element += (
                             '<defs>\n'
-                            '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="180">\n'
+                            '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="180">\n'
+                            '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
+                            '    </marker>\n'
+                            '</defs>\n'
+                            )
+
+                        #Line must be drawn from the left side of stack to right side of text
+                        elif(globals.option_menu == "Stepped"):
+                            line_x0, line_y0, line_x1, line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["line_id"])
+                            #Construct an SVG <line> element for arrows
+                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
+                            svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x1, line_y0, line_x1-7, line_y1, settings.text_color)
+                            
+                            #Add arrowhead on right side of the line
+                            svg_line_element += (
+                                '<defs>\n'
+                                '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="180">\n'
+                                '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
+                                '    </marker>\n'
+                                '</defs>\n'
+                            )
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_line_element)
+                        previously_created_elements.append(svg_line_element)
+
+                    #Create SVG-element for indent_text
+                    if(globals.materials[material]["indent_text_id"] != None):
+                        indent_text_x0, indent_text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_text_id"])
+                        indent_text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["indent_text_id"], 'text')
+                        svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(indent_text_x0, indent_text_y0, settings.svg_text_size, indent_text_content)
+                            
+                        f.write(svg_indent_text_element)
+                        previously_created_elements.append(svg_indent_text_element)
+
+                    #Create SVG-element for indent_text bounding box
+                    if(globals.materials[material]["indent_text_bbox_id"] != None):
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["indent_text_bbox_id"])
+                        svg_indent_text_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
+                            
+                        #Write the SVG representation of the bounding box to the file
+                        f.write(svg_indent_text_bbox_element)
+                        previously_created_elements.append(svg_indent_text_bbox_element)
+
+                    #Create SVG-element for indent_line
+                    if(globals.materials[material]["indent_line_id"] != None):
+                        indent_line_x0, indent_line_y0, indent_line_x1, indent_line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_line_id"])
+                        #Construct an SVG <line> element for arrows
+                        svg_indent_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(indent_line_x0+8, indent_line_y0, indent_line_x1-10, indent_line_y1)
+                        
+                        #Add arrowheads on both sides of the line
+                        svg_indent_line_element += (
+                            '<defs>\n'
+                            '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="0">\n'
+                            '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
+                            '    </marker>\n'
+                            '    <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="0">\n'
                             '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
                             '    </marker>\n'
                             '</defs>\n'
                         )
-                    #Write the SVG representation of the arrow to the file
-                    f.write(svg_line_element)
-                    previously_created_elements.append(svg_line_element)
-
-                #Create SVG-element for indent_text
-                if(globals.materials[material]["indent_text_id"] is not None):
-                    indent_text_x0, indent_text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_text_id"])
-                    indent_text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["indent_text_id"], 'text')
-                    svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(indent_text_x0, indent_text_y0, settings.svg_text_size, indent_text_content)
                         
-                    f.write(svg_indent_text_element)
-                    previously_created_elements.append(svg_indent_text_element)
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_indent_line_element)
+                        previously_created_elements.append(svg_indent_line_element)
 
-                #Create SVG-element for indent_text bounding box
-                if(globals.materials[material]["indent_text_bbox_id"] is not None):
-                    bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["indent_text_bbox_id"])
-                    svg_indent_text_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
-                        
-                    #Write the SVG representation of the bounding box to the file
-                    f.write(svg_indent_text_bbox_element)
-                    previously_created_elements.append(svg_indent_text_bbox_element)
+                    #Create SVG-element for arrow line pointing from indent_text to indent_line
+                    if(globals.materials[material]["indent_arrow_pointer_id"] != None):
+                        line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_arrow_pointer_id"])
+                        #Construct an SVG <line> element for arrows
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["indent_text_bbox_id"])
+                        svg_indent_arrow_pointer_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-start)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
 
-                #Create SVG-element for indent_line
-                if(globals.materials[material]["indent_line_id"] is not None):
-                    indent_line_x0, indent_line_y0, indent_line_x1, indent_line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_line_id"])
-                    #Construct an SVG <line> element for arrows
-                    svg_indent_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(indent_line_x0+8, indent_line_y0, indent_line_x1-10, indent_line_y1)
-                    
-                    #Add arrowheads on both sides of the line
-                    svg_indent_line_element += (
-                        '<defs>\n'
-                        '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="0">\n'
-                        '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
-                        '    </marker>\n'
-                        '    <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="0">\n'
-                        '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
-                        '    </marker>\n'
-                        '</defs>\n'
-                    )
-                    
-                    #Write the SVG representation of the arrow to the file
-                    f.write(svg_indent_line_element)
-                    previously_created_elements.append(svg_indent_line_element)
+                        #Add arrowhead on the left side of the line
+                        svg_indent_arrow_pointer_element += (
+                            '<defs>\n'
+                            '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="180">\n'
+                            '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
+                            '    </marker>\n'
+                            '</defs>\n'
+                        )
 
-                #Create SVG-element for arrow line pointing from indent_text to indent_line
-                if(globals.materials[material]["indent_arrow_pointer_id"] is not None):
-                    line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_arrow_pointer_id"])
-                    #Construct an SVG <line> element for arrows
-                    bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["indent_text_bbox_id"])
-                    svg_indent_arrow_pointer_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-start)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
+                        #Write the SVG representation of the arrow to the file
+                        f.write(svg_indent_arrow_pointer_element)
+                        previously_created_elements.append(svg_indent_arrow_pointer_element)
 
-                    #Add arrowhead on the left side of the line
-                    svg_indent_arrow_pointer_element += (
-                        '<defs>\n'
-                        '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="180">\n'
-                        '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
-                        '    </marker>\n'
-                        '</defs>\n'
-                    )
+                    #Write the closing SVG tag to the file, completing the SVG file
+                    f.write('</svg>\n')
 
+                #Close the svg file
+                f.close()
 
-                    #Write the SVG representation of the arrow to the file
-                    f.write(svg_indent_arrow_pointer_element)
-                    previously_created_elements.append(svg_indent_arrow_pointer_element)
-
-                #Write the closing SVG tag to the file, completing the SVG file
-                f.write('</svg>\n')
-
-            #Close the svg file
-            f.close()
-
-            #Increment layer_counter
-            layer_counter += 1
+                #Increment layer_counter
+                layer_counter += 1

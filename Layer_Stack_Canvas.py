@@ -4,9 +4,10 @@ import customtkinter
 import settings
 import globals
 
+
 #BUGS write indent on stepped stack
-    #Stegene må ikke tegnes i minus
     #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
+    #I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
 
 #This class handles everything that happens on the canvas 
 class Layer_Stack_Canvas:
@@ -147,8 +148,18 @@ class Layer_Stack_Canvas:
     def draw_material_stack_stacked(self):       
         # print("DRAW_MATERIAL_STACK_STACKED()")
         
-        #Clear all existing elements on canvas
+        #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            globals.materials[material]["rectangle_id"] = None
+            globals.materials[material]["text_id"] = None
+            globals.materials[material]["text_bbox_id"] = None
+            globals.materials[material]["line_id"] = None
+            globals.materials[material]["indent_text_id"] = None
+            globals.materials[material]["indent_text_bbox_id"] = None
+            globals.materials[material]["indent_line_id"] = None
+            globals.materials[material]["indent_arrow_pointer_id"] = None
+
 
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color, tags="canvas_bounding_box_rectangle")
@@ -173,41 +184,45 @@ class Layer_Stack_Canvas:
         
         #Draw rectangles on canvas
         for material in globals.materials:
-            #"substrate" will be drawn on the bottom 1/10 of the canvas
-            if(material == "substrate"):            
-                created_rectangle = self.layer_stack_canvas.create_rectangle(
-                    # self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, 
-                    self.visible_canvas_bbox_x0, round(self.layer_stack_canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
-                    fill=globals.materials["substrate"]["color"], 
-                    outline=settings.layer_stack_canvas_rectangle_outline_color,
-                    tags="material_rectangle"
-                )
+            #Create material rectangle only if "thickness" is > zero
+            if(int(globals.materials[material]["thickness"]) > 0):
+
+                #"substrate" will be drawn on the bottom 1/10 of the canvas
+                if(material == "substrate"):            
+                    created_rectangle = self.layer_stack_canvas.create_rectangle(
+                        # self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, 
+                        self.visible_canvas_bbox_x0, round(self.layer_stack_canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
+                        fill=globals.materials["substrate"]["color"], 
+                        outline=settings.layer_stack_canvas_rectangle_outline_color,
+                        tags="material_rectangle"
+                    )
+                    
+                    #Add rectangle_id to its place in self.materials
+                    globals.materials[material]["rectangle_id"] = created_rectangle
                 
-                #Add rectangle_id to its place in self.materials
-                globals.materials["substrate"]["rectangle_id"] = created_rectangle
-            
-            else:
-                #find how many percent the current rectangle's height is of the total sum of materials
-                rectangle_height = int(globals.materials[material]["thickness"])
-                rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
-                #Convert rectangle percentage to pixels
-                rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
+                #Material is not "substrate"
+                else:
+                    #find how many percent the current rectangle's height is of the total sum of materials
+                    rectangle_height = int(globals.materials[material]["thickness"])
+                    rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+                    #Convert rectangle percentage to pixels
+                    rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
 
-                #draw rectangle from top of canvas to its number of pixles in height
-                rectangle_y1 = rectangle_y0 - rectangle_height_pixels
-                created_rectangle = self.layer_stack_canvas.create_rectangle(
-                    rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                    fill=globals.materials[material]["color"],
-                    outline=settings.layer_stack_canvas_rectangle_outline_color, 
-                    tags="material_rectangle"
-                )
+                    #draw rectangle from top of canvas to its number of pixles in height
+                    rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+                    created_rectangle = self.layer_stack_canvas.create_rectangle(
+                        rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
+                        fill=globals.materials[material]["color"],
+                        outline=settings.layer_stack_canvas_rectangle_outline_color, 
+                        tags="material_rectangle"
+                    )
 
-                #Add rectangle_id to its place in globals.materials
-                globals.materials[material]["rectangle_id"] = created_rectangle
+                    #Add rectangle_id to its place in globals.materials
+                    globals.materials[material]["rectangle_id"] = created_rectangle
 
-                #Add rectangle height to prevent overlaping
-                rectangle_y0 -= rectangle_height_pixels
-            
+                    #Add rectangle height to prevent overlaping
+                    rectangle_y0 -= rectangle_height_pixels
+
         #Write text on the stack
         self.write_text_on_stack()
             
@@ -216,8 +231,18 @@ class Layer_Stack_Canvas:
     def draw_material_stack_realistic(self):
         # print("DRAW_MATERIAL_STACK_REALISTIC()")
             
-        #Clear all existing elements on canvas
+        #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            globals.materials[material]["rectangle_id"] = None
+            globals.materials[material]["text_id"] = None
+            globals.materials[material]["text_bbox_id"] = None
+            globals.materials[material]["line_id"] = None
+            globals.materials[material]["indent_text_id"] = None
+            globals.materials[material]["indent_text_bbox_id"] = None
+            globals.materials[material]["indent_line_id"] = None
+            globals.materials[material]["indent_arrow_pointer_id"] = None
+
 
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color , tags="canvas_bounding_box_rectangle")
@@ -239,21 +264,28 @@ class Layer_Stack_Canvas:
         
         #Draw rectangles on canvas
         for material in globals.materials:
-            #find how many percent the current rectangle's height is of the total sum of materials
-            rectangle_height = int(globals.materials[material]["thickness"])
-            rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
-            #Convert rectangle percentage to pixels
-            rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
+            #Create material rectangle only if "thickness" is > zero
+            if(int(globals.materials[material]["thickness"]) > 0):
+                #find how many percent the current rectangle's height is of the total sum of materials
+                rectangle_height = int(globals.materials[material]["thickness"])
+                rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+                #Convert rectangle percentage to pixels
+                rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
 
-            #draw rectangle from top of canvas to its number of pixles in height
-            rectangle_y1 = rectangle_y0 - rectangle_height_pixels
-            created_rectangle = self.layer_stack_canvas.create_rectangle(rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, fill=globals.materials[material]["color"], tags="material_rectangle")
+                #draw rectangle from top of canvas to its number of pixles in height
+                rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+                created_rectangle = self.layer_stack_canvas.create_rectangle(
+                    rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
+                    fill=globals.materials[material]["color"], 
+                    tags="material_rectangle"
+                )
 
-            #Add rectangle_id to its place in self.materials
-            globals.materials[material]["rectangle_id"] = created_rectangle
+                #Add rectangle_id to its place in self.materials
+                globals.materials[material]["rectangle_id"] = created_rectangle
 
-            #Add rectangle height to prevent overlaping
-            rectangle_y0 -= rectangle_height_pixels
+                #Add rectangle height to prevent overlaping
+                rectangle_y0 -= rectangle_height_pixels
+            
         
         #Write text on the stack
         self.write_text_on_stack()
@@ -263,8 +295,17 @@ class Layer_Stack_Canvas:
     def draw_material_stack_stepped(self):
         # print("DRAW_MATERIAL_STACK_STEPPED()")
 
-        #Clear all existing elements on canvas
+        #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            globals.materials[material]["rectangle_id"] = None
+            globals.materials[material]["text_id"] = None
+            globals.materials[material]["text_bbox_id"] = None
+            globals.materials[material]["line_id"] = None
+            globals.materials[material]["indent_text_id"] = None
+            globals.materials[material]["indent_text_bbox_id"] = None
+            globals.materials[material]["indent_line_id"] = None
+            globals.materials[material]["indent_arrow_pointer_id"] = None
 
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color, tags="canvas_bounding_box_rectangle")
@@ -275,6 +316,7 @@ class Layer_Stack_Canvas:
         for material in globals.materials:
             if(material=="substrate"):
                 continue    #Skip substrate
+
             sum_of_all_materials += int(globals.materials[material]["thickness"])
             if(biggest_material < int(globals.materials[material]["thickness"])):
                 biggest_material = int(globals.materials[material]["thickness"])
@@ -310,10 +352,14 @@ class Layer_Stack_Canvas:
                 )
                 
                 #Add created rectangle to materials{}
-                globals.materials["substrate"]["rectangle_id"] = created_rectangle
+                globals.materials[material]["rectangle_id"] = created_rectangle
 
-            #Draw rectangles except "substrate"
-            else:
+                #Jump to the next material
+                continue
+
+            #Create material rectangle only if "thickness" and "indent" is > zero
+            if(int(globals.materials[material]["thickness"]) > 0 and int(globals.materials[material]["indent"]) > 0):
+
                 #Find how many pixels is needed to represent the height of the current material
                 rectangle_height_pixels = int(globals.materials[material]["thickness"])/nanometers_per_pixel
                 
@@ -326,30 +372,21 @@ class Layer_Stack_Canvas:
                 #Set the indent width for the current rectangle
                 rectangle_x1 =  rectangle_x1 - indent_width_pixels
 
-                #Draw rectangle if the "indent" is not less than the original rectangle drawing point 
-                if(rectangle_x1 > original_rectangle_x0):
+                #Draw and create rectangle if its width is greater than the original start drawing point for rectangles
+                if(rectangle_x1 >= original_rectangle_x0):
                     created_rectangle = self.layer_stack_canvas.create_rectangle(
                         rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
                         fill=globals.materials[material]["color"], 
                         outline=settings.layer_stack_canvas_rectangle_outline_color,
                         tags="material_rectangle"
                     )
-                #Just draw a line if the rectangle is supposed to be drawn in the negative direction
-                else:
-                    # created_rectangle = None
-                    created_rectangle = self.layer_stack_canvas.create_rectangle(
-                        original_rectangle_x0, rectangle_y0, original_rectangle_x0+1, rectangle_y1, 
-                        fill=globals.materials[material]["color"], 
-                        outline=settings.layer_stack_canvas_rectangle_outline_color,
-                        tags="material_rectangle"
-                    )
                 
-
-                #Add rectangle_id to its place in globals.materials{}
-                globals.materials[material]["rectangle_id"] = created_rectangle
+                    #Add rectangle_id to its place in globals.materials{}
+                    globals.materials[material]["rectangle_id"] = created_rectangle
 
                 #Add rectangle height to prevent overlaping
                 rectangle_y0 -= rectangle_height_pixels
+
 
         #Write text and indent on stack
         self.write_text_on_stack()
@@ -365,14 +402,11 @@ class Layer_Stack_Canvas:
             self.layer_stack_canvas.delete(globals.materials[material]["text_id"])
             self.layer_stack_canvas.delete(globals.materials[material]["text_bbox_id"])
             self.layer_stack_canvas.delete(globals.materials[material]["line_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["indent_text_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["indent_line_id"])
 
             globals.materials[material]["text_id"] = None
             globals.materials[material]["text_bbox_id"] = None
             globals.materials[material]["line_id"] = None
-            globals.materials[material]["indent_text_id"] = None
-            globals.materials[material]["indent_line_id"] = None
+
        
         #Write different texts based on current stack option
         match globals.option_menu:
@@ -384,8 +418,8 @@ class Layer_Stack_Canvas:
 
                 #Loop through all the materials:
                 for material in dict(reversed(globals.materials.items())):
-                    #Only create text, bounding boxes and lines if the "thickness" is not zero
-                    if(globals.materials[material]["thickness"] > 0):
+                    #If material has a rectangle that text can be written on
+                    if(globals.materials[material]["rectangle_id"] != None):
                         #Find coordinates and height of current material_rectangle
                         current_rectangle_x0, current_rectangle_y0, current_rectangle_x1, current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["rectangle_id"])
                         current_rectangle_height = current_rectangle_y1-current_rectangle_y0
@@ -521,8 +555,8 @@ class Layer_Stack_Canvas:
 
                 #Loop through all the materials:
                 for material in dict(reversed(globals.materials.items())):
-                    #Only create text, bounding boxes and lines if the "thickness" is not zero
-                    if(globals.materials[material]["thickness"] > 0):
+                    #If material has a rectangle that text can be written on
+                    if(globals.materials[material]["rectangle_id"] != None):
                         #Find coordinates and height of current material_rectangle
                         current_rectangle_x0, current_rectangle_y0, current_rectangle_x1, current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["rectangle_id"])
                         current_rectangle_height = current_rectangle_y1-current_rectangle_y0
@@ -649,7 +683,7 @@ class Layer_Stack_Canvas:
                             globals.materials[material]["text_bbox_id"] = created_text_bbox
                             globals.materials[material]["line_id"] = created_arrow_line
                             
-                        # #Set previous material to the current one
+                        #Set previous material to the current one
                         previous_material = material
 
         
@@ -683,11 +717,14 @@ class Layer_Stack_Canvas:
 
         #Go through every material
         for material in globals.materials:
+            
+            #There is a rectangle that text can be written on
+            if(globals.materials[material]["rectangle_id"] != None):
 
-            #Skip first material (no indent or line should be drawn)
-            if(previous_material != None):
-                #Only draw indent_text and lines if "thickness" and "indent" are > 0
-                if((int(globals.materials[material]["thickness"]) > 0) and (int(globals.materials[material]["indent"]) > 0)):
+                #Skip first material (no indent or line should be drawn)
+                if(previous_material != None):
+                    #Only draw indent_text and lines if "thickness" and "indent" are > 0
+                    # if((int(globals.materials[material]["thickness"]) > 0) and (int(globals.materials[material]["indent"]) > 0)):
                     #Find information about current material_rectangle
                     current_material_rect_coordinates = [
                         self.layer_stack_canvas.bbox(globals.materials[material]["rectangle_id"])[0],
@@ -784,68 +821,5 @@ class Layer_Stack_Canvas:
                     previous_material_rect_coordinates = current_material_rect_coordinates
                     previous_material_indent_textbox_coordinates = current_material_indent_textbox_coordinates
                     previous_material_indent_line_coordinates = current_material_indent_line_coordinates
-            
-            previous_material = material
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # #Loop through all the materials:
-        # for material in globals.materials:
-        #     #The first material is skipped so indent and text is not written on it
-        #     if(previous_material != None):
-        #         #Only create text and lines if the "thickness" is not zero
-        #         if(int(globals.materials[material]["thickness"]) > 0):
-        #             #Only create texts and lines if the "indent" is not zero
-        #             if(int(globals.materials[material]["indent"]) > 0):
-        #                 #Find usefull coordinates of current material_rectangle
-        #                 current_rectangle_x1 = self.layer_stack_canvas.bbox(globals.materials[material]["rectangle_id"])[2]
-        #                 current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["rectangle_id"])[3]
         
-        #                 #Find x1 coordinate of previous rectangle
-        #                 previous_rectangle_x1 = self.layer_stack_canvas.bbox(globals.materials[previous_material]["rectangle_id"])[2]
-        
-        #                 #Create a two sided arrow line between the differense of the two rectangles
-        #                 created_indent_line = self.layer_stack_canvas.create_line(
-        #                     current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, current_rectangle_y1-5, 
-        #                     fill=settings.text_color,
-        #                     arrow=tkinter.BOTH
-        #                 )
-
-        #                 #Write indent number on the side of arrow line
-        #                 indent_number = int(globals.materials[material]["indent"])
-        #                 created_indent_text = self.layer_stack_canvas.create_text(
-        #                     # (current_rectangle_x1+previous_rectangle_x1)/2, current_rectangle_y1-15,
-        #                     previous_rectangle_x1+35, current_rectangle_y1-5,
-        #                     text=f"{indent_number} {globals.materials[material]['unit']}", 
-        #                     fill=settings.text_color, 
-        #                     font=(settings.text_font, settings.text_size), 
-        #                 )
-        
-        #                 #if indent number overlaps with the rectangle_x1, then move it to the right
-        #                 if(self.layer_stack_canvas.bbox(created_indent_text)[0] < current_rectangle_x1):
-        #                     overlap = current_rectangle_x1 - self.layer_stack_canvas.bbox(created_indent_text)[0]
-        #                     self.layer_stack_canvas.move(created_indent_text, overlap, 0)
-                        
-        #                 #Add created elements to dictionary
-        #                 globals.materials[material]["indent_text_id"] = created_indent_text
-        #                 globals.materials[material]["indent_line_id"] = created_indent_line
-
-        #     #Set the "previous material" for use in the next loop
-        #     previous_material = material
+                previous_material = material
