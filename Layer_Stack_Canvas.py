@@ -5,10 +5,6 @@ import settings
 import globals
 
 
-#BUGS write indent on stepped stack
-    #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
-    #I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
-
 #This class handles everything that happens on the canvas 
 class Layer_Stack_Canvas:
     def __init__(self, window):
@@ -276,7 +272,8 @@ class Layer_Stack_Canvas:
                 rectangle_y1 = rectangle_y0 - rectangle_height_pixels
                 created_rectangle = self.layer_stack_canvas.create_rectangle(
                     rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                    fill=globals.materials[material]["color"], 
+                    fill=globals.materials[material]["color"],
+                    outline=settings.layer_stack_canvas_rectangle_outline_color, 
                     tags="material_rectangle"
                 )
 
@@ -347,7 +344,8 @@ class Layer_Stack_Canvas:
                 #Create rectangle
                 created_rectangle = self.layer_stack_canvas.create_rectangle(
                     rectangle_x0, rectangle_y0, rectangle_x1, self.visible_canvas_bbox_y1,
-                    fill=globals.materials[material]["color"], 
+                    fill=globals.materials[material]["color"],
+                    outline=settings.layer_stack_canvas_rectangle_outline_color, 
                     tags="material_rectangle"
                 )
                 

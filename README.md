@@ -71,6 +71,9 @@
 
 
     BUGS:
+        -write indent on stepped stack
+            #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
+            #I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
             
 
