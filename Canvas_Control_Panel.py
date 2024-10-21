@@ -244,7 +244,7 @@ class Canvas_Control_Panel:
                 globals.option_menu = "Stacked"
 
                 #Change the label in user_interface_frame
-                globals.material_control_panel.slider_label.configure(text="Thickness (nm)")
+                globals.material_control_panel.slider_label.configure(text="Thickness [nm]")
 
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
                 for material in globals.materials:
@@ -260,7 +260,7 @@ class Canvas_Control_Panel:
                 globals.option_menu = "Realistic"
 
                 #Change the label in user_interface_frame
-                globals.material_control_panel.slider_label.configure(text="Thickness (nm)")
+                globals.material_control_panel.slider_label.configure(text="Thickness [nm]")
 
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
                 for material in globals.materials:
@@ -276,7 +276,7 @@ class Canvas_Control_Panel:
                 globals.option_menu = "Stepped"
 
                 #Change the label in UI frame
-                globals.material_control_panel.slider_label.configure(text="Indent")
+                globals.material_control_panel.slider_label.configure(text="Indent [nm]")
 
                 #Set all material entry and slider values to "indent" value, except the entries that are "disabled"
                 for material in globals.materials:

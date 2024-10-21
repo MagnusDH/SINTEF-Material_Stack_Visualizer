@@ -18,24 +18,34 @@ class Material_Control_Panel:
 
         self.create_material_control_panel()
 
-    """Creates a Frame in the given window"""
+    """
+    -Creates a Frame and material_control_panel in the given window if it does not already exist.
+    -If the Frame exists, then the material_control_panel is simply updated corresponding with the materials in globals.materials{} 
+    """
     def create_material_control_panel(self):
         # print("CREATE_MATERIAL_CONTROL_PANEL()")
 
-        #Create Frame from the control panel and place it within given window
-        self.material_control_panel_frame = customtkinter.CTkScrollableFrame(
-            master=self.window,
-            width=settings.material_control_panel_width,
-            height=settings.material_control_panel_height,
-            fg_color=settings.material_control_panel_background_color
-        )
-        self.material_control_panel_frame.grid(
-            row=0,
-            column=0,
-            padx=(settings.material_control_panel_padding_left, settings.material_control_panel_padding_right),
-            pady=(settings.material_control_panel_padding_top, settings.material_control_panel_padding_bottom),
-            sticky="nw"
-        )
+        #if material_control_frame has NOT been created before, create it
+        if not hasattr(self, 'material_control_panel_frame'):
+            #Create Frame from the control panel and place it within given window
+            self.material_control_panel_frame = customtkinter.CTkScrollableFrame(
+                master=self.window,
+                width=settings.material_control_panel_width,
+                height=settings.material_control_panel_height,
+                fg_color=settings.material_control_panel_background_color
+            )
+            self.material_control_panel_frame.grid(
+                row=0,
+                column=0,
+                padx=(settings.material_control_panel_padding_left, settings.material_control_panel_padding_right),
+                pady=(settings.material_control_panel_padding_top, settings.material_control_panel_padding_bottom),
+                sticky="nw"
+            )
+        
+        #delete all widgets in frame
+        for widget in self.material_control_panel_frame.winfo_children():
+            widget.destroy()
+            self.row_counter = 0
 
         #Labels for "material", "thickness"/"Indent" and "add material" button
         material_label = customtkinter.CTkLabel(
@@ -58,7 +68,7 @@ class Material_Control_Panel:
             case "Stacked" | "Realistic":
                 self.slider_label = customtkinter.CTkLabel(
                     master=self.material_control_panel_frame, 
-                    text="Thickness (nm)", 
+                    text="Thickness [nm]", 
                     fg_color=settings.material_control_panel_background_color,
                     text_color="#55b6ff",
                     font=(settings.text_font, 20, "bold")
@@ -67,7 +77,7 @@ class Material_Control_Panel:
             case "Stepped":
                 self.slider_label = customtkinter.CTkLabel(
                     master=self.material_control_panel_frame, 
-                    text="Indent", 
+                    text="Indent [nm]", 
                     fg_color=settings.material_control_panel_background_color,
                     text_color="#55b6ff",
                     font=(settings.text_font, 20, "bold")
@@ -195,7 +205,6 @@ class Material_Control_Panel:
                 #Increment row_counter
                 self.row_counter+=1
 
-    
     
     """Updates the thickness value in globals.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, entry):
@@ -270,14 +279,14 @@ class Material_Control_Panel:
         #Create Labels and Entries for material properties 
         self.material_name_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="Material name", 
+            text="Name", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.material_name_label.grid(
             row=0, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -301,14 +310,14 @@ class Material_Control_Panel:
         #Thickness
         self.material_thickness_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="Material thickness", 
+            text="Thickness [nm]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.material_thickness_label.grid(
             row=1, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -362,14 +371,14 @@ class Material_Control_Panel:
         #Indent
         self.material_indent_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="Material indent", 
+            text="Indent [nm]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.material_indent_label.grid(
             row=3, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -392,14 +401,14 @@ class Material_Control_Panel:
         #Color
         self.material_color_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="Material color", 
+            text="Color", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.material_color_label.grid(
             row=4, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -423,14 +432,14 @@ class Material_Control_Panel:
         #E value
         self.E_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="'E' value", 
+            text="E: Youngs Modulus [GPa]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.E_value_label.grid(
             row=5, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -454,14 +463,14 @@ class Material_Control_Panel:
         #"rho" value
         self.rho_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="'rho' value", 
+            text="Rho: density [kg/m3]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.rho_value_label.grid(
             row=6, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -485,14 +494,14 @@ class Material_Control_Panel:
         #"sigma" value
         self.sigma_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="'sigma' value", 
+            text="Sigma: in-plane stress [MPa]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.sigma_value_label.grid(
             row=7, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -516,14 +525,14 @@ class Material_Control_Panel:
         #'nu' value
         self.nu_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="'nu' value", 
+            text="Nu: Poisson", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
         self.nu_value_label.grid(
             row=8, 
             column=0, 
-            sticky="", 
+            sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
@@ -574,7 +583,11 @@ class Material_Control_Panel:
             #You might have to Update the "layer" values in globals.materials{}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             #Update the material_control_panel
-            self.update_material_control_panel()
+            self.create_material_control_panel()
+
+            #Re-draw the material stack
+            globals.layer_stack_canvas.draw_material_stack()
+
         
         else:
             messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
@@ -589,51 +602,38 @@ class Material_Control_Panel:
 
         #Check if no entries are empty
         if(not self.material_name_entry.get()):
-            messagebox.showerror("ERROR", "Material name can not be empty", parent=self.add_material_window)
+            messagebox.showerror("ERROR", "'Name' can not be empty", parent=self.add_material_window)
             self.add_material_window.lift()
             return
         
         #Check if material_name already exists in materials dictionary
         if(self.material_name_entry.get() in globals.materials):
-            messagebox.showerror("ERROR", "Material name already exists", parent=self.add_material_window)
+            messagebox.showerror("ERROR", "'Name' already exists", parent=self.add_material_window)
             return
 
-        #Thickness
-        if(not self.material_thickness_entry.get()):
-            messagebox.showerror("ERROR", "Material thickness can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
 
-        #Check if value is (int)
-        try:
-            thickness_value = self.material_thickness_entry.get() 
-            thickness_value = int(thickness_value)
-        except ValueError:
-            messagebox.showerror("ERROR", "Material thickness value has to be an integer", parent=self.add_material_window)
-            return
+        #If "thickness" value is entered, check if it is integer
+        if(self.material_thickness_entry.get() != ""):
+            try:
+                thickness_value = self.material_thickness_entry.get() 
+                thickness_value = int(thickness_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'Thickness' value has to be an integer", parent=self.add_material_window)
+                return
 
-        # if(not self.material_unit_entry.get()):
-        #     messagebox.showerror("ERROR", "Material unit can not be empty", parent=self.add_material_window)
-        #     self.add_material_window.lift()
-        #     return 
+        #if "indent" value is entered, check if it is integer
+        if(self.material_indent_entry.get() != ""):
+            try:
+                indent_value = self.material_indent_entry.get() 
+                indent_value = int(indent_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'Indent' value has to be an integer", parent=self.add_material_window)
+                return
 
-        #Indent
-        if(not self.material_indent_entry.get()):
-            messagebox.showerror("ERROR", "Material indent can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()      
-            return
-
-        #Check if value is (int)
-        try:
-            indent_value = self.material_indent_entry.get() 
-            indent_value = int(indent_value)
-        except ValueError:
-            messagebox.showerror("ERROR", "Material indent value has to be an integer", parent=self.add_material_window)
-            return
 
         #Color
         if(not self.material_color_entry.get()):
-            messagebox.showerror("ERROR", "Material color can not be empty", parent=self.add_material_window)
+            messagebox.showerror("ERROR", "'Color' can not be empty", parent=self.add_material_window)
             self.add_material_window.lift()
             return
         
@@ -643,70 +643,55 @@ class Material_Control_Panel:
             self.add_material_window.lift()
             return
 
-        #'E' value 
-        if(not self.E_value_entry.get()):
-            messagebox.showerror("ERROR", "'E' value can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
-
-        #Check if 'E' value is (int)
-        try:
-            E_value = self.E_value_entry.get() 
-            E_value = int(E_value)
-        except ValueError:
-            messagebox.showerror("ERROR", "'E' value has to be an integer", parent=self.add_material_window)
-            return
+        #If "E" value is entered, check if it is integer
+        if(self.E_value_entry.get() != ""):
+            try:
+                E_value = self.E_value_entry.get() 
+                E_value = int(E_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'E' value has to be an integer", parent=self.add_material_window)
+                return
         
-        
-        #'rho' value 
-        if(not self.rho_value_entry.get()):
-            messagebox.showerror("ERROR", "'rho' value can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
 
-        #Check if 'rho' value is (int)
-        try:
-            rho_value = self.rho_value_entry.get() 
-            rho_value = int(rho_value)
-        except ValueError:
-            messagebox.showerror("ERROR", "'rho' value has to be an integer", parent=self.add_material_window)
-            return
+        #If "rho" value is entered, check if it is integer
+        if(self.rho_value_entry.get() != ""):
+            try:
+                rho_value = self.rho_value_entry.get() 
+                rho_value = int(rho_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'rho' value has to be an integer", parent=self.add_material_window)
+                return
 
 
-        #'sigma' value 
-        if(not self.sigma_value_entry.get()):
-            messagebox.showerror("ERROR", "'sigma' value can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
-
-        #Check if 'sigma' value is (int)
-        try:
-            sigma_value = self.sigma_value_entry.get() 
-            sigma_value = int(sigma_value)
-        except ValueError:
-            messagebox.showerror("ERROR", "'sigma' value has to be an integer", parent=self.add_material_window)
-            return
+        #If 'sigma' value is entered, check if it is integer 
+        if(self.sigma_value_entry.get() != ""):
+            try:
+                sigma_value = self.sigma_value_entry.get() 
+                sigma_value = int(sigma_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'sigma' value has to be an integer", parent=self.add_material_window)
+                return
 
 
-        #'nu' value 
-        if(not self.nu_value_entry.get()):
-            messagebox.showerror("ERROR", "'nu' value can not be empty", parent=self.add_material_window)
-            self.add_material_window.lift()
-            return 
-
-        #Check if 'nu' value is (int)
-        try:
-            nu_value = self.nu_value_entry.get() 
-            nu_value = int(nu_value)
-        except ValueError:
-            messagebox.showerror("ERROR", "'nu' value has to be an integer", parent=self.add_material_window)
-            return
+        #If 'nu' value is entered, check if it is integer
+        if(self.nu_value_entry.get() != ""):
+            try:
+                nu_value = self.nu_value_entry.get() 
+                nu_value = int(nu_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'nu' value has to be an integer", parent=self.add_material_window)
+                return
 
 
         #All inputs have been validated, add it to dictionary
         self.add_material_to_dictionary()
         self.add_material_window.destroy()
-        self.update_material_control_panel()
+        
+        #Update material_control_panel
+        self.create_material_control_panel()
+
+        #Re-draw the material stack
+        globals.layer_stack_canvas.draw_material_stack()
 
 
     """Returns True if given color string is a valid color. Return False if invalid"""
@@ -728,19 +713,57 @@ class Material_Control_Panel:
     def add_material_to_dictionary(self):
         # print("ADD_MATERIAL_TO_DICTIONARY")
 
+        #If some entries in "add_material_window" are not set, the values is automaticly set to zero
+        #THICKNESS
+        if(self.material_thickness_entry.get() == ""):
+            material_thickness = 0
+        else:
+            material_thickness = int(self.material_thickness_entry.get())
+
+        #INDENT
+        if(self.material_indent_entry.get() == ""):
+            material_indent = 0
+        else:
+            material_indent = int(self.material_indent_entry.get())
+
+        #E VALUE
+        if(self.E_value_entry.get() == ""):
+            E_value = 0
+        else:
+            E_value = int(self.E_value_entry.get())
+
+        #RHO VALUE
+        if(self.rho_value_entry.get() == ""):
+            rho_value = 0
+        else:
+            rho_value = int(self.rho_value_entry.get())
+        
+        #SIGMA VALUE
+        if(self.sigma_value_entry.get() == ""):
+            sigma_value = 0
+        else:
+            sigma_value = int(self.sigma_value_entry.get())
+        
+        #NU VALUE
+        if(self.nu_value_entry.get() == ""):
+            nu_value = 0
+        else:
+            nu_value = int(self.nu_value_entry.get())
+
+
         #Add values to dictionary
         info = {
             "name": str(self.material_name_entry.get()),
             "layer": int(len(globals.materials)),
-            "thickness": int(self.material_thickness_entry.get()),
+            "thickness": material_thickness,
             "unit": "nm",
-            "indent": int(self.material_indent_entry.get()),
+            "indent": material_indent,
             "color": str(self.material_color_entry.get()),
             "status": "active",
-            "E": int(self.E_value_entry.get()),
-            "rho": int(self.rho_value_entry.get()),
-            "sigma": int(self.sigma_value_entry.get()),
-            "nu": int(self.nu_value_entry.get()),
+            "E": E_value,
+            "rho": rho_value,
+            "sigma": sigma_value,
+            "nu": nu_value,
             "rectangle_id": None,
             "text_id": None,
             "text_bbox_id" : None,
@@ -752,189 +775,7 @@ class Material_Control_Panel:
             "indent_line_id": None,
             "indent_arrow_pointer_id": None
         }
-
-
-
-                        
+                       
         
         #Put "info" dictionary into self.materials dictionary
         globals.materials[self.material_name_entry.get()] = info
-
-
-    """Destroys the widgets in material_contral_panel_frame and builds it up again with materials from materials{} dictionary"""
-    def update_material_control_panel(self):
-        # print("UPDATE_MATERIAL_CONTROL_PANEL")
-
-        """"  
-        problemet her er at når modusen er i 'stepped' og man da trykker 'delete_material' så vil ikke 'indent' verdiene bli vist i 'material_control_panel'. 
-        Det er da 'thickness' verdiene som blir vist og dette er feil 
-        """
-
-        #delete all widgets in frame
-        for widget in self.material_control_panel_frame.winfo_children():
-            widget.destroy()
-            self.row_counter = 0
-        
-        #Labels for "material", "thickness"/"Indent" and "add material" button
-        material_label = customtkinter.CTkLabel(
-            master=self.material_control_panel_frame, 
-            text="Material", 
-            fg_color=settings.material_control_panel_background_color,
-            text_color="#55b6ff",
-            font=(settings.text_font, 20, "bold")
-        )
-        material_label.grid(
-            row=self.row_counter,
-            column=1,
-            sticky="n",
-            padx=(0,0),
-            pady=(0,0)
-        )
-
-        #Create label to display slider functionality
-        self.slider_label = customtkinter.CTkLabel(
-            master=self.material_control_panel_frame, 
-            text="Thickness (nm)", 
-            fg_color=settings.material_control_panel_background_color,
-            text_color="#55b6ff",
-            font=(settings.text_font, 20, "bold")
-        )          
-
-        self.slider_label.grid(
-            row=self.row_counter,
-            column=3,
-            sticky="n",
-            padx=(0,0),
-            pady=(0,0)
-        )
-
-        #Button to add material
-        add_material_button = customtkinter.CTkButton(
-            master = self.window,
-            width=40,
-            height=40,
-            text="+",
-            bg_color=settings.material_control_panel_background_color,
-            hover_color=settings.material_control_panel_button_hover_color,
-            text_color=settings.material_control_panel_text_color,
-            font=(settings.text_font, 30),
-            command=self.add_material
-        )
-
-        add_material_button.grid(
-            row=0,
-            column=0,
-            sticky="se",
-            padx=(0,20),
-            pady=(0,10)
-        )
-
-
-        self.row_counter += 1
-        
-        #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
-        if(len(globals.materials) > 0):
-
-            for material in dict(reversed(globals.materials.items())):
-                delete_material_button = customtkinter.CTkButton(
-                    master = self.material_control_panel_frame,
-                    text="del",
-                    fg_color=settings.material_control_panel_button_color,
-                    hover_color=settings.material_control_panel_button_hover_color,
-                    text_color=settings.material_control_panel_text_color,
-                    width=20,
-                    height=10,
-                    command=lambda material=material: self.delete_material(material)
-                )
-
-                delete_material_button.grid(
-                    row=self.row_counter,
-                    column=0
-                    # sticky="w",
-                    # padx=(5,0),
-                    # pady=(5,0)
-                )
-                label = customtkinter.CTkLabel(
-                    master=self.material_control_panel_frame, 
-                    text=material, 
-                    fg_color=settings.material_control_panel_background_color,
-                    text_color=settings.material_control_panel_text_color
-                )
-                label.grid(
-                    row=self.row_counter, 
-                    column=1, 
-                    sticky="", 
-                    padx=(0,0),
-                    pady=(0,0)
-                )
-
-                #Create Entry, customize it and add it to dictionary
-                entry = customtkinter.CTkEntry(
-                    master=self.material_control_panel_frame,
-                    textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
-                    fg_color = settings.material_control_panel_entry_background_color,
-                    text_color="black",
-                    width=settings.material_control_panel_entry_width,
-                    height=settings.material_control_panel_entry_height,
-                    justify="center"
-                )
-                entry.grid(
-                    row=self.row_counter, 
-                    column=2,
-                    sticky="e",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
-                entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                globals.materials[material]["entry_id"] = entry
-
-                #Create Slider, customize it and add it to dictionary
-                slider = customtkinter.CTkSlider(
-                    master=self.material_control_panel_frame, 
-                    width=settings.material_control_panel_slider_width,
-                    height=settings.material_control_panel_slider_height,
-                    from_=settings.material_control_panel_slider_range_min, 
-                    to=settings.material_control_panel_slider_range_max,
-                    progress_color=globals.materials[material]["color"],
-                    fg_color=settings.material_control_panel_slider_color,
-                    button_hover_color=settings.material_control_panel_slider_hover_color,
-                    command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
-                )
-                slider.grid(
-                    row=self.row_counter, 
-                    column=3,
-                    sticky="e",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
-                slider.set(globals.materials[material]["thickness"])
-                globals.materials[material]["slider_id"] = slider 
-
-                #Disable slider and Entry if specified by the excel-file
-                if(globals.materials[material]["status"] == "disabled"):
-                    globals.materials[material]["slider_id"].configure(state="disabled") #Disable slider
-                    globals.materials[material]["entry_id"].delete(0, tkinter.END)     #Disable Entry
-                    globals.materials[material]["entry_id"].insert(0, "Disabled")      #Disable Entry
-                    globals.materials[material]["entry_id"].configure(state="disabled")#Disable Entry
-                globals.materials[material]["slider_id"] = slider 
-
-                #Increment row_counter
-                self.row_counter+=1
-
-        #Based on canvas-mode, values for entries, sliders and labels must change
-        match globals.option_menu:
-            case "Stacked" | "Realistic":
-                self.slider_label.configure(text="Thickness (nm)")
-                for material in globals.materials:
-                    globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"]))),
-                    globals.materials[material]["slider_id"].set(globals.materials[material]["thickness"])
-        
-            case "Stepped":
-                self.slider_label.configure(text="Indent")
-                for material in globals.materials:
-                    globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["indent"]))),
-                    globals.materials[material]["slider_id"].set(globals.materials[material]["indent"])
-
-
-        #Draw the material stack
-        globals.layer_stack_canvas.draw_material_stack()

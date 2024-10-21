@@ -81,5 +81,16 @@
         -Navigate to the folder containing the python program
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
-    PATCH NOTES:
-        -
+    TO DO
+        -Create a functionality to move each layer up and down in the stack
+
+        -Create a new View, "Stress":
+            -Shows the "stacked" stack and curve side by side
+            -Show the value for R explicitly in the graph (ex. In upper right corner)
+            -Change the color of the graph when curving up vs down
+            -All the other Views should only be the stack in different modes
+        
+        -Create an "export as excel" button that:
+            -creates an excel sheet of all the current values in the material{} dictionary
+                -this should overwrite the current excel sheet in the folder (if it exists) so that it is imported the next time
+            -Import/glue a picture/svg of the stack into the excel sheet
