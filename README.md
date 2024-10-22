@@ -83,10 +83,6 @@
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
     TO DO
-        -Create a new View, "Stress":
-            -Show the value for R explicitly in the graph (ex. In upper right corner)
-            -Change the color of the graph when curving up vs down
-        
         -Organize exports into different folders
             
         -Create a functionality to move each layer up and down in the stack

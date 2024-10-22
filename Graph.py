@@ -64,10 +64,23 @@ class Graph:
     RUNAR
     """
     def draw_curvature_graph(self, val=None):
-        print("DRAW_CURVATURE_GRAPH()")
+        # # print("DRAW_CURVATURE_GRAPH()")
         
         #Clear the graph
         self.ax.clear()
+
+        #Fetch the R-value from the slider and round it to 3 decimal places
+        r_value = round(globals.graph_control_panel.r_slider.get(), 3)
+
+        #Display the R-value directly on the graph
+        self.ax.text(
+            0.85, 1.1,                              # X and Y Coordinates of the text (relative to axes in percentages)
+            f"R = {r_value}",                       # Text
+            transform=self.ax.transAxes,            # Transform to make the coordinates relative to the axes
+            fontsize=12,                            # Set the font size
+            verticalalignment='top',                # Align text to the top
+            bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
+        )
 
         #Set title and names for x/y axes
         self.ax.set_title("Curvature")
@@ -82,28 +95,35 @@ class Graph:
 
         ######################  CALCULATE VALUES FOR X AND Y ########################
 
-        #Fetch values from excel sheet
+        #Fetch values from excel sheet (for context, not really used here)
         E = globals.materials["substrate"]["E"]
         rho = globals.materials["substrate"]["rho"]
         sigma = globals.materials["substrate"]["sigma"]
         nu =  globals.materials["substrate"]["nu"]
         
-        
         #Create an array of fixed values for x (from, to, number of spots)
         x = numpy.linspace(settings.graph_x_axis_range_min, settings.graph_x_axis_range_max, 50)
 
-        
-        # Adjust 'a' based on the slider value
+        #Adjust 'a' based on the slider value
         a = globals.graph_control_panel.r_slider.get() / (100 ** 2)  # Scaling factor to make the curve fit the range
 
-        # Calculate y values - peak in the middle, and y = 0 at x = -100 and x = 100
+        #Calculate y values - peak in the middle, and y = 0 at x = -100 and x = 100
         y = a * (x ** 2) - a * (100 ** 2)  # Subtract constant to ensure y=0 at x=-100 and x=100
-
+        
         ############################################################################
 
+        #Split the x and y data into positive and negative segments
+        positive_x = x[y >= 0]
+        positive_y = y[y >= 0]
 
-        #Plot the values in the graph
-        self.ax.plot(x, y, marker="o", label="This should be the Y line", color="black")
+        negative_x = x[y < 0]
+        negative_y = y[y < 0]
+
+        #Plot positive values in red
+        self.ax.plot(positive_x, positive_y, marker="o", label="Positive values", color="red")
+
+        #Plot negative values in blue
+        self.ax.plot(negative_x, negative_y, marker="o", label="Negative values", color="blue")
 
         #Redraw grid and axes
         self.ax.grid(True)
@@ -112,6 +132,66 @@ class Graph:
 
         #Redraw the graph
         self.graph.draw_idle()
+
+
+            
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

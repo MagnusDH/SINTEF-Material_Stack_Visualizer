@@ -379,7 +379,7 @@ class Canvas_Control_Panel:
                 #Create panel that controls the actions of the graph
                 globals.graph_control_panel = Graph_Control_Panel(globals.main_frame)
 
-                # globals.graph.draw_curvature_graph()
+                globals.graph.draw_curvature_graph()
 
 
 
