@@ -7,6 +7,9 @@ import os
 import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
 
+from Graph import Graph
+from Graph_Control_Panel import Graph_Control_Panel
+
 
 #This class handles the buttons that perform actions on the canvas
 class Canvas_Control_Panel:
@@ -131,7 +134,7 @@ class Canvas_Control_Panel:
         #Switch layout option menu
         self.option_menu = customtkinter.CTkOptionMenu(
             master=layer_stack_canvas_control_panel_frame, 
-            values=["Stacked", "Realistic", "Stepped"],
+            values=["Stacked", "Realistic", "Stepped", "Stress"],
             width=30,
             fg_color=settings.layer_stack_canvas_control_panel_button_color, 
             button_hover_color=settings.layer_stack_canvas_control_panel_button_hover_color,
@@ -148,15 +151,25 @@ class Canvas_Control_Panel:
         return layer_stack_canvas_control_panel_frame
 
     
-    """
-    -Calls reset_canvas in Layer_stack_Canvas class
-    -Ultimately deletes the current canvas and creates a new one in its original place
-    """
-    def reset_canvas(self, *args):
+    """Resets the scale of items and the start drawing point on the canvas back to their original scale and place"""
+    def reset_canvas(self):
         # print("CLASS CANVAS_CONTROL_PANEL -> RESET_CANVAS()")
 
-        #Call reset_canvas in Layer_stack_Canvas class
-        globals.layer_stack_canvas.reset_canvas()
+        #Find the original scale of the canvas
+        inverse_scale = 1.0 / globals.layer_stack_canvas.current_scale
+
+        #Scale all items back to their original size
+        globals.layer_stack_canvas.layer_stack_canvas.scale("all", 0, 0, inverse_scale, inverse_scale)
+
+        #Reset the original scale
+        globals.layer_stack_canvas.current_scale = 1.0
+
+        #Move the canvas back to its original drawing point
+        globals.layer_stack_canvas.layer_stack_canvas.xview_moveto(0)
+        globals.layer_stack_canvas.layer_stack_canvas.yview_moveto(0)
+
+        #Redraw material stack
+        globals.layer_stack_canvas.draw_material_stack()
 
 
     """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
@@ -169,7 +182,9 @@ class Canvas_Control_Panel:
         if(os.path.isfile(excel_file)):
             try:
                 match globals.option_menu:
-                    case "Stacked" | "Realistic":
+
+                    #Reset only the "thickness" values
+                    case "Stacked" | "Realistic" | "Stress":
                         #Reload initial thickness values from given excel file
                         #Read given excel file into Pandas dataframe
                         excel_data = pandas.read_excel(excel_file)
@@ -194,11 +209,10 @@ class Canvas_Control_Panel:
                             
                         #Draw rectangle stack with original values
                         globals.layer_stack_canvas.draw_material_stack()
-                
-            
-                
+
+                    #Reset only the "indent" values
                     case "Stepped":
-                        #Reload initial thickness values from given excel file
+                        #Reload initial indent values from given excel file
                         #Read given excel file into Pandas dataframe
                         excel_data = pandas.read_excel(excel_file)
 
@@ -238,6 +252,16 @@ class Canvas_Control_Panel:
     def switch_layout(self, *event):
         # print("SWITCH_LAYOUT()")
 
+        #Destroy the graph if it exists
+        if hasattr(globals.graph, 'graph'):
+            globals.graph.graph.get_tk_widget().destroy()
+            globals.graph = None
+            
+        #Destroy the graph_control_panel if it exists
+        if hasattr(globals.graph_control_panel, 'graph_control_panel'):
+            globals.graph_control_panel.graph_control_panel.destroy()
+
+
         #Switch UI layout based on option value
         match self.option_menu.get():
             case "Stacked":
@@ -253,8 +277,20 @@ class Canvas_Control_Panel:
                     if(globals.materials[material]["status"] != "disabled"):
                         globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
                 
+                #Set new dimensions for layer_stack_canvas back to the original
+                globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
+
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
+
+                globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
+                globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+
                 #Draw material stack                
                 globals.layer_stack_canvas.draw_material_stack()
+
+                #Set new dimensions for canvas_control_panel back to the original
+                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=settings.layer_stack_canvas_control_panel_width)
 
             case "Realistic":
                 globals.option_menu = "Realistic"
@@ -269,8 +305,18 @@ class Canvas_Control_Panel:
                     if(globals.materials[material]["status"] != "disabled"):
                         globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
 
+                #Set new dimensions for layer_stack_canvas back to the original
+                globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
+                globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
+                globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+
                 #Draw the material stack
                 globals.layer_stack_canvas.draw_material_stack()
+
+                #Set new dimensions for canvas_control_panel back to the original
+                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=settings.layer_stack_canvas_control_panel_width)
             
             case "Stepped":
                 globals.option_menu = "Stepped"
@@ -284,9 +330,57 @@ class Canvas_Control_Panel:
 
                     if(globals.materials[material]["status"] != "disabled"):
                         globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["indent"])))
-                    
+                
+                #Set new dimensions for layer_stack_canvas back to the original
+                globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
+
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
+
+                globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
+                globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+                
                 #Draw the material stack
                 globals.layer_stack_canvas.draw_material_stack()
+
+                #Set new dimensions for canvas_control_panel back to the original
+                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=settings.layer_stack_canvas_control_panel_width)
+
+            case "Stress":
+                #Set option menu status
+                globals.option_menu = "Stress"
+
+                #Change the label in user_interface_frame
+                globals.material_control_panel.slider_label.configure(text="Thickness [nm]")
+
+                #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
+                for material in globals.materials:
+                    globals.materials[material]["slider_id"].set(globals.materials[material]["thickness"])
+                    
+                    if(globals.materials[material]["status"] != "disabled"):
+                        globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
+
+                #Set new dimensions for layer_stack_canvas
+                globals.layer_stack_canvas.layer_stack_canvas.configure(width=525)
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
+                globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
+                globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+
+                #Redraw material stack
+                globals.layer_stack_canvas.draw_material_stack()
+
+                #Set new dimensions for canvas_control_panel
+                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=globals.layer_stack_canvas.layer_stack_canvas_width*0.8)
+
+                #Create Graph
+                globals.graph = Graph(globals.main_frame)
+
+                #Create panel that controls the actions of the graph
+                globals.graph_control_panel = Graph_Control_Panel(globals.main_frame)
+
+                # globals.graph.draw_curvature_graph()
+
 
 
     """Exports the stack without material names as SVG file"""
@@ -303,6 +397,9 @@ class Canvas_Control_Panel:
 
             case "Stepped":
                 filename = "stack_stepped.svg"
+            
+            case "Stress":
+                filename = "stack_stress.svg"
             
             #Default case
             case _:
@@ -341,7 +438,7 @@ class Canvas_Control_Panel:
                     #Write the SVG representation of the rectangle to the file
                     f.write(svg_rect_element)
                     #Construct an SVG <rect> element for the bounding box
-                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0)
+                    svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, settings.layer_stack_canvas_rectangle_outline_color)
                     # Write the SVG representation of the bounding box to the file
                     f.write(svg_bbox_element)
 
@@ -382,6 +479,9 @@ class Canvas_Control_Panel:
                     case "Stepped":
                         filename = f"{layer_counter}_layer_stepped.svg"
                     
+                    case "Stress":
+                        filename = f"{layer_counter}_layer_stress.svg"
+
                     #Default case
                     case _:
                         filename = f"{layer_counter}_layer.svg"
@@ -438,7 +538,7 @@ class Canvas_Control_Panel:
                     #Create SVG-element for arrow line pointing from box to rectangle
                     if(globals.materials[material]["line_id"] != None):
                         #Line must be drawn from the right side of stack to left side of text
-                        if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic"):
+                        if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic" or globals.option_menu == "Stress"):
                             line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["line_id"])
                             #Construct an SVG <line> element for arrows
                             bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])

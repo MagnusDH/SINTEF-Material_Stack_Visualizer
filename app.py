@@ -27,6 +27,7 @@ class App:
         
         #Main frame where every widgets is placed
         self.main_frame = self.create_scrollable_frame(self.program_window)
+        globals.main_frame = self.main_frame
 
         #Create canvas to draw materials on. This class also creates a control panel to control the layer_stack_canvas
         globals.layer_stack_canvas = Layer_Stack_Canvas(self.main_frame)
@@ -39,12 +40,12 @@ class App:
         globals.canvas_control_panel = Canvas_Control_Panel(self.main_frame)
 
         #Create a frame that displays a graph???????????????????????????????????????
-        globals.graph = Graph(self.main_frame)
+        # globals.graph = Graph(self.main_frame)
 
         #Create panel that controls the actions of the graph???????????????????????????????????????
-        globals.graph_control_panel = Graph_Control_Panel(self.main_frame)
+        # globals.graph_control_panel = Graph_Control_Panel(self.main_frame)
 
-        globals.graph.draw_curvature_graph()
+        # globals.graph.draw_curvature_graph()
 
 
 

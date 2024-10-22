@@ -10,7 +10,7 @@ import numpy
 
 class Graph:
     def __init__(self, window):
-        print("CLASS: GRAPH_INIT()")
+        # print("CLASS: GRAPH_INIT()")
         
         self.window = window
 
@@ -27,12 +27,12 @@ class Graph:
         )
 
         #Create a canvas to draw the graph on and place it
-        figure_canvas = FigureCanvasTkAgg(figure, master=self.window)
+        figure_canvas = FigureCanvasTkAgg(figure, master=globals.main_frame)
         figure_canvas.get_tk_widget().grid(
             row=0,
             column=2,
             sticky="nw",
-            padx=(5, 0),
+            padx=(5,0),
             pady=(5,0)
         )
 
@@ -80,7 +80,7 @@ class Graph:
 
 
 
-    ######################  CALCULATE VALUES FOR X AND Y ########################
+        ######################  CALCULATE VALUES FOR X AND Y ########################
 
         #Fetch values from excel sheet
         E = globals.materials["substrate"]["E"]
@@ -99,7 +99,7 @@ class Graph:
         # Calculate y values - peak in the middle, and y = 0 at x = -100 and x = 100
         y = a * (x ** 2) - a * (100 ** 2)  # Subtract constant to ensure y=0 at x=-100 and x=100
 
-    ############################################################################
+        ############################################################################
 
 
         #Plot the values in the graph

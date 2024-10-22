@@ -11,6 +11,8 @@ class Layer_Stack_Canvas:
         #Create a canvas in a given window
         self.window = window
 
+        self.current_scale = 1.0
+
         self.layer_stack_canvas = self.create_canvas()
 
         #Draw material stack
@@ -32,7 +34,7 @@ class Layer_Stack_Canvas:
         layer_stack_canvas.grid(
             row=0, 
             column=1, 
-            sticky="n", 
+            sticky="nw", 
             padx=(settings.layer_stack_canvas_padding_left, settings.layer_stack_canvas_padding_right), 
             pady=(settings.layer_stack_canvas_padding_top, settings.layer_stack_canvas_padding_bottom)
         )
@@ -78,34 +80,22 @@ class Layer_Stack_Canvas:
         #Zoom in: Scale all items on the canvas around the mouse cursor
         if event.delta > 0:
             canvas.scale("all", event.x, event.y, zoom_factor, zoom_factor)
+            self.current_scale *= zoom_factor
 
         #Zoom out: Scale all items on the canvas around the mouse cursor
         elif event.delta < 0:
             canvas.scale("all", event.x, event.y, 1.0/zoom_factor, 1.0/zoom_factor)
+            self.current_scale /= zoom_factor
 
-        #Redraw text on stack
+
+            #Redraw text on stack
             match globals.option_menu:
-                case "Stacked":
+                case "Stacked" | "Realistic" | "Stress":
                     self.write_text_on_stack()
-                case "Realistic":
-                    self.write_text_on_stack()
+                
                 case "Stepped":
                     self.write_text_on_stack()
                     self.write_indent_on_stepped_stack()
-
-     
-    """Deletes the current canvas and creates a new one in its original place"""
-    def reset_canvas(self):
-        #print("CLASS LAYER_STACK_CANVAS -> RESET_CANVAS()")
-
-        #Delete canvas from program window
-        self.layer_stack_canvas.destroy()
-
-        #Create new canvas in its original position
-        self.layer_stack_canvas = self.create_canvas()
-
-        #Redraw material stack
-        self.draw_material_stack()
 
 
     """Draws the material stack based on the value in the option box"""
@@ -114,13 +104,13 @@ class Layer_Stack_Canvas:
                 
         #Draw stack based on value in option menu
         match globals.option_menu:
-            case "Stacked":
+            case "Stacked" | "Stress":
                 self.draw_material_stack_stacked()
             case "Realistic":
                 self.draw_material_stack_realistic()
             case "Stepped":
                 self.draw_material_stack_stepped()
-
+            
 
     # """Scales the material stack according to the program window"""
     # def program_window_resized(self, event):
@@ -142,7 +132,6 @@ class Layer_Stack_Canvas:
 
     """Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what"""
     def draw_material_stack_stacked(self):       
-        # print("DRAW_MATERIAL_STACK_STACKED()")
         
         #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
@@ -221,7 +210,8 @@ class Layer_Stack_Canvas:
 
         #Write text on the stack
         self.write_text_on_stack()
-            
+
+              
 
     """Draws a realistic version of the rectangle stack"""
     def draw_material_stack_realistic(self):
@@ -408,7 +398,7 @@ class Layer_Stack_Canvas:
        
         #Write different texts based on current stack option
         match globals.option_menu:
-            case "Stacked" | "Realistic":
+            case "Stacked" | "Realistic" | "Stress":
                 #Find out the height of a potential text's bounding box
                 text_font = font.Font(family=settings.text_font, size=settings.text_size)
                 text_height = text_font.metrics()['linespace']

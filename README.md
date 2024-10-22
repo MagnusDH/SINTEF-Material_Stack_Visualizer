@@ -71,6 +71,7 @@
 
 
     BUGS:
+        -When the "indent" value in "stepped mode" is zero the material is not rendered. The material should be rendered with the same width as the rpevious material
         -write indent on stepped stack
             #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
             #I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
@@ -82,13 +83,14 @@
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
     TO DO
-        -Create a functionality to move each layer up and down in the stack
-
         -Create a new View, "Stress":
-            -Shows the "stacked" stack and curve side by side
             -Show the value for R explicitly in the graph (ex. In upper right corner)
             -Change the color of the graph when curving up vs down
-            -All the other Views should only be the stack in different modes
+        
+        -Organize exports into different folders
+            
+        -Create a functionality to move each layer up and down in the stack
+
         
         -Create an "export as excel" button that:
             -creates an excel sheet of all the current values in the material{} dictionary

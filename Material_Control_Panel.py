@@ -65,7 +65,7 @@ class Material_Control_Panel:
 
         #Create label to display slider functionality
         match globals.option_menu:
-            case "Stacked" | "Realistic":
+            case "Stacked" | "Realistic" | "Stress":
                 self.slider_label = customtkinter.CTkLabel(
                     master=self.material_control_panel_frame, 
                     text="Thickness [nm]", 
@@ -212,7 +212,7 @@ class Material_Control_Panel:
     
         # Update different values in self.materials based on option menu value
         match globals.option_menu:
-            case "Stacked"|"Realistic":
+            case "Stacked" | "Realistic" | "Stress":
                 #Find material that corresponds to "entry"
                 for material in globals.materials:
                     if(globals.materials[material]["entry_id"] == entry):
@@ -247,7 +247,7 @@ class Material_Control_Panel:
       
         #Update different values in self.materials based on option value
         match globals.canvas_control_panel.option_menu.get():
-            case "Stacked"|"Realistic":
+            case "Stacked"|"Realistic" | "Stress":
                 #Update the thickness value in self.materials
                 globals.materials[identifier]["thickness"] = value
 
