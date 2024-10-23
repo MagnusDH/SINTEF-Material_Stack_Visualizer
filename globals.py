@@ -17,7 +17,7 @@ graph = None
 graph_control_panel = None
 
 #Reference to the dropdown menu in Canvas_Control_Panel
-option_menu = "Stress"
+option_menu = "Stacked"
 
 #Reference to the main program window
 program_window = None

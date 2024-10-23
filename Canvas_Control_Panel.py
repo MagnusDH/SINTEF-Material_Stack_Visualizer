@@ -387,34 +387,25 @@ class Canvas_Control_Panel:
     def export_stack_as_svg(self):
         # print("EXPORT_STACK_AS_SVG()")
 
-        #Define the name of the svg file
-        match globals.option_menu:
-            case "Stacked":
-                filename = "stack.svg"
-
-            case "Realistic":
-                filename = "stack_realistic.svg"
-
-            case "Stepped":
-                filename = "stack_stepped.svg"
-            
-            case "Stress":
-                filename = "stack_stress.svg"
-            
-            #Default case
-            case _:
-                filename = "stack.svg"
+        #CREATE FOLDER HIERARCHY
+        main_folder = "svg_exports"                                 #Name for main folder
+        #Create main folder if it does not exist
+        if not os.path.exists(main_folder):
+            os.makedirs(main_folder)
         
+        sub_folder_name = globals.option_menu                            #Name for sub_folder
+        #Create path for sub_folder
+        sub_folder_path = os.path.join(main_folder, sub_folder_name)
+        
+        #Create sub_folder if it does not exist
+        if not os.path.exists(f"{main_folder}/{sub_folder_name}"):
+            os.makedirs(sub_folder_path)
 
-        #Specify a folder where the SVG-file should be saved
-        folder_path = "svg_exports"
+        #Create name for the file
+        filename = f"stack_{globals.option_menu}.svg"
 
-        #Create the folder if it doesn't exist
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        #Create the file path by joining the folder path and the filename
-        file_path = os.path.join(folder_path, filename)
+        #Create path for the file to be saved in
+        file_path = os.path.join(sub_folder_path, filename)
 
         #Open the file for writing
         with open(file_path, 'w') as f:
@@ -451,14 +442,26 @@ class Canvas_Control_Panel:
    
     """Exports every layer of the stack with text and arrows as SVG-file"""
     def export_layers_as_svg(self):
-        # print("EXPORT_LAYERS_AS_SVG()")
+        #print("EXPORT_LAYERS_AS_SVG()")
 
+        #CREATE FOLDER HIERARCHY
         #Specify a folder where the SVG-files should be saved
-        folder_path = "svg_exports"
+        main_folder = "svg_exports"
         #Create the folder if it doesn't exist
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+        if not os.path.exists(main_folder):
+            os.makedirs(main_folder)
 
+        #Name for sub_folder
+        sub_folder_name = globals.option_menu
+        
+        #Create path for sub_folder
+        sub_folder_path = os.path.join(main_folder, sub_folder_name)
+        
+        #Create sub_folder if it does not exist
+        if not os.path.exists(f"{main_folder}/{sub_folder_name}"):
+            os.makedirs(sub_folder_path)
+
+        
         #Each SVG-file is assigned a number based on how many layers are in each file
         layer_counter = 1
         previously_created_elements = []
@@ -469,25 +472,10 @@ class Canvas_Control_Panel:
             if(globals.materials[material]["rectangle_id"] != None):
 
                 #Create a name for the SVG file for the current layer
-                match globals.option_menu:
-                    case "Stacked":
-                        filename = f"{layer_counter}_layer_stacked.svg"
-
-                    case "Realistic":
-                        filename = f"{layer_counter}_layer_realistic.svg"
-
-                    case "Stepped":
-                        filename = f"{layer_counter}_layer_stepped.svg"
-                    
-                    case "Stress":
-                        filename = f"{layer_counter}_layer_stress.svg"
-
-                    #Default case
-                    case _:
-                        filename = f"{layer_counter}_layer.svg"
+                filename = f"{layer_counter}_layer_{globals.option_menu}.svg"
 
                 #Create the file path by joining the folder path and the filename
-                file_path = os.path.join(folder_path, filename)
+                file_path = os.path.join(sub_folder_path, filename)
 
                 #Open file for writing
                 with open(file_path, 'w') as f:

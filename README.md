@@ -82,12 +82,9 @@
         -Navigate to the folder containing the python program
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
-    TO DO
-        -Organize exports into different folders
-            
+    TO DO           
         -Create a functionality to move each layer up and down in the stack
 
-        
         -Create an "export as excel" button that:
             -creates an excel sheet of all the current values in the material{} dictionary
                 -this should overwrite the current excel sheet in the folder (if it exists) so that it is imported the next time
