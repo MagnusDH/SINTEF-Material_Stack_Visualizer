@@ -84,6 +84,11 @@
 
     TO DO           
         -Create a functionality to move each layer up and down in the stack
+            -Get the name and row&column of a clicked label
+            -Create a text that shows the user that he is in "edit mode" and also a "cancel" button
+            -When a label is clicked the other labels get some sort of marking around them that the user can click on
+            -If another label is clicked, the first clicked label is moved the that specific labels place, and ALL other labels underneath it is moved one step down
+            -The "layer" value in materials{} must be changed tot eh corresponding layer/row
 
         -Create an "export as excel" button that:
             -creates an excel sheet of all the current values in the material{} dictionary

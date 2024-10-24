@@ -21,40 +21,54 @@ scrollbar_background_color = "#4c4c4c"
 
 
 #MAIN FRAME
-main_frame_width = 1225#program_window_width * 0.8      #Scaling for widgets is different, and is around 75% of the main program_window
-main_frame_height = 503#program_window_height * 0.75    #Scaling for widgets is different, and is around 75% of the main program_window
+main_frame_width = 1225      
+main_frame_height = 503
 main_frame_background_color = "#00192c"
 
 
+#MATERIAL ADJUSTMENT PANEL
+material_adjustment_panel_width = 340
+material_adjustment_panel_height = 405
+material_adjustment_panel_padding_top = 5
+material_adjustment_panel_padding_bottom = 0
+material_adjustment_panel_padding_right = 0
+material_adjustment_panel_padding_left = 5
+material_adjustment_panel_background_color = "#284154"
+material_adjustment_panel_text_color = "white"
+material_adjustment_panel_entry_background_color = "white"
+material_adjustment_panel_entry_width = 60
+material_adjustment_panel_entry_height = 10
+material_adjustment_panel_slider_width = 130
+material_adjustment_panel_slider_height = 17
+material_adjustment_panel_slider_range_min = 0
+material_adjustment_panel_slider_range_max = 6000
+material_adjustment_panel_slider_color = "#00192c"
+material_adjustment_panel_slider_hover_color = "#009ffb"
+material_adjustment_panel_button_color = "#0080ca"
+material_adjustment_panel_button_hover_color = "#009ffb"
+
+
 #MATERIAL CONTROL PANEL
-material_control_panel_width = 340
-material_control_panel_height = 400
+material_control_panel_width = 363
+material_control_panel_height = 70
+material_control_panel_background_color = material_adjustment_panel_background_color
 material_control_panel_padding_top = 5
 material_control_panel_padding_bottom = 0
 material_control_panel_padding_right = 0
 material_control_panel_padding_left = 5
-material_control_panel_background_color = "#284154"
+material_control_panel_button_color = material_adjustment_panel_button_color
+material_control_panel_button_hover_color = material_adjustment_panel_button_hover_color
 material_control_panel_text_color = "white"
-material_control_panel_entry_background_color = "white"
-material_control_panel_entry_width = 60
-material_control_panel_entry_height = 10
-material_control_panel_slider_width = 130
-material_control_panel_slider_height = 17
-material_control_panel_slider_range_min = 0
-material_control_panel_slider_range_max = 6000
-material_control_panel_slider_color = "#00192c"
-material_control_panel_slider_hover_color = "#009ffb"
-material_control_panel_button_color = "#0080ca"
-material_control_panel_button_hover_color = "#009ffb"
+
 
 
 #POP UP WINDOW FOR ADDING MATERIAL
 add_material_window_width = 400
 add_material_window_height = 410
-add_material_window_background_color = "#284154"
+add_material_window_background_color = material_adjustment_panel_background_color
 add_material_window_text_color = "white"
-add_material_window_button_color = "#0080ca"
-add_material_window_button_hover_color = "#009ffb"
+add_material_window_button_color = material_adjustment_panel_button_color
+add_material_window_button_hover_color = material_adjustment_panel_button_hover_color
 
 
 #LAYER STACK CANVAS
@@ -81,16 +95,16 @@ layer_stack_canvas_control_panel_padding_top = 5
 layer_stack_canvas_control_panel_padding_bottom = 0
 layer_stack_canvas_control_panel_padding_right = 0
 layer_stack_canvas_control_panel_padding_left = 5
-layer_stack_canvas_control_panel_background_color = "#284154"
+layer_stack_canvas_control_panel_background_color = material_adjustment_panel_background_color
 layer_stack_canvas_control_panel_text_color = "white"
-layer_stack_canvas_control_panel_button_color = "#0080ca"
-layer_stack_canvas_control_panel_button_hover_color = "#009ffb"
+layer_stack_canvas_control_panel_button_color = material_adjustment_panel_button_color
+layer_stack_canvas_control_panel_button_hover_color = material_adjustment_panel_button_hover_color
 
 
 #GRAPH FRAME
 graph_frame_width = 600
 graph_frame_height = 500
-graph_frame_background_color = material_control_panel_background_color
+graph_frame_background_color = material_adjustment_panel_background_color
 graph_frame_padding_top = 5
 graph_frame_padding_bottom = 0
 graph_frame_padding_left = 5
@@ -110,7 +124,7 @@ graph_y_axis_range_max = 100
 #GRAPH CONTROL PANEL
 graph_control_panel_width = 525 * 0.8
 graph_control_panel_height = 70
-graph_control_panel_background_color = material_control_panel_background_color
+graph_control_panel_background_color = material_adjustment_panel_background_color
 graph_control_panel_padding_top = 5
 graph_control_panel_padding_bottom = 0
 graph_control_panel_padding_left = 5
@@ -121,8 +135,8 @@ graph_control_panel_slider_range_min = graph_x_axis_range_min
 graph_control_panel_slider_range_max = graph_x_axis_range_max
 graph_control_panel_slider_background_color = main_frame_background_color
 graph_control_panel_slider_progress_color = main_frame_background_color
-graph_control_panel_slider_button_color = material_control_panel_button_color
-graph_control_panel_slider_hover_color = material_control_panel_button_hover_color
+graph_control_panel_slider_button_color = material_adjustment_panel_button_color
+graph_control_panel_slider_hover_color = material_adjustment_panel_button_hover_color
 
 
 #SVG

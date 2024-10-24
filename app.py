@@ -7,11 +7,12 @@ import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
 import settings
 import globals
-from Material_Control_Panel import Material_Control_Panel
+from Material_Adjustment_Panel import Material_Adjustment_Panel
 from Layer_Stack_Canvas import Layer_Stack_Canvas
 from Canvas_Control_Panel import Canvas_Control_Panel
 from Graph import Graph
 from Graph_Control_Panel import Graph_Control_Panel
+from Material_Control_Panel import Material_Control_Panel
 
 
 #Main application class
@@ -33,19 +34,13 @@ class App:
         globals.layer_stack_canvas = Layer_Stack_Canvas(self.main_frame)
 
         #Create a panel that controls the properties of each material
-        globals.material_control_panel = Material_Control_Panel(self.main_frame)
+        globals.material_adjustment_panel = Material_Adjustment_Panel(self.main_frame)
 
+        #Create a panel that controls the properties of each material
+        globals.material_control_panel = Material_Control_Panel(self.main_frame)
         
         #Create a panel that controls the actions of the layer_stack_canvas
         globals.canvas_control_panel = Canvas_Control_Panel(self.main_frame)
-
-        #Create a frame that displays a graph???????????????????????????????????????
-        # globals.graph = Graph(self.main_frame)
-
-        #Create panel that controls the actions of the graph???????????????????????????????????????
-        # globals.graph_control_panel = Graph_Control_Panel(self.main_frame)
-
-        # globals.graph.draw_curvature_graph()
 
 
 
