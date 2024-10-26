@@ -7,7 +7,7 @@ import globals
 
 class Graph_Control_Panel:
     def __init__(self, window):
-        print("CLASS: GRAPH_CONTROL_PANEL_INIT()")
+        # print("CLASS: GRAPH_CONTROL_PANEL_INIT()")
         
         self.window = window
 

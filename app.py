@@ -38,7 +38,7 @@ class App:
 
         #Create a panel that controls the properties of each material
         globals.material_control_panel = Material_Control_Panel(self.main_frame)
-        
+
         #Create a panel that controls the actions of the layer_stack_canvas
         globals.canvas_control_panel = Canvas_Control_Panel(self.main_frame)
 
@@ -160,9 +160,10 @@ class App:
 
                 #Loop through the rows in excel_file
                 i = 2
+                layer = 1
                 for column, row in excel_data.iterrows():
                     #Check the background color of the cell
-                    background_color = fs.cell(column=2, row=i).fill.bgColor.index
+                    background_color = fs.cell(column=1, row=i).fill.bgColor.index
                     if(background_color == "FFFFFF00"):
                         status = "disabled"
                     else:
@@ -173,7 +174,7 @@ class App:
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
                         "name": row["Material"],
-                        "layer": row["Layer"],
+                        "layer": int(layer),
                         "thickness": row["Thickness"],
                         "unit": row["Unit"],
                         "indent": row["Indent"],
@@ -197,6 +198,11 @@ class App:
 
                     #Put "info" dictionary into self.materials dictionary
                     globals.materials[row["Material"]] = info
+
+                    layer += 1
+                
+                #Sort the materials dictionary after the "layer" value
+                globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
                 
             except Exception as error:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")

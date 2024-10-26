@@ -88,7 +88,7 @@ layer_stack_canvas_indent_left_side = 150
 layer_stack_canvas_stepped_indent_top = 0
 
 
-#LAYER STACK CANVAS CONTROL PANEL
+#CANVAS CONTROL PANEL
 layer_stack_canvas_control_panel_width = layer_stack_canvas_width * 0.8
 layer_stack_canvas_control_panel_height = 70
 layer_stack_canvas_control_panel_padding_top = 5

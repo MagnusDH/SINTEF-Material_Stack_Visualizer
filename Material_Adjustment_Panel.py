@@ -25,7 +25,7 @@ class Material_Adjustment_Panel:
     def create_material_adjustment_panel(self):
         # print("CREATE_MATERIAL_ADJUSTMENT_PANEL()")
 
-        #if material_control_frame has NOT been created before, create it
+        #if material_adjustment_frame has NOT been created before, create it
         if not hasattr(self, 'material_adjustment_panel_frame'):
             #Create Frame from the control panel and place it within given window
             self.material_adjustment_panel_frame = customtkinter.CTkScrollableFrame(
@@ -47,15 +47,15 @@ class Material_Adjustment_Panel:
             widget.destroy()
             self.row_counter = 0
 
-        #Labels for "material", "thickness"/"Indent" and "add material" button
-        material_label = customtkinter.CTkLabel(
+        #Create label headline for "material"
+        material_headline = customtkinter.CTkLabel(
             master=self.material_adjustment_panel_frame, 
             text="Material", 
             fg_color=settings.material_adjustment_panel_background_color,
             text_color="#55b6ff",
             font=(settings.text_font, 20, "bold")
         )
-        material_label.grid(
+        material_headline.grid(
             row=self.row_counter,
             column=1,
             sticky="n",
@@ -63,7 +63,7 @@ class Material_Adjustment_Panel:
             pady=(0,0)
         )
 
-        #Create label to display slider functionality
+        #Create label to display slider functionality and place it
         match globals.option_menu:
             case "Stacked" | "Realistic" | "Stress":
                 self.slider_label = customtkinter.CTkLabel(
@@ -83,7 +83,6 @@ class Material_Adjustment_Panel:
                     font=(settings.text_font, 20, "bold")
                 )
             
-
         self.slider_label.grid(
             row=self.row_counter,
             column=3,
@@ -97,25 +96,25 @@ class Material_Adjustment_Panel:
         #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
         if(len(globals.materials) > 0):
 
-            for material in dict(reversed(globals.materials.items())):
-                delete_material_button = customtkinter.CTkButton(
-                    master = self.material_adjustment_panel_frame,
-                    text="del",
-                    fg_color=settings.material_adjustment_panel_button_color,
-                    hover_color=settings.material_adjustment_panel_button_hover_color,
-                    text_color=settings.material_adjustment_panel_text_color,
-                    width=20,
-                    height=10,
-                    command=lambda material=material: self.delete_material(material)
-                )
+            for material in globals.materials: 
+                # delete_material_button = customtkinter.CTkButton(
+                #     master = self.material_adjustment_panel_frame,
+                #     text="del",
+                #     fg_color=settings.material_adjustment_panel_button_color,
+                #     hover_color=settings.material_adjustment_panel_button_hover_color,
+                #     text_color=settings.material_adjustment_panel_text_color,
+                #     width=20,
+                #     height=10,
+                #     command=lambda material=material: self.delete_material(material)
+                # )
 
-                delete_material_button.grid(
-                    row=self.row_counter,
-                    column=0
-                    # sticky="w",
-                    # padx=(5,0),
-                    # pady=(5,0)
-                )
+                # delete_material_button.grid(
+                #     row=self.row_counter,
+                #     column=0
+                #     # sticky="w",
+                #     # padx=(5,0),
+                #     # pady=(5,0)
+                # )
                 label = customtkinter.CTkLabel(
                     master=self.material_adjustment_panel_frame, 
                     text=material, 
@@ -130,14 +129,10 @@ class Material_Adjustment_Panel:
                     pady=(0,0)
                 )
 
-                #Bind the label to check for mouse clicks on it
-                label.bind("<Button-1>", lambda event, row=self.row_counter, column=1: self.label_click(event, row, column))
-
-
                 #Create Entry, customize it and add it to dictionary
                 entry = customtkinter.CTkEntry(
                     master=self.material_adjustment_panel_frame,
-                    textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
+                    # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
                     fg_color = settings.material_adjustment_panel_entry_background_color,
                     text_color="black",
                     width=settings.material_adjustment_panel_entry_width,
@@ -173,8 +168,18 @@ class Material_Adjustment_Panel:
                     padx=(0,0),
                     pady=(0,0)
                 )
-                slider.set(globals.materials[material]["thickness"])
                 globals.materials[material]["slider_id"] = slider 
+
+                #Set slider and entry values, based on the option_manu value
+                match globals.option_menu:
+                    case "Stacked" | "Realistic" | "Stress":
+                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
+                        slider.set(globals.materials[material]["thickness"])
+                    
+                    case "Stepped":
+                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["indent"])))
+                        slider.set(globals.materials[material]["indent"])
+
 
                 #Disable slider and Entry if specified by the excel-file
                 if(globals.materials[material]["status"] == "disabled"):
@@ -249,63 +254,23 @@ class Material_Adjustment_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    """Deletes a material from the materials{} dictionary and updates the material_adjustment_panel"""
-    def delete_material(self, material):
-        #print("DELETE_MATERIAL()")
+    # """Deletes a material from the materials{} dictionary and updates the material_adjustment_panel"""
+    # def delete_material(self, material):
+    #     #print("DELETE_MATERIAL()")
         
-        #check if given material key is in dictionary
-        if material in globals.materials:
-            #Delete the key
-            del globals.materials[material]
+    #     #check if given material key is in dictionary
+    #     if material in globals.materials:
+    #         #Delete the key
+    #         del globals.materials[material]
 
-            #You might have to Update the "layer" values in globals.materials{}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    #         #You might have to Update the "layer" values in globals.materials{}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            #Update the material_adjustment_panel
-            self.create_material_adjustment_panel()
+    #         #Update the material_adjustment_panel
+    #         self.create_material_adjustment_panel()
 
-            #Re-draw the material stack
-            globals.layer_stack_canvas.draw_material_stack()
+    #         #Re-draw the material stack
+    #         globals.layer_stack_canvas.draw_material_stack()
 
         
-        else:
-            messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
-
-            
-    
-    def label_click(self, event, row, column):
-        print("LABEL_CLICK()")
-
-        label = event.widget
-
-        label_name = label.cget("text")
-
-        print(f"{label_name} clicked at row {row}, column {column}")
-
-        #Create text to show user that he can now click another label to move current label to its place
-        edit_mode_text = customtkinter.CTkLabel(
-            master=globals.main_frame,
-            text=f"Click another material\nto place '{label_name}' there",
-            text_color="green"
-        )
-        edit_mode_text.grid(
-            row=1,
-            column=0,
-            sticky="w",
-            padx=(0,0),
-            pady=(0,0) 
-        )
-
-        cancel_button = customtkinter.CTkButton(
-            master=globals.main_frame,
-            text="Cancel",
-            fg_color="white",
-            text_color="black",
-            hover_color="red"
-        )
-        cancel_button.grid(
-            row=1,
-            column=0,
-            sticky="e",
-            padx=(0,0),
-            pady=(0,0)
-        )
+    #     else:
+    #         messagebox.showerror("ERROR", "Could not find material-key in globals.materials")

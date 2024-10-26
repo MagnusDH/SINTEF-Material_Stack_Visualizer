@@ -2,7 +2,7 @@
 materials = {}
 
 #Instance of class 
-material_control_panel = None
+material_adjustment_panel = None
 
 #Instance of class 
 material_control_panel2 = None

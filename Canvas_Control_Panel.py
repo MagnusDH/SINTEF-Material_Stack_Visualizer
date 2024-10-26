@@ -18,34 +18,38 @@ class Canvas_Control_Panel:
         
         self.window = window
 
-        self.layer_stack_canvas_control_panel = self.create_canvas_control_panel()
+        # self.layer_stack_canvas_control_panel = self.create_canvas_control_panel()
+        self.create_canvas_control_panel()
 
 
     """Creates a frame with widgets that performs actions on the layer_stack_canvas"""
     def create_canvas_control_panel(self):
         # print("CREATE_CANVAS_CONTROL_PANEL()")
 
-        #Create Frame from the control panel and place it within given window
-        layer_stack_canvas_control_panel_frame = customtkinter.CTkFrame(
-            master=self.window,
-            width=settings.layer_stack_canvas_control_panel_width,
-            height=settings.layer_stack_canvas_control_panel_height,
-            fg_color=settings.layer_stack_canvas_control_panel_background_color
-        )
-        layer_stack_canvas_control_panel_frame.grid(
-            row=1,
-            column=1,
-            padx=(settings.layer_stack_canvas_control_panel_padding_left, settings.layer_stack_canvas_control_panel_padding_right),
-            pady=(settings.layer_stack_canvas_control_panel_padding_top, settings.layer_stack_canvas_control_panel_padding_bottom),
-            sticky="nw"
-        )
+        #if canvas_control_panel_frame has NOT been created before, create it
+        if not hasattr(self, 'canvas_control_panel_frame'):
+
+            #Create Frame from the control panel and place it within given window
+            self.canvas_control_panel_frame = customtkinter.CTkFrame(
+                master=self.window,
+                width=settings.layer_stack_canvas_control_panel_width,
+                height=settings.layer_stack_canvas_control_panel_height,
+                fg_color=settings.layer_stack_canvas_control_panel_background_color
+            )
+            self.canvas_control_panel_frame.grid(
+                row=1,
+                column=1,
+                padx=(settings.layer_stack_canvas_control_panel_padding_left, settings.layer_stack_canvas_control_panel_padding_right),
+                pady=(settings.layer_stack_canvas_control_panel_padding_top, settings.layer_stack_canvas_control_panel_padding_bottom),
+                sticky="nw"
+            )
 
         #Prevent the frame to downsize itself to fit widgets placed inside
-        layer_stack_canvas_control_panel_frame.grid_propagate(False)
+        self.canvas_control_panel_frame.grid_propagate(False)
 
         #Reset canvas button
         reset_canvas_button = customtkinter.CTkButton(
-            master=layer_stack_canvas_control_panel_frame, 
+            master=self.canvas_control_panel_frame, 
             text="Reset canvas", 
             fg_color=settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
@@ -63,7 +67,7 @@ class Canvas_Control_Panel:
 
         #Reset values button
         reset_values_button = customtkinter.CTkButton(
-            master=layer_stack_canvas_control_panel_frame,
+            master=self.canvas_control_panel_frame,
             text="Reset values",
             fg_color= settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
@@ -81,7 +85,7 @@ class Canvas_Control_Panel:
 
         #Export stack as SVG button
         export_stack_as_svg_button = customtkinter.CTkButton(
-            master=layer_stack_canvas_control_panel_frame,
+            master=self.canvas_control_panel_frame,
             text="Export stack",
             fg_color= settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
@@ -99,7 +103,7 @@ class Canvas_Control_Panel:
 
         #Export layers as SVG button
         export_layers_as_svg_button = customtkinter.CTkButton(
-            master=layer_stack_canvas_control_panel_frame,
+            master=self.canvas_control_panel_frame,
             text="Export layers",
             fg_color= settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
@@ -117,7 +121,7 @@ class Canvas_Control_Panel:
 
         #Option menu "view" label
         option_menu_view_label = customtkinter.CTkLabel(
-            master=layer_stack_canvas_control_panel_frame,
+            master=self.canvas_control_panel_frame,
             text="View", 
             bg_color=settings.layer_stack_canvas_control_panel_background_color,
             text_color="#55b6ff",
@@ -133,7 +137,7 @@ class Canvas_Control_Panel:
 
         #Switch layout option menu
         self.option_menu = customtkinter.CTkOptionMenu(
-            master=layer_stack_canvas_control_panel_frame, 
+            master=self.canvas_control_panel_frame, 
             values=["Stacked", "Realistic", "Stepped", "Stress"],
             width=30,
             fg_color=settings.layer_stack_canvas_control_panel_button_color, 
@@ -148,7 +152,9 @@ class Canvas_Control_Panel:
             pady=(2,2)
         )
 
-        return layer_stack_canvas_control_panel_frame
+        self.option_menu.set(globals.option_menu)
+
+        # return layer_stack_canvas_control_panel_frame
 
     
     """Resets the scale of items and the start drawing point on the canvas back to their original scale and place"""
@@ -290,7 +296,7 @@ class Canvas_Control_Panel:
                 globals.layer_stack_canvas.draw_material_stack()
 
                 #Set new dimensions for canvas_control_panel back to the original
-                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=settings.layer_stack_canvas_control_panel_width)
+                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
 
             case "Realistic":
                 globals.option_menu = "Realistic"
@@ -316,7 +322,7 @@ class Canvas_Control_Panel:
                 globals.layer_stack_canvas.draw_material_stack()
 
                 #Set new dimensions for canvas_control_panel back to the original
-                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=settings.layer_stack_canvas_control_panel_width)
+                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
             
             case "Stepped":
                 globals.option_menu = "Stepped"
@@ -344,7 +350,7 @@ class Canvas_Control_Panel:
                 globals.layer_stack_canvas.draw_material_stack()
 
                 #Set new dimensions for canvas_control_panel back to the original
-                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=settings.layer_stack_canvas_control_panel_width)
+                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
 
             case "Stress":
                 #Set option menu status
@@ -371,7 +377,7 @@ class Canvas_Control_Panel:
                 globals.layer_stack_canvas.draw_material_stack()
 
                 #Set new dimensions for canvas_control_panel
-                globals.canvas_control_panel.layer_stack_canvas_control_panel.configure(width=globals.layer_stack_canvas.layer_stack_canvas_width*0.8)
+                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=globals.layer_stack_canvas.layer_stack_canvas_width*0.8)
 
                 #Create Graph
                 globals.graph = Graph(globals.main_frame)

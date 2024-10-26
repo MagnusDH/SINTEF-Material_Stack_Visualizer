@@ -71,11 +71,19 @@
 
 
     BUGS:
+        -Potential bug: what happens if one of the values in the excel sheet is left as "empty"? What value is put in materials{}?
+        -Why does the dictionary have to be reversed when "writing text on stack" and "writing indent on stepped stack"????
+
         -When the "indent" value in "stepped mode" is zero the material is not rendered. The material should be rendered with the same width as the rpevious material
+        
         -write indent on stepped stack
             #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
             #I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
+        
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
+        
+        -The user has the option to move "substrate", but it will always be drawn in the bottom of the stack. Implement a function that check if "substrate" is in the dictionary and automaticly places it as the lowest layer?
+
             
 
     #HOW TO CREATE AN EXECUTABLE FILE:
@@ -83,14 +91,11 @@
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
     TO DO           
-        -Create a functionality to move each layer up and down in the stack
-            -Get the name and row&column of a clicked label
-            -Create a text that shows the user that he is in "edit mode" and also a "cancel" button
-            -When a label is clicked the other labels get some sort of marking around them that the user can click on
-            -If another label is clicked, the first clicked label is moved the that specific labels place, and ALL other labels underneath it is moved one step down
-            -The "layer" value in materials{} must be changed tot eh corresponding layer/row
-
         -Create an "export as excel" button that:
             -creates an excel sheet of all the current values in the material{} dictionary
                 -this should overwrite the current excel sheet in the folder (if it exists) so that it is imported the next time
             -Import/glue a picture/svg of the stack into the excel sheet
+        
+        -Fix bugs
+
+        -Add functionality to change color of the materials? add a color palette?

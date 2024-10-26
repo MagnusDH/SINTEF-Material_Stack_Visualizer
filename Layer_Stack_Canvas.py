@@ -101,6 +101,9 @@ class Layer_Stack_Canvas:
     """Draws the material stack based on the value in the option box"""
     def draw_material_stack(self, *event):
         # print("DRAW MATERIAL STACK()")
+
+        #Sort the materials dictionary after the "layer" value
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
                 
         #Draw stack based on value in option menu
         match globals.option_menu:
@@ -168,12 +171,13 @@ class Layer_Stack_Canvas:
         rectangle_y1 = None #Calculated later
         
         #Draw rectangles on canvas
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
+
             #Create material rectangle only if "thickness" is > zero
             if(int(globals.materials[material]["thickness"]) > 0):
 
                 #"substrate" will be drawn on the bottom 1/10 of the canvas
-                if(material == "substrate"):            
+                if(material == "substrate"):  
                     created_rectangle = self.layer_stack_canvas.create_rectangle(
                         # self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, 
                         self.visible_canvas_bbox_x0, round(self.layer_stack_canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
@@ -229,7 +233,6 @@ class Layer_Stack_Canvas:
             globals.materials[material]["indent_line_id"] = None
             globals.materials[material]["indent_arrow_pointer_id"] = None
 
-
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color , tags="canvas_bounding_box_rectangle")
 
@@ -249,7 +252,8 @@ class Layer_Stack_Canvas:
         canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
         
         #Draw rectangles on canvas
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
+        
             #Create material rectangle only if "thickness" is > zero
             if(int(globals.materials[material]["thickness"]) > 0):
                 #find how many percent the current rectangle's height is of the total sum of materials
@@ -322,7 +326,8 @@ class Layer_Stack_Canvas:
         original_rectangle_x0 = rectangle_x0
 
         #Draw rectangles on canvas
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
+
             #Draw "substrate" on the bottom 1/10 of the canvas
             if(material == "substrate"):
                 #Find how many pixels is needed to represent the indent of the current material
@@ -346,7 +351,7 @@ class Layer_Stack_Canvas:
                 continue
 
             #Create material rectangle only if "thickness" and "indent" is > zero
-            if(int(globals.materials[material]["thickness"]) > 0 and int(globals.materials[material]["indent"]) > 0):
+            if(int(globals.materials[material]["thickness"]) > 0):# and int(globals.materials[material]["indent"]) >= 0):
 
                 #Find how many pixels is needed to represent the height of the current material
                 rectangle_height_pixels = int(globals.materials[material]["thickness"])/nanometers_per_pixel
@@ -405,7 +410,8 @@ class Layer_Stack_Canvas:
                 previous_material = None
 
                 #Loop through all the materials:
-                for material in dict(reversed(globals.materials.items())):
+                # for material in dict(reversed(globals.materials.items())):
+                for material in globals.materials:
                     #If material has a rectangle that text can be written on
                     if(globals.materials[material]["rectangle_id"] != None):
                         #Find coordinates and height of current material_rectangle
@@ -542,7 +548,8 @@ class Layer_Stack_Canvas:
                 previous_material = None
 
                 #Loop through all the materials:
-                for material in dict(reversed(globals.materials.items())):
+                # for material in dict(reversed(globals.materials.items())):
+                for material in globals.materials:
                     #If material has a rectangle that text can be written on
                     if(globals.materials[material]["rectangle_id"] != None):
                         #Find coordinates and height of current material_rectangle
@@ -704,7 +711,8 @@ class Layer_Stack_Canvas:
         
 
         #Go through every material
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
+
             
             #There is a rectangle that text can be written on
             if(globals.materials[material]["rectangle_id"] != None):
