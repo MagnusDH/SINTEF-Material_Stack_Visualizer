@@ -23,6 +23,7 @@
         4.CustomTkinter
             -For a more modern look of the app
             -"pip install customtkinter"
+        
 
     
 
@@ -83,6 +84,12 @@
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
         
         -The user has the option to move "substrate", but it will always be drawn in the bottom of the stack. Implement a function that check if "substrate" is in the dictionary and automaticly places it as the lowest layer?
+
+        -Set a specific width for each cell in "export_excel" file, so that its more readable when opening the excel file?
+
+        -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?
+
+        -in "add_material" popup window: add functionality to press "enter" to automaticly press the "confirm" button and add material to materials{}
 
             
 

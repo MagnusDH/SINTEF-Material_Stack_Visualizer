@@ -12,11 +12,12 @@ class Material_Adjustment_Panel:
 
         #Window where everything is placed
         self.window = window
-
+        
         #Keeps track of how many rows with widgets has been created in the control panel frame 
         self.row_counter = 0
 
         self.create_material_adjustment_panel()
+
         
     """
     -Creates a Frame and material_adjustment_panel in the given window if it does not already exist.
@@ -97,24 +98,6 @@ class Material_Adjustment_Panel:
         if(len(globals.materials) > 0):
 
             for material in globals.materials: 
-                # delete_material_button = customtkinter.CTkButton(
-                #     master = self.material_adjustment_panel_frame,
-                #     text="del",
-                #     fg_color=settings.material_adjustment_panel_button_color,
-                #     hover_color=settings.material_adjustment_panel_button_hover_color,
-                #     text_color=settings.material_adjustment_panel_text_color,
-                #     width=20,
-                #     height=10,
-                #     command=lambda material=material: self.delete_material(material)
-                # )
-
-                # delete_material_button.grid(
-                #     row=self.row_counter,
-                #     column=0
-                #     # sticky="w",
-                #     # padx=(5,0),
-                #     # pady=(5,0)
-                # )
                 label = customtkinter.CTkLabel(
                     master=self.material_adjustment_panel_frame, 
                     text=material, 
@@ -128,6 +111,7 @@ class Material_Adjustment_Panel:
                     padx=(0,0),
                     pady=(0,0)
                 )
+
 
                 #Create Entry, customize it and add it to dictionary
                 entry = customtkinter.CTkEntry(

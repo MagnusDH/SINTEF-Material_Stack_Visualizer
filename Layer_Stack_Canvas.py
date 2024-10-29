@@ -155,7 +155,7 @@ class Layer_Stack_Canvas:
         #Find the total height of all materials combined
         sum_of_all_materials = 0
         for material in globals.materials:
-            if(material=="substrate"):
+            if(material.lower() =="substrate"):
                 continue    #Skip substrate
                 
             rectangle_height = int(globals.materials[material]["thickness"])
@@ -177,11 +177,11 @@ class Layer_Stack_Canvas:
             if(int(globals.materials[material]["thickness"]) > 0):
 
                 #"substrate" will be drawn on the bottom 1/10 of the canvas
-                if(material == "substrate"):  
+                if(material.lower() == "substrate"):  
                     created_rectangle = self.layer_stack_canvas.create_rectangle(
                         # self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y1, rectangle_x1, canvas_height, 
                         self.visible_canvas_bbox_x0, round(self.layer_stack_canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
-                        fill=globals.materials["substrate"]["color"], 
+                        fill=globals.materials[material]["color"], 
                         outline=settings.layer_stack_canvas_rectangle_outline_color,
                         tags="material_rectangle"
                     )
@@ -216,7 +216,6 @@ class Layer_Stack_Canvas:
         self.write_text_on_stack()
 
               
-
     """Draws a realistic version of the rectangle stack"""
     def draw_material_stack_realistic(self):
         # print("DRAW_MATERIAL_STACK_REALISTIC()")
@@ -305,7 +304,7 @@ class Layer_Stack_Canvas:
         sum_of_all_materials = 0
         biggest_material = 0
         for material in globals.materials:
-            if(material=="substrate"):
+            if(material.lower() == "substrate"):
                 continue    #Skip substrate
 
             sum_of_all_materials += int(globals.materials[material]["thickness"])
@@ -329,7 +328,7 @@ class Layer_Stack_Canvas:
         for material in dict(reversed(globals.materials.items())):
 
             #Draw "substrate" on the bottom 1/10 of the canvas
-            if(material == "substrate"):
+            if(material.lower() == "substrate"):
                 #Find how many pixels is needed to represent the indent of the current material
                 indent_width_pixels = int(globals.materials[material]["indent"])/nanometers_per_pixel
 

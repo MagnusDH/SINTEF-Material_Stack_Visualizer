@@ -96,10 +96,10 @@ class Graph:
         ######################  CALCULATE VALUES FOR X AND Y ########################
 
         #Fetch values from excel sheet (for context, not really used here)
-        E = globals.materials["substrate"]["E"]
-        rho = globals.materials["substrate"]["rho"]
-        sigma = globals.materials["substrate"]["sigma"]
-        nu =  globals.materials["substrate"]["nu"]
+        # E = globals.materials["substrate"]["E"]
+        # rho = globals.materials["substrate"]["rho"]
+        # sigma = globals.materials["substrate"]["sigma"]
+        # nu =  globals.materials["substrate"]["nu"]
         
         #Create an array of fixed values for x (from, to, number of spots)
         x = numpy.linspace(settings.graph_x_axis_range_min, settings.graph_x_axis_range_max, 50)

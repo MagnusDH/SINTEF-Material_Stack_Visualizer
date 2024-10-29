@@ -3,6 +3,10 @@ from tkinter import messagebox
 import customtkinter
 import settings #File containing settings
 import globals  #File containing global variables
+import pandas   #Excel-file reading
+import openpyxl #Excel-file reading
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill, Border, Side, Font
 
 
 class Material_Control_Panel:
@@ -102,7 +106,7 @@ class Material_Control_Panel:
             master=self.material_control_panel_frame, 
             width=100,
             height=25,
-            text="export to excel", 
+            text="Export values to excel", 
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
             text_color=settings.material_control_panel_text_color,
@@ -748,22 +752,23 @@ class Material_Control_Panel:
         #Render all materials with a checkbox on the left side
         row_counter = 0
         for material in globals.materials:
-            #Create a "choose material" button and place it
-            choose_button = customtkinter.CTkButton(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
-                text="Select", 
-                width=90,
-                height=10,
-                hover_color=globals.materials[material]["color"],
-                command=lambda chosen_material=material: self.move_material(chosen_material)
-            )
-            choose_button.grid(
-                row=row_counter,
-                column=0,
-                sticky="",
-                padx=(0,0),
-                pady=(0,0)
-            )
+            if(material.lower() != "substrate"):
+                #Create a "choose material" button and place it
+                choose_button = customtkinter.CTkButton(
+                    master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
+                    text="Select", 
+                    width=90,
+                    height=10,
+                    hover_color=globals.materials[material]["color"],
+                    command=lambda chosen_material=material: self.move_material(chosen_material)
+                )
+                choose_button.grid(
+                    row=row_counter,
+                    column=0,
+                    sticky="",
+                    padx=(0,0),
+                    pady=(0,0)
+                )
 
             #Create a "layer" label for current material
             layer_label = customtkinter.CTkLabel(
@@ -803,7 +808,7 @@ class Material_Control_Panel:
             row=0,
             column=4,
             sticky="e",
-            padx=(30,0),
+            padx=(20,0),
             pady=(0,0)
         )
 
@@ -1018,8 +1023,71 @@ class Material_Control_Panel:
     def export_to_excel(self):
         print("EXPORT_TO_EXCEL()")
 
-        #Create an excel file with a specific name
-        #Put the following headlines in to excel file: Material 	Thickness	Unit	Indent	Color	E	rho	sigma	nu
-        #For each row in the excel file, put the corresponding values from materials{} in to excel file
-        #Export the current stack to svg file
+        #Create an filename and a workbook to contain data
+        filename = "exported_materials.xlsx"
+        workbook = Workbook()
+
+        # Optionally, rename the default sheet
+        sheet = workbook.active
+        # sheet.title = "EmptySheet"
+
+        #Place some values in specific cells
+        # Place a value in a specific cell
+        sheet["A1"] = "Material"          # Add a new header in column A row 1
+        sheet["B1"] = "Thickness"
+        sheet["C1"] = "Unit"
+        sheet["D1"] = "Indent [nm]"
+        sheet["E1"] = "Color"
+        sheet["F1"] = "Modulus [GPa]"
+        sheet["G1"] = "Density [Kg/m3]"
+        sheet["H1"] = "In-plane stress [MPa]"
+        sheet["I1"] = "Poisson"
+
+        #Define a fill_color for cells
+        fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
+
+        #Loop through the desired range of columns and rows to apply the fill_color and set a bold font
+        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=9):  # Adjust row/column range as needed
+            for cell in row:
+                cell.font = Font(bold=True)
+                cell.fill = fill_color
+
+
+        #Define a border style (thin lines for grid)
+        thin_border = Border(
+            left=Side(style="thin"),
+            right=Side(style="thin"),
+            top=Side(style="thin"),
+            bottom=Side(style="thin")
+        )
+
+        #Apply the border to a range of cells
+        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=9):  # Adjust range as needed
+            for cell in row:
+                cell.border = thin_border
+
+
+        #Loop through materials{} and place values in excel file
+        row_counter = 2
+
+        for material in globals.materials:
+            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["name"])
+            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["thickness"])
+            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["unit"])
+            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["indent"])
+            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["color"])
+            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["E"])
+            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["rho"])
+            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["sigma"])
+            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["nu"])
+
+            #increment row_counter
+            row_counter += 1
+
+
+        #Save the empty workbook to a file
+        workbook.save(filename)
+
+
+
         #Find a way to place the stack.svg file in to the excel file

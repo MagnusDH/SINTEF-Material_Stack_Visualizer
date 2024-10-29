@@ -6,7 +6,6 @@ import globals
 import os
 import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
-
 from Graph import Graph
 from Graph_Control_Panel import Graph_Control_Panel
 

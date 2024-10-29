@@ -23,9 +23,10 @@ class App:
         #Program window
         self.program_window = program_window
 
-        #Populate materials{} dictionary if "materials.xlsx" file exists
-        self.load_materials_from_excel()
-        
+        #If excel file exists and user wants to open load it, then load materials.xlsx
+        if(os.path.isfile("Materials.xlsx")):
+            self.load_materials_from_excel()
+                
         #Main frame where every widgets is placed
         self.main_frame = self.create_scrollable_frame(self.program_window)
         globals.main_frame = self.main_frame
@@ -41,7 +42,6 @@ class App:
 
         #Create a panel that controls the actions of the layer_stack_canvas
         globals.canvas_control_panel = Canvas_Control_Panel(self.main_frame)
-
 
 
     """
@@ -140,8 +140,8 @@ class App:
     def on_frame_configure(self, canvas, event=None):
         #Update the scroll region of the canvas to encompass the entire frame
         canvas.configure(scrollregion=canvas.bbox("all"))
-
-
+    
+    
     """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self):
         #print("LOAD_MATERIALS_FROM_EXCEL()")
@@ -170,6 +170,12 @@ class App:
                         status = "active"
                     #Increment "i" to go to the next row
                     i+=1
+
+                    #If some cells are left empty, apply default value
+                    # if(pandas.isna(row["Material"])):
+                    #     row["Material"] = "No name"
+                    # if(pandas.isna(row["Thickness"])):
+                        # row["Thickness"] = 
 
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
@@ -201,19 +207,40 @@ class App:
 
                     layer += 1
                 
-                #Sort the materials dictionary after the "layer" value
-                globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
+                #Sort the materials dictionary
+                self.sort_dictionary()
                 
             except Exception as error:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")
                 return
 
+    """Places 'substrate' as the lowest layer and sorts the materials{} dictionary after the 'layer' value of each material"""
+    def sort_dictionary(self):
+        # print("SORT_DICTIONARY()")
+
+        #If "substrate" is in dictionary
+        for key in globals.materials:
+            if(key.lower() == "substrate"):
+                #if "substrate" is not the lowest layer
+                if(globals.materials[key]["layer"] < len(globals.materials)):
+                    substrate_orig_place = globals.materials[key]["layer"] 
+                    #place "substrate" as the lowest layer
+                    globals.materials[key]["layer"] = len(globals.materials)
+
+                    #Decrement the "layer" value of other materials that was higher than the "substrate" layer
+                    for material in globals.materials:
+                        if(material.lower() != "substrate"):
+                            if(globals.materials[material]["layer"] > substrate_orig_place):
+                                globals.materials[material]["layer"] -= 1
+
+        #Sort the materials dictionary after the "layer" value
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
+            
 
 if __name__ == "__main__":
-    
     #Create the main application window
     program_window = tkinter.Tk()
-
+    
     #Other classes needs access to this window 
     globals.program_window = program_window
 
@@ -229,6 +256,7 @@ if __name__ == "__main__":
     program_window.title(settings.program_window_title)
     program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
     program_window.configure(bg=settings.program_window_background_color)
+        
 
     #Create keyboard shortcuts for the main window
     program_window.bind("<Escape>", lambda event: program_window.destroy())
@@ -240,8 +268,14 @@ if __name__ == "__main__":
     # program_window.bind("<Configure>", lambda event: app.program_window_resized(event))
     
     # Create an instance of App and run it
-    app = App(program_window)
+    app = App(program_window)   
 
     #Start the main loop of the program
     program_window.mainloop()
 
+
+
+
+
+
+               
