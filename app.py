@@ -269,6 +269,7 @@ if __name__ == "__main__":
     
     # Create an instance of App and run it
     app = App(program_window)   
+    globals.app = app
 
     #Start the main loop of the program
     program_window.mainloop()

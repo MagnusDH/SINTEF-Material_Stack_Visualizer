@@ -618,7 +618,8 @@ class Material_Control_Panel:
         globals.materials[self.material_name_entry.get()] = info
 
         #Sort the materials dictionary after the "layer" value
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
+        globals.app.sort_dictionary()
+        # globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
 
 
     """
@@ -1093,7 +1094,7 @@ class Material_Control_Panel:
         canvas_x2 = canvas_x1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_width()
         canvas_y2 = canvas_y1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_height()
 
-        bbox = (canvas_x, canvas_y, canvas_x2, canvas_y2)
+        bbox = (canvas_x1, canvas_y1, canvas_x2, canvas_y2)
 
         #Take a screenshot of the screen where canvas is
         screenshot = ImageGrab.grab(bbox=bbox)

@@ -2,6 +2,9 @@
 materials = {}
 
 #Instance of class 
+app = None
+
+#Instance of class 
 material_adjustment_panel = None
 
 #Instance of class 
