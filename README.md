@@ -73,6 +73,10 @@
             3. "self.main_frame": a frame that lays on top of the background_canvas. This frame is the main frame for all other widgets in the application
 
 
+    #HOW TO CREATE AN EXECUTABLE FILE:
+        -Navigate to the folder containing the python program
+        -Run the following command: "python -m PyInstaller --onefile program_name.py"
+
 
     BUGS:
         -Potential bug: what happens if one of the values in the excel sheet is left as "empty"? What value is put in materials{}?
@@ -92,24 +96,10 @@
 
         -in "add_material" popup window: add functionality to press "enter" to automaticly press the "confirm" button and add material to materials{}
 
-            
-
-    #HOW TO CREATE AN EXECUTABLE FILE:
-        -Navigate to the folder containing the python program
-        -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
     TO DO           
         -Fix bugs
 
         -Add functionality to change color of the materials? add a color palette?
 
-
-    Til Runar:
-        -Mitt program klarer å ta et screenshot av canvas og plassere det i excel filen. Sjekk om det fungerer hos han også
-        -Når programmet er eksporert som excel, hva skal filen hete? skal den overskrive "Materials.xlsx" eller hete noe annet?
-        -Skal excel filen lagres i "exports" mappen? 
-        -Skal canvas.png filen lagres i "exports" mappen?
-        -"Click and drag" for å flytte på materialer fungerer ikke. Funker den metoden som er i programmet nå?
-        -Er "delete material" metoden bra eller er den uoversiktlig?
-        -Hvis "Materials.xlsx" filen eksisterer. Skal brukeren få muligheten til å laste den inn eller starte ett nytt prosjekt?
-        
+        -Add a color palette image in the "Materials" excel file and the exported excel file?
