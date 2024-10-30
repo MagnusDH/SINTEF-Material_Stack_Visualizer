@@ -7,6 +7,8 @@ import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Border, Side, Font
+from PIL import ImageGrab
+from openpyxl.drawing.image import Image
 
 
 class Material_Control_Panel:
@@ -889,7 +891,7 @@ class Material_Control_Panel:
                         text=f"Place in row: ",#{globals.materials[material]['layer']}", 
                         width=70,
                         height=10,
-                        hover_color="#26aa00",
+                        hover_color=globals.materials[material]["color"],# "#26aa00",
                         command=lambda selected_layer=material, chosen_material=chosen_material: self.edit_layers(chosen_material, selected_layer)
                     )
                     move_here_button.grid(
@@ -1020,8 +1022,9 @@ class Material_Control_Panel:
         globals.canvas_control_panel.create_canvas_control_panel()
 
 
+    """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
     def export_to_excel(self):
-        print("EXPORT_TO_EXCEL()")
+        # print("EXPORT_TO_EXCEL()")
 
         #Create an filename and a workbook to contain data
         filename = "exported_materials.xlsx"
@@ -1029,10 +1032,9 @@ class Material_Control_Panel:
 
         # Optionally, rename the default sheet
         sheet = workbook.active
-        # sheet.title = "EmptySheet"
+        # sheet.title = ""
 
-        #Place some values in specific cells
-        # Place a value in a specific cell
+        #Create header cells
         sheet["A1"] = "Material"          # Add a new header in column A row 1
         sheet["B1"] = "Thickness"
         sheet["C1"] = "Unit"
@@ -1085,9 +1087,27 @@ class Material_Control_Panel:
             row_counter += 1
 
 
-        #Save the empty workbook to a file
+        #Find coordinates of canvas on the screen
+        canvas_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_rootx()
+        canvas_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_rooty()
+        canvas_x2 = canvas_x1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_width()
+        canvas_y2 = canvas_y1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_height()
+
+        bbox = (canvas_x, canvas_y, canvas_x2, canvas_y2)
+
+        #Take a screenshot of the screen where canvas is
+        screenshot = ImageGrab.grab(bbox=bbox)
+        screenshot.save("canvasPNG.png", "PNG")
+
+        #Load the image with openpyxl
+        img = Image("canvasPNG.png")
+
+        #Set the width and height of image placed in excel file
+        img.width = 750
+        img.height = 350
+
+        #Add the image to the excel file
+        sheet.add_image(img, "K1")
+
+        #Save the workbook as excel file
         workbook.save(filename)
-
-
-
-        #Find a way to place the stack.svg file in to the excel file

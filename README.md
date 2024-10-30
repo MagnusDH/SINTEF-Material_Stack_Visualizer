@@ -24,6 +24,9 @@
             -For a more modern look of the app
             -"pip install customtkinter"
         
+        5.Pillow
+            -For taking screenshot of the canvas
+            -"pip install pillow"
 
     
 
@@ -83,8 +86,6 @@
         
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
         
-        -The user has the option to move "substrate", but it will always be drawn in the bottom of the stack. Implement a function that check if "substrate" is in the dictionary and automaticly places it as the lowest layer?
-
         -Set a specific width for each cell in "export_excel" file, so that its more readable when opening the excel file?
 
         -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?
@@ -106,3 +107,8 @@
         -Fix bugs
 
         -Add functionality to change color of the materials? add a color palette?
+
+
+    Til Runar:
+        -Når programmet er eksporert som excel, hva skal filen hete? skal den overskrive "Materials.xlsx" eller hete noe annet?
+        -
