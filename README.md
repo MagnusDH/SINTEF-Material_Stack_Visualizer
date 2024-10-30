@@ -99,16 +99,17 @@
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
     TO DO           
-        -Create an "export as excel" button that:
-            -creates an excel sheet of all the current values in the material{} dictionary
-                -this should overwrite the current excel sheet in the folder (if it exists) so that it is imported the next time
-            -Import/glue a picture/svg of the stack into the excel sheet
-        
         -Fix bugs
 
         -Add functionality to change color of the materials? add a color palette?
 
 
     Til Runar:
+        -Mitt program klarer å ta et screenshot av canvas og plassere det i excel filen. Sjekk om det fungerer hos han også
         -Når programmet er eksporert som excel, hva skal filen hete? skal den overskrive "Materials.xlsx" eller hete noe annet?
-        -
+        -Skal excel filen lagres i "exports" mappen? 
+        -Skal canvas.png filen lagres i "exports" mappen?
+        -"Click and drag" for å flytte på materialer fungerer ikke. Funker den metoden som er i programmet nå?
+        -Er "delete material" metoden bra eller er den uoversiktlig?
+        -Hvis "Materials.xlsx" filen eksisterer. Skal brukeren få muligheten til å laste den inn eller starte ett nytt prosjekt?
+        
