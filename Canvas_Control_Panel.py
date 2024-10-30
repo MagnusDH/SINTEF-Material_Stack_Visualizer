@@ -202,12 +202,12 @@ class Canvas_Control_Panel:
                             #Populate material dictionary
                             if(material_name in globals.materials):
 
-                                globals.materials[material_name]["thickness"] = material_thickness
+                                globals.materials[material_name]["Thickness"] = material_thickness
                                 
                                 #Update sliders and Entries
-                                globals.materials[material_name]["slider_id"].set(material_thickness)
-                                globals.materials[material_name]["entry_id"].delete(0, tkinter.END)
-                                globals.materials[material_name]["entry_id"].insert(0, material_thickness)
+                                globals.materials[material_name]["Slider_id"].set(material_thickness)
+                                globals.materials[material_name]["Entry_id"].delete(0, tkinter.END)
+                                globals.materials[material_name]["Entry_id"].insert(0, material_thickness)
                             
                             #Reset text_size
                             # self.current_text_size = self.original_text_size
@@ -229,12 +229,12 @@ class Canvas_Control_Panel:
                             #Populate material dictionary
                             if(material_name in globals.materials):
 
-                                globals.materials[material_name]["indent"] = material_indent
+                                globals.materials[material_name]["Indent [nm]"] = material_indent
                                     
                                 #Update sliders and Entries
-                                globals.materials[material_name]["slider_id"].set(material_indent)
-                                globals.materials[material_name]["entry_id"].delete(0, tkinter.END)
-                                globals.materials[material_name]["entry_id"].insert(0, material_indent)
+                                globals.materials[material_name]["Slider_id"].set(material_indent)
+                                globals.materials[material_name]["Entry_id"].delete(0, tkinter.END)
+                                globals.materials[material_name]["Entry_id"].insert(0, material_indent)
                             
                                 #Reset text_size
                                 # self.current_text_size = self.original_text_size
@@ -277,10 +277,10 @@ class Canvas_Control_Panel:
 
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
                 for material in globals.materials:
-                    globals.materials[material]["slider_id"].set(globals.materials[material]["thickness"])
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
                     
-                    if(globals.materials[material]["status"] != "disabled"):
-                        globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
+                    if(globals.materials[material]["Status"] != "disabled"):
+                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                 
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
@@ -305,10 +305,10 @@ class Canvas_Control_Panel:
 
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
                 for material in globals.materials:
-                    globals.materials[material]["slider_id"].set(globals.materials[material]["thickness"])
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
                     
-                    if(globals.materials[material]["status"] != "disabled"):
-                        globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
+                    if(globals.materials[material]["Status"] != "disabled"):
+                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
 
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
@@ -331,10 +331,10 @@ class Canvas_Control_Panel:
 
                 #Set all material entry and slider values to "indent" value, except the entries that are "disabled"
                 for material in globals.materials:
-                    globals.materials[material]["slider_id"].set(globals.materials[material]["indent"])
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
 
-                    if(globals.materials[material]["status"] != "disabled"):
-                        globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["indent"])))
+                    if(globals.materials[material]["Status"] != "disabled"):
+                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
                 
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
@@ -360,10 +360,10 @@ class Canvas_Control_Panel:
 
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
                 for material in globals.materials:
-                    globals.materials[material]["slider_id"].set(globals.materials[material]["thickness"])
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
                     
-                    if(globals.materials[material]["status"] != "disabled"):
-                        globals.materials[material]["entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
+                    if(globals.materials[material]["Status"] != "disabled"):
+                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
 
                 #Set new dimensions for layer_stack_canvas
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=525)
@@ -393,7 +393,7 @@ class Canvas_Control_Panel:
         # print("EXPORT_STACK_AS_SVG()")
 
         #CREATE FOLDER HIERARCHY
-        main_folder = "svg_exports"                                 #Name for main folder
+        main_folder = "exports"                                 #Name for main folder
         #Create main folder if it does not exist
         if not os.path.exists(main_folder):
             os.makedirs(main_folder)
@@ -425,12 +425,12 @@ class Canvas_Control_Panel:
             #Go through every rectangle found on canvas
             for material in globals.materials:
                 #Only create element of rectangle if it is not "None"
-                if(globals.materials[material]["rectangle_id"] != None):
+                if(globals.materials[material]["Rectangle_id"] != None):
 
                     #Find the coordinates of the rectangle
-                    rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["rectangle_id"])
+                    rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Rectangle_id"])
                     #Construct an SVG <rect> element for the rectangle
-                    svg_rect_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["color"])
+                    svg_rect_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["Color"])
                     #Write the SVG representation of the rectangle to the file
                     f.write(svg_rect_element)
                     #Construct an SVG <rect> element for the bounding box
@@ -451,7 +451,7 @@ class Canvas_Control_Panel:
 
         #CREATE FOLDER HIERARCHY
         #Specify a folder where the SVG-files should be saved
-        main_folder = "svg_exports"
+        main_folder = "exports"
         #Create the folder if it doesn't exist
         if not os.path.exists(main_folder):
             os.makedirs(main_folder)
@@ -474,7 +474,7 @@ class Canvas_Control_Panel:
         #Iterate through all the materials
         for material in globals.materials:
             #Only create svg element if there is a rectangle
-            if(globals.materials[material]["rectangle_id"] != None):
+            if(globals.materials[material]["Rectangle_id"] != None):
 
                 #Create a name for the SVG file for the current layer
                 filename = f"{layer_counter}_layer_{globals.option_menu}.svg"
@@ -497,10 +497,10 @@ class Canvas_Control_Panel:
                             f.write(element)
 
                     #Create SVG-element of material rectangle
-                    if(globals.materials[material]["rectangle_id"] != None):
-                        rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["rectangle_id"])
+                    if(globals.materials[material]["Rectangle_id"] != None):
+                        rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Rectangle_id"])
 
-                        svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["color"])
+                        svg_rectangle_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(rect_x0, rect_y0, rect_x1 - rect_x0, rect_y1 - rect_y0, globals.materials[material]["Color"])
                         f.write(svg_rectangle_element)
                         previously_created_elements.append(svg_rectangle_element)
 
@@ -512,16 +512,16 @@ class Canvas_Control_Panel:
                         break
 
                     #Create SVG-element for material text
-                    if(globals.materials[material]["text_id"] is not None):
-                        text_x0, text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["text_id"])
-                        text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["text_id"], 'text')
+                    if(globals.materials[material]["Text_id"] is not None):
+                        text_x0, text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Text_id"])
+                        text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["Text_id"], 'text')
                         svg_text_element = '<text x="{}" y="{}" fill="{}" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, settings.text_color, settings.svg_text_size, text_content)
                         f.write(svg_text_element)
                         previously_created_elements.append(svg_text_element)
 
                     #Create SVG-element for text bounding box
-                    if(globals.materials[material]["text_bbox_id"] is not None):
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
+                    if(globals.materials[material]["Text_bbox_id"] is not None):
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
                             
                         #Write the SVG representation of the bounding box to the file
@@ -529,12 +529,12 @@ class Canvas_Control_Panel:
                         previously_created_elements.append(svg_bbox_element)
 
                     #Create SVG-element for arrow line pointing from box to rectangle
-                    if(globals.materials[material]["line_id"] != None):
+                    if(globals.materials[material]["Line_id"] != None):
                         #Line must be drawn from the right side of stack to left side of text
                         if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic" or globals.option_menu == "Stress"):
-                            line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["line_id"])
+                            line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
                             #Construct an SVG <line> element for arrows
-                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
+                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                             svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
 
                             #Add arrowhead on the left side of the line
@@ -548,9 +548,9 @@ class Canvas_Control_Panel:
 
                         #Line must be drawn from the left side of stack to right side of text
                         elif(globals.option_menu == "Stepped"):
-                            line_x0, line_y0, line_x1, line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["line_id"])
+                            line_x0, line_y0, line_x1, line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
                             #Construct an SVG <line> element for arrows
-                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["text_bbox_id"])
+                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                             svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x1, line_y0, line_x1-7, line_y1, settings.text_color)
                             
                             #Add arrowhead on right side of the line
@@ -566,17 +566,17 @@ class Canvas_Control_Panel:
                         previously_created_elements.append(svg_line_element)
 
                     #Create SVG-element for indent_text
-                    if(globals.materials[material]["indent_text_id"] != None):
-                        indent_text_x0, indent_text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_text_id"])
-                        indent_text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["indent_text_id"], 'text')
+                    if(globals.materials[material]["Indent_text_id"] != None):
+                        indent_text_x0, indent_text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Indent_text_id"])
+                        indent_text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["Indent_text_id"], 'text')
                         svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(indent_text_x0, indent_text_y0, settings.svg_text_size, indent_text_content)
                             
                         f.write(svg_indent_text_element)
                         previously_created_elements.append(svg_indent_text_element)
 
                     #Create SVG-element for indent_text bounding box
-                    if(globals.materials[material]["indent_text_bbox_id"] != None):
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["indent_text_bbox_id"])
+                    if(globals.materials[material]["Indent_text_bbox_id"] != None):
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                         svg_indent_text_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
                             
                         #Write the SVG representation of the bounding box to the file
@@ -584,8 +584,8 @@ class Canvas_Control_Panel:
                         previously_created_elements.append(svg_indent_text_bbox_element)
 
                     #Create SVG-element for indent_line
-                    if(globals.materials[material]["indent_line_id"] != None):
-                        indent_line_x0, indent_line_y0, indent_line_x1, indent_line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_line_id"])
+                    if(globals.materials[material]["Indent_line_id"] != None):
+                        indent_line_x0, indent_line_y0, indent_line_x1, indent_line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Indent_line_id"])
                         #Construct an SVG <line> element for arrows
                         svg_indent_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(indent_line_x0+8, indent_line_y0, indent_line_x1-10, indent_line_y1)
                         
@@ -606,10 +606,10 @@ class Canvas_Control_Panel:
                         previously_created_elements.append(svg_indent_line_element)
 
                     #Create SVG-element for arrow line pointing from indent_text to indent_line
-                    if(globals.materials[material]["indent_arrow_pointer_id"] != None):
-                        line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["indent_arrow_pointer_id"])
+                    if(globals.materials[material]["Indent_arrow_pointer_id"] != None):
+                        line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"])
                         #Construct an SVG <line> element for arrows
-                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["indent_text_bbox_id"])
+                        bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                         svg_indent_arrow_pointer_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-start)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
 
                         #Add arrowhead on the left side of the line

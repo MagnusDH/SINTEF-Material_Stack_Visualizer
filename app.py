@@ -179,27 +179,28 @@ class App:
 
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
-                        "name": row["Material"],
-                        "layer": int(layer),
-                        "thickness": row["Thickness"],
-                        "unit": row["Unit"],
-                        "indent": row["Indent"],
-                        "color": row["Color"],
-                        "status": status,
-                        "E": row["E"],
-                        "rho": row["rho"],
-                        "sigma": row["sigma"],
-                        "nu": row["nu"],
-                        "entry_id": None,
-                        "slider_id": None,
-                        "rectangle_id": None,
-                        "text_id": None,
-                        "text_bbox_id" : None,
-                        "line_id": None,
-                        "indent_text_id": None,
-                        "indent_text_bbox_id": None,
-                        "indent_line_id": None,
-                        "indent_arrow_pointer_id": None
+                        "Name": row["Material"],
+                        "Layer": int(layer),
+                        "Thickness": row["Thickness"],
+                        "Unit": row["Unit"],
+                        "Indent [nm]": row["Indent [nm]"],
+                        "Color": row["Color"],
+                        "Status": status,
+                        "Modulus [GPa]": row["Modulus [GPa]"],
+                        "CTE [ppm/deg]": row["CTE [ppm/deg]"],
+                        "Density [kg/m3]": row["Density [kg/m3]"],
+                        "Stress_x [MPa]": row["Stress_x [MPa]"],
+                        "Poisson": row["Poisson"],
+                        "Entry_id": None,
+                        "Slider_id": None,
+                        "Rectangle_id": None,
+                        "Text_id": None,
+                        "Text_bbox_id" : None,
+                        "Line_id": None,
+                        "Indent_text_id": None,
+                        "Indent_text_bbox_id": None,
+                        "Indent_line_id": None,
+                        "Indent_arrow_pointer_id": None
                     }
 
                     #Put "info" dictionary into self.materials dictionary
@@ -222,19 +223,19 @@ class App:
         for key in globals.materials:
             if(key.lower() == "substrate"):
                 #if "substrate" is not the lowest layer
-                if(globals.materials[key]["layer"] < len(globals.materials)):
-                    substrate_orig_place = globals.materials[key]["layer"] 
+                if(globals.materials[key]["Layer"] < len(globals.materials)):
+                    substrate_orig_place = globals.materials[key]["Layer"] 
                     #place "substrate" as the lowest layer
-                    globals.materials[key]["layer"] = len(globals.materials)
+                    globals.materials[key]["Layer"] = len(globals.materials)
 
                     #Decrement the "layer" value of other materials that was higher than the "substrate" layer
                     for material in globals.materials:
                         if(material.lower() != "substrate"):
-                            if(globals.materials[material]["layer"] > substrate_orig_place):
-                                globals.materials[material]["layer"] -= 1
+                            if(globals.materials[material]["Layer"] > substrate_orig_place):
+                                globals.materials[material]["Layer"] -= 1
 
         #Sort the materials dictionary after the "layer" value
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
             
 
 if __name__ == "__main__":
@@ -273,10 +274,5 @@ if __name__ == "__main__":
 
     #Start the main loop of the program
     program_window.mainloop()
-
-
-
-
-
 
                

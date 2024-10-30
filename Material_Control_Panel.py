@@ -6,9 +6,10 @@ import globals  #File containing global variables
 import pandas   #Excel-file reading
 import openpyxl #Excel-file reading
 from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Border, Side, Font
+from openpyxl.styles import PatternFill, Border, Side, Font, Alignment
 from PIL import ImageGrab
 from openpyxl.drawing.image import Image
+import os
 
 
 class Material_Control_Panel:
@@ -286,14 +287,14 @@ class Material_Control_Panel:
         )
 
 
-        #E value
-        self.E_value_label = customtkinter.CTkLabel(
+        #Modulus [GPa] value
+        self.Modulus_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="E: Youngs Modulus [GPa]", 
+            text="Modulus [GPa]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
-        self.E_value_label.grid(
+        self.Modulus_value_label.grid(
             row=5, 
             column=0, 
             sticky="e", 
@@ -301,14 +302,14 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
-        self.E_value_entry = customtkinter.CTkEntry(
+        self.Modulus_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
             fg_color = "white",
             text_color="black",
             width=70,
             justify="center"
         )
-        self.E_value_entry.grid(
+        self.Modulus_value_entry.grid(
             row=5, 
             column=1,
             sticky="e",
@@ -316,15 +317,15 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
-
-        #"rho" value
-        self.rho_value_label = customtkinter.CTkLabel(
+        #################################
+        #CTE [ppm/deg] value
+        self.CTE_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="Rho: density [kg/m3]", 
+            text="CTE [ppm/deg]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
-        self.rho_value_label.grid(
+        self.CTE_value_label.grid(
             row=6, 
             column=0, 
             sticky="e", 
@@ -332,15 +333,47 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
-        self.rho_value_entry = customtkinter.CTkEntry(
+        self.CTE_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
             fg_color = "white",
             text_color="black",
             width=70,
             justify="center"
         )
-        self.rho_value_entry.grid(
+        self.CTE_value_entry.grid(
             row=6, 
+            column=1,
+            sticky="e",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        #################################
+
+
+        #Density [kg/m3] value
+        self.Density_value_label = customtkinter.CTkLabel(
+            master=self.add_material_window, 
+            text="Density [kg/m3]", 
+            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_background_color,
+        )
+        self.Density_value_label.grid(
+            row=7, 
+            column=0, 
+            sticky="e", 
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        self.Density_value_entry = customtkinter.CTkEntry(
+            master=self.add_material_window,
+            fg_color = "white",
+            text_color="black",
+            width=70,
+            justify="center"
+        )
+        self.Density_value_entry.grid(
+            row=7, 
             column=1,
             sticky="e",
             padx=(0,0),
@@ -348,30 +381,30 @@ class Material_Control_Panel:
         )
 
         
-        #"sigma" value
-        self.sigma_value_label = customtkinter.CTkLabel(
+        #Stress_x [MPa] value
+        self.Stress_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="Sigma: in-plane stress [MPa]", 
+            text="Stress_x [MPa]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
-        self.sigma_value_label.grid(
-            row=7, 
+        self.Stress_value_label.grid(
+            row=8, 
             column=0, 
             sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
 
-        self.sigma_value_entry = customtkinter.CTkEntry(
+        self.Stress_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
             fg_color = "white",
             text_color="black",
             width=70,
             justify="center"
         )
-        self.sigma_value_entry.grid(
-            row=7, 
+        self.Stress_value_entry.grid(
+            row=8, 
             column=1,
             sticky="e",
             padx=(0,0),
@@ -379,30 +412,30 @@ class Material_Control_Panel:
         )
             
 
-        #'nu' value
-        self.nu_value_label = customtkinter.CTkLabel(
+        #Poisson value
+        self.Poisson_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
-            text="Nu: Poisson", 
+            text="Poisson", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
         )
-        self.nu_value_label.grid(
-            row=8, 
+        self.Poisson_value_label.grid(
+            row=9, 
             column=0, 
             sticky="e", 
             padx=(0,0),
             pady=(0,0)
         )
 
-        self.nu_value_entry = customtkinter.CTkEntry(
+        self.Poisson_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
             fg_color = "white",
             text_color="black",
             width=70,
             justify="center"
         )
-        self.nu_value_entry.grid(
-            row=8, 
+        self.Poisson_value_entry.grid(
+            row=9, 
             column=1,
             sticky="e",
             padx=(0,0),
@@ -420,7 +453,7 @@ class Material_Control_Panel:
             command=self.validate_inputs
         )
         confirm_button.grid(
-            row=9,
+            row=10,
             column=2,
             sticky="n",
             padx=(0,0),
@@ -479,42 +512,51 @@ class Material_Control_Panel:
             return
 
         #If "E" value is entered, check if it is integer
-        if(self.E_value_entry.get() != ""):
+        if(self.Modulus_value_entry.get() != ""):
             try:
-                E_value = self.E_value_entry.get() 
-                E_value = int(E_value)
+                Modulus_value = self.Modulus_value_entry.get() 
+                Modulus_value = int(Modulus_value)
             except ValueError:
-                messagebox.showerror("ERROR", "'E' value has to be an integer", parent=self.add_material_window)
+                messagebox.showerror("ERROR", "'Modulus [GPa]' value has to be an integer", parent=self.add_material_window)
+                return
+        
+        #If "CTE" value is entered, check if it is integer
+        if(self.CTE_value_entry.get() != ""):
+            try:
+                CTE_value = self.CTE_value_entry.get() 
+                CTE_value = int(CTE_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'CTE [ppm/deg]' value has to be an integer", parent=self.add_material_window)
                 return
         
 
-        #If "rho" value is entered, check if it is integer
-        if(self.rho_value_entry.get() != ""):
+        #If "Density" value is entered, check if it is integer
+        if(self.Density_value_entry.get() != ""):
             try:
-                rho_value = self.rho_value_entry.get() 
-                rho_value = int(rho_value)
+                Density_value = self.Density_value_entry.get() 
+                Density_value = int(Density_value)
             except ValueError:
-                messagebox.showerror("ERROR", "'rho' value has to be an integer", parent=self.add_material_window)
+                messagebox.showerror("ERROR", "'Density [kg/m3]' value has to be an integer", parent=self.add_material_window)
                 return
 
 
-        #If 'sigma' value is entered, check if it is integer 
-        if(self.sigma_value_entry.get() != ""):
+        #If 'Stress_x [MPa]' value is entered, check if it is integer 
+        if(self.Stress_value_entry.get() != ""):
             try:
-                sigma_value = self.sigma_value_entry.get() 
-                sigma_value = int(sigma_value)
+                Stress_value = self.Stress_value_entry.get() 
+                Stress_value = int(Stress_value)
             except ValueError:
-                messagebox.showerror("ERROR", "'sigma' value has to be an integer", parent=self.add_material_window)
+                messagebox.showerror("ERROR", "'Stress_x [MPa]' value has to be an integer", parent=self.add_material_window)
                 return
 
 
-        #If 'nu' value is entered, check if it is integer
-        if(self.nu_value_entry.get() != ""):
+        #If 'Poisson' value is entered, check if it is integer
+        if(self.Poisson_value_entry.get() != ""):
             try:
-                nu_value = self.nu_value_entry.get() 
-                nu_value = int(nu_value)
+                Poisson_value = self.Poisson_value_entry.get() 
+                Poisson_value = int(Poisson_value)
             except ValueError:
-                messagebox.showerror("ERROR", "'nu' value has to be an integer", parent=self.add_material_window)
+                messagebox.showerror("ERROR", "'Poisson' value has to be an integer", parent=self.add_material_window)
                 return
 
 
@@ -561,57 +603,64 @@ class Material_Control_Panel:
         else:
             material_indent = int(self.material_indent_entry.get())
 
-        #E VALUE
-        if(self.E_value_entry.get() == ""):
-            E_value = 0
+        #Modulus [GPa] VALUE
+        if(self.Modulus_value_entry.get() == ""):
+            Modulus_value = 0
         else:
-            E_value = int(self.E_value_entry.get())
+            Modulus_value = int(self.Modulus_value_entry.get())
 
-        #RHO VALUE
-        if(self.rho_value_entry.get() == ""):
-            rho_value = 0
+        #CTE [ppm/deg] VALUE
+        if(self.CTE_value_entry.get() == ""):
+            CTE_value = 0
         else:
-            rho_value = int(self.rho_value_entry.get())
+            CTE_value = int(self.CTE_value_entry.get())
+
+        #Density [kg/m3] VALUE
+        if(self.Density_value_entry.get() == ""):
+            Density_value = 0
+        else:
+            Density_value = int(self.Density_value_entry.get())
         
-        #SIGMA VALUE
-        if(self.sigma_value_entry.get() == ""):
-            sigma_value = 0
+        #Stress_x [MPa] VALUE
+        if(self.Stress_value_entry.get() == ""):
+            Stress_value = 0
         else:
-            sigma_value = int(self.sigma_value_entry.get())
+            Stress_value = int(self.Stress_value_entry.get())
         
-        #NU VALUE
-        if(self.nu_value_entry.get() == ""):
-            nu_value = 0
+        #POISSON VALUE
+        if(self.Poisson_value_entry.get() == ""):
+            Poisson_value = 0
         else:
-            nu_value = int(self.nu_value_entry.get())
+            Poisson_value = int(self.Poisson_value_entry.get())
 
         #Loop through all materials and increment "layer" with 1, assuring that the new material is placed on top of the stack
         for material in globals.materials:
-            globals.materials[material]["layer"] += 1
+            globals.materials[material]["Layer"] += 1
 
         #Add values to dictionary
         info = {
-            "name": str(self.material_name_entry.get()),
-            "layer": 1,
-            "thickness": material_thickness,
-            "unit": "nm",
-            "indent": material_indent,
-            "color": str(self.material_color_entry.get()),
-            "status": "active",
-            "E": E_value,
-            "rho": rho_value,
-            "sigma": sigma_value,
-            "nu": nu_value,
-            "rectangle_id": None,
-            "text_id": None,
-            "text_bbox_id" : None,
-            "line_id": None,
-            "entry_id": None,
-            "slider_id": None,
-            "indent_text_id": None,
-            "indent_text_bbox_id": None,
-            "indent_line_id": None,
-            "indent_arrow_pointer_id": None
+            "Name": str(self.material_name_entry.get()),
+            "Layer": 1,
+            "Thickness": material_thickness,
+            "Unit": "nm",
+            "Indent [nm]": material_indent,
+            "Color": str(self.material_color_entry.get()),
+            "Status": "active",
+            "Modulus [GPa]": Modulus_value,
+            "CTE [ppm/deg]": CTE_value,
+            "Density [kg/m3]": Density_value,
+            "Stress_x [MPa]": Stress_value,
+            "Poisson": Poisson_value,
+            "Rectangle_id": None,
+            "Text_id": None,
+            "Text_bbox_id" : None,
+            "Line_id": None,
+            "Entry_id": None,
+            "Slider_id": None,
+            "Indent_text_id": None,
+            "Indent_text_bbox_id": None,
+            "Indent_line_id": None,
+            "Indent_arrow_pointer_id": None
         }
         
         #Put "info" dictionary into self.materials dictionary
@@ -647,7 +696,7 @@ class Material_Control_Panel:
                 text="Delete", 
                 width=50,
                 height=10,
-                hover_color=globals.materials[material]["color"],
+                hover_color=globals.materials[material]["Color"],
                 command=lambda delete_material=material: self.delete_material_from_dictionary(delete_material)
             )
             delete_button.grid(
@@ -661,7 +710,7 @@ class Material_Control_Panel:
             #Create a "layer" label for current material
             layer_label = customtkinter.CTkLabel(
                 master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=globals.materials[material]["layer"]
+                text=globals.materials[material]["Layer"]
             )
             layer_label.grid(
                 row=row_counter,
@@ -711,8 +760,8 @@ class Material_Control_Panel:
         if chosen_material in globals.materials:
             #The materials with a "layer" value less than chosen material must be decremented to keep materials{} organized by "layer"
             for material in globals.materials:
-                if(globals.materials[material]["layer"] > globals.materials[chosen_material]["layer"]):
-                    globals.materials[material]["layer"] -= 1
+                if(globals.materials[material]["Layer"] > globals.materials[chosen_material]["Layer"]):
+                    globals.materials[material]["Layer"] -= 1
             
             #Delete the key
             del globals.materials[chosen_material]
@@ -762,7 +811,7 @@ class Material_Control_Panel:
                     text="Select", 
                     width=90,
                     height=10,
-                    hover_color=globals.materials[material]["color"],
+                    hover_color=globals.materials[material]["Color"],
                     command=lambda chosen_material=material: self.move_material(chosen_material)
                 )
                 choose_button.grid(
@@ -776,7 +825,7 @@ class Material_Control_Panel:
             #Create a "layer" label for current material
             layer_label = customtkinter.CTkLabel(
                 master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=globals.materials[material]["layer"]
+                text=globals.materials[material]["Layer"]
             )
             layer_label.grid(
                 row=row_counter,
@@ -892,7 +941,7 @@ class Material_Control_Panel:
                         text=f"Place in row: ",#{globals.materials[material]['layer']}", 
                         width=70,
                         height=10,
-                        hover_color=globals.materials[material]["color"],# "#26aa00",
+                        hover_color=globals.materials[material]["Color"],# "#26aa00",
                         command=lambda selected_layer=material, chosen_material=chosen_material: self.edit_layers(chosen_material, selected_layer)
                     )
                     move_here_button.grid(
@@ -906,7 +955,7 @@ class Material_Control_Panel:
             #Create a "layer" label for current material
             layer_label = customtkinter.CTkLabel(
                 master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=globals.materials[material]["layer"],
+                text=globals.materials[material]["Layer"],
             )
             layer_label.grid(
                 row=row_counter,
@@ -955,37 +1004,37 @@ class Material_Control_Panel:
         # print("EDIT_LAYERS()")
 
         #save first material original "layer" value
-        first_material_orig_layer = globals.materials[first_material]["layer"] 
+        first_material_orig_layer = globals.materials[first_material]["Layer"] 
 
         #Save second_material original "layer" value
-        second_material_orig_layer = globals.materials[second_material]["layer"] 
+        second_material_orig_layer = globals.materials[second_material]["Layer"] 
 
         if(first_material_orig_layer > second_material_orig_layer):
             #Change the layer value in chosen material to the selected layer
-            globals.materials[first_material]["layer"] = globals.materials[second_material]["layer"]
+            globals.materials[first_material]["Layer"] = globals.materials[second_material]["Layer"]
 
             #For everything that is lower than first material layer, excluding the first_material
             for material in globals.materials:
                 if(material != first_material):
-                    if(globals.materials[material]["layer"] < first_material_orig_layer):
-                        if(globals.materials[material]["layer"] >= second_material_orig_layer):
-                            globals.materials[material]["layer"] += 1
+                    if(globals.materials[material]["Layer"] < first_material_orig_layer):
+                        if(globals.materials[material]["Layer"] >= second_material_orig_layer):
+                            globals.materials[material]["Layer"] += 1
         
         #first_material layer is less than second_material layer
         else:
             #Change the layer value in chosen material to the selected layer
-            globals.materials[first_material]["layer"] = globals.materials[second_material]["layer"]
+            globals.materials[first_material]["Layer"] = globals.materials[second_material]["Layer"]
 
             #For everything that is higher than first material layer, excluding the first_material
             for material in globals.materials:
                 if(material != first_material):
-                    if(globals.materials[material]["layer"] > first_material_orig_layer):
-                        if(globals.materials[material]["layer"] <= second_material_orig_layer):
-                            globals.materials[material]["layer"] -= 1
+                    if(globals.materials[material]["Layer"] > first_material_orig_layer):
+                        if(globals.materials[material]["Layer"] <= second_material_orig_layer):
+                            globals.materials[material]["Layer"] -= 1
 
 
         #Order globals.materials{} in order of "layer"
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
 
         #Redraw the material stack
         globals.layer_stack_canvas.draw_material_stack()
@@ -1029,6 +1078,21 @@ class Material_Control_Panel:
 
         #Create an filename and a workbook to contain data
         filename = "exported_materials.xlsx"
+
+        #Create main folder if it does not already exist
+        main_folder = "exports"
+        if not os.path.exists(main_folder):
+            os.makedirs(main_folder)
+
+        #Create sub_folder if it does not already exist
+        sub_folder = "excel"
+        if not os.path.exists(f"{main_folder}/{sub_folder}"):
+            os.makedirs(f"{main_folder}/{sub_folder}")
+        
+
+        #Create path for file to be saved in
+        file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
+
         workbook = Workbook()
 
         # Optionally, rename the default sheet
@@ -1042,15 +1106,16 @@ class Material_Control_Panel:
         sheet["D1"] = "Indent [nm]"
         sheet["E1"] = "Color"
         sheet["F1"] = "Modulus [GPa]"
-        sheet["G1"] = "Density [Kg/m3]"
-        sheet["H1"] = "In-plane stress [MPa]"
-        sheet["I1"] = "Poisson"
+        sheet["G1"] = "CTE [ppm/deg]"
+        sheet["H1"] = "Density [kg/m3]"
+        sheet["I1"] = "Stress_x [MPa]"
+        sheet["J1"] = "Poisson"
 
         #Define a fill_color for cells
         fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
 
         #Loop through the desired range of columns and rows to apply the fill_color and set a bold font
-        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=9):  # Adjust row/column range as needed
+        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=10):  # Adjust row/column range as needed
             for cell in row:
                 cell.font = Font(bold=True)
                 cell.fill = fill_color
@@ -1064,25 +1129,42 @@ class Material_Control_Panel:
             bottom=Side(style="thin")
         )
 
-        #Apply the border to a range of cells
-        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=9):  # Adjust range as needed
+        #Apply the border to a range of cells and center the text in each cell
+        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=10):  # Adjust range as needed
             for cell in row:
                 cell.border = thin_border
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        #Set the height and width values of cells in the excel file
+        sheet.column_dimensions['A'].width = 13  #Width of column A
+        sheet.column_dimensions['B'].width = 10  
+        sheet.column_dimensions['C'].width = 6  
+        sheet.column_dimensions['D'].width = 13  
+        sheet.column_dimensions['E'].width = 10  
+        sheet.column_dimensions['F'].width = 15  
+        sheet.column_dimensions['G'].width = 15  
+        sheet.column_dimensions['H'].width = 15
+        sheet.column_dimensions['I'].width = 15  
+        sheet.column_dimensions['J'].width = 10
+
+        # Set row height
+        # sheet.row_dimensions[1].height = 20  # Height of row 1 set to 30
 
 
         #Loop through materials{} and place values in excel file
         row_counter = 2
 
         for material in globals.materials:
-            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["name"])
-            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["thickness"])
-            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["unit"])
-            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["indent"])
-            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["color"])
-            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["E"])
-            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["rho"])
-            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["sigma"])
-            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["nu"])
+            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["Name"])
+            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness"])
+            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"])
+            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["Indent [nm]"])
+            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["Color"])
+            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["Modulus [GPa]"])
+            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["CTE [ppm/deg]"])
+            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"])
+            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"])
+            sheet.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"])
 
             #increment row_counter
             row_counter += 1
@@ -1098,17 +1180,17 @@ class Material_Control_Panel:
 
         #Take a screenshot of the screen where canvas is
         screenshot = ImageGrab.grab(bbox=bbox)
-        screenshot.save("canvasPNG.png", "PNG")
+        screenshot.save(f"{main_folder}/{sub_folder}/canvas_screenshot.png", "PNG")
 
         #Load the image with openpyxl
-        img = Image("canvasPNG.png")
+        canvas_screenshot = Image(f"{main_folder}/{sub_folder}/canvas_screenshot.png")
 
         #Set the width and height of image placed in excel file
-        img.width = 750
-        img.height = 350
+        canvas_screenshot.width = 750
+        canvas_screenshot.height = 350
 
         #Add the image to the excel file
-        sheet.add_image(img, "K1")
+        sheet.add_image(canvas_screenshot, "L1")
 
         #Save the workbook as excel file
-        workbook.save(filename)
+        workbook.save(f"{main_folder}/{sub_folder}/{filename}")

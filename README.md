@@ -34,17 +34,18 @@
 
         materials = {
             "material_name":
-                {"layer" : int(value)},
-                {"name"} : str(value)},
-                {"thickness": int(value)},
-                {"unit" : str(value)},
-                {"indent" : int(value)},
-                {"color" : str(value)},
-                {"status" : str(value)},
-                {"E": int(value)},
-                {"rho": int(value)},
-                {"sigma": int(value)},
-                {"nu": int(value),
+                {"Name"} : str(value)},
+                {"Layer"}: int(value),
+                {"Thickness": int(value)},
+                {"Unit" : str(value)},
+                {"Indent [nm]" : int(value)},
+                {"Color" : str(value)},
+                {"Status" : str(value)},
+                {"Modulus [GPa]": int(value)}, == E
+                {"CTE [ppm/deg]": int(value)}
+                {"Density [kg/m3]": int(value)}, == rho
+                {"Stress_x [MPa]": int(value)}, == sigma
+                {"Poisson": int(value), == nu
                 {"entry_id": tkinter(value)},
                 {"slider_id": tkinter(value)},
                 {"rectangle_id": tkinter(value)},
@@ -57,8 +58,6 @@
                 {"indent_arrow_pointer_id": tkinter(value)}
         }
 
-
-        self.materials[material_name] = {"layer": 0, "name": "gull", "thickness":30, "unit":"nm", "indent": 69, "color": "blue", "status": "active/disabled", "rectangle_id": None, "text_id": None, "text_bbox_id": None, line_id": None, "entry_id": None, "slider_id": None, "indent_text_id": None, "indent_arrow_id": None}
 
 
     *Class Organization and inheritance
@@ -98,6 +97,15 @@
 
 
     TO DO           
+        -Endre "add material" knappen til en grønn knapp med et pluss tegn
+
+        -Fjern "delete material" lag heller en "x" knapp på venstre side av materialet
+        -Fjern "modify material" og lag heller "pil opp/ned" på høyre siden av materialet for å flytte på det
+
+        -I "stepped view": hvis "indent==0" så skal ikke en pil til "indent" lages
+
+        -Lag en knapp "modify material" som lar bruker endre på alle parametre til et materiale 
+        
         -Fix bugs
 
         -Add functionality to change color of the materials? add a color palette?

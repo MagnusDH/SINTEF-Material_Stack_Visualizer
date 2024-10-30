@@ -131,7 +131,7 @@ class Material_Adjustment_Panel:
                     pady=(0,0)
                 )
                 entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                globals.materials[material]["entry_id"] = entry
+                globals.materials[material]["Entry_id"] = entry
 
                 #Create Slider, customize it and add it to dictionary
                 slider = customtkinter.CTkSlider(
@@ -140,7 +140,7 @@ class Material_Adjustment_Panel:
                     height=settings.material_adjustment_panel_slider_height,
                     from_=settings.material_adjustment_panel_slider_range_min, 
                     to=settings.material_adjustment_panel_slider_range_max,
-                    progress_color=globals.materials[material]["color"],
+                    progress_color=globals.materials[material]["Color"],
                     fg_color=settings.material_adjustment_panel_slider_color,
                     button_hover_color=settings.material_adjustment_panel_slider_hover_color,
                     command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
@@ -152,26 +152,26 @@ class Material_Adjustment_Panel:
                     padx=(0,0),
                     pady=(0,0)
                 )
-                globals.materials[material]["slider_id"] = slider 
+                globals.materials[material]["Slider_id"] = slider 
 
                 #Set slider and entry values, based on the option_manu value
                 match globals.option_menu:
                     case "Stacked" | "Realistic" | "Stress":
-                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["thickness"])))
-                        slider.set(globals.materials[material]["thickness"])
+                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                        slider.set(globals.materials[material]["Thickness"])
                     
                     case "Stepped":
-                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["indent"])))
-                        slider.set(globals.materials[material]["indent"])
+                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
+                        slider.set(globals.materials[material]["Indent [nm]"])
 
 
                 #Disable slider and Entry if specified by the excel-file
-                if(globals.materials[material]["status"] == "disabled"):
-                    globals.materials[material]["slider_id"].configure(state="disabled") #Disable slider
-                    globals.materials[material]["entry_id"].delete(0, tkinter.END)     #Disable Entry
-                    globals.materials[material]["entry_id"].insert(0, "Disabled")      #Disable Entry
-                    globals.materials[material]["entry_id"].configure(state="disabled")#Disable Entry
-                globals.materials[material]["slider_id"] = slider 
+                if(globals.materials[material]["Status"] == "disabled"):
+                    globals.materials[material]["Slider_id"].configure(state="disabled") #Disable slider
+                    globals.materials[material]["Entry_id"].delete(0, tkinter.END)     #Disable Entry
+                    globals.materials[material]["Entry_id"].insert(0, "Disabled")      #Disable Entry
+                    globals.materials[material]["Entry_id"].configure(state="disabled")#Disable Entry
+                globals.materials[material]["Slider_id"] = slider 
 
                 #Increment row_counter
                 self.row_counter+=1
@@ -186,26 +186,26 @@ class Material_Adjustment_Panel:
             case "Stacked" | "Realistic" | "Stress":
                 #Find material that corresponds to "entry"
                 for material in globals.materials:
-                    if(globals.materials[material]["entry_id"] == entry):
+                    if(globals.materials[material]["Entry_id"] == entry):
                         #Find entered value
                         entered_value = int(entry.get())
                         #Update the thickness value in self.materials
-                        globals.materials[material]["thickness"] = entered_value
+                        globals.materials[material]["Thickness"] = entered_value
 
                         #Update the slider corresponding to the key
-                        globals.materials[material]["slider_id"].set(entered_value)
+                        globals.materials[material]["Slider_id"].set(entered_value)
 
             case "Stepped":
                 #Find material that corresponds to "entry"
                 for material in globals.materials:
-                    if(globals.materials[material]["entry_id"] == entry):
+                    if(globals.materials[material]["Entry_id"] == entry):
                         #Find entered value
                         entered_value = int(entry.get())
                         #Update the thickness value in self.materials
-                        globals.materials[material]["indent"] = entered_value
+                        globals.materials[material]["Indent [nm]"] = entered_value
 
                         #Update the slider corresponding to the key
-                        globals.materials[material]["slider_id"].set(entered_value)
+                        globals.materials[material]["Slider_id"].set(entered_value)
         
         
         #Redraw material stack
@@ -220,19 +220,19 @@ class Material_Adjustment_Panel:
         match globals.canvas_control_panel.option_menu.get():
             case "Stacked"|"Realistic" | "Stress":
                 #Update the thickness value in self.materials
-                globals.materials[identifier]["thickness"] = value
+                globals.materials[identifier]["Thickness"] = value
 
                 #Update the entry corresponding to key
-                globals.materials[identifier]["entry_id"].delete(0, tkinter.END)
-                globals.materials[identifier]["entry_id"].insert(0, value)
+                globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
+                globals.materials[identifier]["Entry_id"].insert(0, value)
             
             case "Stepped":
                 #Update the "indent" value in self.materials
-                globals.materials[identifier]["indent"] = value
+                globals.materials[identifier]["Indent [nm]"] = value
 
                 #Update the entry corresponding to key
-                globals.materials[identifier]["entry_id"].delete(0, tkinter.END)
-                globals.materials[identifier]["entry_id"].insert(0, value)
+                globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
+                globals.materials[identifier]["Entry_id"].insert(0, value)
 
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
