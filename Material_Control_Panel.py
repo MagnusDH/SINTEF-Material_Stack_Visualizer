@@ -49,36 +49,17 @@ class Material_Control_Panel:
         #Create button to "add material" and place it
         add_material_button = customtkinter.CTkButton(
             master=self.material_control_panel_frame, 
-            width=100,
-            height=25,
-            text="Add material", 
-            fg_color=settings.material_control_panel_button_color,
-            hover_color=settings.material_control_panel_button_hover_color,
+            width=35,
+            height=35,
+            text="+", 
+            fg_color="#008c00", #settings.material_control_panel_button_color,
+            hover_color="#00cd00", #settings.material_control_panel_button_hover_color,
             text_color=settings.material_control_panel_text_color,
+            font=(settings.text_font, -25),
             command=self.add_material
         )
         add_material_button.grid(
             row=0,
-            column=0,
-            sticky="",
-            padx=(5,0),
-            pady=(5,0)
-        )
-
-        #Create button to "delete material" and place it
-        delete_material_button = customtkinter.CTkButton(
-            master=self.material_control_panel_frame, 
-            width=100,
-            height=25,
-            text="Delete material", 
-            fg_color=settings.material_control_panel_button_color,
-            hover_color=settings.material_control_panel_button_hover_color,
-            text_color=settings.material_control_panel_text_color,
-            command=self.delete_material
-
-        )
-        delete_material_button.grid(
-            row=1,
             column=0,
             sticky="",
             padx=(5,0),
@@ -669,116 +650,7 @@ class Material_Control_Panel:
         #Sort the materials dictionary after the "layer" value
         globals.app.sort_dictionary()
         # globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
-
-
-    """
-    -Deletes all widgets from material_adjustment_panel and material_control_panel
-    -Renders materials along with delete buttons in material_adjustment_panel_frame
-    -Renders a 'cancel_edit' button in material_control_panel_frame
-    """
-    def delete_material(self):
-        print("DELETE_MATERIAL()")
-
-        #Delete all the widgets in the "material_adjustment_panel"
-        for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
-            widget.destroy()
-        
-        #Delete all the widgets in the "material_control_panel"
-        for widget in globals.material_control_panel.material_control_panel_frame.winfo_children():
-            widget.destroy()
-        
-        #Render material labels to delete and delete buttons in material_adjustment_frame
-        row_counter = 0
-        for material in globals.materials:
-            #Create a "choose material" button and place it, but skip "substrate"
-            delete_button = customtkinter.CTkButton(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
-                text="Delete", 
-                width=50,
-                height=10,
-                hover_color=globals.materials[material]["Color"],
-                command=lambda delete_material=material: self.delete_material_from_dictionary(delete_material)
-            )
-            delete_button.grid(
-                row=row_counter,
-                column=0,
-                sticky="",
-                padx=(0,0),
-                pady=(0,0)
-            )
-
-            #Create a "layer" label for current material
-            layer_label = customtkinter.CTkLabel(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=globals.materials[material]["Layer"]
-            )
-            layer_label.grid(
-                row=row_counter,
-                column=1,
-                sticky="",
-                padx=(10,0),
-                pady=(0,0)
-            )
-
-            #Create a "layer" label for current material
-            material_label = customtkinter.CTkLabel(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=material
-            )
-            material_label.grid(
-                row=row_counter,
-                column=1,
-                sticky="",
-                padx=(10,0),
-                pady=(0,0)
-            )
-
-            row_counter += 1
-        
-        #Render a "cancel edit mode" button, and place it
-        cancel_edit_mode_button = customtkinter.CTkButton(
-            master=globals.material_control_panel.material_control_panel_frame, 
-            text="Done deleting", 
-            width=70,
-            height=10,
-            command=self.finish_edit
-        )
-        cancel_edit_mode_button.grid(
-            row=0,
-            column=0,
-            sticky="",
-            padx=(140,0),
-            pady=(25,0)
-        )
-        
-
-    """Deletes given material from the materials{} dictionary, reorders the materials{} dictionary and redraws the material_stack"""
-    def delete_material_from_dictionary(self, chosen_material):
-        #print("DELETE_MATERIAL_FROM_DICTIONARY()")
-
-        #check if given material key is in dictionary
-        if chosen_material in globals.materials:
-            #The materials with a "layer" value less than chosen material must be decremented to keep materials{} organized by "layer"
-            for material in globals.materials:
-                if(globals.materials[material]["Layer"] > globals.materials[chosen_material]["Layer"]):
-                    globals.materials[material]["Layer"] -= 1
-            
-            #Delete the key
-            del globals.materials[chosen_material]
-
-            #Render the "delete material" frame again with less materials
-            self.delete_material()
-
-            #Update the material_adjustment_panel
-            # self.create_material_adjustment_panel()
-
-            #Re-draw the material stack
-            globals.layer_stack_canvas.draw_material_stack()
-
-        
-        else:
-            messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
-
+       
 
     """
     -Deletes all widgets from material_adjustment_panel, material_control_panel and canvas_control_panel

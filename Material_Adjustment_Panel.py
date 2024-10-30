@@ -98,6 +98,26 @@ class Material_Adjustment_Panel:
         if(len(globals.materials) > 0):
 
             for material in globals.materials: 
+                #Button to delete material
+                delete_material_button = customtkinter.CTkButton(
+                    master=self.material_adjustment_panel_frame, 
+                    width=1,
+                    height=1,
+                    text="✕", #✕ 🗑 🛠  ✔️ ⬆️ ⬇️ 🔼 🔽
+                    font=(settings.text_font, -15),
+                    fg_color="#820000",
+                    hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
+                    text_color=settings.material_control_panel_text_color,
+                    command=lambda material=material: self.delete_material(material)
+                )
+                delete_material_button.grid(
+                    row=self.row_counter,
+                    column=0,
+                    sticky="",
+                    padx=(0,0),
+                    pady=(0,0)
+                )
+
                 label = customtkinter.CTkLabel(
                     master=self.material_adjustment_panel_frame, 
                     text=material, 
@@ -238,23 +258,30 @@ class Material_Adjustment_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    # """Deletes a material from the materials{} dictionary and updates the material_adjustment_panel"""
-    # def delete_material(self, material):
-    #     #print("DELETE_MATERIAL()")
+    """
+    -Deletes given material from the materials{} dictionary
+    -Reorders the materials{} dictionary
+    -Reorders the material adjustment panel
+    -Redraws the material_stack
+    """
+    def delete_material(self, chosen_material):
+        #print("DELETE_MATERIAL()")
+
+        #check if given material key is in dictionary
+        if chosen_material in globals.materials:
+            #The materials with a "layer" value less than chosen material must be decremented to keep materials{} organized by "layer"
+            for material in globals.materials:
+                if(globals.materials[material]["Layer"] > globals.materials[chosen_material]["Layer"]):
+                    globals.materials[material]["Layer"] -= 1
+            
+            #Delete the key
+            del globals.materials[chosen_material]
+
+            #Update the material_adjustment_panel
+            self.create_material_adjustment_panel()
+
+            #Re-draw the material stack
+            globals.layer_stack_canvas.draw_material_stack()
         
-    #     #check if given material key is in dictionary
-    #     if material in globals.materials:
-    #         #Delete the key
-    #         del globals.materials[material]
-
-    #         #You might have to Update the "layer" values in globals.materials{}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    #         #Update the material_adjustment_panel
-    #         self.create_material_adjustment_panel()
-
-    #         #Re-draw the material stack
-    #         globals.layer_stack_canvas.draw_material_stack()
-
-        
-    #     else:
-    #         messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
+        else:
+            messagebox.showerror("ERROR", "Could not find material-key in globals.materials")

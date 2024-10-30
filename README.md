@@ -97,9 +97,6 @@
 
 
     TO DO           
-        -Endre "add material" knappen til en grønn knapp med et pluss tegn
-
-        -Fjern "delete material" lag heller en "x" knapp på venstre side av materialet
         -Fjern "modify material" og lag heller "pil opp/ned" på høyre siden av materialet for å flytte på det
 
         -I "stepped view": hvis "indent==0" så skal ikke en pil til "indent" lages
