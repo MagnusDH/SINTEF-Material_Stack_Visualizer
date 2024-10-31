@@ -191,6 +191,7 @@ class App:
                         "Density [kg/m3]": row["Density [kg/m3]"],
                         "Stress_x [MPa]": row["Stress_x [MPa]"],
                         "Poisson": row["Poisson"],
+                        "Label_name_id": None,
                         "Entry_id": None,
                         "Slider_id": None,
                         "Rectangle_id": None,

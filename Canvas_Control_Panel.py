@@ -366,7 +366,7 @@ class Canvas_Control_Panel:
                         globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
 
                 #Set new dimensions for layer_stack_canvas
-                globals.layer_stack_canvas.layer_stack_canvas.configure(width=525)
+                globals.layer_stack_canvas.layer_stack_canvas.configure(width=510)
                 globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
                 globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
                 globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0

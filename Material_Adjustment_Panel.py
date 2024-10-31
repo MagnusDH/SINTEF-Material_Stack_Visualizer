@@ -103,12 +103,12 @@ class Material_Adjustment_Panel:
                     master=self.material_adjustment_panel_frame, 
                     width=1,
                     height=1,
-                    text="✕", #✕ 🗑 🛠  ✔️ ⬆️ ⬇️ 🔼 🔽
-                    font=(settings.text_font, -15),
+                    text="✕", #✕ 🗑
+                    font=(settings.text_font, -15, "bold"),
                     fg_color="#820000",
                     hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
                     text_color=settings.material_control_panel_text_color,
-                    command=lambda material=material: self.delete_material(material)
+                    command=lambda button_layer=self.row_counter: self.delete_material(button_layer)
                 )
                 delete_material_button.grid(
                     row=self.row_counter,
@@ -131,6 +131,8 @@ class Material_Adjustment_Panel:
                     padx=(0,0),
                     pady=(0,0)
                 )
+                #Add label to dictionary
+                globals.materials[material]["Label_name_id"] = label
 
 
                 #Create Entry, customize it and add it to dictionary
@@ -192,6 +194,47 @@ class Material_Adjustment_Panel:
                     globals.materials[material]["Entry_id"].insert(0, "Disabled")      #Disable Entry
                     globals.materials[material]["Entry_id"].configure(state="disabled")#Disable Entry
                 globals.materials[material]["Slider_id"] = slider 
+
+                #Create buttons to move layer up or down
+                if(material.lower() != "substrate"):
+                    move_down_button = customtkinter.CTkButton(
+                        master=self.material_adjustment_panel_frame, 
+                        width=20,
+                        height=1,
+                        text="⬇", #⬆ ⬇ 🔼 🔽
+                        font=(settings.text_font, -15),
+                        fg_color="white", #settings.material_adjustment_panel_button_color,
+                        hover_color=settings.material_adjustment_panel_button_hover_color, 
+                        text_color="blue", #settings.material_adjustment_panel_text_color,
+                        command=lambda material=material, up_or_down="down", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                    )
+                    move_down_button.grid(
+                        row=self.row_counter,
+                        column=4,
+                        sticky="",
+                        padx=(5,0),
+                        pady=(0,0)
+                    )
+                    move_up_button = customtkinter.CTkButton(
+                        master=self.material_adjustment_panel_frame, 
+                        width=20,
+                        height=1,
+                        text="⬆", #⬆ ⬇ 🔼 🔽
+                        font=(settings.text_font, -15),
+                        fg_color="white", #settings.material_adjustment_panel_button_color,
+                        hover_color=settings.material_adjustment_panel_button_hover_color, 
+                        text_color="blue",#settings.material_adjustment_panel_text_color,
+                        command=lambda material=material, up_or_down="up", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+
+                    )
+                    move_up_button.grid(
+                        row=self.row_counter,
+                        column=5,
+                        sticky="",
+                        padx=(7,0),
+                        pady=(0,0)
+                    )
+
 
                 #Increment row_counter
                 self.row_counter+=1
@@ -259,29 +302,129 @@ class Material_Adjustment_Panel:
 
 
     """
-    -Deletes given material from the materials{} dictionary
+    -Deletes the material that has the same layer value as 'button_layer' from the materials{} dictionary
+    -Decrements the materials with a layer value above 'button_layer'
     -Reorders the materials{} dictionary
-    -Reorders the material adjustment panel
+    -Re-renders the material adjustment panel
     -Redraws the material_stack
     """
-    def delete_material(self, chosen_material):
+    def delete_material(self, button_layer):
         #print("DELETE_MATERIAL()")
 
-        #check if given material key is in dictionary
-        if chosen_material in globals.materials:
-            #The materials with a "layer" value less than chosen material must be decremented to keep materials{} organized by "layer"
-            for material in globals.materials:
-                if(globals.materials[material]["Layer"] > globals.materials[chosen_material]["Layer"]):
-                    globals.materials[material]["Layer"] -= 1
-            
-            #Delete the key
-            del globals.materials[chosen_material]
+        #Go through all materials
+        for material in globals.materials:
+            #Delete the material at the same row as button layer
+            if(globals.materials[material]["Layer"] == button_layer):
+                delete_material = material
 
-            #Update the material_adjustment_panel
-            self.create_material_adjustment_panel()
+            #Decrement the layer value of materials above button_layer/deleted material
+            if(globals.materials[material]["Layer"] > button_layer):
+                globals.materials[material]["Layer"] -= 1
 
-            #Re-draw the material stack
-            globals.layer_stack_canvas.draw_material_stack()
+        del globals.materials[delete_material]
+
+        #Sort the materials{} dictionary
+        globals.app.sort_dictionary()
         
+        #Update the material_adjustment_panel
+        self.create_material_adjustment_panel()
+
+        #Re-draw the material stack
+        globals.layer_stack_canvas.draw_material_stack()
+        
+
+        
+
+        # #check if given material key is in dictionary
+        # if chosen_material in globals.materials:
+        #     #The materials with a "layer" value less than chosen material must be decremented to keep materials{} organized by "layer"
+        #     for material in globals.materials:
+        #         if(globals.materials[material]["Layer"] > globals.materials[chosen_material]["Layer"]):
+        #             globals.materials[material]["Layer"] -= 1
+            
+        #     #Delete the key
+        #     del globals.materials[chosen_material]
+
+        #     #Update the material_adjustment_panel
+        #     self.create_material_adjustment_panel()
+
+        #     #Re-draw the material stack
+        #     globals.layer_stack_canvas.draw_material_stack()
+        
+        # else:
+        #     messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
+
+
+    """
+    -Switches the places between chosen material and whatever material is over or under it
+    -Organizes materials{} so that the order of "layers" is consistent
+    -Redraws the material stack
+    -Switches the grid places of the modified materials Label_name:id, Entry_id and Slider_id in the material_adjustment_panel
+    """
+    def move_material(self, chosen_material, up_or_down, button_layer):
+        # print("MOVE_MATERIAL()")
+
+        #Find the needed material names
+        chosen_material = None
+        above_material = None
+        below_material = None
+        for material in globals.materials:
+            if(globals.materials[material]["Layer"] == button_layer):
+                chosen_material = material
+
+            if(globals.materials[material]["Layer"] == button_layer-1):
+                above_material = material
+            
+            if(globals.materials[material]["Layer"] == button_layer+1):
+                below_material = material
+
+        #Move chosen_material up one layer and above_material down one layer 
+        if(up_or_down == "up"):
+            #Skip this function if the user tries to move the material to row zero, which does not exist
+            if(button_layer == 1):
+                return
+
+            #Switch places of the chosen material and the material above chosen material
+            tmp_layer = globals.materials[chosen_material]["Layer"]
+            globals.materials[chosen_material]["Layer"] = globals.materials[above_material]["Layer"]
+            globals.materials[above_material]["Layer"] = tmp_layer
+
+            #Sort the dictionary
+            globals.app.sort_dictionary()
+
+            #Redraw the material stack
+            globals.layer_stack_canvas.draw_material_stack()
+                    
+            #Move the chosen_material label, entry_id and slider_id
+            globals.materials[chosen_material]["Slider_id"].grid(row=globals.materials[chosen_material]["Layer"])
+            globals.materials[chosen_material]["Entry_id"].grid(row=globals.materials[chosen_material]["Layer"])
+            globals.materials[chosen_material]["Label_name_id"].grid(row=globals.materials[chosen_material]["Layer"])
+
+            #Move the replaced materials label, entry_id and slider_id
+            globals.materials[above_material]["Slider_id"].grid(row=globals.materials[above_material]["Layer"])
+            globals.materials[above_material]["Entry_id"].grid(row=globals.materials[above_material]["Layer"])
+            globals.materials[above_material]["Label_name_id"].grid(row=globals.materials[above_material]["Layer"])
+
+
+        #Move chosen_material down one layer and below_material up one layer 
         else:
-            messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
+            #Switch places of the chosen material and the material above chosen material
+            tmp_layer = globals.materials[chosen_material]["Layer"]
+            globals.materials[chosen_material]["Layer"] = globals.materials[below_material]["Layer"]
+            globals.materials[below_material]["Layer"] = tmp_layer
+
+            #Sort the dictionary
+            globals.app.sort_dictionary()
+
+            #Redraw the material stack
+            globals.layer_stack_canvas.draw_material_stack()
+                    
+            #Move the chosen_material label, entry_id and slider_id to its new place in the material_adjustment_panel
+            globals.materials[chosen_material]["Slider_id"].grid(row=globals.materials[chosen_material]["Layer"])
+            globals.materials[chosen_material]["Entry_id"].grid(row=globals.materials[chosen_material]["Layer"])
+            globals.materials[chosen_material]["Label_name_id"].grid(row=globals.materials[chosen_material]["Layer"])
+
+            #Move the below_materials label, entry_id and slider_id to its new place in the material_adjustment_panel
+            globals.materials[below_material]["Slider_id"].grid(row=globals.materials[below_material]["Layer"])
+            globals.materials[below_material]["Entry_id"].grid(row=globals.materials[below_material]["Layer"])
+            globals.materials[below_material]["Label_name_id"].grid(row=globals.materials[below_material]["Layer"])

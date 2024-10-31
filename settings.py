@@ -27,7 +27,7 @@ main_frame_background_color = "#00192c"
 
 
 #MATERIAL ADJUSTMENT PANEL
-material_adjustment_panel_width = 340
+material_adjustment_panel_width = 355
 material_adjustment_panel_height = 405
 material_adjustment_panel_padding_top = 5
 material_adjustment_panel_padding_bottom = 0
@@ -49,7 +49,7 @@ material_adjustment_panel_button_hover_color = "#009ffb"
 
 
 #MATERIAL CONTROL PANEL
-material_control_panel_width = 363
+material_control_panel_width = 378
 material_control_panel_height = 70
 material_control_panel_background_color = material_adjustment_panel_background_color
 material_control_panel_padding_top = 5
@@ -72,7 +72,7 @@ add_material_window_button_hover_color = material_adjustment_panel_button_hover_
 
 
 #LAYER STACK CANVAS
-layer_stack_canvas_width = 1050
+layer_stack_canvas_width = 1040
 layer_stack_canvas_height = 520
 layer_stack_canvas_padding_top = 5
 layer_stack_canvas_padding_bottom = 0
@@ -102,7 +102,7 @@ layer_stack_canvas_control_panel_button_hover_color = material_adjustment_panel_
 
 
 #GRAPH FRAME
-graph_frame_width = 600
+graph_frame_width = 585
 graph_frame_height = 500
 graph_frame_background_color = material_adjustment_panel_background_color
 graph_frame_padding_top = 5

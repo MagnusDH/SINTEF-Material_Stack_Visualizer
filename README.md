@@ -46,6 +46,7 @@
                 {"Density [kg/m3]": int(value)}, == rho
                 {"Stress_x [MPa]": int(value)}, == sigma
                 {"Poisson": int(value), == nu
+                {"Label_name_id": tkinter(value)},                      #ID of the label in material_adjustment_panel 
                 {"entry_id": tkinter(value)},
                 {"slider_id": tkinter(value)},
                 {"rectangle_id": tkinter(value)},
@@ -97,8 +98,6 @@
 
 
     TO DO           
-        -Fjern "modify material" og lag heller "pil opp/ned" på høyre siden av materialet for å flytte på det
-
         -I "stepped view": hvis "indent==0" så skal ikke en pil til "indent" lages
 
         -Lag en knapp "modify material" som lar bruker endre på alle parametre til et materiale 

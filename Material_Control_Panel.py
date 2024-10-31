@@ -66,24 +66,24 @@ class Material_Control_Panel:
             pady=(5,0)
         )
 
-        #Create button to modify the order of materials, and place the button
-        modify_order_button = customtkinter.CTkButton(
-            master=self.material_control_panel_frame, 
-            width=100,
-            height=25,
-            text="Modify order", 
-            fg_color=settings.material_control_panel_button_color,
-            hover_color=settings.material_control_panel_button_hover_color,
-            text_color=settings.material_control_panel_text_color,
-            command=self.choose_material
-        )
-        modify_order_button.grid(
-            row=0,
-            column=1,
-            sticky="",
-            padx=(5,0),
-            pady=(5,0)
-        )
+        # #Create button to modify the order of materials, and place the button
+        # modify_order_button = customtkinter.CTkButton(
+        #     master=self.material_control_panel_frame, 
+        #     width=100,
+        #     height=25,
+        #     text="Modify order", 
+        #     fg_color=settings.material_control_panel_button_color,
+        #     hover_color=settings.material_control_panel_button_hover_color,
+        #     text_color=settings.material_control_panel_text_color,
+        #     command=self.choose_material
+        # )
+        # modify_order_button.grid(
+        #     row=0,
+        #     column=1,
+        #     sticky="",
+        #     padx=(5,0),
+        #     pady=(5,0)
+        # )
 
         #Create button to export materials{} and stack to a excel file
         export_as_excel_button = customtkinter.CTkButton(
@@ -632,6 +632,7 @@ class Material_Control_Panel:
             "Density [kg/m3]": Density_value,
             "Stress_x [MPa]": Stress_value,
             "Poisson": Poisson_value,
+            "Label_name_id": None,
             "Rectangle_id": None,
             "Text_id": None,
             "Text_bbox_id" : None,
@@ -652,296 +653,296 @@ class Material_Control_Panel:
         # globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["layer"]))
        
 
-    """
-    -Deletes all widgets from material_adjustment_panel, material_control_panel and canvas_control_panel
-    -Renders materials along with a 'select' button on the side
-    -Renders a 'cancel edit' button
-    """
-    def choose_material(self):
-        # print("CHOOSE_MATERIAL()")
+    # """
+    # -Deletes all widgets from material_adjustment_panel, material_control_panel and canvas_control_panel
+    # -Renders materials along with a 'select' button on the side
+    # -Renders a 'cancel edit' button
+    # """
+    # def choose_material(self):
+    #     # print("CHOOSE_MATERIAL()")
 
-        #Delete all the widgets in the "material_adjustment_panel"
-        for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
-            widget.destroy()
+    #     #Delete all the widgets in the "material_adjustment_panel"
+    #     for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
+    #         widget.destroy()
         
-        #Delete all the widgets in the "canvas_control_panel"
-        for widget in globals.canvas_control_panel.canvas_control_panel_frame.winfo_children():
-            widget.destroy()
+    #     #Delete all the widgets in the "canvas_control_panel"
+    #     for widget in globals.canvas_control_panel.canvas_control_panel_frame.winfo_children():
+    #         widget.destroy()
 
-        #Delete all the widgets in the "material_control_panel"
-        for widget in globals.material_control_panel.material_control_panel_frame.winfo_children():
-            widget.destroy()   
-
-
-        #Render all materials with a checkbox on the left side
-        row_counter = 0
-        for material in globals.materials:
-            if(material.lower() != "substrate"):
-                #Create a "choose material" button and place it
-                choose_button = customtkinter.CTkButton(
-                    master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
-                    text="Select", 
-                    width=90,
-                    height=10,
-                    hover_color=globals.materials[material]["Color"],
-                    command=lambda chosen_material=material: self.move_material(chosen_material)
-                )
-                choose_button.grid(
-                    row=row_counter,
-                    column=0,
-                    sticky="",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
-
-            #Create a "layer" label for current material
-            layer_label = customtkinter.CTkLabel(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=globals.materials[material]["Layer"]
-            )
-            layer_label.grid(
-                row=row_counter,
-                column=1,
-                sticky="",
-                padx=(10,0),
-                pady=(0,0)
-            )
-
-            #Create a label for current material
-            material_label = customtkinter.CTkLabel(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=material,
-            )
-            material_label.grid(
-                row=row_counter,
-                column=2,
-                sticky="",
-                padx=(10,0),
-                pady=(0,0)
-            )
-
-            row_counter += 1
-
-        #Render an explanation on how the editing works
-        explanation_label = customtkinter.CTkLabel(
-            master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-            text="Please select the material \nyou want to move",
-            fg_color="#36556c"
-        )
-        explanation_label.grid(
-            row=0,
-            column=4,
-            sticky="e",
-            padx=(20,0),
-            pady=(0,0)
-        )
+    #     #Delete all the widgets in the "material_control_panel"
+    #     for widget in globals.material_control_panel.material_control_panel_frame.winfo_children():
+    #         widget.destroy()   
 
 
-        #Render a "cancel edit mode" button, and place it
-        cancel_edit_mode_button = customtkinter.CTkButton(
-            master=globals.material_control_panel.material_control_panel_frame, 
-            text="Done editing", 
-            width=70,
-            height=10,
-            command=self.finish_edit
-        )
-        cancel_edit_mode_button.grid(
-            row=0,
-            column=0,
-            sticky="",
-            padx=(140,0),
-            pady=(25,0)
-        )
+    #     #Render all materials with a checkbox on the left side
+    #     row_counter = 0
+    #     for material in globals.materials:
+    #         if(material.lower() != "substrate"):
+    #             #Create a "choose material" button and place it
+    #             choose_button = customtkinter.CTkButton(
+    #                 master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
+    #                 text="Select", 
+    #                 width=90,
+    #                 height=10,
+    #                 hover_color=globals.materials[material]["Color"],
+    #                 command=lambda chosen_material=material: self.move_material(chosen_material)
+    #             )
+    #             choose_button.grid(
+    #                 row=row_counter,
+    #                 column=0,
+    #                 sticky="",
+    #                 padx=(0,0),
+    #                 pady=(0,0)
+    #             )
 
-        # #Render a "done" button and place it
-        # finish_edit_button = customtkinter.CTkButton(
-        #     master=globals.material_control_panel.material_control_panel_frame, 
-        #     text="Confirm", 
-        #     width=70,
-        #     height=10,
-        #     command=self.finish_edit
-        # )
-        # finish_edit_button.grid(
-        #     row=0,
-        #     column=1,
-        #     sticky="",
-        #     padx=(5,0),
-        #     pady=(5,0)
-        # )
+    #         #Create a "layer" label for current material
+    #         layer_label = customtkinter.CTkLabel(
+    #             master=globals.material_adjustment_panel.material_adjustment_panel_frame,
+    #             text=globals.materials[material]["Layer"]
+    #         )
+    #         layer_label.grid(
+    #             row=row_counter,
+    #             column=1,
+    #             sticky="",
+    #             padx=(10,0),
+    #             pady=(0,0)
+    #         )
+
+    #         #Create a label for current material
+    #         material_label = customtkinter.CTkLabel(
+    #             master=globals.material_adjustment_panel.material_adjustment_panel_frame,
+    #             text=material,
+    #         )
+    #         material_label.grid(
+    #             row=row_counter,
+    #             column=2,
+    #             sticky="",
+    #             padx=(10,0),
+    #             pady=(0,0)
+    #         )
+
+    #         row_counter += 1
+
+    #     #Render an explanation on how the editing works
+    #     explanation_label = customtkinter.CTkLabel(
+    #         master=globals.material_adjustment_panel.material_adjustment_panel_frame,
+    #         text="Please select the material \nyou want to move",
+    #         fg_color="#36556c"
+    #     )
+    #     explanation_label.grid(
+    #         row=0,
+    #         column=4,
+    #         sticky="e",
+    #         padx=(20,0),
+    #         pady=(0,0)
+    #     )
 
 
-    """
-    -Deletes all widgets in material_adjustment_panel
-    -Renders all materials along with a 'move_here' button
-    """
-    def move_material(self, chosen_material):
-        # print("MOVE_MATERIAL()")
+    #     #Render a "cancel edit mode" button, and place it
+    #     cancel_edit_mode_button = customtkinter.CTkButton(
+    #         master=globals.material_control_panel.material_control_panel_frame, 
+    #         text="Done editing", 
+    #         width=70,
+    #         height=10,
+    #         command=self.finish_edit
+    #     )
+    #     cancel_edit_mode_button.grid(
+    #         row=0,
+    #         column=0,
+    #         sticky="",
+    #         padx=(140,0),
+    #         pady=(25,0)
+    #     )
+
+    #     # #Render a "done" button and place it
+    #     # finish_edit_button = customtkinter.CTkButton(
+    #     #     master=globals.material_control_panel.material_control_panel_frame, 
+    #     #     text="Confirm", 
+    #     #     width=70,
+    #     #     height=10,
+    #     #     command=self.finish_edit
+    #     # )
+    #     # finish_edit_button.grid(
+    #     #     row=0,
+    #     #     column=1,
+    #     #     sticky="",
+    #     #     padx=(5,0),
+    #     #     pady=(5,0)
+    #     # )
+
+
+    # """
+    # -Deletes all widgets in material_adjustment_panel
+    # -Renders all materials along with a 'move_here' button
+    # """
+    # def move_material(self, chosen_material):
+    #     # print("MOVE_MATERIAL()")
         
-        #Delete all the widgets in the "material_adjustment_panel"
-        for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
-            widget.destroy()
+    #     #Delete all the widgets in the "material_adjustment_panel"
+    #     for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
+    #         widget.destroy()
 
-        #Render all materials with a button on the left side
-        row_counter = 0
-        for material in globals.materials:
+    #     #Render all materials with a button on the left side
+    #     row_counter = 0
+    #     for material in globals.materials:
 
-            #Render "deselect" button for chosen_material
-            if(material == chosen_material):
-                deselect_button = customtkinter.CTkButton(
-                    master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
-                    text="Deselect", 
-                    width=70,
-                    height=10,
-                    fg_color="#d80000",
-                    hover_color="#ff0000",
-                    # command=lambda selected_layer=material, chosen_material=chosen_material: self.edit_layers(chosen_material, selected_layer)
-                    command=self.choose_material
-                )
-                deselect_button.grid(
-                    row=row_counter,
-                    column=0,
-                    sticky="",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
-            #Render "choose material" button for the other materials
-            else:
-                #Create a "choose material" button and place it, but skip "substrate"
-                if(material.lower() != "substrate"):
-                    move_here_button = customtkinter.CTkButton(
-                        master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
-                        text=f"Place in row: ",#{globals.materials[material]['layer']}", 
-                        width=70,
-                        height=10,
-                        hover_color=globals.materials[material]["Color"],# "#26aa00",
-                        command=lambda selected_layer=material, chosen_material=chosen_material: self.edit_layers(chosen_material, selected_layer)
-                    )
-                    move_here_button.grid(
-                        row=row_counter,
-                        column=0,
-                        sticky="",
-                        padx=(0,0),
-                        pady=(0,0)
-                    )
+    #         #Render "deselect" button for chosen_material
+    #         if(material == chosen_material):
+    #             deselect_button = customtkinter.CTkButton(
+    #                 master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
+    #                 text="Deselect", 
+    #                 width=70,
+    #                 height=10,
+    #                 fg_color="#d80000",
+    #                 hover_color="#ff0000",
+    #                 # command=lambda selected_layer=material, chosen_material=chosen_material: self.edit_layers(chosen_material, selected_layer)
+    #                 command=self.choose_material
+    #             )
+    #             deselect_button.grid(
+    #                 row=row_counter,
+    #                 column=0,
+    #                 sticky="",
+    #                 padx=(0,0),
+    #                 pady=(0,0)
+    #             )
+    #         #Render "choose material" button for the other materials
+    #         else:
+    #             #Create a "choose material" button and place it, but skip "substrate"
+    #             if(material.lower() != "substrate"):
+    #                 move_here_button = customtkinter.CTkButton(
+    #                     master=globals.material_adjustment_panel.material_adjustment_panel_frame, 
+    #                     text=f"Place in row: ",#{globals.materials[material]['layer']}", 
+    #                     width=70,
+    #                     height=10,
+    #                     hover_color=globals.materials[material]["Color"],# "#26aa00",
+    #                     command=lambda selected_layer=material, chosen_material=chosen_material: self.edit_layers(chosen_material, selected_layer)
+    #                 )
+    #                 move_here_button.grid(
+    #                     row=row_counter,
+    #                     column=0,
+    #                     sticky="",
+    #                     padx=(0,0),
+    #                     pady=(0,0)
+    #                 )
 
-            #Create a "layer" label for current material
-            layer_label = customtkinter.CTkLabel(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=globals.materials[material]["Layer"],
-            )
-            layer_label.grid(
-                row=row_counter,
-                column=1,
-                sticky="w",
-                padx=(10,0),
-                pady=(0,0)
-            )
+    #         #Create a "layer" label for current material
+    #         layer_label = customtkinter.CTkLabel(
+    #             master=globals.material_adjustment_panel.material_adjustment_panel_frame,
+    #             text=globals.materials[material]["Layer"],
+    #         )
+    #         layer_label.grid(
+    #             row=row_counter,
+    #             column=1,
+    #             sticky="w",
+    #             padx=(10,0),
+    #             pady=(0,0)
+    #         )
 
-            #Create a label for current material
-            material_label = customtkinter.CTkLabel(
-                master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-                text=material,
-            )
-            material_label.grid(
-                row=row_counter,
-                column=2,
-                sticky="",
-                padx=(10,0),
-                pady=(0,0)
-            )
+    #         #Create a label for current material
+    #         material_label = customtkinter.CTkLabel(
+    #             master=globals.material_adjustment_panel.material_adjustment_panel_frame,
+    #             text=material,
+    #         )
+    #         material_label.grid(
+    #             row=row_counter,
+    #             column=2,
+    #             sticky="",
+    #             padx=(10,0),
+    #             pady=(0,0)
+    #         )
 
-            row_counter += 1
+    #         row_counter += 1
         
-        #Render an explanation on how the editing works
-        explanation_label = customtkinter.CTkLabel(
-            master=globals.material_adjustment_panel.material_adjustment_panel_frame,
-            text="Please select the row\nto place it in",
-            fg_color="#36556c"
-        )
-        explanation_label.grid(
-            row=0,
-            column=4,
-            sticky="e",
-            padx=(30,0),
-            pady=(0,0)
-        )
+    #     #Render an explanation on how the editing works
+    #     explanation_label = customtkinter.CTkLabel(
+    #         master=globals.material_adjustment_panel.material_adjustment_panel_frame,
+    #         text="Please select the row\nto place it in",
+    #         fg_color="#36556c"
+    #     )
+    #     explanation_label.grid(
+    #         row=0,
+    #         column=4,
+    #         sticky="e",
+    #         padx=(30,0),
+    #         pady=(0,0)
+    #     )
 
 
-    """
-    -Organizes materials{} so that the order of "layers" is consistent
-    -Redraws the material stack
-    -Renders the 'choose_material' version of the material_adjustment_frame again
-    """
-    def edit_layers(self, first_material, second_material):
-        # print("EDIT_LAYERS()")
+    # """
+    # -Organizes materials{} so that the order of "layers" is consistent
+    # -Redraws the material stack
+    # -Renders the 'choose_material' version of the material_adjustment_frame again
+    # """
+    # def edit_layers(self, first_material, second_material):
+    #     # print("EDIT_LAYERS()")
 
-        #save first material original "layer" value
-        first_material_orig_layer = globals.materials[first_material]["Layer"] 
+    #     #save first material original "layer" value
+    #     first_material_orig_layer = globals.materials[first_material]["Layer"] 
 
-        #Save second_material original "layer" value
-        second_material_orig_layer = globals.materials[second_material]["Layer"] 
+    #     #Save second_material original "layer" value
+    #     second_material_orig_layer = globals.materials[second_material]["Layer"] 
 
-        if(first_material_orig_layer > second_material_orig_layer):
-            #Change the layer value in chosen material to the selected layer
-            globals.materials[first_material]["Layer"] = globals.materials[second_material]["Layer"]
+    #     if(first_material_orig_layer > second_material_orig_layer):
+    #         #Change the layer value in chosen material to the selected layer
+    #         globals.materials[first_material]["Layer"] = globals.materials[second_material]["Layer"]
 
-            #For everything that is lower than first material layer, excluding the first_material
-            for material in globals.materials:
-                if(material != first_material):
-                    if(globals.materials[material]["Layer"] < first_material_orig_layer):
-                        if(globals.materials[material]["Layer"] >= second_material_orig_layer):
-                            globals.materials[material]["Layer"] += 1
+    #         #For everything that is lower than first material layer, excluding the first_material
+    #         for material in globals.materials:
+    #             if(material != first_material):
+    #                 if(globals.materials[material]["Layer"] < first_material_orig_layer):
+    #                     if(globals.materials[material]["Layer"] >= second_material_orig_layer):
+    #                         globals.materials[material]["Layer"] += 1
         
-        #first_material layer is less than second_material layer
-        else:
-            #Change the layer value in chosen material to the selected layer
-            globals.materials[first_material]["Layer"] = globals.materials[second_material]["Layer"]
+    #     #first_material layer is less than second_material layer
+    #     else:
+    #         #Change the layer value in chosen material to the selected layer
+    #         globals.materials[first_material]["Layer"] = globals.materials[second_material]["Layer"]
 
-            #For everything that is higher than first material layer, excluding the first_material
-            for material in globals.materials:
-                if(material != first_material):
-                    if(globals.materials[material]["Layer"] > first_material_orig_layer):
-                        if(globals.materials[material]["Layer"] <= second_material_orig_layer):
-                            globals.materials[material]["Layer"] -= 1
-
-
-        #Order globals.materials{} in order of "layer"
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
-
-        #Redraw the material stack
-        globals.layer_stack_canvas.draw_material_stack()
-
-        #Render the first "select material" edit mode version
-        self.choose_material()
+    #         #For everything that is higher than first material layer, excluding the first_material
+    #         for material in globals.materials:
+    #             if(material != first_material):
+    #                 if(globals.materials[material]["Layer"] > first_material_orig_layer):
+    #                     if(globals.materials[material]["Layer"] <= second_material_orig_layer):
+    #                         globals.materials[material]["Layer"] -= 1
 
 
-    """
-    -Deletes all widgets from material_adjustment_panel, material_control_panel and canvas_control_panel
-    -Rebuilds the original verions of material_adjustment_panel, material_control_panel and canvas_control_panel
-    """
-    def finish_edit(self):
-        # print("FINISH_EDIT()")
+    #     #Order globals.materials{} in order of "layer"
+    #     globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+
+    #     #Redraw the material stack
+    #     globals.layer_stack_canvas.draw_material_stack()
+
+    #     #Render the first "select material" edit mode version
+    #     self.choose_material()
+
+
+    # """
+    # -Deletes all widgets from material_adjustment_panel, material_control_panel and canvas_control_panel
+    # -Rebuilds the original verions of material_adjustment_panel, material_control_panel and canvas_control_panel
+    # """
+    # def finish_edit(self):
+    #     # print("FINISH_EDIT()")
         
-        #Delete widgets in material_adjustment_panel_frame
-        for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
-            widget.destroy()  
+    #     #Delete widgets in material_adjustment_panel_frame
+    #     for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
+    #         widget.destroy()  
 
-        #Delete widgets in material_control_panel_frame
-        for widget in globals.material_control_panel.material_control_panel_frame.winfo_children():
-            widget.destroy()
+    #     #Delete widgets in material_control_panel_frame
+    #     for widget in globals.material_control_panel.material_control_panel_frame.winfo_children():
+    #         widget.destroy()
 
-        #Delete widgets in canvas_control_panel_frame
-        for widget in globals.canvas_control_panel.canvas_control_panel_frame.winfo_children():
-            widget.destroy()
+    #     #Delete widgets in canvas_control_panel_frame
+    #     for widget in globals.canvas_control_panel.canvas_control_panel_frame.winfo_children():
+    #         widget.destroy()
 
-        #Restore the material_adjustment_panel
-        globals.material_adjustment_panel.create_material_adjustment_panel()
+    #     #Restore the material_adjustment_panel
+    #     globals.material_adjustment_panel.create_material_adjustment_panel()
 
-        #Restore the material_control_panel
-        globals.material_control_panel_frame = globals.material_control_panel.create_material_control_panel()
+    #     #Restore the material_control_panel
+    #     globals.material_control_panel_frame = globals.material_control_panel.create_material_control_panel()
 
-        #Restore the canvas_control_panel
-        globals.canvas_control_panel.create_canvas_control_panel()
+    #     #Restore the canvas_control_panel
+    #     globals.canvas_control_panel.create_canvas_control_panel()
 
 
     """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
@@ -1058,8 +1059,13 @@ class Material_Control_Panel:
         canvas_screenshot = Image(f"{main_folder}/{sub_folder}/canvas_screenshot.png")
 
         #Set the width and height of image placed in excel file
-        canvas_screenshot.width = 750
-        canvas_screenshot.height = 350
+        match globals.option_menu:
+            case "Stacked" | "Realistic" | "Stepped":
+                canvas_screenshot.width = 750
+                canvas_screenshot.height = 350
+            case "Stress":
+                canvas_screenshot.width = 350
+                canvas_screenshot.height = 350
 
         #Add the image to the excel file
         sheet.add_image(canvas_screenshot, "L1")
