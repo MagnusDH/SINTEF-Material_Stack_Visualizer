@@ -718,103 +718,103 @@ class Layer_Stack_Canvas:
 
                 #Skip first material (no indent or line should be drawn)
                 if(previous_material != None):
-                    #Only draw indent_text and lines if "thickness" and "indent" are > 0
-                    # if((int(globals.materials[material]["thickness"]) > 0) and (int(globals.materials[material]["indent"]) > 0)):
-                    #Find information about current material_rectangle
-                    current_material_rect_coordinates = [
-                        self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0],
-                        self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1],
-                        self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2],
-                        self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]
-                    ]
+                    #Only draw indent_text and lines if "indent" is > 0
+                    if(int(globals.materials[material]["Indent [nm]"]) > 0):
+                        #Find information about current material_rectangle
+                        current_material_rect_coordinates = [
+                            self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0],
+                            self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1],
+                            self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2],
+                            self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]
+                        ]
 
-                    #Find information about previous_material
-                    previous_material_rect_coordinates = [
-                        self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[0],
-                        self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[1],
-                        self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[2],
-                        self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[3]
-                    ]
+                        #Find information about previous_material
+                        previous_material_rect_coordinates = [
+                            self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[0],
+                            self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[1],
+                            self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[2],
+                            self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])[3]
+                        ]
 
-                    #Create a two sided arrow line between the differense of the two rectangles
-                    indent_line = self.layer_stack_canvas.create_line(
-                        current_material_rect_coordinates[2], current_material_rect_coordinates[3]-5, previous_material_rect_coordinates[2], previous_material_rect_coordinates[1]-3,                       
-                        fill=settings.text_color,
-                        arrow=tkinter.BOTH
-                    )
+                        #Create a two sided arrow line between the differense of the two rectangles
+                        indent_line = self.layer_stack_canvas.create_line(
+                            current_material_rect_coordinates[2], current_material_rect_coordinates[3]-5, previous_material_rect_coordinates[2], previous_material_rect_coordinates[1]-3,                       
+                            fill=settings.text_color,
+                            arrow=tkinter.BOTH
+                        )
 
-                    #Save information about indent_line
-                    current_material_indent_line_coordinates = [
-                        self.layer_stack_canvas.bbox(indent_line)[0],
-                        self.layer_stack_canvas.bbox(indent_line)[1],
-                        self.layer_stack_canvas.bbox(indent_line)[2],
-                        self.layer_stack_canvas.bbox(indent_line)[3]
-                    ]
-
-
-                    #Write indent number on the side of indent_line
-                    indent_text = self.layer_stack_canvas.create_text(
-                        self.visible_canvas_bbox_x1 - 50,
-                        self.layer_stack_canvas.bbox(indent_line)[3] - 10,
-                        text=f"{int(globals.materials[material]['Indent [nm]'])} {globals.materials[material]['Unit']}",
-                        fill=settings.text_color, 
-                        font=(settings.text_font, settings.text_size)
-                    )
-
-                    #Save information about indent_text bounding box
-                    current_material_indent_textbox_coordinates = [
-                        self.layer_stack_canvas.bbox(indent_text)[0],
-                        self.layer_stack_canvas.bbox(indent_text)[1],
-                        self.layer_stack_canvas.bbox(indent_text)[2],
-                        self.layer_stack_canvas.bbox(indent_text)[3],
-                    ]
+                        #Save information about indent_line
+                        current_material_indent_line_coordinates = [
+                            self.layer_stack_canvas.bbox(indent_line)[0],
+                            self.layer_stack_canvas.bbox(indent_line)[1],
+                            self.layer_stack_canvas.bbox(indent_line)[2],
+                            self.layer_stack_canvas.bbox(indent_line)[3]
+                        ]
 
 
-                    #Check if indent_number bottom overlaps with previous indent_number top
-                    if(previous_material_indent_textbox_coordinates != None):
-                        #Move indent text and text bounding box up
-                        if(current_material_indent_textbox_coordinates[3] > previous_material_indent_textbox_coordinates[1]):
-                            overlap = previous_material_indent_textbox_coordinates[1] - current_material_indent_textbox_coordinates[3]
-                            self.layer_stack_canvas.move(indent_text, 0, overlap)
-                            self.layer_stack_canvas.move(self.layer_stack_canvas.bbox(indent_text), 0, overlap)
+                        #Write indent number on the side of indent_line
+                        indent_text = self.layer_stack_canvas.create_text(
+                            self.visible_canvas_bbox_x1 - 50,
+                            self.layer_stack_canvas.bbox(indent_line)[3] - 10,
+                            text=f"{int(globals.materials[material]['Indent [nm]'])} {globals.materials[material]['Unit']}",
+                            fill=settings.text_color, 
+                            font=(settings.text_font, settings.text_size)
+                        )
 
-                            #update current material text coordinates
-                            #Save information about indent_text bounding box
-                            current_material_indent_textbox_coordinates = [
-                                self.layer_stack_canvas.bbox(indent_text)[0],
-                                self.layer_stack_canvas.bbox(indent_text)[1],
-                                self.layer_stack_canvas.bbox(indent_text)[2],
-                                self.layer_stack_canvas.bbox(indent_text)[3],
-                            ]
+                        #Save information about indent_text bounding box
+                        current_material_indent_textbox_coordinates = [
+                            self.layer_stack_canvas.bbox(indent_text)[0],
+                            self.layer_stack_canvas.bbox(indent_text)[1],
+                            self.layer_stack_canvas.bbox(indent_text)[2],
+                            self.layer_stack_canvas.bbox(indent_text)[3],
+                        ]
 
-                    #Draw bounding box around indent text
-                    indent_text_bbox = self.layer_stack_canvas.create_rectangle(
-                        self.layer_stack_canvas.bbox(indent_text), 
-                        outline=settings.text_color, 
-                        tags="indent_bbox"
-                    )
 
-                    #Draw an arrow from indent_text_bbox to indent_line 
-                    indent_arrow_pointer = self.layer_stack_canvas.create_line(
-                        current_material_indent_textbox_coordinates[0],
-                        self.layer_stack_canvas.bbox(indent_text_bbox)[3] - ((self.layer_stack_canvas.bbox(indent_text_bbox)[3] - self.layer_stack_canvas.bbox(indent_text_bbox)[1]) / 2),
-                        current_material_indent_line_coordinates[2],
-                        current_material_indent_line_coordinates[3] - 5,
-                        arrow=tkinter.LAST, 
-                        fill=settings.text_color,
-                        tags="indent_pointer_arrow"
-                    )
-                    
-                    #Add created elements to dictionary
-                    globals.materials[material]["Indent_line_id"] = indent_line
-                    globals.materials[material]["Indent_text_id"] = indent_text
-                    globals.materials[material]["Indent_text_bbox_id"] = indent_text_bbox
-                    globals.materials[material]["Indent_arrow_pointer_id"] = indent_arrow_pointer 
-                    
+                        #Check if indent_number bottom overlaps with previous indent_number top
+                        if(previous_material_indent_textbox_coordinates != None):
+                            #Move indent text and text bounding box up
+                            if(current_material_indent_textbox_coordinates[3] > previous_material_indent_textbox_coordinates[1]):
+                                overlap = previous_material_indent_textbox_coordinates[1] - current_material_indent_textbox_coordinates[3]
+                                self.layer_stack_canvas.move(indent_text, 0, overlap)
+                                self.layer_stack_canvas.move(self.layer_stack_canvas.bbox(indent_text), 0, overlap)
 
-                    #Save necessary information about previous_material for next loop iteration
-                    previous_material_rect_coordinates = current_material_rect_coordinates
-                    previous_material_indent_textbox_coordinates = current_material_indent_textbox_coordinates
-                    previous_material_indent_line_coordinates = current_material_indent_line_coordinates
+                                #update current material text coordinates
+                                #Save information about indent_text bounding box
+                                current_material_indent_textbox_coordinates = [
+                                    self.layer_stack_canvas.bbox(indent_text)[0],
+                                    self.layer_stack_canvas.bbox(indent_text)[1],
+                                    self.layer_stack_canvas.bbox(indent_text)[2],
+                                    self.layer_stack_canvas.bbox(indent_text)[3],
+                                ]
+
+                        #Draw bounding box around indent text
+                        indent_text_bbox = self.layer_stack_canvas.create_rectangle(
+                            self.layer_stack_canvas.bbox(indent_text), 
+                            outline=settings.text_color, 
+                            tags="indent_bbox"
+                        )
+
+                        #Draw an arrow from indent_text_bbox to indent_line 
+                        indent_arrow_pointer = self.layer_stack_canvas.create_line(
+                            current_material_indent_textbox_coordinates[0],
+                            self.layer_stack_canvas.bbox(indent_text_bbox)[3] - ((self.layer_stack_canvas.bbox(indent_text_bbox)[3] - self.layer_stack_canvas.bbox(indent_text_bbox)[1]) / 2),
+                            current_material_indent_line_coordinates[2],
+                            current_material_indent_line_coordinates[3] - 5,
+                            arrow=tkinter.LAST, 
+                            fill=settings.text_color,
+                            tags="indent_pointer_arrow"
+                        )
+                        
+                        #Add created elements to dictionary
+                        globals.materials[material]["Indent_line_id"] = indent_line
+                        globals.materials[material]["Indent_text_id"] = indent_text
+                        globals.materials[material]["Indent_text_bbox_id"] = indent_text_bbox
+                        globals.materials[material]["Indent_arrow_pointer_id"] = indent_arrow_pointer 
+                        
+
+                        #Save necessary information about previous_material for next loop iteration
+                        previous_material_rect_coordinates = current_material_rect_coordinates
+                        previous_material_indent_textbox_coordinates = current_material_indent_textbox_coordinates
+                        previous_material_indent_line_coordinates = current_material_indent_line_coordinates
         
                 previous_material = material

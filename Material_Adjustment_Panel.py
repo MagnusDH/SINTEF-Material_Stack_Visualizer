@@ -196,44 +196,45 @@ class Material_Adjustment_Panel:
                 globals.materials[material]["Slider_id"] = slider 
 
                 #Create buttons to move layer up or down
-                if(material.lower() != "substrate"):
-                    move_down_button = customtkinter.CTkButton(
-                        master=self.material_adjustment_panel_frame, 
-                        width=20,
-                        height=1,
-                        text="⬇", #⬆ ⬇ 🔼 🔽
-                        font=(settings.text_font, -15),
-                        fg_color="white", #settings.material_adjustment_panel_button_color,
-                        hover_color=settings.material_adjustment_panel_button_hover_color, 
-                        text_color="blue", #settings.material_adjustment_panel_text_color,
-                        command=lambda material=material, up_or_down="down", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
-                    )
-                    move_down_button.grid(
-                        row=self.row_counter,
-                        column=4,
-                        sticky="",
-                        padx=(5,0),
-                        pady=(0,0)
-                    )
-                    move_up_button = customtkinter.CTkButton(
-                        master=self.material_adjustment_panel_frame, 
-                        width=20,
-                        height=1,
-                        text="⬆", #⬆ ⬇ 🔼 🔽
-                        font=(settings.text_font, -15),
-                        fg_color="white", #settings.material_adjustment_panel_button_color,
-                        hover_color=settings.material_adjustment_panel_button_hover_color, 
-                        text_color="blue",#settings.material_adjustment_panel_text_color,
-                        command=lambda material=material, up_or_down="up", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                if(len(globals.materials) > 1):
+                    if(material.lower() != "substrate"):
+                        move_down_button = customtkinter.CTkButton(
+                            master=self.material_adjustment_panel_frame, 
+                            width=20,
+                            height=1,
+                            text="⬇", #⬆ ⬇ 🔼 🔽
+                            font=(settings.text_font, -15),
+                            fg_color="white", #settings.material_adjustment_panel_button_color,
+                            hover_color=settings.material_adjustment_panel_button_hover_color, 
+                            text_color="blue", #settings.material_adjustment_panel_text_color,
+                            command=lambda material=material, up_or_down="down", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                        )
+                        move_down_button.grid(
+                            row=self.row_counter,
+                            column=4,
+                            sticky="",
+                            padx=(5,0),
+                            pady=(0,0)
+                        )
+                        move_up_button = customtkinter.CTkButton(
+                            master=self.material_adjustment_panel_frame, 
+                            width=20,
+                            height=1,
+                            text="⬆", #⬆ ⬇ 🔼 🔽
+                            font=(settings.text_font, -15),
+                            fg_color="white", #settings.material_adjustment_panel_button_color,
+                            hover_color=settings.material_adjustment_panel_button_hover_color, 
+                            text_color="blue",#settings.material_adjustment_panel_text_color,
+                            command=lambda material=material, up_or_down="up", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
 
-                    )
-                    move_up_button.grid(
-                        row=self.row_counter,
-                        column=5,
-                        sticky="",
-                        padx=(7,0),
-                        pady=(0,0)
-                    )
+                        )
+                        move_up_button.grid(
+                            row=self.row_counter,
+                            column=5,
+                            sticky="",
+                            padx=(7,0),
+                            pady=(0,0)
+                        )
 
 
                 #Increment row_counter

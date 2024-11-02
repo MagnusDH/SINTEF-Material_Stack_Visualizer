@@ -96,12 +96,10 @@
 
         -in "add_material" popup window: add functionality to press "enter" to automaticly press the "confirm" button and add material to materials{}
 
+        -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
 
-    TO DO           
-        -I "stepped view": hvis "indent==0" så skal ikke en pil til "indent" lages
 
-        -Lag en knapp "modify material" som lar bruker endre på alle parametre til et materiale 
-        
+    TO DO                   
         -Fix bugs
 
         -Add functionality to change color of the materials? add a color palette?

@@ -139,5 +139,16 @@ graph_control_panel_slider_button_color = material_adjustment_panel_button_color
 graph_control_panel_slider_hover_color = material_adjustment_panel_button_hover_color
 
 
+#MODIFY MATERIAL WINDOW
+modify_material_window_width = 1450
+modify_material_window_height = 500
+modify_material_window_scrollable_frame_width = 1100
+modify_material_window_scrollable_frame_height = 300
+modify_material_window_background_color = main_frame_background_color
+modify_material_window_text_size = 14
+modify_material_window_text_font = "Arial"
+modify_material_window_entry_width = 90
+
+
 #SVG
 svg_text_size = 14
