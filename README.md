@@ -79,23 +79,12 @@
 
 
     BUGS:
-        -Potential bug: what happens if one of the values in the excel sheet is left as "empty"? What value is put in materials{}?
-        -Why does the dictionary have to be reversed when "writing text on stack" and "writing indent on stepped stack"????
-
-        -When the "indent" value in "stepped mode" is zero the material is not rendered. The material should be rendered with the same width as the rpevious material
-        
         -write indent on stepped stack
             #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
             #I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
         
         -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
         
-        -Set a specific width for each cell in "export_excel" file, so that its more readable when opening the excel file?
-
-        -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?
-
-        -in "add_material" popup window: add functionality to press "enter" to automaticly press the "confirm" button and add material to materials{}
-
         -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
 
 
@@ -105,3 +94,5 @@
         -Add functionality to change color of the materials? add a color palette?
 
         -Add a color palette image in the "Materials" excel file and the exported excel file?
+
+        -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?

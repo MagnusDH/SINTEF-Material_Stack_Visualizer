@@ -172,25 +172,41 @@ class App:
                     i+=1
 
                     #If some cells are left empty, apply default value
-                    # if(pandas.isna(row["Material"])):
-                    #     row["Material"] = "No name"
-                    # if(pandas.isna(row["Thickness"])):
-                        # row["Thickness"] = 
+                    if(pandas.isna(row["Material"])):
+                        row["Material"] = "No name"
+                    if(pandas.isna(row["Thickness"])):
+                        row["Thickness"] = 0                    
+                    if(pandas.isna(row["Unit"])):
+                        row["Unit"] = "No value"
+                    if(pandas.isna(row["Indent [nm]"])):
+                        row["Indent [nm]"] = 0
+                    if(pandas.isna(row["Color"])):
+                        row["Color"] = "white"
+                    if(pandas.isna(row["Modulus [GPa]"])):
+                        row["Modulus [GPa]"] = 0
+                    if(pandas.isna(row["CTE [ppm/deg]"])):
+                        row["CTE [ppm/deg]"] = 0
+                    if(pandas.isna(row["Density [kg/m3]"])):
+                        row["Density [kg/m3]"] = 0
+                    if(pandas.isna(row["Stress_x [MPa]"])):
+                        row["Stress_x [MPa]"] = 0
+                    if(pandas.isna(row["Poisson"])):
+                        row["Poisson"] = 0
 
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
                         "Name": row["Material"],
                         "Layer": int(layer),
-                        "Thickness": row["Thickness"],
+                        "Thickness": int(row["Thickness"]),
                         "Unit": row["Unit"],
-                        "Indent [nm]": row["Indent [nm]"],
+                        "Indent [nm]": int(row["Indent [nm]"]),
                         "Color": row["Color"],
                         "Status": status,
-                        "Modulus [GPa]": row["Modulus [GPa]"],
-                        "CTE [ppm/deg]": row["CTE [ppm/deg]"],
-                        "Density [kg/m3]": row["Density [kg/m3]"],
-                        "Stress_x [MPa]": row["Stress_x [MPa]"],
-                        "Poisson": row["Poisson"],
+                        "Modulus [GPa]": int(row["Modulus [GPa]"]),
+                        "CTE [ppm/deg]": int(row["CTE [ppm/deg]"]),
+                        "Density [kg/m3]": int(row["Density [kg/m3]"]),
+                        "Stress_x [MPa]": int(row["Stress_x [MPa]"]),
+                        "Poisson": int(row["Poisson"]),
                         "Label_name_id": None,
                         "Entry_id": None,
                         "Slider_id": None,

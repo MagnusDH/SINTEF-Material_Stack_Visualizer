@@ -117,6 +117,10 @@ class Material_Control_Panel:
         self.add_material_window.geometry(f"{settings.add_material_window_width}x{settings.add_material_window_height}")
         self.add_material_window.configure(bg=settings.add_material_window_background_color)
 
+        #Bind the "renter/return" button to call validate_add_material_inputs function when pressed
+        self.add_material_window.bind('<Return>', lambda event: self.validate_add_material_inputs())
+
+
         #Create Labels and Entries for material properties 
         self.material_name_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
@@ -577,13 +581,13 @@ class Material_Control_Panel:
         #If some entries in "add_material_window" are not set, the values is automaticly set to zero
         #THICKNESS
         if(self.material_thickness_entry.get() == ""):
-            material_thickness = 1
+            material_thickness = 0
         else:
             material_thickness = int(self.material_thickness_entry.get())
 
         #INDENT
         if(self.material_indent_entry.get() == ""):
-            material_indent = 1
+            material_indent = 0
         else:
             material_indent = int(self.material_indent_entry.get())
 
@@ -961,6 +965,9 @@ class Material_Control_Panel:
         self.modify_material_window.geometry(f"{settings.modify_material_window_width}x{settings.modify_material_window_height}")
         self.modify_material_window.configure(bg=settings.modify_material_window_background_color)
 
+        #Bind the "renter/return" button to call "confirm_material_changes" function when pressed
+        self.modify_material_window.bind('<Return>', lambda event: self.confirm_material_changes())
+
         headline_label = customtkinter.CTkLabel(
             master=self.modify_material_window,
             text="      Material          Thickness      Unit      Indent[nm]         Color          Modulus [GPa]      CTE [ppm/deg]    Density [kg/m3]    Stress_x [MPa]         Poisson",
@@ -1223,34 +1230,34 @@ class Material_Control_Panel:
             
             #NAME
             try:
-                name = str(self.entry_dictionary[material]["Name_entry"].get())
-                if(name == ""):
-                    messagebox.showerror("ERROR", "'Material Name' can not be empty", parent=self.modify_material_window)
+                material_name = str(self.entry_dictionary[material]["Name_entry"].get())
+                if(material_name == ""):
+                    messagebox.showerror("ERROR", "'Material' can not be empty", parent=self.modify_material_window)
                     self.modify_material_window.lift()
                     return
 
             except ValueError:
-                print("Material Name must be of type 'string'")
+                print("'Material' must be of type 'string'")
                 return
 
             #THICKNESS
             try:
-                thickness = int(self.entry_dictionary[material]["Thickness_entry"].get())
+                thickness = int(self.entry_dictionary[material]["Thickness_entry"].get()) 
 
             except ValueError:
-                messagebox.showerror("ERROR", "'Thickness' must be a 'digit'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'Thickness' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return
         
             #UNIT
             try:
                 unit = str(self.entry_dictionary[material]["Unit_entry"].get())
                 if(unit == ""):
-                    messagebox.showerror("ERROR", "'Unit' can not be empty", parent=self.modify_material_window)
+                    messagebox.showerror("ERROR", f"'Unit' value for '{material_name}' can not be empty", parent=self.modify_material_window)
                     self.modify_material_window.lift()
                     return
 
             except ValueError:
-                messagebox.showerror("ERROR", "'Unit' must be of type 'string'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'Unit' value for '{material_name}' must be of type 'string'", parent=self.modify_material_window)
                 return 
         
             #INDENT [NM]
@@ -1258,24 +1265,24 @@ class Material_Control_Panel:
                 indent = int(self.entry_dictionary[material]["Indent_entry"].get())
 
             except ValueError:
-                messagebox.showerror("ERROR", "'Indent' must be a 'digit'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'Indent' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return
         
             #COLOR
             #Check if input color is valid
             if(self.is_valid_color(self.entry_dictionary[material]["Color_entry"].get()) == False):
-                messagebox.showerror("ERROR", "Given 'Color' is not valid.\nValue must be valid string or hex-value ('#123456)", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"Given 'Color' for '{material_name}' is not valid.\nValue must be valid string or hex-value ('#123456)", parent=self.modify_material_window)
                 self.modify_material_window.lift()
                 return
             try:
                 color = str(self.entry_dictionary[material]["Color_entry"].get())
                 if(color == ""):
-                    messagebox.showerror("ERROR", "'Color' can not be empty", parent=self.modify_material_window)
+                    messagebox.showerror("ERROR", f"'Color' for '{material_name}' can not be empty", parent=self.modify_material_window)
                     self.modify_material_window.lift()
                     return
 
             except ValueError:
-                print("'Color' must be of type 'string'")
+                print(f"'Color' value for '{material_name}' must be of type 'string'")
                 return
 
 
@@ -1284,7 +1291,7 @@ class Material_Control_Panel:
                 modulus = int(self.entry_dictionary[material]["Modulus_entry"].get())
 
             except ValueError:
-                messagebox.showerror("ERROR", "'Modulus [GPa]' must be a 'digit'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'Modulus [GPa]' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return  
         
             #CTE [ppm/deg]
@@ -1292,7 +1299,7 @@ class Material_Control_Panel:
                 CTE = int(self.entry_dictionary[material]["CTE_entry"].get())
 
             except ValueError:
-                messagebox.showerror("ERROR", "'CTE [ppm/deg]' must be a 'digit'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'CTE [ppm/deg]' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return
 
             
@@ -1301,7 +1308,7 @@ class Material_Control_Panel:
                 density = int(self.entry_dictionary[material]["Density_entry"].get())
 
             except ValueError:
-                messagebox.showerror("ERROR", "'Density [kg/m3]' must be a 'digit'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'Density [kg/m3]' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return
 
         
@@ -1310,7 +1317,7 @@ class Material_Control_Panel:
                 stress = int(self.entry_dictionary[material]["Stress_entry"].get())
 
             except ValueError:
-                messagebox.showerror("ERROR", "'Stress_x [MPa]' must be a 'digit'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'Stress_x [MPa]' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return
         
             #POISSON
@@ -1318,7 +1325,7 @@ class Material_Control_Panel:
                 poisson = int(self.entry_dictionary[material]["Poisson_entry"].get())
 
             except ValueError:
-                messagebox.showerror("ERROR", "'Poisson' must be a 'digit'", parent=self.modify_material_window)
+                messagebox.showerror("ERROR", f"'Poisson' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return
 
         self.confirm_material_changes()

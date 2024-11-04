@@ -133,7 +133,9 @@ class Layer_Stack_Canvas:
         #     self.draw_material_stack()
 
 
-    """Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what"""
+    """
+    -Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what
+    """
     def draw_material_stack_stacked(self):       
         
         #Clear all existing elements on canvas and in dictionary
@@ -216,7 +218,9 @@ class Layer_Stack_Canvas:
         self.write_text_on_stack()
 
               
-    """Draws a realistic version of the rectangle stack"""
+    """
+    -Draws a realistic version of the rectangle stack
+    """
     def draw_material_stack_realistic(self):
         # print("DRAW_MATERIAL_STACK_REALISTIC()")
             
@@ -281,7 +285,10 @@ class Layer_Stack_Canvas:
         self.write_text_on_stack()
     
 
-    """Draws a stepped rectangle stack where "indent" decide the width of each rectangle"""
+    """
+    Draws a stepped rectangle stack where "indent" decide the width of each rectangle
+    -Each material is drawn from the bottom left corner
+    """
     def draw_material_stack_stepped(self):
         # print("DRAW_MATERIAL_STACK_STEPPED()")
 
