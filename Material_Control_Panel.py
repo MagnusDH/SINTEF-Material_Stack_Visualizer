@@ -101,7 +101,7 @@ class Material_Control_Panel:
         export_as_excel_button.grid(
             row=0,
             column=2,
-            sticky="",
+            sticky="e",
             padx=(5,0),
             pady=(5,0)
         )

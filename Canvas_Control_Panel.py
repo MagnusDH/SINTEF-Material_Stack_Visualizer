@@ -197,7 +197,7 @@ class Canvas_Control_Panel:
                         #Loop through the rows in excel_file and populate "self.materials"
                         for index, row in excel_data.iterrows():
                             material_name = row["Material"]
-                            material_thickness = row["Thickness"]
+                            material_thickness = int(row["Thickness"])
                                 
                             #Populate material dictionary
                             if(material_name in globals.materials):
@@ -224,7 +224,7 @@ class Canvas_Control_Panel:
                         #Loop through the rows in excel_file and populate "self.materials"
                         for index, row in excel_data.iterrows():
                             material_name = row["Material"]
-                            material_indent = row["Indent"]
+                            material_indent = int(row["Indent"])
                                 
                             #Populate material dictionary
                             if(material_name in globals.materials):

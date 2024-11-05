@@ -81,11 +81,14 @@
     BUGS:
         -write indent on stepped stack
             #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
-            #I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
+            #When a materials->thickness is set to "0" and the view is "realistic", then text_bboxes overlaps each other because "previous material" is not registered because it is not drawn
         
-        -If the text for the lowest material must be drawn in a text box, it might be pushed under the canvas if there are other text boxes over it
+        -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
+        
+        -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
         
         -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
+        -Trengs "dissabled/enabled" funksjonen enda å eksistere?
 
 
     TO DO                   
