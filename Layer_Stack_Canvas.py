@@ -612,466 +612,169 @@ class Layer_Stack_Canvas:
         
         #ADJUSTMENT OF TEXT: UP, DOWN AND OVERLAP
         #Loop through every material from TOP layer to LOWEST layer
-        previous_material = None
+        previous_text_bbox_id = None
         for material in globals.materials:
             if(globals.materials[material]["Text_bbox_id"] != None):
                 #Get the coordinates of the current_material_text_bbox
-                current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                current_material_text_bbox_x0 = current_material_text_bbox[0]
-                current_material_text_bbox_y0 = current_material_text_bbox[1]
-                current_material_text_bbox_x1 = current_material_text_bbox[2]
-                current_material_text_bbox_y1 = current_material_text_bbox[3]
+                current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                current_text_bbox_x0 = current_text_bbox[0]
+                current_text_bbox_y0 = current_text_bbox[1]
+                current_text_bbox_x1 = current_text_bbox[2]
+                current_text_bbox_y1 = current_text_bbox[3]
 
                 #if the text_bbox top overlaps with the canvas top
-                if(current_material_text_bbox_y0 < self.visible_canvas_bbox_y0):
+                if(current_text_bbox_y0 < self.visible_canvas_bbox_y0):
                     #find the overlap
-                    overlap = self.visible_canvas_bbox_y0 - current_material_text_bbox_y0
+                    overlap = self.visible_canvas_bbox_y0 - current_text_bbox_y0
                     #Move the text, text_bbox and line_id down
                     self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, overlap)
                     self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, overlap)
 
                     #Get the new text_bbox coordinates
-                    current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                    current_material_text_bbox_x0 = current_material_text_bbox[0]
-                    current_material_text_bbox_y0 = current_material_text_bbox[1]
-                    current_material_text_bbox_x1 = current_material_text_bbox[2]
-                    current_material_text_bbox_y1 = current_material_text_bbox[3]
-                    current_material_text_bbox_middle_y = (current_material_text_bbox_y0 + current_material_text_bbox_y1) / 2
+                    current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                    current_text_bbox_x0 = current_text_bbox[0]
+                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_x1 = current_text_bbox[2]
+                    current_text_bbox_y1 = current_text_bbox[3]
+                    current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
                     #Get coordinates of matching rectangle
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
                     match globals.option_menu:
                         case "Stacked" | "Realistic" | "Stress":
-                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x0, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
+                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
-                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x1, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
+                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
 
             
-                #if there is a previous material
-                if(previous_material != None):
-                    #if the previous_material has a text_bbox
-                    if(globals.materials[previous_material]["Text_bbox_id"] != None):
-                        #Get the coordinates of the current_material text_bbox
-                        current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                        current_material_text_bbox_x0 = current_material_text_bbox[0]
-                        current_material_text_bbox_y0 = current_material_text_bbox[1]
-                        current_material_text_bbox_x1 = current_material_text_bbox[2]
-                        current_material_text_bbox_y1 = current_material_text_bbox[3]
+                #if there is a previous text_bbox
+                if(previous_text_bbox_id != None):
+                    #Get the coordinates of the current_material text_bbox
+                    current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                    current_text_bbox_x0 = current_text_bbox[0]
+                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_x1 = current_text_bbox[2]
+                    current_text_bbox_y1 = current_text_bbox[3]
+                    
+                    #Get the coordinates of the previous_material text_bbox
+                    previous_text_bbox = self.layer_stack_canvas.bbox(previous_text_bbox_id)
+                    previous_text_bbox_x0 = previous_text_bbox[0]
+                    previous_text_bbox_y0 = previous_text_bbox[1]
+                    previous_text_bbox_x1 = previous_text_bbox[2]
+                    previous_text_bbox_y1 = previous_text_bbox[3]
+
+
+                    #if the current_material text_bbox top is overlapping the previous_material text_bbox bottom
+                    if(current_text_bbox_y0 < previous_text_bbox_y1):
+                        #find the overlap
+                        overlap = previous_text_bbox_y1 - current_text_bbox_y0 
+                        #move the current_materials->text, text_bbox and line down
+                        self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, overlap)
+                        self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, overlap)
+
+                        #Get the new text_bbox coordinates
+                        current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                        current_text_bbox_x0 = current_text_bbox[0]
+                        current_text_bbox_y0 = current_text_bbox[1]
+                        current_text_bbox_x1 = current_text_bbox[2]
+                        current_text_bbox_y1 = current_text_bbox[3]
+                        current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
+                        #Get coordinates of matching rectangle
+                        rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                         
-                        #Get the coordinates of the previous_material text_bbox
-                        previous_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Text_bbox_id"])
-                        previous_material_text_bbox_x0 = previous_material_text_bbox[0]
-                        previous_material_text_bbox_y0 = previous_material_text_bbox[1]
-                        previous_material_text_bbox_x1 = previous_material_text_bbox[2]
-                        previous_material_text_bbox_y1 = previous_material_text_bbox[3]
+                        #Move the pointer line based on stack view
+                        match globals.option_menu:
+                            case "Stacked" | "Realistic" | "Stress":
+                                self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
+                            case "Stepped":
+                                self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
 
-
-                        #if the current_material text_bbox top is overlapping the previous_material text_bbox bottom
-                        if(current_material_text_bbox_y0 < previous_material_text_bbox_y1):
-                            #find the overlap
-                            overlap = previous_material_text_bbox_y1 - current_material_text_bbox_y0 
-                            #move the current_materials->text, text_bbox and line down
-                            self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, overlap)
-                            self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, overlap)
-
-                            #Get the new text_bbox coordinates
-                            current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                            current_material_text_bbox_x0 = current_material_text_bbox[0]
-                            current_material_text_bbox_y0 = current_material_text_bbox[1]
-                            current_material_text_bbox_x1 = current_material_text_bbox[2]
-                            current_material_text_bbox_y1 = current_material_text_bbox[3]
-                            current_material_text_bbox_middle_y = (current_material_text_bbox_y0 + current_material_text_bbox_y1) / 2
-                            #Get coordinates of matching rectangle
-                            rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
-                            
-                            #Move the pointer line based on stack view
-                            match globals.option_menu:
-                                case "Stacked" | "Realistic" | "Stress":
-                                    self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x0, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
-                                case "Stepped":
-                                    self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x1, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
-
-            
-            #Set the previous_material to the current one
-            previous_material = material
+        
+                #Set the previous_material_text_bbox_id to the current one
+                previous_text_bbox_id = globals.materials[material]["Text_bbox_id"]
 
 
         #Loop through every material from LOWEST layer to TOP layer
-        previous_material = None
+        previous_text_bbox_id = None
         for material in dict(reversed(globals.materials.items())):
             if(globals.materials[material]["Text_bbox_id"] != None):
                 #Get the coordinates of the current_material_text_bbox
-                current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                current_material_text_bbox_x0 = current_material_text_bbox[0]
-                current_material_text_bbox_y0 = current_material_text_bbox[1]
-                current_material_text_bbox_x1 = current_material_text_bbox[2]
-                current_material_text_bbox_y1 = current_material_text_bbox[3]
+                current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                current_text_bbox_x0 = current_text_bbox[0]
+                current_text_bbox_y0 = current_text_bbox[1]
+                current_text_bbox_x1 = current_text_bbox[2]
+                current_text_bbox_y1 = current_text_bbox[3]
 
                 #if the text_bbox bottom overlaps with the canvas bottom
-                if(current_material_text_bbox_y1 > self.visible_canvas_bbox_y1):
+                if(current_text_bbox_y1 > self.visible_canvas_bbox_y1):
                     #find the overlap
-                    overlap = current_material_text_bbox_y1 - self.visible_canvas_bbox_y1 
+                    overlap = current_text_bbox_y1 - self.visible_canvas_bbox_y1 
                     #Move the text, text_bbox and line_id down
                     self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, -overlap)
                     self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, -overlap)
 
                     #Get the new text_bbox coordinates
-                    current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                    current_material_text_bbox_x0 = current_material_text_bbox[0]
-                    current_material_text_bbox_y0 = current_material_text_bbox[1]
-                    current_material_text_bbox_x1 = current_material_text_bbox[2]
-                    current_material_text_bbox_y1 = current_material_text_bbox[3]
-                    current_material_text_bbox_middle_y = (current_material_text_bbox_y0 + current_material_text_bbox_y1) / 2
+                    current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                    current_text_bbox_x0 = current_text_bbox[0]
+                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_x1 = current_text_bbox[2]
+                    current_text_bbox_y1 = current_text_bbox[3]
+                    current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
                     #Get coordinates of matching rectangle
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
                     match globals.option_menu:
                         case "Stacked" | "Realistic" | "Stress":
-                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x0, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
+                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
-                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x1, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
+                            self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
 
                 #########GOOD SO FAR###################
             
-                #if there is a previous material
-                if(previous_material != None):
-                    #if the previous_material has a text_bbox
-                    if(globals.materials[previous_material]["Text_bbox_id"] != None):
-                        #Get the coordinates of the current_material text_bbox
-                        current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                        current_material_text_bbox_x0 = current_material_text_bbox[0]
-                        current_material_text_bbox_y0 = current_material_text_bbox[1]
-                        current_material_text_bbox_x1 = current_material_text_bbox[2]
-                        current_material_text_bbox_y1 = current_material_text_bbox[3]
+                #if there is a previous text_bbix
+                if(previous_text_bbox_id != None):
+                    #Get the coordinates of the current_material text_bbox
+                    current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                    current_text_bbox_x0 = current_text_bbox[0]
+                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_x1 = current_text_bbox[2]
+                    current_text_bbox_y1 = current_text_bbox[3]
+                    
+                    #Get the coordinates of the previous_material_text_bbox text_bbox
+                    previous_text_bbox = self.layer_stack_canvas.bbox(previous_text_bbox_id)
+                    previous_text_bbox_x0 = previous_text_bbox[0]
+                    previous_text_bbox_y0 = previous_text_bbox[1]
+                    previous_text_bbox_x1 = previous_text_bbox[2]
+                    previous_text_bbox_y1 = previous_text_bbox[3]
+
+
+                    #if the current_material text_bbox bottom is overlapping the previous_material text_bbox top
+                    if(current_text_bbox_y1 > previous_text_bbox_y0):
+                        #find the overlap
+                        overlap = current_text_bbox_y1 - previous_text_bbox_y0  
+                        #move the current_materials->text, text_bbox and line down
+                        self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, -overlap)
+                        self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, -overlap)
+
+                        #Get the new text_bbox coordinates
+                        current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                        current_text_bbox_x0 = current_text_bbox[0]
+                        current_text_bbox_y0 = current_text_bbox[1]
+                        current_text_bbox_x1 = current_text_bbox[2]
+                        current_text_bbox_y1 = current_text_bbox[3]
+                        current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
+                        #Get coordinates of matching rectangle
+                        rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                         
-                        #Get the coordinates of the previous_material text_bbox
-                        previous_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Text_bbox_id"])
-                        previous_material_text_bbox_x0 = previous_material_text_bbox[0]
-                        previous_material_text_bbox_y0 = previous_material_text_bbox[1]
-                        previous_material_text_bbox_x1 = previous_material_text_bbox[2]
-                        previous_material_text_bbox_y1 = previous_material_text_bbox[3]
-
-
-                        #if the current_material text_bbox bottom is overlapping the previous_material text_bbox top
-                        if(current_material_text_bbox_y1 > previous_material_text_bbox_y0):
-                            #find the overlap
-                            overlap = current_material_text_bbox_y1 - previous_material_text_bbox_y0  
-                            #move the current_materials->text, text_bbox and line down
-                            self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, -overlap)
-                            self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, -overlap)
-
-                            #Get the new text_bbox coordinates
-                            current_material_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                            current_material_text_bbox_x0 = current_material_text_bbox[0]
-                            current_material_text_bbox_y0 = current_material_text_bbox[1]
-                            current_material_text_bbox_x1 = current_material_text_bbox[2]
-                            current_material_text_bbox_y1 = current_material_text_bbox[3]
-                            current_material_text_bbox_middle_y = (current_material_text_bbox_y0 + current_material_text_bbox_y1) / 2
-                            #Get coordinates of matching rectangle
-                            rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
-                            
-                            #Move the pointer line based on stack view
-                            match globals.option_menu:
-                                case "Stacked" | "Realistic" | "Stress":
-                                    self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x0, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
-                                case "Stepped":
-                                    self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_material_text_bbox_x1, current_material_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
-
+                        #Move the pointer line based on stack view
+                        match globals.option_menu:
+                            case "Stacked" | "Realistic" | "Stress":
+                                self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
+                            case "Stepped":
+                                self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
             
-            #Set the previous_material to the current one
-            previous_material = material
-
-
-
-            #if materials->text_box_bottom is overlapping the BOTTOM of the canvas AND OR overlapping the previous materials->text_box_top
-                #Calculate the overlapp and move it upwards
-
-
-            #if the text 
-            #Make one loop that goes through every text box for every material and checks if the top of the text box overlaps with the canvas top or the bottom of the previous material text box 
-
-        
-
-       
-        #Write different texts based on current stack option
-        # match globals.option_menu:
-        #     case "Stacked" | "Realistic" | "Stress":
-        #         #Find out the height of a potential text's bounding box
-        #         text_font = font.Font(family=settings.text_font, size=settings.text_size)
-        #         text_height = text_font.metrics()['linespace']
-        #         previous_material = None
-
-        #         #Loop through all the materials:
-        #         # for material in dict(reversed(globals.materials.items())):
-        #         for material in globals.materials:
-        #             #If material has a rectangle that text can be written on
-        #             if(globals.materials[material]["Rectangle_id"] != None):
-        #                 #Find coordinates and height of current material_rectangle
-        #                 current_rectangle_x0, current_rectangle_y0, current_rectangle_x1, current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])
-        #                 current_rectangle_height = current_rectangle_y1-current_rectangle_y0
-        #                 current_rectangle_middle_x = (current_rectangle_x0 + current_rectangle_x1)/2
-        #                 current_rectangle_middle_y = (current_rectangle_y0 + current_rectangle_y1)/2
-
-        #                 #Text is drawn inside rectangle
-        #                 if(text_height < current_rectangle_height):
-        #                     created_text = self.layer_stack_canvas.create_text(
-        #                         current_rectangle_middle_x, current_rectangle_middle_y, 
-        #                         # text=f"{material} - {globals.materials[material]['thickness']}nm",
-        #                         text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-        #                         fill=settings.text_color, 
-        #                         font=(settings.text_font, settings.text_size), 
-        #                         anchor="center", 
-        #                         tags="Material_label"
-        #                     )
-
-        #                     #If text is outside leftside of canvas, place it on the left canvas side
-        #                     if(self.layer_stack_canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
-        #                         overlap = self.visible_canvas_bbox_x0 - self.layer_stack_canvas.bbox(created_text)[0] 
-        #                         self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x+overlap, current_rectangle_middle_y)
-                            
-        #                     #If text is outside rightside of canvas, place it on the right canvas side
-        #                     if(self.layer_stack_canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
-        #                         overlap = self.layer_stack_canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
-        #                         self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x-overlap, current_rectangle_middle_y)
-                            
-        #                     #Add text element to dictionary
-        #                     globals.materials[material]["Text_id"] = created_text
-
-        #                 #Text is drawn outside rectangle
-        #                 else:
-        #                     #Create text, bbox and line and place them
-        #                     created_text = self.layer_stack_canvas.create_text(
-        #                         self.visible_canvas_bbox_x1, current_rectangle_middle_y, 
-        #                         # text=f"{material} - {globals.materials[material]['thickness']}nm", 
-        #                         text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-        #                         fill=settings.text_color, 
-        #                         font=(settings.text_font, settings.text_size), 
-        #                         tags="Material_label"
-        #                     )
-        #                     created_text_bbox = self.layer_stack_canvas.create_rectangle(
-        #                         self.layer_stack_canvas.bbox(created_text), 
-        #                         outline=settings.text_color, 
-        #                         tags="text_bbox"
-        #                     )
-        #                     #Get coordinates of text bounding box
-        #                     current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1  = self.layer_stack_canvas.bbox(created_text)
-        #                     current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-
-        #                     created_arrow_line = self.layer_stack_canvas.create_line(
-        #                         (current_text_bbox_x0, current_text_bbox_middle_y), (current_rectangle_x1, current_rectangle_middle_y), 
-        #                         arrow=tkinter.LAST, 
-        #                         fill=settings.text_color,
-        #                         tags="arrow_line"
-        #                     )
-
-        #                     #Check for adjustments of text
-        #                     #if(text top overlaps with canvas top):
-        #                     if(current_text_bbox_y0 < self.visible_canvas_bbox_y0):
-        #                         #Find how much is overlapping
-        #                         overlap = self.visible_canvas_bbox_y0 - current_text_bbox_y0
-        #                         #Move text and bbox down
-        #                         self.layer_stack_canvas.move(created_text, 0, overlap)
-        #                         self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-        #                         #Find new coordinates of text bounding box
-        #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                         #Move the arrow line
-        #                         self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-                            
-        #                     #if(Text bottom overlaps with canvas bottom):
-        #                     if(current_text_bbox_y1 > self.visible_canvas_bbox_y1):
-        #                         #Find how much is overlapping
-        #                         overlap = current_text_bbox_y1 - self.visible_canvas_bbox_y1
-        #                         #Move text and bounding box up
-        #                         self.layer_stack_canvas.move(created_text, 0, -overlap)
-        #                         self.layer_stack_canvas.move(created_text_bbox, 0, -overlap)
-                                
-        #                         #Find coordinates of new text bounding box
-        #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                         #Move the arrow line
-        #                         self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-                            
-        #                     #if(text right side overlaps with canvas right side)
-        #                     if(current_text_bbox_x1 > self.visible_canvas_bbox_x1):
-        #                         #Find how much is overlapping
-        #                         overlap = current_text_bbox_x1 - self.visible_canvas_bbox_x1
-        #                         #Move text left
-        #                         self.layer_stack_canvas.move(created_text, -overlap, 0)
-        #                         self.layer_stack_canvas.move(created_text_bbox, -overlap, 0)
-                                
-        #                         #Find new coordinates of text bounding box
-        #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                         #Move the arrow line
-        #                         self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-
-        #                     #if(Text top overlaps with previous text bottom):
-        #                     if(previous_material != None):
-        #                         #If text, bounding box and lines has been created for this element
-        #                         if(globals.materials[previous_material]["Text_id"] != None and globals.materials[previous_material]["Text_bbox_id"] != None and globals.materials[previous_material]["Line_id"] != None):
-        #                             #Find necessary coordinated for previous material
-        #                             previous_text_bbox_y1 = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Text_id"])[3]
-        #                             #if(Text top overlaps with previous text bottom):
-        #                             if(current_text_bbox_y0 < previous_text_bbox_y1):
-        #                                 #Find how much is overlapping
-        #                                 overlap = previous_text_bbox_y1 - current_text_bbox_y0
-        #                                 #Move text down
-        #                                 self.layer_stack_canvas.move(created_text, 0, overlap)
-        #                                 self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-        #                                 #Find new coordinates of text bounding box
-        #                                 current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                                 current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                                 #Move the arrow line
-        #                                 self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-
-        #                     #Add created elements to dictionary
-        #                     globals.materials[material]["Text_id"] = created_text
-        #                     globals.materials[material]["Text_bbox_id"] = created_text_bbox
-        #                     globals.materials[material]["Line_id"] = created_arrow_line
-                            
-        #                 #Set previous material to the current one
-        #                 previous_material = material
-
-        #     case "Stepped":
-        #         #Find out the height of a potential text's bounding box
-        #         text_font = font.Font(family=settings.text_font, size=settings.text_size)
-        #         text_height = text_font.metrics()['linespace']
-        #         previous_material = None
-
-        #         #Loop through all the materials:
-        #         # for material in dict(reversed(globals.materials.items())):
-        #         for material in globals.materials:
-        #             #If material has a rectangle that text can be written on
-        #             if(globals.materials[material]["Rectangle_id"] != None):
-        #                 #Find coordinates and height of current material_rectangle
-        #                 current_rectangle_x0, current_rectangle_y0, current_rectangle_x1, current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])
-        #                 current_rectangle_height = current_rectangle_y1-current_rectangle_y0
-        #                 current_rectangle_middle_x = (current_rectangle_x0 + current_rectangle_x1)/2
-        #                 current_rectangle_middle_y = (current_rectangle_y0 + current_rectangle_y1)/2
-
-        #                 #Text is drawn inside rectangle
-        #                 if(text_height < current_rectangle_height):
-        #                     created_text = self.layer_stack_canvas.create_text(
-        #                         current_rectangle_middle_x, current_rectangle_middle_y, 
-        #                         # text=f"{material} - {globals.materials[material]['thickness']}nm", 
-        #                         text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-
-        #                         fill=settings.text_color, 
-        #                         font=(settings.text_font, settings.text_size), 
-        #                         # anchor="center", 
-        #                         tags="Material_label"
-        #                     )
-
-        #                     #If text is outside leftside of canvas, place it on the left canvas side
-        #                     if(self.layer_stack_canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
-        #                         overlap = self.visible_canvas_bbox_x0 - self.layer_stack_canvas.bbox(created_text)[0] 
-        #                         self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x+overlap, current_rectangle_middle_y)
-                            
-        #                     #If text is outside rightside of canvas, place it on the right canvas side
-        #                     if(self.layer_stack_canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
-        #                         overlap = self.layer_stack_canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
-        #                         self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x-overlap, current_rectangle_middle_y)
-                            
-        #                     #Add text element to dictionary
-        #                     globals.materials[material]["Text_id"] = created_text
-
-        #                 #Text is drawn outside rectangle
-        #                 else:
-        #                     #Create text, bbox and line and place them
-        #                     created_text = self.layer_stack_canvas.create_text(
-        #                         self.visible_canvas_bbox_x0, current_rectangle_middle_y, 
-        #                         # text=f"{material} - {globals.materials[material]['thickness']}nm", 
-        #                         text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-
-        #                         fill=settings.text_color, 
-        #                         font=(settings.text_font, settings.text_size), 
-        #                         tags="Material_label"
-        #                     )
-        #                     created_text_bbox = self.layer_stack_canvas.create_rectangle(
-        #                         self.layer_stack_canvas.bbox(created_text), 
-        #                         outline=settings.text_color, 
-        #                         tags="text_bbox"
-        #                     )
-        #                     #Get coordinates of text bounding box
-        #                     current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1  = self.layer_stack_canvas.bbox(created_text)
-        #                     current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-
-        #                     created_arrow_line = self.layer_stack_canvas.create_line(
-        #                         (current_text_bbox_x1, current_text_bbox_middle_y), (current_rectangle_x0, current_rectangle_middle_y), 
-        #                         arrow=tkinter.LAST, 
-        #                         fill=settings.text_color,
-        #                         tags="arrow_line"
-        #                     )
-
-        #                     #Check for adjustments of text
-        #                     #if(text top overlaps with canvas top):
-        #                     if(current_text_bbox_y0 < self.visible_canvas_bbox_y0):
-        #                         #Find how much is overlapping
-        #                         overlap = self.visible_canvas_bbox_y0 - current_text_bbox_y0
-        #                         #Move text and bbox down
-        #                         self.layer_stack_canvas.move(created_text, 0, overlap)
-        #                         self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-        #                         #Find new coordinates of text bounding box
-        #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                         #Move the arrow line
-        #                         self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-                            
-        #                     #if(Text bottom overlaps with canvas bottom):
-        #                     if(current_text_bbox_y1 > self.visible_canvas_bbox_y1):
-        #                         #Find how much is overlapping
-        #                         overlap = current_text_bbox_y1 - self.visible_canvas_bbox_y1
-        #                         #Move text and bounding box up
-        #                         self.layer_stack_canvas.move(created_text, 0, -overlap)
-        #                         self.layer_stack_canvas.move(created_text_bbox, 0, -overlap)
-                                
-        #                         #Find coordinates of new text bounding box
-        #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                         #Move the arrow line
-        #                         self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-                            
-        #                     #if(text left side overlaps with canvas left side)
-        #                     if(current_text_bbox_x0 < self.visible_canvas_bbox_x0):
-        #                         #Find how much is overlapping
-        #                         overlap = self.visible_canvas_bbox_x0 - current_text_bbox_x0
-        #                         #Move text to right
-        #                         self.layer_stack_canvas.move(created_text, overlap, 0)
-        #                         self.layer_stack_canvas.move(created_text_bbox, overlap, 0)
-                                
-        #                         #Find new coordinates of text bounding box
-        #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                         #Move the arrow line
-        #                         self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-
-        #                     #if(Text top overlaps with previous text bottom):
-        #                     if(previous_material != None):
-        #                         #If text, bounding box and lines has been created for this element
-        #                         if(globals.materials[previous_material]["Text_id"] != None and globals.materials[previous_material]["Text_bbox_id"] != None and globals.materials[previous_material]["Line_id"] != None):
-        #                             #Find necessary coordinated for previous material
-        #                             previous_text_bbox_y1 = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Text_id"])[3]
-        #                             #if(Text top overlaps with previous text bottom):
-        #                             if(current_text_bbox_y0 < previous_text_bbox_y1):
-        #                                 #Find how much is overlapping
-        #                                 overlap = previous_text_bbox_y1 - current_text_bbox_y0
-        #                                 #Move text down
-        #                                 self.layer_stack_canvas.move(created_text, 0, overlap)
-        #                                 self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-        #                                 #Find new coordinates of text bounding box
-        #                                 current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-        #                                 current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-        #                                 #Move the arrow line
-        #                                 self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-
-        #                     #Add created elements to dictionary
-        #                     globals.materials[material]["Text_id"] = created_text
-        #                     globals.materials[material]["Text_bbox_id"] = created_text_bbox
-        #                     globals.materials[material]["Line_id"] = created_arrow_line
-                            
-        #                 #Set previous material to the current one
-        #                 previous_material = material
+                #Set the previous_material to the current one
+                previous_text_bbox_id = globals.materials[material]["Text_bbox_id"]
 
         
     """Writes the indent ranges on the stepped material stack"""
@@ -1105,7 +808,6 @@ class Layer_Stack_Canvas:
         #Go through every material
         for material in dict(reversed(globals.materials.items())):
 
-            
             #There is a rectangle that text can be written on
             if(globals.materials[material]["Rectangle_id"] != None):
 
@@ -1211,322 +913,3 @@ class Layer_Stack_Canvas:
                         previous_material_indent_line_coordinates = current_material_indent_line_coordinates
         
                 previous_material = material
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #  """Writes text on rectangles in the material stack"""
-    # def write_text_on_stack(self):                                            #ORIGINAL (293 lines)
-    #     # print("WRITE_TEXT_ON_STACK()")
-
-    #     #Delete all texts from canvas and dictionary
-    #     for material in globals.materials:
-    #         self.layer_stack_canvas.delete(globals.materials[material]["Text_id"])
-    #         self.layer_stack_canvas.delete(globals.materials[material]["Text_bbox_id"])
-    #         self.layer_stack_canvas.delete(globals.materials[material]["Line_id"])
-
-    #         globals.materials[material]["Text_id"] = None
-    #         globals.materials[material]["Text_bbox_id"] = None
-    #         globals.materials[material]["Line_id"] = None
-
-       
-    #     #Write different texts based on current stack option
-    #     match globals.option_menu:
-    #         case "Stacked" | "Realistic" | "Stress":
-    #             #Find out the height of a potential text's bounding box
-    #             text_font = font.Font(family=settings.text_font, size=settings.text_size)
-    #             text_height = text_font.metrics()['linespace']
-    #             previous_material = None
-
-    #             #Loop through all the materials:
-    #             # for material in dict(reversed(globals.materials.items())):
-    #             for material in globals.materials:
-    #                 #If material has a rectangle that text can be written on
-    #                 if(globals.materials[material]["Rectangle_id"] != None):
-    #                     #Find coordinates and height of current material_rectangle
-    #                     current_rectangle_x0, current_rectangle_y0, current_rectangle_x1, current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])
-    #                     current_rectangle_height = current_rectangle_y1-current_rectangle_y0
-    #                     current_rectangle_middle_x = (current_rectangle_x0 + current_rectangle_x1)/2
-    #                     current_rectangle_middle_y = (current_rectangle_y0 + current_rectangle_y1)/2
-
-    #                     #Text is drawn inside rectangle
-    #                     if(text_height < current_rectangle_height):
-    #                         created_text = self.layer_stack_canvas.create_text(
-    #                             current_rectangle_middle_x, current_rectangle_middle_y, 
-    #                             # text=f"{material} - {globals.materials[material]['thickness']}nm",
-    #                             text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-    #                             fill=settings.text_color, 
-    #                             font=(settings.text_font, settings.text_size), 
-    #                             anchor="center", 
-    #                             tags="Material_label"
-    #                         )
-
-    #                         #If text is outside leftside of canvas, place it on the left canvas side
-    #                         if(self.layer_stack_canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
-    #                             overlap = self.visible_canvas_bbox_x0 - self.layer_stack_canvas.bbox(created_text)[0] 
-    #                             self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x+overlap, current_rectangle_middle_y)
-                            
-    #                         #If text is outside rightside of canvas, place it on the right canvas side
-    #                         if(self.layer_stack_canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
-    #                             overlap = self.layer_stack_canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
-    #                             self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x-overlap, current_rectangle_middle_y)
-                            
-    #                         #Add text element to dictionary
-    #                         globals.materials[material]["Text_id"] = created_text
-
-    #                     #Text is drawn outside rectangle
-    #                     else:
-    #                         #Create text, bbox and line and place them
-    #                         created_text = self.layer_stack_canvas.create_text(
-    #                             self.visible_canvas_bbox_x1, current_rectangle_middle_y, 
-    #                             # text=f"{material} - {globals.materials[material]['thickness']}nm", 
-    #                             text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-    #                             fill=settings.text_color, 
-    #                             font=(settings.text_font, settings.text_size), 
-    #                             tags="Material_label"
-    #                         )
-    #                         created_text_bbox = self.layer_stack_canvas.create_rectangle(
-    #                             self.layer_stack_canvas.bbox(created_text), 
-    #                             outline=settings.text_color, 
-    #                             tags="text_bbox"
-    #                         )
-    #                         #Get coordinates of text bounding box
-    #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1  = self.layer_stack_canvas.bbox(created_text)
-    #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-
-    #                         created_arrow_line = self.layer_stack_canvas.create_line(
-    #                             (current_text_bbox_x0, current_text_bbox_middle_y), (current_rectangle_x1, current_rectangle_middle_y), 
-    #                             arrow=tkinter.LAST, 
-    #                             fill=settings.text_color,
-    #                             tags="arrow_line"
-    #                         )
-
-    #                         #Check for adjustments of text
-    #                         #if(text top overlaps with canvas top):
-    #                         if(current_text_bbox_y0 < self.visible_canvas_bbox_y0):
-    #                             #Find how much is overlapping
-    #                             overlap = self.visible_canvas_bbox_y0 - current_text_bbox_y0
-    #                             #Move text and bbox down
-    #                             self.layer_stack_canvas.move(created_text, 0, overlap)
-    #                             self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-    #                             #Find new coordinates of text bounding box
-    #                             current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                             current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                             #Move the arrow line
-    #                             self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-                            
-    #                         #if(Text bottom overlaps with canvas bottom):
-    #                         if(current_text_bbox_y1 > self.visible_canvas_bbox_y1):
-    #                             #Find how much is overlapping
-    #                             overlap = current_text_bbox_y1 - self.visible_canvas_bbox_y1
-    #                             #Move text and bounding box up
-    #                             self.layer_stack_canvas.move(created_text, 0, -overlap)
-    #                             self.layer_stack_canvas.move(created_text_bbox, 0, -overlap)
-                                
-    #                             #Find coordinates of new text bounding box
-    #                             current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                             current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                             #Move the arrow line
-    #                             self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-                            
-    #                         #if(text right side overlaps with canvas right side)
-    #                         if(current_text_bbox_x1 > self.visible_canvas_bbox_x1):
-    #                             #Find how much is overlapping
-    #                             overlap = current_text_bbox_x1 - self.visible_canvas_bbox_x1
-    #                             #Move text left
-    #                             self.layer_stack_canvas.move(created_text, -overlap, 0)
-    #                             self.layer_stack_canvas.move(created_text_bbox, -overlap, 0)
-                                
-    #                             #Find new coordinates of text bounding box
-    #                             current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                             current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                             #Move the arrow line
-    #                             self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-
-    #                         #if(Text top overlaps with previous text bottom):
-    #                         if(previous_material != None):
-    #                             #If text, bounding box and lines has been created for this element
-    #                             if(globals.materials[previous_material]["Text_id"] != None and globals.materials[previous_material]["Text_bbox_id"] != None and globals.materials[previous_material]["Line_id"] != None):
-    #                                 #Find necessary coordinated for previous material
-    #                                 previous_text_bbox_y1 = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Text_id"])[3]
-    #                                 #if(Text top overlaps with previous text bottom):
-    #                                 if(current_text_bbox_y0 < previous_text_bbox_y1):
-    #                                     #Find how much is overlapping
-    #                                     overlap = previous_text_bbox_y1 - current_text_bbox_y0
-    #                                     #Move text down
-    #                                     self.layer_stack_canvas.move(created_text, 0, overlap)
-    #                                     self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-    #                                     #Find new coordinates of text bounding box
-    #                                     current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                                     current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                                     #Move the arrow line
-    #                                     self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x0, current_text_bbox_middle_y, current_rectangle_x1, current_rectangle_middle_y)
-
-    #                         #Add created elements to dictionary
-    #                         globals.materials[material]["Text_id"] = created_text
-    #                         globals.materials[material]["Text_bbox_id"] = created_text_bbox
-    #                         globals.materials[material]["Line_id"] = created_arrow_line
-                            
-    #                     #Set previous material to the current one
-    #                     previous_material = material
-
-    #         case "Stepped":
-    #             #Find out the height of a potential text's bounding box
-    #             text_font = font.Font(family=settings.text_font, size=settings.text_size)
-    #             text_height = text_font.metrics()['linespace']
-    #             previous_material = None
-
-    #             #Loop through all the materials:
-    #             # for material in dict(reversed(globals.materials.items())):
-    #             for material in globals.materials:
-    #                 #If material has a rectangle that text can be written on
-    #                 if(globals.materials[material]["Rectangle_id"] != None):
-    #                     #Find coordinates and height of current material_rectangle
-    #                     current_rectangle_x0, current_rectangle_y0, current_rectangle_x1, current_rectangle_y1 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])
-    #                     current_rectangle_height = current_rectangle_y1-current_rectangle_y0
-    #                     current_rectangle_middle_x = (current_rectangle_x0 + current_rectangle_x1)/2
-    #                     current_rectangle_middle_y = (current_rectangle_y0 + current_rectangle_y1)/2
-
-    #                     #Text is drawn inside rectangle
-    #                     if(text_height < current_rectangle_height):
-    #                         created_text = self.layer_stack_canvas.create_text(
-    #                             current_rectangle_middle_x, current_rectangle_middle_y, 
-    #                             # text=f"{material} - {globals.materials[material]['thickness']}nm", 
-    #                             text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-
-    #                             fill=settings.text_color, 
-    #                             font=(settings.text_font, settings.text_size), 
-    #                             # anchor="center", 
-    #                             tags="Material_label"
-    #                         )
-
-    #                         #If text is outside leftside of canvas, place it on the left canvas side
-    #                         if(self.layer_stack_canvas.bbox(created_text)[0] < self.visible_canvas_bbox_x0):
-    #                             overlap = self.visible_canvas_bbox_x0 - self.layer_stack_canvas.bbox(created_text)[0] 
-    #                             self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x+overlap, current_rectangle_middle_y)
-                            
-    #                         #If text is outside rightside of canvas, place it on the right canvas side
-    #                         if(self.layer_stack_canvas.bbox(created_text)[2] > self.visible_canvas_bbox_x1):
-    #                             overlap = self.layer_stack_canvas.bbox(created_text)[2] - self.visible_canvas_bbox_x1 
-    #                             self.layer_stack_canvas.coords(created_text, current_rectangle_middle_x-overlap, current_rectangle_middle_y)
-                            
-    #                         #Add text element to dictionary
-    #                         globals.materials[material]["Text_id"] = created_text
-
-    #                     #Text is drawn outside rectangle
-    #                     else:
-    #                         #Create text, bbox and line and place them
-    #                         created_text = self.layer_stack_canvas.create_text(
-    #                             self.visible_canvas_bbox_x0, current_rectangle_middle_y, 
-    #                             # text=f"{material} - {globals.materials[material]['thickness']}nm", 
-    #                             text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
-
-    #                             fill=settings.text_color, 
-    #                             font=(settings.text_font, settings.text_size), 
-    #                             tags="Material_label"
-    #                         )
-    #                         created_text_bbox = self.layer_stack_canvas.create_rectangle(
-    #                             self.layer_stack_canvas.bbox(created_text), 
-    #                             outline=settings.text_color, 
-    #                             tags="text_bbox"
-    #                         )
-    #                         #Get coordinates of text bounding box
-    #                         current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1  = self.layer_stack_canvas.bbox(created_text)
-    #                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-
-    #                         created_arrow_line = self.layer_stack_canvas.create_line(
-    #                             (current_text_bbox_x1, current_text_bbox_middle_y), (current_rectangle_x0, current_rectangle_middle_y), 
-    #                             arrow=tkinter.LAST, 
-    #                             fill=settings.text_color,
-    #                             tags="arrow_line"
-    #                         )
-
-    #                         #Check for adjustments of text
-    #                         #if(text top overlaps with canvas top):
-    #                         if(current_text_bbox_y0 < self.visible_canvas_bbox_y0):
-    #                             #Find how much is overlapping
-    #                             overlap = self.visible_canvas_bbox_y0 - current_text_bbox_y0
-    #                             #Move text and bbox down
-    #                             self.layer_stack_canvas.move(created_text, 0, overlap)
-    #                             self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-    #                             #Find new coordinates of text bounding box
-    #                             current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                             current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                             #Move the arrow line
-    #                             self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-                            
-    #                         #if(Text bottom overlaps with canvas bottom):
-    #                         if(current_text_bbox_y1 > self.visible_canvas_bbox_y1):
-    #                             #Find how much is overlapping
-    #                             overlap = current_text_bbox_y1 - self.visible_canvas_bbox_y1
-    #                             #Move text and bounding box up
-    #                             self.layer_stack_canvas.move(created_text, 0, -overlap)
-    #                             self.layer_stack_canvas.move(created_text_bbox, 0, -overlap)
-                                
-    #                             #Find coordinates of new text bounding box
-    #                             current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                             current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                             #Move the arrow line
-    #                             self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-                            
-    #                         #if(text left side overlaps with canvas left side)
-    #                         if(current_text_bbox_x0 < self.visible_canvas_bbox_x0):
-    #                             #Find how much is overlapping
-    #                             overlap = self.visible_canvas_bbox_x0 - current_text_bbox_x0
-    #                             #Move text to right
-    #                             self.layer_stack_canvas.move(created_text, overlap, 0)
-    #                             self.layer_stack_canvas.move(created_text_bbox, overlap, 0)
-                                
-    #                             #Find new coordinates of text bounding box
-    #                             current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                             current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                             #Move the arrow line
-    #                             self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-
-    #                         #if(Text top overlaps with previous text bottom):
-    #                         if(previous_material != None):
-    #                             #If text, bounding box and lines has been created for this element
-    #                             if(globals.materials[previous_material]["Text_id"] != None and globals.materials[previous_material]["Text_bbox_id"] != None and globals.materials[previous_material]["Line_id"] != None):
-    #                                 #Find necessary coordinated for previous material
-    #                                 previous_text_bbox_y1 = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Text_id"])[3]
-    #                                 #if(Text top overlaps with previous text bottom):
-    #                                 if(current_text_bbox_y0 < previous_text_bbox_y1):
-    #                                     #Find how much is overlapping
-    #                                     overlap = previous_text_bbox_y1 - current_text_bbox_y0
-    #                                     #Move text down
-    #                                     self.layer_stack_canvas.move(created_text, 0, overlap)
-    #                                     self.layer_stack_canvas.move(created_text_bbox, 0, overlap)
-    #                                     #Find new coordinates of text bounding box
-    #                                     current_text_bbox_x0, current_text_bbox_y0, current_text_bbox_x1, current_text_bbox_y1 = self.layer_stack_canvas.bbox(created_text_bbox)
-    #                                     current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
-    #                                     #Move the arrow line
-    #                                     self.layer_stack_canvas.coords(created_arrow_line, current_text_bbox_x1, current_text_bbox_middle_y, current_rectangle_x0, current_rectangle_middle_y)
-
-    #                         #Add created elements to dictionary
-    #                         globals.materials[material]["Text_id"] = created_text
-    #                         globals.materials[material]["Text_bbox_id"] = created_text_bbox
-    #                         globals.materials[material]["Line_id"] = created_arrow_line
-                            
-    #                     #Set previous material to the current one
-    #                     previous_material = material
-
-        
