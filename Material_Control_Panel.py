@@ -1,5 +1,5 @@
 import tkinter
-from tkinter import messagebox, StringVar
+from tkinter import messagebox, StringVar, colorchooser
 import customtkinter
 import settings #File containing settings
 import globals  #File containing global variables
@@ -304,7 +304,6 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
-        #################################
         #CTE [ppm/deg] value
         self.CTE_value_label = customtkinter.CTkLabel(
             master=self.add_material_window, 
@@ -334,7 +333,6 @@ class Material_Control_Panel:
             padx=(0,0),
             pady=(0,0)
         )
-        #################################
 
 
         #Density [kg/m3] value
@@ -429,12 +427,30 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
+        #Find color buttom
+        find_color_button = customtkinter.CTkButton(
+            master=self.add_material_window,
+            text="Find color",
+            fg_color=settings.add_material_window_button_color,
+            hover_color=settings.add_material_window_button_hover_color,
+            text_color=settings.add_material_window_text_color,
+            width=15,
+            command=self.choose_color_for_add_material
+        )
+        find_color_button.grid(
+            row=4,
+            column=2,
+            sticky="n",
+            padx=(5,0),
+            pady=(0,0)
+        ) 
+
         #Confirm button
         confirm_button = customtkinter.CTkButton(
             master=self.add_material_window,
             text="Confirm",
-            fg_color=settings.add_material_window_button_color,
-            hover_color=settings.add_material_window_button_hover_color,
+            fg_color="#008c00", 
+            hover_color="#00cd00",
             text_color=settings.add_material_window_text_color,
             width=15,
             command=self.validate_add_material_inputs
@@ -557,6 +573,16 @@ class Material_Control_Panel:
         #Re-draw the material stack
         globals.layer_stack_canvas.draw_material_stack()
 
+
+    """Opens up a color palette window and inserts the color code to 'material_color_entry' in 'add_material_window'"""
+    def choose_color_for_add_material(self):
+        color_code = colorchooser.askcolor(title="Choose a color")[1]
+        if(color_code):
+            #Delete existing string in entry and insert new one
+            self.material_color_entry.delete(0)
+            self.material_color_entry.insert(0, color_code)
+        #Lift the add_material_window to the front
+        self.add_material_window.lift()
 
     
     """Returns True if given color string is a valid color. Return False if invalid"""
@@ -1210,6 +1236,45 @@ class Material_Control_Panel:
 
             row_counter += 1
         
+        #Find color buttom
+        find_color_button = customtkinter.CTkButton(
+            master=self.modify_material_window,
+            text="Find color",
+            fg_color=settings.modify_material_window_button_color,
+            hover_color=settings.modify_material_window_button_hover_color,
+            text_color=settings.modify_material_window_text_color,
+            width=10,
+            height=10,
+            command=self.choose_color_for_modify_material
+        )
+        find_color_button.grid(
+            row=2,
+            column=0,
+            sticky="w",
+            padx=(20,0),
+            pady=(0,0)
+        )
+        
+        
+        #SHOW SELECTED COLOR ENTRY
+        self.color_finder_entry = customtkinter.CTkEntry(
+            master=self.modify_material_window,
+            placeholder_text="No color selected",
+            width=110,
+            height=10,
+            fg_color="white",
+            text_color="black",
+            justify="center"
+        )
+        self.color_finder_entry.grid(
+            row=3,
+            column=0,
+            sticky="w",
+            padx=(5,0),
+            pady=(0,0)
+        )
+
+        #CONFIRM CHANGES BUTTON
         confirm_button = customtkinter.CTkButton(
             master=self.modify_material_window,
             text="Confirm changes",
@@ -1222,6 +1287,18 @@ class Material_Control_Panel:
             padx=(0,0),
             pady=(0,0)
         )
+    
+
+    """Opens a color palette window and inserts the color code to 'self.color_finder_entry' in modify_materials_window'"""
+    def choose_color_for_modify_material(self):
+        color_code = colorchooser.askcolor(title="Choose a color")[1]
+
+        if(color_code):
+            self.color_finder_entry.delete(0)
+            self.color_finder_entry.insert(0, color_code)
+        
+        #Pull modify_material_window to the front
+        self.modify_material_window.lift()
 
 
     """Goes through all entries in self.entry_dictionary and validates all entries"""

@@ -47,16 +47,16 @@
                 {"Stress_x [MPa]": int(value)}, == sigma
                 {"Poisson": int(value), == nu
                 {"Label_name_id": tkinter(value)},                      #ID of the label in material_adjustment_panel 
-                {"entry_id": tkinter(value)},
-                {"slider_id": tkinter(value)},
-                {"rectangle_id": tkinter(value)},
-                {"text_id": tkinter(value)},
-                {"text_bbox_id" : tkinter(value)},
-                {"line_id": tkinter(value)},
-                {"indent_text_id": tkinter(value)},
-                {"indent_text_bbox_id": tkinter(value)},
-                {"indent_line_id": tkinter(value)},
-                {"indent_arrow_pointer_id": tkinter(value)}
+                {"Entry_id": tkinter(value)},
+                {"Slider_id": tkinter(value)},
+                {"Rectangle_id": tkinter(value)},
+                {"Text_id": tkinter(value)},
+                {"Text_bbox_id" : tkinter(value)},
+                {"Line_id": tkinter(value)},
+                {"Indent_text_id": tkinter(value)},
+                {"Indent_text_bbox_id": tkinter(value)},
+                {"Indent_line_id": tkinter(value)},
+                {"Indent_arrow_pointer_id": tkinter(value)}
         }
 
 
@@ -78,24 +78,19 @@
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
 
+
+
+
     BUGS:
-        -write indent on stepped stack
-            #Sjekk at indent text bokser ikke tegnes utenfor canvas når materialer blir for tynn eller tykk
-            #When a materials->thickness is set to "0" and the view is "realistic", then text_bboxes overlaps each other because "previous material" is not registered because it is not drawn
-        
-        -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
-        
-        -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
-        
-        -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
-        -Trengs "dissabled/enabled" funksjonen enda å eksistere?
+        I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
 
     TO DO                   
-        -Fix bugs
-
-        -Add functionality to change color of the materials? add a color palette?
-
-        -Add a color palette image in the "Materials" excel file and the exported excel file?
-
         -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?
+
+        -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
+
+        -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
+        -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
+
+        -Trengs "dissabled/enabled" funksjonen enda å eksistere?
