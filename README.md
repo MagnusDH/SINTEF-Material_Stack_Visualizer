@@ -41,12 +41,14 @@
                 {"Indent [nm]" : int(value)},
                 {"Color" : str(value)},
                 {"Status" : str(value)},
-                {"Modulus [GPa]": int(value)}, == E
+                {"Modulus [GPa]": int(value)},                          == E
                 {"CTE [ppm/deg]": int(value)}
-                {"Density [kg/m3]": int(value)}, == rho
-                {"Stress_x [MPa]": int(value)}, == sigma
-                {"Poisson": int(value), == nu
-                {"Label_name_id": tkinter(value)},                      #ID of the label in material_adjustment_panel 
+                {"Density [kg/m3]": int(value)},                        == rho
+                {"Stress_x [MPa]": int(value)},                         == sigma
+                {"Poisson": int(value),                                 == nu
+                {"R0": int(value)}
+                {"R": int(value)}
+                {"Label_name_id": tkinter(value)},                      == ID of the label in material_adjustment_panel 
                 {"Entry_id": tkinter(value)},
                 {"Slider_id": tkinter(value)},
                 {"Rectangle_id": tkinter(value)},
@@ -85,12 +87,25 @@
         I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
 
-    TO DO                   
+    TO DO 
+        -Stoney view skal ha et eget layout:
+            -"tick bokser" skal vises istedetfor "delete material" knapper.
+            -Kun ett materiale skal kunne markeres/vises samtidig som substratet
+            -"R0" og "R" variablene skal vises sammens med slider og tykkelse bokser til hver materiale
+
+        -Fjern "R-slider" i graph
+    
+    QUESTIONS:
+        -
+
+    POTENTIAL FIXES:
+        -Add a "scrollable frame" in "add material" window
+
         -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?
 
         -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
 
-        -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
         -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
+        -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
 
         -Trengs "dissabled/enabled" funksjonen enda å eksistere?

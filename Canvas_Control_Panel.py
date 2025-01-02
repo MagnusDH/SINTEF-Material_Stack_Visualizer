@@ -137,7 +137,7 @@ class Canvas_Control_Panel:
         #Switch layout option menu
         self.option_menu = customtkinter.CTkOptionMenu(
             master=self.canvas_control_panel_frame, 
-            values=["Stacked", "Realistic", "Stepped", "Stress"],
+            values=["Stacked", "Realistic", "Stepped", "Stoney"],
             width=30,
             fg_color=settings.layer_stack_canvas_control_panel_button_color, 
             button_hover_color=settings.layer_stack_canvas_control_panel_button_hover_color,
@@ -189,7 +189,7 @@ class Canvas_Control_Panel:
                 match globals.option_menu:
 
                     #Reset only the "thickness" values
-                    case "Stacked" | "Realistic" | "Stress":
+                    case "Stacked" | "Realistic" | "Stoney":
                         #Reload initial thickness values from given excel file
                         #Read given excel file into Pandas dataframe
                         excel_data = pandas.read_excel(excel_file)
@@ -257,9 +257,12 @@ class Canvas_Control_Panel:
     def switch_layout(self, *event):
         # print("SWITCH_LAYOUT()")
 
+        #Switch the option in globals.option_menu
+        globals.option_menu = self.option_menu.get()
+
         #Destroy the graph if it exists
         if hasattr(globals.graph, 'graph'):
-            globals.graph.graph.get_tk_widget().destroy()
+            globals.graph.graph_canvas.get_tk_widget().destroy()
             globals.graph = None
             
         #Destroy the graph_control_panel if it exists
@@ -267,27 +270,25 @@ class Canvas_Control_Panel:
             globals.graph_control_panel.graph_control_panel.destroy()
 
 
+        #Create a new material_adjustment_panel with a different layout based on the option menu
+        globals.material_adjustment_panel.create_material_adjustment_panel()
+        
         #Switch UI layout based on option value
         match self.option_menu.get():
             case "Stacked":
-                globals.option_menu = "Stacked"
-
-                #Change the label in user_interface_frame
-                globals.material_adjustment_panel.slider_label.configure(text="Thickness [nm]")
 
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
-                for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                    
-                    if(globals.materials[material]["Status"] != "disabled"):
-                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-                
+                #for material in globals.materials:
+                #globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                            
+                #if(globals.materials[material]["Status"] != "disabled"):
+                #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                        
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
 
                 globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
                 globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
-
                 globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
                 globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
 
@@ -298,17 +299,13 @@ class Canvas_Control_Panel:
                 globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
 
             case "Realistic":
-                globals.option_menu = "Realistic"
-
-                #Change the label in user_interface_frame
-                globals.material_adjustment_panel.slider_label.configure(text="Thickness [nm]")
 
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
-                for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                    
-                    if(globals.materials[material]["Status"] != "disabled"):
-                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                #for material in globals.materials:
+                    #globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                            
+                    #if(globals.materials[material]["Status"] != "disabled"):
+                    #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
 
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
@@ -324,46 +321,35 @@ class Canvas_Control_Panel:
                 globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
             
             case "Stepped":
-                globals.option_menu = "Stepped"
-
-                #Change the label in UI frame
-                globals.material_adjustment_panel.slider_label.configure(text="Indent [nm]")
 
                 #Set all material entry and slider values to "indent" value, except the entries that are "disabled"
-                for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
+                #for material in globals.materials:
+                    #globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
 
-                    if(globals.materials[material]["Status"] != "disabled"):
-                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
-                
+                    #if(globals.materials[material]["Status"] != "disabled"):
+                        #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
+                        
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
 
                 globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
                 globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
-
                 globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
                 globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-                
+                        
                 #Draw the material stack
                 globals.layer_stack_canvas.draw_material_stack()
 
                 #Set new dimensions for canvas_control_panel back to the original
                 globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
 
-            case "Stress":
-                #Set option menu status
-                globals.option_menu = "Stress"
-
-                #Change the label in user_interface_frame
-                globals.material_adjustment_panel.slider_label.configure(text="Thickness [nm]")
-
+            case "Stoney":
                 #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
-                for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                #for material in globals.materials:
+                    #globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
                     
-                    if(globals.materials[material]["Status"] != "disabled"):
-                        globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    #if(globals.materials[material]["Status"] != "disabled"):
+                        #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
 
                 #Set new dimensions for layer_stack_canvas
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=510)
@@ -531,7 +517,7 @@ class Canvas_Control_Panel:
                     #Create SVG-element for arrow line pointing from box to rectangle
                     if(globals.materials[material]["Line_id"] != None):
                         #Line must be drawn from the right side of stack to left side of text
-                        if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic" or globals.option_menu == "Stress"):
+                        if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic" or globals.option_menu == "Stoney"):
                             line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
                             #Construct an SVG <line> element for arrows
                             bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])

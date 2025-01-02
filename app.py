@@ -26,7 +26,7 @@ class App:
         #If excel file exists and user wants to open load it, then load materials.xlsx
         if(os.path.isfile("Materials.xlsx")):
             self.load_materials_from_excel()
-                
+
         #Main frame where every widgets is placed
         self.main_frame = self.create_scrollable_frame(self.program_window)
         globals.main_frame = self.main_frame
@@ -192,6 +192,10 @@ class App:
                         row["Stress_x [MPa]"] = 0
                     if(pandas.isna(row["Poisson"])):
                         row["Poisson"] = 0
+                    if(pandas.isna(row["R0"])):
+                        row["R0"] = 0
+                    if(pandas.isna(row["R"])):
+                        row["R"] = 0
 
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
@@ -207,6 +211,8 @@ class App:
                         "Density [kg/m3]": int(row["Density [kg/m3]"]),
                         "Stress_x [MPa]": int(row["Stress_x [MPa]"]),
                         "Poisson": int(row["Poisson"]),
+                        "R0": int(row["R0"]),
+                        "R": int(row["R"]),
                         "Label_name_id": None,
                         "Entry_id": None,
                         "Slider_id": None,
@@ -232,6 +238,7 @@ class App:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")
                 return
 
+
     """Places 'substrate' as the lowest layer and sorts the materials{} dictionary after the 'layer' value of each material"""
     def sort_dictionary(self):
         # print("SORT_DICTIONARY()")
@@ -253,7 +260,29 @@ class App:
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+
+
+    """Prints the globals.materials dictionary specifily"""
+    def print_dictionary(self):
+        for material in globals.materials:
+            print("Name: ", globals.materials[material]["Name"])
+            print("Layer: ", globals.materials[material]["Layer"])
+            print("Thickness: ", globals.materials[material]["Thickness"])  
+            print("Unit: ", globals.materials[material]["Unit"])  
+            print("Indent [nm]: ", globals.materials[material]["Indent [nm]"])  
+            print("Color: ", globals.materials[material]["Color"])  
+            print("Status: ", globals.materials[material]["Status"])  
+            print("Modulus [GPa]: ", globals.materials[material]["Modulus [GPa]"])  
+            print("CTE [ppm/deg]: ", globals.materials[material]["CTE [ppm/deg]"])  
+            print("Density [kg/m3]: ", globals.materials[material]["Density [kg/m3]"])  
+            print("Stress_x [MPa]: ", globals.materials[material]["Stress_x [MPa]"])  
+            print("Poisson: ", globals.materials[material]["Poisson"])  
+            print("R0: ", globals.materials[material]["R0"])  
+            print("R: ", globals.materials[material]["R"])  
             
+            print("\n")
+
+
 
 if __name__ == "__main__":
     #Create the main application window

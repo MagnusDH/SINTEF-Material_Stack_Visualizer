@@ -14,7 +14,7 @@ class Graph:
         
         self.window = window
 
-        self.graph = self.create_graph()
+        self.graph_canvas, self.graph = self.create_graph()
 
 
     def create_graph(self):
@@ -55,9 +55,7 @@ class Graph:
         self.ax.axhline(0, color="black", linewidth=1)
         self.ax.axvline(0, color="black", linewidth=1)
 
-        return figure_canvas
-    
-
+        return figure_canvas, figure
     
 
     """
@@ -131,7 +129,7 @@ class Graph:
         self.ax.axvline(0, color="black", linewidth=1)
 
         #Redraw the graph
-        self.graph.draw_idle()
+        self.graph_canvas.draw_idle()
 
 
             

@@ -90,7 +90,7 @@ class Layer_Stack_Canvas:
 
             #Redraw text on stack
             match globals.option_menu:
-                case "Stacked" | "Realistic" | "Stress":
+                case "Stacked" | "Realistic" | "Stoney":
                     self.write_text_on_stack()
                 
                 case "Stepped":
@@ -107,7 +107,7 @@ class Layer_Stack_Canvas:
                 
         #Draw stack based on value in option menu
         match globals.option_menu:
-            case "Stacked" | "Stress":
+            case "Stacked" | "Stoney":
                 self.draw_material_stack_stacked()
             case "Realistic":
                 self.draw_material_stack_realistic()
@@ -417,7 +417,7 @@ class Layer_Stack_Canvas:
 
         #CREATION OF TEXT, TEXT_BBOX AND LINES
         match globals.option_menu:
-            case "Stacked" | "Realistic" | "Stress":
+            case "Stacked" | "Realistic" | "Stoney":
 
                 #Loop through every material:
                 for material in globals.materials:
@@ -546,7 +546,7 @@ class Layer_Stack_Canvas:
         #ADJUSTMENT OF TEXT: LEFT AND RIGHT            
         match globals.option_menu:
             #Text overlaps with canvas right side
-            case "Stacked" | "Realistic" | "Stress":
+            case "Stacked" | "Realistic" | "Stoney":
                 #Loop through all materials
                 for material in globals.materials:
                     if(globals.materials[material]["Text_bbox_id"] != None):
@@ -641,7 +641,7 @@ class Layer_Stack_Canvas:
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
                     match globals.option_menu:
-                        case "Stacked" | "Realistic" | "Stress":
+                        case "Stacked" | "Realistic" | "Stoney":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
@@ -684,7 +684,7 @@ class Layer_Stack_Canvas:
                         
                         #Move the pointer line based on stack view
                         match globals.option_menu:
-                            case "Stacked" | "Realistic" | "Stress":
+                            case "Stacked" | "Realistic" | "Stoney":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                             case "Stepped":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
@@ -724,7 +724,7 @@ class Layer_Stack_Canvas:
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
                     match globals.option_menu:
-                        case "Stacked" | "Realistic" | "Stress":
+                        case "Stacked" | "Realistic" | "Stoney":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
@@ -768,7 +768,7 @@ class Layer_Stack_Canvas:
                         
                         #Move the pointer line based on stack view
                         match globals.option_menu:
-                            case "Stacked" | "Realistic" | "Stress":
+                            case "Stacked" | "Realistic" | "Stoney":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                             case "Stepped":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)

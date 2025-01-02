@@ -64,7 +64,7 @@ material_control_panel_text_color = "white"
 
 #ADD MATERIAL WINDOW
 add_material_window_width = 400
-add_material_window_height = 410
+add_material_window_height = 420
 add_material_window_background_color = material_adjustment_panel_background_color
 add_material_window_text_color = "white"
 add_material_window_button_color = material_adjustment_panel_button_color
@@ -72,10 +72,8 @@ add_material_window_button_hover_color = material_adjustment_panel_button_hover_
 
 
 #MODIFY MATERIAL WINDOW
-modify_material_window_width = 1450
+modify_material_window_width = 1550
 modify_material_window_height = 500
-modify_material_window_scrollable_frame_width = 1100
-modify_material_window_scrollable_frame_height = 300
 modify_material_window_background_color = main_frame_background_color
 modify_material_window_button_color = material_adjustment_panel_button_color
 modify_material_window_button_hover_color = material_adjustment_panel_button_hover_color
@@ -83,6 +81,9 @@ modify_material_window_text_size = 14
 modify_material_window_text_color = "white"
 modify_material_window_text_font = "Arial"
 modify_material_window_entry_width = 90
+modify_material_window_scrollable_frame_width = 1200
+modify_material_window_scrollable_frame_height = 300
+modify_material_window_scrollable_frame_color = "#444444"
 
 
 #LAYER STACK CANVAS

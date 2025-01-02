@@ -427,6 +427,67 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
+        #R0 value
+        self.R0_value_label = customtkinter.CTkLabel(
+            master=self.add_material_window, 
+            text="R0", 
+            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_background_color,
+        )
+        self.R0_value_label.grid(
+            row=10, 
+            column=0, 
+            sticky="e", 
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        self.R0_value_entry = customtkinter.CTkEntry(
+            master=self.add_material_window,
+            fg_color = "white",
+            text_color="black",
+            width=70,
+            justify="center"
+        )
+        self.R0_value_entry.grid(
+            row=10, 
+            column=1,
+            sticky="e",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        #R value
+        self.R_value_label = customtkinter.CTkLabel(
+            master=self.add_material_window, 
+            text="R", 
+            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_background_color,
+        )
+        self.R_value_label.grid(
+            row=11, 
+            column=0, 
+            sticky="e", 
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        self.R_value_entry = customtkinter.CTkEntry(
+            master=self.add_material_window,
+            fg_color = "white",
+            text_color="black",
+            width=70,
+            justify="center"
+        )
+        self.R_value_entry.grid(
+            row=11, 
+            column=1,
+            sticky="e",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+
         #Find color buttom
         find_color_button = customtkinter.CTkButton(
             master=self.add_material_window,
@@ -456,7 +517,7 @@ class Material_Control_Panel:
             command=self.validate_add_material_inputs
         )
         confirm_button.grid(
-            row=10,
+            row=13,
             column=2,
             sticky="n",
             padx=(0,0),
@@ -514,7 +575,7 @@ class Material_Control_Panel:
             self.add_material_window.lift()
             return
 
-        #If "E" value is entered, check if it is integer
+        #If "Modulus" value is entered, check if it is integer
         if(self.Modulus_value_entry.get() != ""):
             try:
                 Modulus_value = self.Modulus_value_entry.get() 
@@ -560,6 +621,25 @@ class Material_Control_Panel:
                 Poisson_value = int(Poisson_value)
             except ValueError:
                 messagebox.showerror("ERROR", "'Poisson' value has to be an integer", parent=self.add_material_window)
+                return
+
+        #If 'R0' value is entered, check if it is integer
+        if(self.R0_value_entry.get() != ""):
+            try:
+                R0_value = self.R0_value_entry.get() 
+                R0_value = int(R0_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'R0' value has to be an integer", parent=self.add_material_window)
+                return
+
+
+        #If 'R' value is entered, check if it is integer
+        if(self.R_value_entry.get() != ""):
+            try:
+                R_value = self.R_value_entry.get() 
+                R_value = int(R_value)
+            except ValueError:
+                messagebox.showerror("ERROR", "'R' value has to be an integer", parent=self.add_material_window)
                 return
 
 
@@ -994,30 +1074,12 @@ class Material_Control_Panel:
         #Bind the "renter/return" button to call "confirm_material_changes" function when pressed
         self.modify_material_window.bind('<Return>', lambda event: self.confirm_material_changes())
 
-        headline_label = customtkinter.CTkLabel(
-            master=self.modify_material_window,
-            text="      Material          Thickness      Unit      Indent[nm]         Color          Modulus [GPa]      CTE [ppm/deg]    Density [kg/m3]    Stress_x [MPa]         Poisson",
-            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_background_color
-        )
-        headline_label.grid(
-            row=0,
-            column=0,
-            sticky="nw",
-            padx=(5,0),
-            pady=(0,0)
-        )
-
         #Create a scrollable frame for entries to each material
         scrollable_frame = customtkinter.CTkScrollableFrame(
             master=self.modify_material_window,
             width=settings.modify_material_window_scrollable_frame_width,
             height=settings.modify_material_window_scrollable_frame_height,
-            # label_text = "   Material     Thickness         Unit        Indent[nm]       Color     Modulus [GPa]        CTE [ppm/deg]      Density [kg/m3]         Stress_x [MPa]       Poisson",
-            # label_fg_color = settings.modify_material_window_background_color,
-            # label_font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            # label_anchor="w"
+            fg_color = settings.modify_material_window_scrollable_frame_color,
         )
         scrollable_frame.grid(
             row=1,
@@ -1027,11 +1089,206 @@ class Material_Control_Panel:
             pady=(0,0)
         )
 
-        #Loop through all materials
-        row_counter = 0
+        #Create headlines in the scrollable frame
+        #Name
+        name_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Name",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        name_label.grid(
+            row=0,
+            column=0,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        #Thickness  
+        thickness_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Thicknes",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        thickness_label.grid(
+            row=0,
+            column=1,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        #Unit
+        unit_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Unit",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        unit_label.grid(
+            row=0,
+            column=2,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        #Indent[nm]
+        indent_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Indent[nm]",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        indent_label.grid(
+            row=0,
+            column=3,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        #Color
+        color_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Color",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        color_label.grid(
+            row=0,
+            column=4,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        #Modulus [GPa]
+        modulus_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Modulus [GPa]",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        modulus_label.grid(
+            row=0,
+            column=5,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        #CTE [ppm/deg]
+        CTE_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="CTE [ppm/deg]",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        CTE_label.grid(
+            row=0,
+            column=6,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        #Density [kg/m3]
+        density_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Density [kg/m3]",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        density_label.grid(
+            row=0,
+            column=7,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        #Stress_x [MPa]
+        stress_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Stress_x [MPa]",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        stress_label.grid(
+            row=0,
+            column=8,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        #Poisson
+        poisson_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="Poisson",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        poisson_label.grid(
+            row=0,
+            column=9,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        #R0
+        R0_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="R0",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        R0_label.grid(
+            row=0,
+            column=10,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+
+        #R
+        R_label = customtkinter.CTkLabel(
+            master=scrollable_frame,
+            text="R",
+            font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
+            text_color="white",
+            fg_color=settings.modify_material_window_scrollable_frame_color
+        )
+        R_label.grid(
+            row=0,
+            column=11,
+            sticky="nwse",
+            padx=(0,0),
+            pady=(0,0)
+        )
+        
+        
+        
+        #Create entries for all materials
+        row_counter = 1
         for material in globals.materials:
             inner_dictionary = {}
-
+            
             #Create entries for each category in materials
 
             #MATERIAL NAME
@@ -1232,6 +1489,47 @@ class Material_Control_Panel:
             )
             inner_dictionary["Poisson_entry"] = poisson_entry
 
+
+            #R0
+            R0_entry = customtkinter.CTkEntry(
+                master=scrollable_frame,
+                textvariable=StringVar(value=str(globals.materials[material]["R0"])),
+                width=50, #settings.modify_material_window_entry_width,
+                height=10,
+                fg_color="white",
+                text_color="black",
+                justify="center"
+            )
+            R0_entry.grid(
+                row=row_counter,
+                column=10,
+                sticky="",
+                padx=(3,0),
+                pady=(0,0)
+            )
+            inner_dictionary["R0_entry"] = R0_entry
+
+
+            #R
+            R_entry = customtkinter.CTkEntry(
+                master=scrollable_frame,
+                textvariable=StringVar(value=str(globals.materials[material]["R"])),
+                width=50, #settings.modify_material_window_entry_width,
+                height=10,
+                fg_color="white",
+                text_color="black",
+                justify="center"
+            )
+            R_entry.grid(
+                row=row_counter,
+                column=11,
+                sticky="",
+                padx=(3,0),
+                pady=(0,0)
+            )
+            inner_dictionary["R_entry"] = R_entry
+
+
             self.entry_dictionary[material] = inner_dictionary
 
             row_counter += 1
@@ -1405,6 +1703,25 @@ class Material_Control_Panel:
                 messagebox.showerror("ERROR", f"'Poisson' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
                 return
 
+
+            #R0
+            try:
+                R0 = int(self.entry_dictionary[material]["R0_entry"].get())
+
+            except ValueError:
+                messagebox.showerror("ERROR", f"'R0' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
+                return
+
+            
+            #R
+            try:
+                R = int(self.entry_dictionary[material]["R_entry"].get())
+
+            except ValueError:
+                messagebox.showerror("ERROR", f"'R' value for '{material_name}' must be a 'digit'", parent=self.modify_material_window)
+                return
+
+
         self.confirm_material_changes()
 
     
@@ -1431,6 +1748,10 @@ class Material_Control_Panel:
             globals.materials[new_key]["Density [kg/m3]"] = int(self.entry_dictionary[material]["Density_entry"].get())
             globals.materials[new_key]["Stress_x [MPa]"] = int(self.entry_dictionary[material]["Stress_entry"].get())
             globals.materials[new_key]["Poisson"] = int(self.entry_dictionary[material]["Poisson_entry"].get())
+
+            globals.materials[new_key]["R0"] = int(self.entry_dictionary[material]["R0_entry"].get())
+            globals.materials[new_key]["R"] = int(self.entry_dictionary[material]["R_entry"].get())
+
 
         #Sort materials dictionary
         globals.app.sort_dictionary()
@@ -1483,12 +1804,15 @@ class Material_Control_Panel:
         sheet["H1"] = "Density [kg/m3]"
         sheet["I1"] = "Stress_x [MPa]"
         sheet["J1"] = "Poisson"
+        sheet["K1"] = "R0"
+        sheet["L1"] = "R"
+
 
         #Define a fill_color for cells
         fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
 
         #Loop through the desired range of columns and rows to apply the fill_color and set a bold font
-        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=10):  # Adjust row/column range as needed
+        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=12):  # Adjust row/column range as needed
             for cell in row:
                 cell.font = Font(bold=True)
                 cell.fill = fill_color
@@ -1503,7 +1827,7 @@ class Material_Control_Panel:
         )
 
         #Apply the border to a range of cells and center the text in each cell
-        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=10):  # Adjust range as needed
+        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=12):  # Adjust range as needed
             for cell in row:
                 cell.border = thin_border
                 cell.alignment = Alignment(horizontal="center", vertical="center")
@@ -1519,6 +1843,9 @@ class Material_Control_Panel:
         sheet.column_dimensions['H'].width = 15
         sheet.column_dimensions['I'].width = 15  
         sheet.column_dimensions['J'].width = 10
+        sheet.column_dimensions['K'].width = 10
+        sheet.column_dimensions['L'].width = 10
+
 
         # Set row height
         # sheet.row_dimensions[1].height = 20  # Height of row 1 set to 30
@@ -1538,6 +1865,9 @@ class Material_Control_Panel:
             sheet.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"])
             sheet.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"])
             sheet.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"])
+            sheet.cell(row=row_counter, column=11, value=globals.materials[material]["R0"])
+            sheet.cell(row=row_counter, column=12, value=globals.materials[material]["R"])
+
 
             #increment row_counter
             row_counter += 1
@@ -1563,12 +1893,12 @@ class Material_Control_Panel:
             case "Stacked" | "Realistic" | "Stepped":
                 canvas_screenshot.width = 750
                 canvas_screenshot.height = 350
-            case "Stress":
+            case "Stoney":
                 canvas_screenshot.width = 350
                 canvas_screenshot.height = 350
 
-        #Add the image to the excel file
-        sheet.add_image(canvas_screenshot, "L1")
+        #Add the image to the excel file in a specific cell
+        sheet.add_image(canvas_screenshot, "N1")
 
         #Save the workbook as excel file
         workbook.save(f"{main_folder}/{sub_folder}/{filename}")
