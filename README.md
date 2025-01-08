@@ -40,7 +40,7 @@
                 {"Unit" : str(value)},
                 {"Indent [nm]" : int(value)},
                 {"Color" : str(value)},
-                {"Status" : str(value)},
+                {"Status" : str(value)},                                == "active" or "inactive"                             
                 {"Modulus [GPa]": int(value)},                          == E
                 {"CTE [ppm/deg]": int(value)}
                 {"Density [kg/m3]": int(value)},                        == rho
@@ -51,6 +51,7 @@
                 {"Label_name_id": tkinter(value)},                      == ID of the label in material_adjustment_panel 
                 {"Entry_id": tkinter(value)},
                 {"Slider_id": tkinter(value)},
+                {"Checkbox_id": tkinter(value)},
                 {"Rectangle_id": tkinter(value)},
                 {"Text_id": tkinter(value)},
                 {"Text_bbox_id" : tkinter(value)},
@@ -60,7 +61,7 @@
                 {"Indent_line_id": tkinter(value)},
                 {"Indent_arrow_pointer_id": tkinter(value)}
         }
-
+            
 
 
     *Class Organization and inheritance
@@ -88,15 +89,30 @@
 
 
     TO DO 
-        -Stoney view skal ha et eget layout:
-            -"tick bokser" skal vises istedetfor "delete material" knapper.
-            -Kun ett materiale skal kunne markeres/vises samtidig som substratet
-            -"R0" og "R" variablene skal vises sammens med slider og tykkelse bokser til hver materiale
+        -Stoney layout:
+            -Kun ETT annet materiale kan velges samtidig. Dette materialet kan bare sendes direkte rundt til andre funksjoner
+            -Når et materiale er valgt må funksjonen som tegner grafen kalles
+            -Lag en ny "draw_layer_stack_stoney" funksjon som bare tegner substratet sammen med det valgte materialet (self.draw_material_stack_stoney(self, material))
 
-        -Fjern "R-slider" i graph
+
+        -Fjern "reset values" funksjon
+
+    til runar:
+        -yo, her e nytt program.
+        -for å bruke "stoney view", bare trykk inn på den modusen og velg et materiale/filament. Da vil grafen tegnes og sigma_R verdien vises. 
+
+        -Syns programmet fungere litt ræva akkurat no og det ser litt wonky ut, men treng en oppdatering på om æ e på rett vei?
+
+        -Y1 grafen som blir tegna no e bare en negativ verdi av ligninga du gav mæ, fordi ligningen vi snakka om e jo helt likens hvis R0 og R verdiene er likens?
+            y0 = sqrt((R0**2) - (x**2))  
+            y1 = sqrt((R**2) - (x**2))
+        
+        -Sjekk om "export graph" funksjonen fungere hos dæ også
+
+         
     
     QUESTIONS:
-        -
+        -Har ligningen i grafen et navn?
 
     POTENTIAL FIXES:
         -Add a "scrollable frame" in "add material" window
@@ -109,3 +125,5 @@
         -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
 
         -Trengs "dissabled/enabled" funksjonen enda å eksistere?
+
+        -I "stoney" view: Materialer der tickbox value="off" kan være grå farge, materialer der tickbox value="on" kan være deres egen farge

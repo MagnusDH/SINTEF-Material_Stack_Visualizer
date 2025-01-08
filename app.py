@@ -162,12 +162,6 @@ class App:
                 i = 2
                 layer = 1
                 for column, row in excel_data.iterrows():
-                    #Check the background color of the cell
-                    background_color = fs.cell(column=1, row=i).fill.bgColor.index
-                    if(background_color == "FFFFFF00"):
-                        status = "disabled"
-                    else:
-                        status = "active"
                     #Increment "i" to go to the next row
                     i+=1
 
@@ -205,7 +199,7 @@ class App:
                         "Unit": row["Unit"],
                         "Indent [nm]": int(row["Indent [nm]"]),
                         "Color": row["Color"],
-                        "Status": status,
+                        "Status": "active",
                         "Modulus [GPa]": int(row["Modulus [GPa]"]),
                         "CTE [ppm/deg]": int(row["CTE [ppm/deg]"]),
                         "Density [kg/m3]": int(row["Density [kg/m3]"]),
@@ -216,6 +210,7 @@ class App:
                         "Label_name_id": None,
                         "Entry_id": None,
                         "Slider_id": None,
+                        "Checkbox_id": None,
                         "Rectangle_id": None,
                         "Text_id": None,
                         "Text_bbox_id" : None,

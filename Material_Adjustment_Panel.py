@@ -24,7 +24,7 @@ class Material_Adjustment_Panel:
     -If the Frame exists, then the material_adjustment_panel is simply updated corresponding with the materials in globals.materials{} 
     """
     def create_material_adjustment_panel(self):
-        print("CREATE_MATERIAL_ADJUSTMENT_PANEL()")
+        # print("CREATE_MATERIAL_ADJUSTMENT_PANEL()")
 
         #if material_adjustment_frame has NOT been created before, create it
         if not hasattr(self, 'material_adjustment_panel_frame'):
@@ -57,7 +57,7 @@ class Material_Adjustment_Panel:
                     text="Material", 
                     fg_color=settings.material_adjustment_panel_background_color,
                     text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
+                    font=(settings.text_font, 18, "bold")
                 )
                 material_headline.grid(
                     row=self.row_counter,
@@ -73,7 +73,7 @@ class Material_Adjustment_Panel:
                     text="Thickness [nm]", 
                     fg_color=settings.material_adjustment_panel_background_color,
                     text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
+                    font=(settings.text_font, 18, "bold")
                 )                    
                 self.slider_label.grid(
                     row=self.row_counter,
@@ -171,12 +171,6 @@ class Material_Adjustment_Panel:
                         entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                         slider.set(globals.materials[material]["Thickness"])
                             
-                        #Disable slider and Entry if specified by the excel-file
-                        if(globals.materials[material]["Status"] == "disabled"):
-                            globals.materials[material]["Slider_id"].configure(state="disabled") #Disable slider
-                            globals.materials[material]["Entry_id"].delete(0, tkinter.END)     #Disable Entry
-                            globals.materials[material]["Entry_id"].insert(0, "Disabled")      #Disable Entry
-                            globals.materials[material]["Entry_id"].configure(state="disabled")#Disable Entry
                         globals.materials[material]["Slider_id"] = slider 
 
                         #Create buttons to move layer up or down
@@ -230,7 +224,7 @@ class Material_Adjustment_Panel:
                     text="Material", 
                     fg_color=settings.material_adjustment_panel_background_color,
                     text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
+                    font=(settings.text_font, 18, "bold")
                 )
                 material_headline.grid(
                     row=self.row_counter,
@@ -246,7 +240,7 @@ class Material_Adjustment_Panel:
                     text="Indent [nm]", 
                     fg_color=settings.material_adjustment_panel_background_color,
                     text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
+                    font=(settings.text_font, 18, "bold")
                 )    
                 self.slider_label.grid(
                     row=self.row_counter,
@@ -344,13 +338,7 @@ class Material_Adjustment_Panel:
                         entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
                         slider.set(globals.materials[material]["Indent [nm]"])
 
-
-                        #Disable slider and Entry if specified by the excel-file
-                        if(globals.materials[material]["Status"] == "disabled"):
-                            globals.materials[material]["Slider_id"].configure(state="disabled") #Disable slider
-                            globals.materials[material]["Entry_id"].delete(0, tkinter.END)     #Disable Entry
-                            globals.materials[material]["Entry_id"].insert(0, "Disabled")      #Disable Entry
-                            globals.materials[material]["Entry_id"].configure(state="disabled")#Disable Entry
+                        #Add slider to globals.materials
                         globals.materials[material]["Slider_id"] = slider 
 
                         #Create buttons to move layer up or down
@@ -398,29 +386,14 @@ class Material_Adjustment_Panel:
                         self.row_counter+=1
             
             case "Stoney":
-                #Render the tick boxes and remove the delete buttons
-                print("STONEY VIEW")
-
-
-                #Render:
-                    #material name headline label
-                    #material Thickness headline label
-                    #material R0 headline label
-                    #material R headline label
-
-                    #tick box
-                    #Entry box
-                    #Slider
-                    #R0 entry box
-                    #R entry box
-
+                
                 #Create label headline for "material"
                 material_headline = customtkinter.CTkLabel(
                     master=self.material_adjustment_panel_frame, 
                     text="Material", 
                     fg_color=settings.material_adjustment_panel_background_color,
                     text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
+                    font=(settings.text_font, 18, "bold")
                 )
                 material_headline.grid(
                     row=self.row_counter,
@@ -436,7 +409,7 @@ class Material_Adjustment_Panel:
                     text="Thickness [nm]", 
                     fg_color=settings.material_adjustment_panel_background_color,
                     text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
+                    font=(settings.text_font, 18, "bold")
                 )                    
                 self.slider_label.grid(
                     row=self.row_counter,
@@ -446,67 +419,38 @@ class Material_Adjustment_Panel:
                     pady=(0,0)
                 )
 
-                ########
-                #Create label to display R0 value
-                self.R0_headline = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="R0", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
-                )                    
-                self.R0_headline.grid(
-                    row=self.row_counter,
-                    column=5,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
-                
-                
-                #Create label to display R value
-                self.R_headline = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="R", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 20, "bold")
-                )                    
-                self.R_headline.grid(
-                    row=self.row_counter,
-                    column=6,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
-                #######
-
                 self.row_counter += 1
                 
                 #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
                 if(len(globals.materials) > 0):
 
                     for material in globals.materials: 
-                        #Button to delete material
-                        delete_material_button = customtkinter.CTkButton(
-                            master=self.material_adjustment_panel_frame, 
-                            width=1,
-                            height=1,
-                            text="✕", #✕ 🗑
-                            font=(settings.text_font, -15, "bold"),
-                            fg_color="#820000",
-                            hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
-                            text_color=settings.material_control_panel_text_color,
-                            command=lambda button_layer=self.row_counter: self.delete_material(button_layer)
+                        #Checkbox to select or deselect material
+                        checkbox_value = customtkinter.StringVar(value="off")
+                        checkbox = customtkinter.CTkCheckBox(
+                            master=self.material_adjustment_panel_frame,
+                            width=0,
+                            text="",
+                            command=lambda material=material, checkbox=checkbox_value: self.checkbox_event(material),
+                            variable=checkbox_value,
+                            onvalue="on",
+                            offvalue="off"
                         )
-                        delete_material_button.grid(
+                        checkbox.grid(
                             row=self.row_counter,
                             column=0,
                             sticky="",
                             padx=(0,0),
                             pady=(0,0)
                         )
+                        globals.materials[material]["Checkbox_id"] = checkbox
 
+                        #if material is substrate, then the checkbox must be "on"
+                        if(material.lower() == "substrate"):
+                            globals.materials[material]["Checkbox_id"].select()
+
+
+                        #Material name label
                         label = customtkinter.CTkLabel(
                             master=self.material_adjustment_panel_frame, 
                             text=material, 
@@ -568,14 +512,10 @@ class Material_Adjustment_Panel:
                         #Set slider and entry values
                         entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                         slider.set(globals.materials[material]["Thickness"])
-                            
-                        #Disable slider and Entry if specified by the excel-file
-                        if(globals.materials[material]["Status"] == "disabled"):
-                            globals.materials[material]["Slider_id"].configure(state="disabled") #Disable slider
-                            globals.materials[material]["Entry_id"].delete(0, tkinter.END)     #Disable Entry
-                            globals.materials[material]["Entry_id"].insert(0, "Disabled")      #Disable Entry
-                            globals.materials[material]["Entry_id"].configure(state="disabled")#Disable Entry
+
+                        #Add slider to globals.materials                            
                         globals.materials[material]["Slider_id"] = slider 
+
 
                         #Create buttons to move layer up or down
                         if(len(globals.materials) > 1):
@@ -622,10 +562,26 @@ class Material_Adjustment_Panel:
                         self.row_counter+=1
 
 
+    def checkbox_event(self, chosen_material):
+        # print("CHECKBOX_EVENT()")
+
+        #Turn off all materials->checkboxes and mark them as "inactive"
+        for material in globals.materials:
+            #Mark the chosen material and "substrate" as "active" and turn on their checkboxes
+            if((material.lower() == "substrate") or material == chosen_material):
+                globals.materials[material]["Checkbox_id"].select()
+                globals.materials[material]["Status"] = "active"
+            #for every other material: Turn off checkboxes and mark them as "inactive"
+            else:
+                globals.materials[material]["Checkbox_id"].deselect()
+                globals.materials[material]["Status"] = "inactive"
             
+        #Redraw the material stack in a limited version
+        globals.layer_stack_canvas.draw_material_stack()
 
-       
-
+        #Create graph with the two given materials
+        globals.graph.draw_graph()
+            
     
     """Updates the thickness value in globals.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, entry):
@@ -668,7 +624,7 @@ class Material_Adjustment_Panel:
       
         #Update different values in self.materials based on option value
         match globals.canvas_control_panel.option_menu.get():
-            case "Stacked"|"Realistic" | "Stoney":
+            case "Stacked"|"Realistic":
                 #Update the thickness value in self.materials
                 globals.materials[identifier]["Thickness"] = value
 
@@ -683,6 +639,17 @@ class Material_Adjustment_Panel:
                 #Update the entry corresponding to key
                 globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
                 globals.materials[identifier]["Entry_id"].insert(0, value)
+            
+            case "Stoney":
+                #Update the thickness value in self.materials
+                globals.materials[identifier]["Thickness"] = value
+
+                #Update the entry corresponding to key
+                globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
+                globals.materials[identifier]["Entry_id"].insert(0, value)
+
+                #Redraw the graph
+                globals.graph.draw_graph()
 
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
@@ -1015,10 +982,10 @@ class Material_Adjustment_Panel:
 
 
 #                 #Disable slider and Entry if specified by the excel-file
-#                 if(globals.materials[material]["Status"] == "disabled"):
+#                 if(globals.materials[material]["Status"] == "inactive"):
 #                     globals.materials[material]["Slider_id"].configure(state="disabled") #Disable slider
 #                     globals.materials[material]["Entry_id"].delete(0, tkinter.END)     #Disable Entry
-#                     globals.materials[material]["Entry_id"].insert(0, "Disabled")      #Disable Entry
+#                     globals.materials[material]["Entry_id"].insert(0, "inactive")      #Disable Entry
 #                     globals.materials[material]["Entry_id"].configure(state="disabled")#Disable Entry
 #                 globals.materials[material]["Slider_id"] = slider 
 

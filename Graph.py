@@ -1,11 +1,11 @@
 import tkinter
+from tkinter import messagebox
 import customtkinter
 import settings
 import globals
 
 from matplotlib.figure import Figure                            #For creating graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #For creating graphs
-
 import numpy
 
 class Graph:
@@ -14,21 +14,21 @@ class Graph:
         
         self.window = window
 
-        self.graph_canvas, self.graph = self.create_graph()
+        self.create_graph_canvas()
 
-
-    def create_graph(self):
+    """Creates a figure/canvas where the graph can be drawn"""
+    def create_graph_canvas(self):
         # print("CREATE_GRAPH()")
 
-        #Create a figure object
-        figure = Figure(
+        #Create a drawing space for the graph
+        self.graph_canvas = Figure(
             figsize=(settings.graph_width/100, settings.graph_height/100),
             dpi=settings.graph_dpi
         )
 
-        #Create a canvas to draw the graph on and place it
-        figure_canvas = FigureCanvasTkAgg(figure, master=globals.main_frame)
-        figure_canvas.get_tk_widget().grid(
+        #Create a "figure/translator" so that matplotlib can render in tkinter GUI
+        self.graph_translator = FigureCanvasTkAgg(self.graph_canvas, master=globals.main_frame)
+        self.graph_translator.get_tk_widget().grid(
             row=0,
             column=2,
             sticky="nw",
@@ -36,212 +36,153 @@ class Graph:
             pady=(5,0)
         )
 
+        #Create details in graph
         #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left
-        self.ax = figure.add_subplot(111)    
+        self.graph = self.graph_canvas.add_subplot(111)    
 
         #Set labels for the graph
-        # self.ax.set_title("This is a simple graph")
-        # self.ax.set_xlabel("This is the x line")
-        # self.ax.set_ylabel("This is the y line")
+        # self.graph.set_title("This is a simple graph")
+        self.graph.set_xlabel("X")
+        self.graph.set_ylabel("Y")
         
-        # #Set the display limits of the x and y axises 
-        self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
-        self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
+        #Set the display limits of the x and y axises 
+        self.graph.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+        self.graph.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
 
-        # #Display the grid of the graph
-        self.ax.grid(True)
+        #Display the grid of the graph
+        self.graph.grid(True)
 
-        # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
-        self.ax.axhline(0, color="black", linewidth=1)
-        self.ax.axvline(0, color="black", linewidth=1)
+        #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        self.graph.axhline(0, color="black", linewidth=1)
+        self.graph.axvline(0, color="black", linewidth=1)
 
-        return figure_canvas, figure
-    
 
-    """
-    RUNAR
-    """
-    def draw_curvature_graph(self, val=None):
-        # # print("DRAW_CURVATURE_GRAPH()")
-        
+    """Draws the graph with materials that are "active" in the materials dictionary"""
+    def draw_graph(self):
+        # print("DRAW_GRAPH()")
+
         #Clear the graph
-        self.ax.clear()
+        self.graph.clear()
 
-        #Fetch the R-value from the slider and round it to 3 decimal places
-        r_value = round(globals.graph_control_panel.r_slider.get(), 3)
+        #Create details in graph
+        #Set labels for the graph
+        # self.graph.set_title("This is a simple graph")
+        self.graph.set_xlabel("X")
+        self.graph.set_ylabel("Y")
+        
+        #Set the display limits of the x and y axises 
+        self.graph.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+        self.graph.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
 
-        #Display the R-value directly on the graph
-        self.ax.text(
-            0.85, 1.1,                              # X and Y Coordinates of the text (relative to axes in percentages)
-            f"R = {r_value}",                       # Text
-            transform=self.ax.transAxes,            # Transform to make the coordinates relative to the axes
+        #Display the grid of the graph
+        self.graph.grid(True)
+
+        #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        self.graph.axhline(0, color="black", linewidth=1)
+        self.graph.axvline(0, color="black", linewidth=1)
+
+        #Fetch the correct materials by checking which are "active"
+        material_counter = 0
+        for material in globals.materials:
+            if(material.lower() == "substrate"):
+                substrate_material = material
+                continue     #Skip to next material
+
+            if(globals.materials[material]["Status"] == "active"):
+                chosen_material = material
+                material_counter += 1
+        
+        #Raise error if there are more than two selected materials/filaments
+        if(material_counter > 1):
+            print("ERROR: MORE THAN TWO FILAMENTS SELECTED!!!!!!!!!")
+
+        #Fetch necessary values
+        #Es = modulus til substratet
+        Es = globals.materials[substrate_material]["Modulus [GPa]"]
+        #Vs = poisson til substratet
+        Vs = globals.materials[substrate_material]["Poisson"]
+        #Ts = tykkelse til substratet
+        Ts = globals.materials[substrate_material]["Thickness"]
+        #Tf = tykkelse til gitt materiale/filament
+        Tf = globals.materials[chosen_material]["Thickness"]
+        #R0 = R0 til substratet
+        R0 = globals.materials[substrate_material]["R0"]
+        #R = R til materialet/filament
+        R = globals.materials[chosen_material]["R"]
+
+        #Check for division by zero errors
+        if(Tf) == 0:
+            messagebox.showerror("Division by zero Error", "The 'thickness' of a filament can not be zero")
+            return
+        if(R == 0):
+            messagebox.showerror("Division by zero Error", "The 'R' value for chosen filament can not be zero")
+            return
+        if(R0 == 0):
+            messagebox.showerror("Division by zero Error", "The 'R0' value for 'substrate' can not be zero")
+            return
+        if(6* (1-Vs) *Tf) == 0:
+            messagebox.showerror("Division by zero Error", "The calculation: '6*(1-Vs) *Tf' resulted in zero")
+            return
+        
+        #Calculate the sigma_R value
+        sigma_R = ( (Es* (Ts**2)) / (6*(1-Vs)*Tf)) * ( (1/R) - (1/R0) )
+        
+        #Display the sigma_R value in the graph
+        self.graph.text(
+            0.0, 1.1,                              # X and Y Coordinates of the text (relative to axes in percentages)
+            f"σR = {sigma_R}",                      # Text
+            transform=self.graph.transAxes,            # Transform to make the coordinates relative to the axes
             fontsize=12,                            # Set the font size
             verticalalignment='top',                # Align text to the top
             bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
         )
 
-        #Set title and names for x/y axes
-        self.ax.set_title("Curvature")
-        self.ax.set_xlabel("Some name for x line")
-        self.ax.set_ylabel("Some name for y line")
-
-        #Set the limit for the x and y axes
-        self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
-        self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
-
-
-
-        ######################  CALCULATE VALUES FOR X AND Y ########################
-
-        #Fetch values from excel sheet (for context, not really used here)
-        # E = globals.materials["substrate"]["E"]
-        # rho = globals.materials["substrate"]["rho"]
-        # sigma = globals.materials["substrate"]["sigma"]
-        # nu =  globals.materials["substrate"]["nu"]
-        
-        #Create an array of fixed values for x (from, to, number of spots)
-        x = numpy.linspace(settings.graph_x_axis_range_min, settings.graph_x_axis_range_max, 50)
-
-        #Adjust 'a' based on the slider value
-        a = globals.graph_control_panel.r_slider.get() / (100 ** 2)  # Scaling factor to make the curve fit the range
-
-        #Calculate y values - peak in the middle, and y = 0 at x = -100 and x = 100
-        y = a * (x ** 2) - a * (100 ** 2)  # Subtract constant to ensure y=0 at x=-100 and x=100
-        
-        ############################################################################
-
-        #Split the x and y data into positive and negative segments
-        positive_x = x[y >= 0]
-        positive_y = y[y >= 0]
-
-        negative_x = x[y < 0]
-        negative_y = y[y < 0]
-
-        #Plot positive values in red
-        self.ax.plot(positive_x, positive_y, marker="o", label="Positive values", color="red")
-
-        #Plot negative values in blue
-        self.ax.plot(negative_x, negative_y, marker="o", label="Negative values", color="blue")
-
-        #Redraw grid and axes
-        self.ax.grid(True)
-        self.ax.axhline(0, color="black", linewidth=1)
-        self.ax.axvline(0, color="black", linewidth=1)
-
-        #Redraw the graph
-        self.graph_canvas.draw_idle()
-
-
-            
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # def draw_circle_graph(self, val=None):
-    # #Formel for sirkel: (x^2 - h) + (y^2 - k) = r^2
-
-    # # print("DRAW_CIRCLE_FUNCTION()")
+        #Display the R0 value in the graph
+        self.graph.text(
+            0.05, 0.98,                              # X and Y Coordinates of the text (relative to axes in percentages)
+            f"R0 = {R0}",                         # Text
+            color="blue",
+            transform=self.graph.transAxes,            # Transform to make the coordinates relative to the axes
+            fontsize=12,                            # Set the font size
+            verticalalignment='top',                # Align text to the top
+            bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
+        )
+
+        #Display the R value in the graph
+        self.graph.text(
+            0.05, 0.90,                              # X and Y Coordinates of the text (relative to axes in percentages)
+            f"R = {R}",                      # Text
+            color="red",
+            transform=self.graph.transAxes,            # Transform to make the coordinates relative to the axes
+            fontsize=12,                            # Set the font size
+            verticalalignment='top',                # Align text to the top
+            bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
+        )
+
+
+
+        #Plot the following values in the graph
+            # y1 = sqrt((R**2) - (x**2)) 
+            # y0 = sqrt((R0**2) - (x**2)) 
+
+        #Create a  range of X values 
+        x = numpy.linspace(-min(R, R0), min(R, R0), 100)  #100 points for smooth curves
+
+        #calculate values for y1 and y0
+        y0 = numpy.sqrt((R0**2) - (x**2))
+        y1 = -numpy.sqrt((R**2) - (x**2))
+
+        #Plot y1 and y0 values
+        self.graph.plot(x, y0, label=r"$y_0 = \sqrt{R_0^2 - x^2}$", color="red")
+        self.graph.plot(x, y1, label=r"$y_1 = -\sqrt{R^2 - x^2}$", color="blue")
+
+        #Add a legend???????
+        self.graph.legend()
+
+        #Redraw the canvas to display the updates
+        # self.graph.figure.canvas.draw()
+
+
+        #Draw the created elements in the graph
+        self.graph_translator.draw() 
     
-    # #Clear the graph
-    # self.ax.clear()
-
-    # #Set the display limits of the x and y axises 
-    # self.ax.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
-    # self.ax.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
-
-    # print(globals.graph_control_panel.r_slider.get())
-    # radius = globals.graph_control_panel.r_slider.get()
-
-    # #Create a range of values for x
-    # x = numpy.linspace(-radius, radius, 100)
-
-    # #Find the positive and negative values for y
-    # y_positive = numpy.sqrt(radius**2 - x**2)
-    # y_negative = -numpy.sqrt(radius**2 - x**2)
-
-    # #Plot the values in the graph
-    # self.ax.plot(x, y_positive, marker="o", label="This is where the line name is put")
-    # self.ax.plot(x, y_negative, marker="o", label="This is where the line name is put")
-
-    # # Redraw grid and axes
-    # self.ax.grid(True)
-    # # self.ax.axhline(0, color="black", linewidth=1)
-    # self.ax.axvline(0, color="black", linewidth=1)
-
-    # #Redraw the canvas to update the graph
-    # self.graph.draw_idle()

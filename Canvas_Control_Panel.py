@@ -261,13 +261,14 @@ class Canvas_Control_Panel:
         globals.option_menu = self.option_menu.get()
 
         #Destroy the graph if it exists
-        if hasattr(globals.graph, 'graph'):
-            globals.graph.graph_canvas.get_tk_widget().destroy()
+        if hasattr(globals.graph, 'graph_translator'):
+            globals.graph.graph_translator.get_tk_widget().destroy()
             globals.graph = None
+            print("YESSSS")
             
         #Destroy the graph_control_panel if it exists
-        if hasattr(globals.graph_control_panel, 'graph_control_panel'):
-            globals.graph_control_panel.graph_control_panel.destroy()
+        # if hasattr(globals.graph_control_panel, 'graph_control_panel'):
+        #     globals.graph_control_panel.graph_control_panel.destroy()
 
 
         #Create a new material_adjustment_panel with a different layout based on the option menu
@@ -277,12 +278,12 @@ class Canvas_Control_Panel:
         match self.option_menu.get():
             case "Stacked":
 
-                #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
-                #for material in globals.materials:
-                #globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                            
-                #if(globals.materials[material]["Status"] != "disabled"):
-                #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                #Set all material entry and slider values to "thickness" value, and mark all as "active"
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    globals.materials[material]["Status"] = "active"
+
                         
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
@@ -299,13 +300,11 @@ class Canvas_Control_Panel:
                 globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
 
             case "Realistic":
-
-                #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
-                #for material in globals.materials:
-                    #globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                            
-                    #if(globals.materials[material]["Status"] != "disabled"):
-                    #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                #Set all material entry and slider values to "thickness" value, and mark all as "active"
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    globals.materials[material]["Status"] = "active"
 
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
@@ -321,13 +320,11 @@ class Canvas_Control_Panel:
                 globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
             
             case "Stepped":
-
-                #Set all material entry and slider values to "indent" value, except the entries that are "disabled"
-                #for material in globals.materials:
-                    #globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
-
-                    #if(globals.materials[material]["Status"] != "disabled"):
-                        #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
+                #Set all material entry and slider values to "indent" value, and mark all as "active"
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
+                    globals.materials[material]["Status"] = "active"
                         
                 #Set new dimensions for layer_stack_canvas back to the original
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
@@ -344,13 +341,17 @@ class Canvas_Control_Panel:
                 globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
 
             case "Stoney":
-                #Set all material entry and slider values to "thickness" value, except the entries that are "disabled"
-                #for material in globals.materials:
-                    #globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                    
-                    #if(globals.materials[material]["Status"] != "disabled"):
-                        #globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                #Set all material entry and slider values to "thickness" value
+                #Set all materials "Status", except "substrate" to "inactive
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    globals.materials[material]["Status"] = "inactive"
 
+                    if(material.lower() == "substrate"):
+                        globals.materials[material]["Status"] = "active"
+
+    
                 #Set new dimensions for layer_stack_canvas
                 globals.layer_stack_canvas.layer_stack_canvas.configure(width=510)
                 globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
@@ -359,7 +360,7 @@ class Canvas_Control_Panel:
                 globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
 
                 #Redraw material stack
-                globals.layer_stack_canvas.draw_material_stack()
+                globals.layer_stack_canvas.draw_material_stack_limited()
 
                 #Set new dimensions for canvas_control_panel
                 globals.canvas_control_panel.canvas_control_panel_frame.configure(width=globals.layer_stack_canvas.layer_stack_canvas_width*0.8)
@@ -369,9 +370,6 @@ class Canvas_Control_Panel:
 
                 #Create panel that controls the actions of the graph
                 globals.graph_control_panel = Graph_Control_Panel(globals.main_frame)
-
-                globals.graph.draw_curvature_graph()
-
 
 
     """Exports the stack without material names as SVG file"""

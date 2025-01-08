@@ -70,8 +70,8 @@ class Material_Control_Panel:
         #Create button to modify the order of materials, and place the button
         modify_material_button = customtkinter.CTkButton(
             master=self.material_control_panel_frame, 
-            width=35,
-            height=35,
+            width=36,
+            height=36,
             text="⚙️",
             text_color="white", 
             font=(settings.text_font, -18),
@@ -91,7 +91,7 @@ class Material_Control_Panel:
         export_as_excel_button = customtkinter.CTkButton(
             master=self.material_control_panel_frame, 
             width=100,
-            height=25,
+            height=36,
             text="Export values to excel", 
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
@@ -727,6 +727,19 @@ class Material_Control_Panel:
         else:
             Poisson_value = int(self.Poisson_value_entry.get())
 
+        #R0 VALUE
+        if(self.R0_value_entry.get() == ""):
+            R0_value = 0
+        else:
+            R0_value = int(self.R0_value_entry.get())
+
+        #R VALUE
+        if(self.R_value_entry.get() == ""):
+            R_value = 0
+        else:
+            R_value = int(self.R_value_entry.get())
+
+
         #Loop through all materials and increment "layer" with 1, assuring that the new material is placed on top of the stack
         for material in globals.materials:
             globals.materials[material]["Layer"] += 1
@@ -745,6 +758,8 @@ class Material_Control_Panel:
             "Density [kg/m3]": Density_value,
             "Stress_x [MPa]": Stress_value,
             "Poisson": Poisson_value,
+            "R0": R0_value,
+            "R": R_value,
             "Label_name_id": None,
             "Rectangle_id": None,
             "Text_id": None,
@@ -752,6 +767,7 @@ class Material_Control_Panel:
             "Line_id": None,
             "Entry_id": None,
             "Slider_id": None,
+            "Checkbox_id": None,
             "Indent_text_id": None,
             "Indent_text_bbox_id": None,
             "Indent_line_id": None,
