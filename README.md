@@ -81,35 +81,12 @@
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
 
-
-
-
     BUGS:
         I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
 
     TO DO 
-        -Stoney layout:
-            -Kun ETT annet materiale kan velges samtidig. Dette materialet kan bare sendes direkte rundt til andre funksjoner
-            -Når et materiale er valgt må funksjonen som tegner grafen kalles
-            -Lag en ny "draw_layer_stack_stoney" funksjon som bare tegner substratet sammen med det valgte materialet (self.draw_material_stack_stoney(self, material))
-
-
-        -Fjern "reset values" funksjon
-
-    til runar:
-        -yo, her e nytt program.
-        -for å bruke "stoney view", bare trykk inn på den modusen og velg et materiale/filament. Da vil grafen tegnes og sigma_R verdien vises. 
-
-        -Syns programmet fungere litt ræva akkurat no og det ser litt wonky ut, men treng en oppdatering på om æ e på rett vei?
-
-        -Y1 grafen som blir tegna no e bare en negativ verdi av ligninga du gav mæ, fordi ligningen vi snakka om e jo helt likens hvis R0 og R verdiene er likens?
-            y0 = sqrt((R0**2) - (x**2))  
-            y1 = sqrt((R**2) - (x**2))
-        
-        -Sjekk om "export graph" funksjonen fungere hos dæ også
-
-         
+        -
     
     QUESTIONS:
         -Har ligningen i grafen et navn?

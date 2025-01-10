@@ -16,6 +16,10 @@ class Graph:
 
         self.create_graph_canvas()
 
+        # self.x_values = numpy.linspace(-50, 50, 100)  #Generate 100 evenly values from -50 to 50
+
+
+
     """Creates a figure/canvas where the graph can be drawn"""
     def create_graph_canvas(self):
         # print("CREATE_GRAPH()")
@@ -166,22 +170,21 @@ class Graph:
             # y0 = sqrt((R0**2) - (x**2)) 
 
         #Create a  range of X values 
-        x = numpy.linspace(-min(R, R0), min(R, R0), 100)  #100 points for smooth curves
+        x_values = numpy.linspace(-min(R, R0), min(R, R0), 100)
 
         #calculate values for y1 and y0
-        y0 = numpy.sqrt((R0**2) - (x**2))
-        y1 = -numpy.sqrt((R**2) - (x**2))
+        y0 = numpy.sqrt((R0**2) - (x_values**2))
+        y1 = -numpy.sqrt((R**2) - (x_values**2))
 
         #Plot y1 and y0 values
-        self.graph.plot(x, y0, label=r"$y_0 = \sqrt{R_0^2 - x^2}$", color="red")
-        self.graph.plot(x, y1, label=r"$y_1 = -\sqrt{R^2 - x^2}$", color="blue")
+        self.graph.plot(x_values, y0, label=r"$y_0 = \sqrt{R_0^2 - x^2}$", color="red")
+        self.graph.plot(x_values, y1, label=r"$y_1 = -\sqrt{R^2 - x^2}$", color="blue")
 
         #Add a legend???????
-        self.graph.legend()
+        # self.graph.legend()
 
-        #Redraw the canvas to display the updates
+        # Redraw the canvas to display the updates
         # self.graph.figure.canvas.draw()
-
 
         #Draw the created elements in the graph
         self.graph_translator.draw() 

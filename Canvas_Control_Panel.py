@@ -53,7 +53,7 @@ class Canvas_Control_Panel:
             fg_color=settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
             text_color=settings.layer_stack_canvas_control_panel_text_color,
-            width=15,
+            width=90,
             command=self.reset_canvas
         )
         reset_canvas_button.grid(
@@ -71,7 +71,7 @@ class Canvas_Control_Panel:
             fg_color= settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
             text_color=settings.layer_stack_canvas_control_panel_text_color,
-            width=15,
+            width=90,
             command=self.reset_values
         )
         reset_values_button.grid(
@@ -89,7 +89,7 @@ class Canvas_Control_Panel:
             fg_color= settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
             text_color=settings.layer_stack_canvas_control_panel_text_color,
-            width=15,
+            width=90,
             command=self.export_stack_as_svg
         )
         export_stack_as_svg_button.grid(
@@ -107,7 +107,7 @@ class Canvas_Control_Panel:
             fg_color= settings.layer_stack_canvas_control_panel_button_color, 
             hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
             text_color=settings.layer_stack_canvas_control_panel_text_color,
-            width=15,
+            width=90,
             command=self.export_layers_as_svg
         )
         export_layers_as_svg_button.grid(
@@ -177,7 +177,7 @@ class Canvas_Control_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    """Reads the excel file again and repopulated the "thickness" in self.materials. Updates sliders and entries with new values"""
+    """Repopulates globals.materials dictionary with values from the excel file and recreates the material_adjustment_panel """
     def reset_values(self):
         # print("RESET_VALUES")
         
@@ -185,66 +185,25 @@ class Canvas_Control_Panel:
 
         #If there is a "materials" file in the folder, read it and reset the thickness values of each material
         if(os.path.isfile(excel_file)):
-            try:
-                match globals.option_menu:
+            #Clear the existing globals.materials
+            globals.materials.clear()
 
-                    #Reset only the "thickness" values
-                    case "Stacked" | "Realistic" | "Stoney":
-                        #Reload initial thickness values from given excel file
-                        #Read given excel file into Pandas dataframe
-                        excel_data = pandas.read_excel(excel_file)
+            #Reload the values from the excel file in to the dictionary
+            globals.app.load_materials_from_excel()
 
-                        #Loop through the rows in excel_file and populate "self.materials"
-                        for index, row in excel_data.iterrows():
-                            material_name = row["Material"]
-                            material_thickness = int(row["Thickness"])
-                                
-                            #Populate material dictionary
-                            if(material_name in globals.materials):
+            #Stoney view is special and needs all materials to be "inactive" except "substrate"
+            if(globals.option_menu == "Stoney"):
+                for material in globals.materials:
+                    globals.materials[material]["Status"] = "inactive"
 
-                                globals.materials[material_name]["Thickness"] = material_thickness
-                                
-                                #Update sliders and Entries
-                                globals.materials[material_name]["Slider_id"].set(material_thickness)
-                                globals.materials[material_name]["Entry_id"].delete(0, tkinter.END)
-                                globals.materials[material_name]["Entry_id"].insert(0, material_thickness)
-                            
-                            #Reset text_size
-                            # self.current_text_size = self.original_text_size
-                            
-                        #Draw rectangle stack with original values
-                        globals.layer_stack_canvas.draw_material_stack()
+                    if(material.lower() == "substrate"):
+                        globals.materials[material]["Status"] = "active"
 
-                    #Reset only the "indent" values
-                    case "Stepped":
-                        #Reload initial indent values from given excel file
-                        #Read given excel file into Pandas dataframe
-                        excel_data = pandas.read_excel(excel_file)
+            #Redraw the material stack
+            globals.layer_stack_canvas.draw_material_stack()
 
-                        #Loop through the rows in excel_file and populate "self.materials"
-                        for index, row in excel_data.iterrows():
-                            material_name = row["Material"]
-                            material_indent = int(row["Indent"])
-                                
-                            #Populate material dictionary
-                            if(material_name in globals.materials):
-
-                                globals.materials[material_name]["Indent [nm]"] = material_indent
-                                    
-                                #Update sliders and Entries
-                                globals.materials[material_name]["Slider_id"].set(material_indent)
-                                globals.materials[material_name]["Entry_id"].delete(0, tkinter.END)
-                                globals.materials[material_name]["Entry_id"].insert(0, material_indent)
-                            
-                                #Reset text_size
-                                # self.current_text_size = self.original_text_size
-                            
-                        #Draw rectangle stack with original values
-                        globals.layer_stack_canvas.draw_material_stack()
-                
-            #Handle errors
-            except Exception as error:
-                messagebox.showerror("Error", "Could not reset values\nMay be a issue with reading from excel-file")
+            #Recreate the material_adjustment_panel
+            globals.material_adjustment_panel.create_material_adjustment_panel()
 
         else:
             messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")
@@ -264,11 +223,10 @@ class Canvas_Control_Panel:
         if hasattr(globals.graph, 'graph_translator'):
             globals.graph.graph_translator.get_tk_widget().destroy()
             globals.graph = None
-            print("YESSSS")
             
         #Destroy the graph_control_panel if it exists
-        # if hasattr(globals.graph_control_panel, 'graph_control_panel'):
-        #     globals.graph_control_panel.graph_control_panel.destroy()
+        if hasattr(globals.graph_control_panel, 'graph_control_panel'):
+            globals.graph_control_panel.graph_control_panel.destroy()
 
 
         #Create a new material_adjustment_panel with a different layout based on the option menu
@@ -276,7 +234,7 @@ class Canvas_Control_Panel:
         
         #Switch UI layout based on option value
         match self.option_menu.get():
-            case "Stacked":
+            case "Stacked" | "Realistic":
 
                 #Set all material entry and slider values to "thickness" value, and mark all as "active"
                 for material in globals.materials:
@@ -294,26 +252,6 @@ class Canvas_Control_Panel:
                 globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
 
                 #Draw material stack                
-                globals.layer_stack_canvas.draw_material_stack()
-
-                #Set new dimensions for canvas_control_panel back to the original
-                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
-
-            case "Realistic":
-                #Set all material entry and slider values to "thickness" value, and mark all as "active"
-                for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-                    globals.materials[material]["Status"] = "active"
-
-                #Set new dimensions for layer_stack_canvas back to the original
-                globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
-                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
-                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
-                globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
-                globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-
-                #Draw the material stack
                 globals.layer_stack_canvas.draw_material_stack()
 
                 #Set new dimensions for canvas_control_panel back to the original

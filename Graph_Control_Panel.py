@@ -47,8 +47,10 @@ class Graph_Control_Panel:
         export_graph_button = customtkinter.CTkButton(
             master=graph_control_panel_frame,
             text="Export graph",
-            width=10,
-            height=10,
+            width=90,
+            fg_color= settings.graph_control_panel_button_color, 
+            hover_color=settings.graph_control_panel_button_hover_color, 
+            # text_color=settings.,
             command=self.export_graph
         )
         export_graph_button.grid(
@@ -58,6 +60,8 @@ class Graph_Control_Panel:
             padx=(5,0),
             pady=(5,0)
         )
+
+        return graph_control_panel_frame
 
 
     """Exports the graph as svg file"""

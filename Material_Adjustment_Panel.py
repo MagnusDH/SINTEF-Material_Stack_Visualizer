@@ -589,7 +589,7 @@ class Material_Adjustment_Panel:
     
         # Update different values in self.materials based on option menu value
         match globals.option_menu:
-            case "Stacked" | "Realistic" | "Stoney":
+            case "Stacked" | "Realistic":
                 #Find material that corresponds to "entry"
                 for material in globals.materials:
                     if(globals.materials[material]["Entry_id"] == entry):
@@ -612,7 +612,21 @@ class Material_Adjustment_Panel:
 
                         #Update the slider corresponding to the key
                         globals.materials[material]["Slider_id"].set(entered_value)
-        
+
+            case "Stoney":
+                #Find material that corresponds to "entry"
+                for material in globals.materials:
+                    if(globals.materials[material]["Entry_id"] == entry):
+                        #Find entered value
+                        entered_value = int(entry.get())
+                        #Update the thickness value in self.materials
+                        globals.materials[material]["Thickness"] = entered_value
+
+                        #Update the slider corresponding to the key
+                        globals.materials[material]["Slider_id"].set(entered_value)
+                
+                #Redraw the graph
+                globals.graph.draw_graph()
         
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
