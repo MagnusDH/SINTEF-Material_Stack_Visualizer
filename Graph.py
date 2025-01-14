@@ -46,8 +46,8 @@ class Graph:
 
         #Set labels for the graph
         # self.graph.set_title("This is a simple graph")
-        self.graph.set_xlabel("X")
-        self.graph.set_ylabel("Y")
+        self.graph.set_xlabel("X [mm]", fontsize=15, labelpad=3)
+        self.graph.set_ylabel("Height [μm]", fontsize=15, labelpad=-5)
         
         #Set the display limits of the x and y axises 
         self.graph.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
@@ -71,8 +71,8 @@ class Graph:
         #Create details in graph
         #Set labels for the graph
         # self.graph.set_title("This is a simple graph")
-        self.graph.set_xlabel("X")
-        self.graph.set_ylabel("Y")
+        self.graph.set_xlabel("X [mm]", fontsize=15, labelpad=3)
+        self.graph.set_ylabel("Height [μm]", fontsize=15, labelpad=-5)
         
         #Set the display limits of the x and y axises 
         self.graph.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
@@ -101,18 +101,19 @@ class Graph:
             print("ERROR: MORE THAN TWO FILAMENTS SELECTED!!!!!!!!!")
 
         #Fetch necessary values
-        #Es = modulus til substratet
-        Es = globals.materials[substrate_material]["Modulus [GPa]"]
+        #Es = modulus for the substrate (multiplied by 1billion)
+        Es = globals.materials[substrate_material]["Modulus [GPa]"] * 1000000000
         #Vs = poisson til substratet
         Vs = globals.materials[substrate_material]["Poisson"]
-        #Ts = tykkelse til substratet
-        Ts = globals.materials[substrate_material]["Thickness"]
-        #Tf = tykkelse til gitt materiale/filament
-        Tf = globals.materials[chosen_material]["Thickness"]
-        #R0 = R0 til substratet
-        R0 = globals.materials[substrate_material]["R0"]
+        #Ts = thickness for the substrate in nanometers (value divided by 1billion)
+        Ts = globals.materials[substrate_material]["Thickness"] / 1000000000
+        #Tf = thickness for material/filament in nanometers (value divided by 1billion)
+        Tf = globals.materials[chosen_material]["Thickness"] / 1000000000
+        #R0 = R0 til filamentet
+        R0 = globals.materials[chosen_material]["R0"]
         #R = R til materialet/filament
         R = globals.materials[chosen_material]["R"]
+
 
         #Check for division by zero errors
         if(Tf) == 0:
@@ -124,17 +125,24 @@ class Graph:
         if(R0 == 0):
             messagebox.showerror("Division by zero Error", "The 'R0' value for 'substrate' can not be zero")
             return
+        if(1-Vs) == 0:
+            messagebox.showerror("Division by zero Error", "The calculation (1 - Vs) resulted in zero")
+            return
         if(6* (1-Vs) *Tf) == 0:
             messagebox.showerror("Division by zero Error", "The calculation: '6*(1-Vs) *Tf' resulted in zero")
             return
         
         #Calculate the sigma_R value
         sigma_R = ( (Es* (Ts**2)) / (6*(1-Vs)*Tf)) * ( (1/R) - (1/R0) )
-        
+        #Convert to correct value
+        sigma_R = sigma_R/1000000
+        #Limit value to 2 decimals
+        sigma_R = round(sigma_R, 2)
+
         #Display the sigma_R value in the graph
         self.graph.text(
             0.0, 1.1,                              # X and Y Coordinates of the text (relative to axes in percentages)
-            f"σR = {sigma_R}",                      # Text
+            f"σR = {sigma_R}MPa",                      # Text
             transform=self.graph.transAxes,            # Transform to make the coordinates relative to the axes
             fontsize=12,                            # Set the font size
             verticalalignment='top',                # Align text to the top
@@ -163,22 +171,20 @@ class Graph:
             bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
         )
 
-
-
         #Plot the following values in the graph
-            # y1 = sqrt((R**2) - (x**2)) 
             # y0 = sqrt((R0**2) - (x**2)) 
+            # y1 = sqrt((R**2) - (x**2)) 
 
         #Create a  range of X values 
         x_values = numpy.linspace(-min(R, R0), min(R, R0), 100)
 
         #calculate values for y1 and y0
         y0 = numpy.sqrt((R0**2) - (x_values**2))
-        y1 = -numpy.sqrt((R**2) - (x_values**2))
+        y1 = numpy.sqrt((R**2) - (x_values**2))
 
         #Plot y1 and y0 values
-        self.graph.plot(x_values, y0, label=r"$y_0 = \sqrt{R_0^2 - x^2}$", color="red")
-        self.graph.plot(x_values, y1, label=r"$y_1 = -\sqrt{R^2 - x^2}$", color="blue")
+        self.graph.plot(x_values, y0, color="red")
+        self.graph.plot(x_values, y1, color="blue")
 
         #Add a legend???????
         # self.graph.legend()

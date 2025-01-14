@@ -82,16 +82,28 @@
 
 
     BUGS:
+        -If you move a layer up or down in "stoney" view, then the checkbox does not follow the correct layer and messes up the graph values
+
         I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
 
-    TO DO 
-        -
+    TO DO       
+        -Visningen av programmet er forskjellig fra PC til PC. Finn en måte å få alt av frames til å passe korrekt inn i vidden og høyden til program vinduet
+        
+        -I "modify materials" så fungere det ikke å trykke "enter" for å aktivere "Confirm changes"
+            
+        -I "modify materials" så fungerer ikke "digit check". Den godtar ikke decimal tall
+            
+        -I "read materials from excel" så burde den akseptere decimaltall som både er skrevet med "komma" og "punktum" 
+
     
     QUESTIONS:
-        -Har ligningen i grafen et navn?
+        -Ask Runar why the red graph does not show?
+        -How many decimal points does he want for sigma_R value in graph?
 
     POTENTIAL FIXES:
+        -Check the width of a materials name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
+
         -Add a "scrollable frame" in "add material" window
 
         -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?
