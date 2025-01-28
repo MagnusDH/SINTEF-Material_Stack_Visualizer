@@ -11,18 +11,18 @@ class Material_Adjustment_Panel:
         # print("CLASS MATERIAL_ADJUSTMENT_PANEL INIT()")
 
         #Window where everything is placed
-        self.window = window
+        self.program_window = window
         
         #Keeps track of how many rows with widgets has been created in the control panel frame 
-        self.row_counter = 0
+        # self.row_counter = 0
 
-        self.create_material_adjustment_panel()
+        self.material_adjustment_panel_frame = self.create_material_adjustment_panel()
 
         
-    """
-    -Creates a Frame and material_adjustment_panel in the given window if it does not already exist.
-    -If the Frame exists, then the material_adjustment_panel is simply updated corresponding with the materials in globals.materials{} 
-    """
+# #     """
+# #     -Creates a Frame and material_adjustment_panel in the given window if it does not already exist.
+# #     -If the Frame exists, then the material_adjustment_panel is simply updated corresponding with the materials in globals.materials{} 
+# #     """
     def create_material_adjustment_panel(self):
         # print("CREATE_MATERIAL_ADJUSTMENT_PANEL()")
 
@@ -30,9 +30,9 @@ class Material_Adjustment_Panel:
         if not hasattr(self, 'material_adjustment_panel_frame'):
             #Create Frame from the control panel and place it within given window
             self.material_adjustment_panel_frame = customtkinter.CTkScrollableFrame(
-                master=self.window,
-                width=settings.material_adjustment_panel_width,
-                height=settings.material_adjustment_panel_height,
+                master=self.program_window,
+                # width=max(settings.material_adjustment_panel_minimum_width, self.main_frame.winfo_width() * 0.5),
+                # height=settings.material_adjustment_panel_height,
                 fg_color=settings.material_adjustment_panel_background_color
             )
             self.material_adjustment_panel_frame.grid(
@@ -40,528 +40,747 @@ class Material_Adjustment_Panel:
                 column=0,
                 padx=(settings.material_adjustment_panel_padding_left, settings.material_adjustment_panel_padding_right),
                 pady=(settings.material_adjustment_panel_padding_top, settings.material_adjustment_panel_padding_bottom),
-                sticky="nw"
+                sticky="nswe"
             )
-        
-        #delete all widgets in frame
-        for widget in self.material_adjustment_panel_frame.winfo_children():
-            widget.destroy()
-            self.row_counter = 0
 
+            #Define the row&column layout of the program window
+            self.material_adjustment_panel_frame.columnconfigure(0, weight=8, uniform="group1")    #Delete Button
+            self.material_adjustment_panel_frame.columnconfigure(1, weight=30, uniform="group1")    #Material name
+            self.material_adjustment_panel_frame.columnconfigure(2, weight=17, uniform="group1")     #Entry
+            self.material_adjustment_panel_frame.columnconfigure(3, weight=35, uniform="group1")    #Slider
+            self.material_adjustment_panel_frame.columnconfigure(4, weight=6, uniform="group1")    #Down Button
+            self.material_adjustment_panel_frame.columnconfigure(5, weight=6, uniform="group1")    #Up Button
+
+            self.material_adjustment_panel_frame.rowconfigure((0,1), weight=4, uniform="group1")    
+
+        row_counter = 1
         #Create a different layout based on the "view"
         match globals.option_menu:
             case "Stacked" | "Realistic":
+                #If checkboxes has been made, disable it
+                for material in globals.materials:
+                    if(globals.materials[material]["Checkbox_id"] != None):
+                        globals.materials[material]["Checkbox_id"].grid_forget()
+
                 #Create label headline for "material"
-                material_headline = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="Material", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 18, "bold")
-                )
-                material_headline.grid(
-                    row=self.row_counter,
-                    column=1,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
+                if not hasattr(self, 'material_headline'):
+                    #Create label headline for "material"
+                    self.material_headline = customtkinter.CTkLabel(
+                        master=self.material_adjustment_panel_frame, 
+                        text="Material", 
+                        fg_color=settings.material_adjustment_panel_background_color,
+                        text_color="#55b6ff",
+                        font=(settings.text_font, 18, "bold")
+                    )
+                    self.material_headline.grid(
+                        row=0,
+                        column=1,
+                        sticky="n",
+                        padx=(0,0),
+                        pady=(0,0)
+                    )
+                #Adjust existing material_headline
+                else:
+                    self.material_headline.configure(text="Material")
+                
 
                 #Create label to display slider functionality and place it
-                self.slider_label = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="Thickness [nm]", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 18, "bold")
-                )                    
-                self.slider_label.grid(
-                    row=self.row_counter,
-                    column=3,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
+                if not hasattr(self, 'slider_label'):
+                    self.slider_label = customtkinter.CTkLabel(
+                        master=self.material_adjustment_panel_frame, 
+                        text="Thickness [nm]", 
+                        fg_color=settings.material_adjustment_panel_background_color,
+                        text_color="#55b6ff",
+                        font=(settings.text_font, 15, "bold")
+                    )                    
+                    self.slider_label.grid(
+                        row=0,
+                        column=2,
+                        columnspan=2,
+                        sticky="nsew",
+                        padx=(0,0),
+                        pady=(0,0)
+                    )
+                #Adjust existing slider_label
+                else:
+                    self.slider_label.configure(text="Thickness [nm]")
 
-                self.row_counter += 1
                 
                 #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
                 if(len(globals.materials) > 0):
-
+                    
                     for material in globals.materials: 
-                        #Button to delete material
-                        delete_material_button = customtkinter.CTkButton(
-                            master=self.material_adjustment_panel_frame, 
-                            width=1,
-                            height=1,
-                            text="✕", #✕ 🗑
-                            font=(settings.text_font, -15, "bold"),
-                            fg_color="#820000",
-                            hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
-                            text_color=settings.material_control_panel_text_color,
-                            command=lambda button_layer=self.row_counter: self.delete_material(button_layer)
-                        )
-                        delete_material_button.grid(
-                            row=self.row_counter,
-                            column=0,
-                            sticky="",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
+                        #Create button to delete material
+                        if(globals.materials[material]["Delete_material_button_id"] == None):
+                            delete_material_button = customtkinter.CTkButton(
+                                master=self.material_adjustment_panel_frame, 
+                                width=1,
+                                height=1,
+                                text="✕", #✕ 🗑
+                                font=(settings.text_font, 10, "bold"),
+                                fg_color="#820000",
+                                hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
+                                text_color=settings.material_control_panel_text_color,
+                                command=lambda identifier=material: self.delete_material(identifier)
+                            )
+                            delete_material_button.grid(
+                                row=row_counter,
+                                column=0,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Delete_material_button_id"] = delete_material_button
+                        #Adjust existing delete_button
+                        else:
+                            globals.materials[material]["Delete_material_button_id"].configure(
+                                command=lambda identifier=material: self.delete_material(identifier)
+                            )
+                            globals.materials[material]["Delete_material_button_id"].grid(
+                                row=row_counter,
+                                column=0
+                            )
 
-                        label = customtkinter.CTkLabel(
-                            master=self.material_adjustment_panel_frame, 
-                            text=material, 
-                            fg_color=settings.material_adjustment_panel_background_color,
-                            text_color=settings.material_adjustment_panel_text_color
-                        )
-                        label.grid(
-                            row=self.row_counter, 
-                            column=1, 
-                            sticky="", 
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        #Add label to dictionary
-                        globals.materials[material]["Label_name_id"] = label
+                        #Create label to display material name
+                        if(globals.materials[material]["Label_name_id"] == None):
+                            label = customtkinter.CTkLabel(
+                                master=self.material_adjustment_panel_frame, 
+                                text=material, 
+                                fg_color=settings.material_adjustment_panel_background_color,
+                                text_color=settings.material_adjustment_panel_text_color
+                            )
+                            label.grid(
+                                row=row_counter, 
+                                column=1, 
+                                sticky="", 
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            #Add label to dictionary
+                            globals.materials[material]["Label_name_id"] = label
+                        #Adjust existing material name label
+                        else:
+                            globals.materials[material]["Label_name_id"].configure(text=globals.materials[material]["Name"])
+                            globals.materials[material]["Label_name_id"].grid(
+                                row=row_counter,
+                                column=1
+                            )
+
+                        #Create Entry
+                        if(globals.materials[material]["Entry_id"] == None):
+                            entry = customtkinter.CTkEntry(
+                                master=self.material_adjustment_panel_frame,
+                                # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
+                                fg_color = settings.material_adjustment_panel_entry_background_color,
+                                text_color="black",
+                                # width=settings.material_adjustment_panel_entry_width,
+                                # height=settings.material_adjustment_panel_entry_height,
+                                justify="center"
+                            )
+                            entry.grid(
+                                row=row_counter, 
+                                column=2,
+                                sticky="e",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
+                            entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                            globals.materials[material]["Entry_id"] = entry
+                        #Adjust existing Entry
+                        else:
+                            globals.materials[material]["Entry_id"].configure(
+                                textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
+                            )
+                            globals.materials[material]["Entry_id"].grid(
+                                row=row_counter,
+                                column=2
+                            )
 
 
-                        #Create Entry, customize it and add it to dictionary
-                        entry = customtkinter.CTkEntry(
-                            master=self.material_adjustment_panel_frame,
-                            # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
-                            fg_color = settings.material_adjustment_panel_entry_background_color,
-                            text_color="black",
-                            width=settings.material_adjustment_panel_entry_width,
-                            height=settings.material_adjustment_panel_entry_height,
-                            justify="center"
-                        )
-                        entry.grid(
-                            row=self.row_counter, 
-                            column=2,
-                            sticky="e",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                        globals.materials[material]["Entry_id"] = entry
+                        #Create Slider
+                        if(globals.materials[material]["Slider_id"] == None):
+                            slider = customtkinter.CTkSlider(
+                                master=self.material_adjustment_panel_frame, 
+                                # width=settings.material_adjustment_panel_slider_width,
+                                # height=settings.material_adjustment_panel_slider_height,
+                                from_=settings.material_adjustment_panel_slider_range_min, 
+                                to=settings.material_adjustment_panel_slider_range_max,
+                                progress_color=globals.materials[material]["Color"],
+                                fg_color=settings.material_adjustment_panel_slider_color,
+                                button_hover_color=settings.material_adjustment_panel_slider_hover_color,
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                            )
+                            slider.grid(
+                                row=row_counter, 
+                                column=3,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Slider_id"] = slider 
+                            slider.set(globals.materials[material]["Thickness"])
+                        #Adjust existing slider
+                        else:
+                            globals.materials[material]["Slider_id"].configure(
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                            )
 
-                        #Create Slider, customize it and add it to dictionary
-                        slider = customtkinter.CTkSlider(
-                            master=self.material_adjustment_panel_frame, 
-                            width=settings.material_adjustment_panel_slider_width,
-                            height=settings.material_adjustment_panel_slider_height,
-                            from_=settings.material_adjustment_panel_slider_range_min, 
-                            to=settings.material_adjustment_panel_slider_range_max,
-                            progress_color=globals.materials[material]["Color"],
-                            fg_color=settings.material_adjustment_panel_slider_color,
-                            button_hover_color=settings.material_adjustment_panel_slider_hover_color,
-                            command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
-                        )
-                        slider.grid(
-                            row=self.row_counter, 
-                            column=3,
-                            sticky="e",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        globals.materials[material]["Slider_id"] = slider 
+                            globals.materials[material]["Slider_id"].grid(
+                                row=row_counter,
+                                column=3
+                            )
+                            globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
 
-                        #Set slider and entry values
-                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-                        slider.set(globals.materials[material]["Thickness"])
-                            
-                        globals.materials[material]["Slider_id"] = slider 
 
-                        #Create buttons to move layer up or down
-                        if(len(globals.materials) > 1):
-                            if(material.lower() != "substrate"):
+                        
+                        #Create buttons to move layer up or down, but not for "substrate"
+                        if((len(globals.materials) > 1) and (material.lower() != "substrate")):
+                            #Create down_button
+                            if(globals.materials[material]["Move_down_button_id"] == None):
                                 move_down_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
-                                    width=20,
-                                    height=1,
                                     text="⬇", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, -15),
-                                    fg_color="white", #settings.material_adjustment_panel_button_color,
+                                    font=(settings.text_font, 15),
+                                    fg_color="white",
                                     hover_color=settings.material_adjustment_panel_button_hover_color, 
-                                    text_color="blue", #settings.material_adjustment_panel_text_color,
-                                    command=lambda material=material, up_or_down="down", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                                    text_color="blue",
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_down_button.grid(
-                                    row=self.row_counter,
+                                    row=row_counter,
                                     column=4,
                                     sticky="",
-                                    padx=(5,0),
+                                    padx=(0,0),
                                     pady=(0,0)
+                                )
+                                globals.materials[material]["Move_down_button_id"] = move_down_button
+                            #Adjust existing move_down_button
+                            else:
+                                globals.materials[material]["Move_down_button_id"].configure(
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
+                                )
+                                globals.materials[material]["Move_down_button_id"].grid(
+                                    row=row_counter,
+                                    column=4
                                 )
 
+                            #Create up_button
+                            if(globals.materials[material]["Move_up_button_id"] == None):
                                 move_up_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
-                                    width=20,
-                                    height=1,
                                     text="⬆", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, -15),
-                                    fg_color="white", #settings.material_adjustment_panel_button_color,
+                                    font=(settings.text_font, 15),
+                                    fg_color="white",
                                     hover_color=settings.material_adjustment_panel_button_hover_color, 
-                                    text_color="blue",#settings.material_adjustment_panel_text_color,
-                                    command=lambda material=material, up_or_down="up", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                                    text_color="blue",
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_up_button.grid(
-                                    row=self.row_counter,
+                                    row=row_counter,
                                     column=5,
                                     sticky="",
-                                    padx=(7,0),
+                                    padx=(0,0),
                                     pady=(0,0)
+                                )
+                                globals.materials[material]["Move_up_button_id"] = move_up_button
+                            #Adjust existing move_down_button
+                            else:
+                                globals.materials[material]["Move_up_button_id"].configure(
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
+                                )
+                                globals.materials[material]["Move_up_button_id"].grid(
+                                    row=row_counter,
+                                    column=5
                                 )
 
                         #Increment row_counter
-                        self.row_counter+=1
+                        row_counter+=1
 
             case "Stepped":
+                #If checkboxes has been made, disable it
+                for material in globals.materials:
+                    if(globals.materials[material]["Checkbox_id"] != None):
+                        globals.materials[material]["Checkbox_id"].grid_forget()
+
                 #Create label headline for "material"
-                material_headline = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="Material", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 18, "bold")
-                )
-                material_headline.grid(
-                    row=self.row_counter,
-                    column=1,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
+                if not hasattr(self, 'material_headline'):
+                    #Create label headline for "material"
+                    self.material_headline = customtkinter.CTkLabel(
+                        master=self.material_adjustment_panel_frame, 
+                        text="Material", 
+                        fg_color=settings.material_adjustment_panel_background_color,
+                        text_color="#55b6ff",
+                        font=(settings.text_font, 18, "bold")
+                    )
+                    self.material_headline.grid(
+                        row=0,
+                        column=1,
+                        sticky="n",
+                        padx=(0,0),
+                        pady=(0,0)
+                    )
+                #Adjust existing material_headline
+                else:
+                    self.material_headline.configure(text="Material")
+                    
 
                 #Create label to display slider functionality and place it
-                self.slider_label = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="Indent [nm]", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 18, "bold")
-                )    
-                self.slider_label.grid(
-                    row=self.row_counter,
-                    column=3,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
+                if not hasattr(self, 'slider_label'):
+                    self.slider_label = customtkinter.CTkLabel(
+                        master=self.material_adjustment_panel_frame, 
+                        text="Indent [nm]", 
+                        fg_color=settings.material_adjustment_panel_background_color,
+                        text_color="#55b6ff",
+                        font=(settings.text_font, 15, "bold")
+                    )                    
+                    self.slider_label.grid(
+                        row=0,
+                        column=2,
+                        columnspan=2,
+                        sticky="nsew",
+                        padx=(0,0),
+                        pady=(0,0)
+                    )
+                #Adjust existing slider_label
+                else:
+                    self.slider_label.configure(text="Indent [nm]")
 
-                self.row_counter += 1
-                
                 #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
                 if(len(globals.materials) > 0):
-
                     for material in globals.materials: 
-                        #Button to delete material
-                        delete_material_button = customtkinter.CTkButton(
-                            master=self.material_adjustment_panel_frame, 
-                            width=1,
-                            height=1,
-                            text="✕", #✕ 🗑
-                            font=(settings.text_font, -15, "bold"),
-                            fg_color="#820000",
-                            hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
-                            text_color=settings.material_control_panel_text_color,
-                            command=lambda button_layer=self.row_counter: self.delete_material(button_layer)
-                        )
-                        delete_material_button.grid(
-                            row=self.row_counter,
-                            column=0,
-                            sticky="",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
+                        #Create button to delete material
+                        if(globals.materials[material]["Delete_material_button_id"] == None):
+                            delete_material_button = customtkinter.CTkButton(
+                                master=self.material_adjustment_panel_frame, 
+                                width=1,
+                                height=1,
+                                text="✕", #✕ 🗑
+                                font=(settings.text_font, 10, "bold"),
+                                fg_color="#820000",
+                                hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
+                                text_color=settings.material_control_panel_text_color,
+                                command=lambda identifier=material: self.delete_material(identifier)
+                            )
+                            delete_material_button.grid(
+                                row=row_counter,
+                                column=0,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Delete_material_button_id"] = delete_material_button
+                        #Adjust existing delete_button
+                        else:
+                            globals.materials[material]["Delete_material_button_id"].configure(
+                                command=lambda identifier=material: self.delete_material(identifier)
+                            )
+                            globals.materials[material]["Delete_material_button_id"].grid(
+                                row=row_counter,
+                                column=0
+                            )
 
-                        label = customtkinter.CTkLabel(
-                            master=self.material_adjustment_panel_frame, 
-                            text=material, 
-                            fg_color=settings.material_adjustment_panel_background_color,
-                            text_color=settings.material_adjustment_panel_text_color
-                        )
-                        label.grid(
-                            row=self.row_counter, 
-                            column=1, 
-                            sticky="", 
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        #Add label to dictionary
-                        globals.materials[material]["Label_name_id"] = label
+                        #Create label to display material name
+                        if(globals.materials[material]["Label_name_id"] == None):
+                            label = customtkinter.CTkLabel(
+                                master=self.material_adjustment_panel_frame, 
+                                text=material, 
+                                fg_color=settings.material_adjustment_panel_background_color,
+                                text_color=settings.material_adjustment_panel_text_color
+                            )
+                            label.grid(
+                                row=row_counter, 
+                                column=1, 
+                                sticky="", 
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            #Add label to dictionary
+                            globals.materials[material]["Label_name_id"] = label
+                        #Adjust existing material name label
+                        else:
+                            globals.materials[material]["Label_name_id"].configure(text=globals.materials[material]["Name"])
+                            globals.materials[material]["Label_name_id"].grid(
+                                row=row_counter,
+                                column=1
+                            )
+
+                        #Create Entry
+                        if(globals.materials[material]["Entry_id"] == None):
+                            entry = customtkinter.CTkEntry(
+                                master=self.material_adjustment_panel_frame,
+                                # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
+                                fg_color = settings.material_adjustment_panel_entry_background_color,
+                                text_color="black",
+                                # width=settings.material_adjustment_panel_entry_width,
+                                # height=settings.material_adjustment_panel_entry_height,
+                                justify="center"
+                            )
+                            entry.grid(
+                                row=row_counter, 
+                                column=2,
+                                sticky="e",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
+                            entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
+                            globals.materials[material]["Entry_id"] = entry
+                        #Adjust existing Entry
+                        else:
+                            globals.materials[material]["Entry_id"].configure(
+                                textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"]))
+                            )
+                            globals.materials[material]["Entry_id"].grid(
+                                row=row_counter,
+                                column=2
+                            )
 
 
-                        #Create Entry, customize it and add it to dictionary
-                        entry = customtkinter.CTkEntry(
-                            master=self.material_adjustment_panel_frame,
-                            # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
-                            fg_color = settings.material_adjustment_panel_entry_background_color,
-                            text_color="black",
-                            width=settings.material_adjustment_panel_entry_width,
-                            height=settings.material_adjustment_panel_entry_height,
-                            justify="center"
-                        )
-                        entry.grid(
-                            row=self.row_counter, 
-                            column=2,
-                            sticky="e",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                        globals.materials[material]["Entry_id"] = entry
+                        #Create Slider
+                        if(globals.materials[material]["Slider_id"] == None):
+                            slider = customtkinter.CTkSlider(
+                                master=self.material_adjustment_panel_frame, 
+                                # width=settings.material_adjustment_panel_slider_width,
+                                # height=settings.material_adjustment_panel_slider_height,
+                                from_=settings.material_adjustment_panel_slider_range_min, 
+                                to=settings.material_adjustment_panel_slider_range_max,
+                                progress_color=globals.materials[material]["Color"],
+                                fg_color=settings.material_adjustment_panel_slider_color,
+                                button_hover_color=settings.material_adjustment_panel_slider_hover_color,
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                            )
+                            slider.grid(
+                                row=row_counter, 
+                                column=3,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Slider_id"] = slider 
+                            slider.set(globals.materials[material]["Indent [nm]"])
+                        #Adjust existing slider
+                        else:
+                            globals.materials[material]["Slider_id"].configure(
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                            )
+                            globals.materials[material]["Slider_id"].grid(
+                                row=row_counter,
+                                column=3
+                            )
+                            globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
 
-                        #Create Slider, customize it and add it to dictionary
-                        slider = customtkinter.CTkSlider(
-                            master=self.material_adjustment_panel_frame, 
-                            width=settings.material_adjustment_panel_slider_width,
-                            height=settings.material_adjustment_panel_slider_height,
-                            from_=settings.material_adjustment_panel_slider_range_min, 
-                            to=settings.material_adjustment_panel_slider_range_max,
-                            progress_color=globals.materials[material]["Color"],
-                            fg_color=settings.material_adjustment_panel_slider_color,
-                            button_hover_color=settings.material_adjustment_panel_slider_hover_color,
-                            command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
-                        )
-                        slider.grid(
-                            row=self.row_counter, 
-                            column=3,
-                            sticky="e",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        globals.materials[material]["Slider_id"] = slider 
-
-                        #Set slider and entry values
-                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
-                        slider.set(globals.materials[material]["Indent [nm]"])
-
-                        #Add slider to globals.materials
-                        globals.materials[material]["Slider_id"] = slider 
-
-                        #Create buttons to move layer up or down
-                        if(len(globals.materials) > 1):
-                            if(material.lower() != "substrate"):
+                        
+                        #Create buttons to move layer up or down, but not for "substrate"
+                        if((len(globals.materials) > 1) and (material.lower() != "substrate")):
+                            #Create down_button
+                            if(globals.materials[material]["Move_down_button_id"] == None):
                                 move_down_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
-                                    width=20,
-                                    height=1,
                                     text="⬇", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, -15),
-                                    fg_color="white", #settings.material_adjustment_panel_button_color,
+                                    font=(settings.text_font, 15),
+                                    fg_color="white",
                                     hover_color=settings.material_adjustment_panel_button_hover_color, 
-                                    text_color="blue", #settings.material_adjustment_panel_text_color,
-                                    command=lambda material=material, up_or_down="down", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                                    text_color="blue",
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_down_button.grid(
-                                    row=self.row_counter,
+                                    row=row_counter,
                                     column=4,
                                     sticky="",
-                                    padx=(5,0),
+                                    padx=(0,0),
                                     pady=(0,0)
+                                )
+                                globals.materials[material]["Move_down_button_id"] = move_down_button
+                            #Adjust existing move_down_button
+                            else:
+                                globals.materials[material]["Move_down_button_id"].configure(
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
+                                )
+                                globals.materials[material]["Move_down_button_id"].grid(
+                                    row=row_counter,
+                                    column=4
                                 )
 
+                            #Create up_button
+                            if(globals.materials[material]["Move_up_button_id"] == None):
                                 move_up_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
-                                    width=20,
-                                    height=1,
                                     text="⬆", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, -15),
-                                    fg_color="white", #settings.material_adjustment_panel_button_color,
+                                    font=(settings.text_font, 15),
+                                    fg_color="white",
                                     hover_color=settings.material_adjustment_panel_button_hover_color, 
-                                    text_color="blue",#settings.material_adjustment_panel_text_color,
-                                    command=lambda material=material, up_or_down="up", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                                    text_color="blue",
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_up_button.grid(
-                                    row=self.row_counter,
+                                    row=row_counter,
                                     column=5,
                                     sticky="",
-                                    padx=(7,0),
+                                    padx=(0,0),
                                     pady=(0,0)
+                                )
+                                globals.materials[material]["Move_up_button_id"] = move_up_button
+                            #Adjust existing move_down_button
+                            else:
+                                globals.materials[material]["Move_up_button_id"].configure(
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
+                                )
+                                globals.materials[material]["Move_up_button_id"].grid(
+                                    row=row_counter,
+                                    column=5
                                 )
 
                         #Increment row_counter
-                        self.row_counter+=1
-            
+                        row_counter+=1
+        
             case "Stoney":
+                #If delete button has been made, remove them from grid
+                for material in globals.materials:
+                    if(globals.materials[material]["Delete_material_button_id"] != None):
+                        globals.materials[material]["Delete_material_button_id"].grid_forget()
                 
                 #Create label headline for "material"
-                material_headline = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="Material", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 18, "bold")
-                )
-                material_headline.grid(
-                    row=self.row_counter,
-                    column=1,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
+                if not hasattr(self, 'material_headline'):
+                    #Create label headline for "material"
+                    self.material_headline = customtkinter.CTkLabel(
+                        master=self.material_adjustment_panel_frame, 
+                        text="Material", 
+                        fg_color=settings.material_adjustment_panel_background_color,
+                        text_color="#55b6ff",
+                        font=(settings.text_font, 18, "bold")
+                    )
+                    self.material_headline.grid(
+                        row=0,
+                        column=1,
+                        sticky="n",
+                        padx=(0,0),
+                        pady=(0,0)
+                    )
+                #Adjust existing material_headline
+                else:
+                    self.material_headline.configure(text="Material")
+                
 
                 #Create label to display slider functionality and place it
-                self.slider_label = customtkinter.CTkLabel(
-                    master=self.material_adjustment_panel_frame, 
-                    text="Thickness [nm]", 
-                    fg_color=settings.material_adjustment_panel_background_color,
-                    text_color="#55b6ff",
-                    font=(settings.text_font, 18, "bold")
-                )                    
-                self.slider_label.grid(
-                    row=self.row_counter,
-                    column=3,
-                    sticky="n",
-                    padx=(0,0),
-                    pady=(0,0)
-                )
+                if not hasattr(self, 'slider_label'):
+                    self.slider_label = customtkinter.CTkLabel(
+                        master=self.material_adjustment_panel_frame, 
+                        text="Thickness [nm]", 
+                        fg_color=settings.material_adjustment_panel_background_color,
+                        text_color="#55b6ff",
+                        font=(settings.text_font, 15, "bold")
+                    )                    
+                    self.slider_label.grid(
+                        row=0,
+                        column=2,
+                        columnspan=2,
+                        sticky="nsew",
+                        padx=(0,0),
+                        pady=(0,0)
+                    )
+                #Adjust existing slider_label
+                else:
+                    self.slider_label.configure(text="Thickness [nm]")
 
-                self.row_counter += 1
-                
                 #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
                 if(len(globals.materials) > 0):
-
                     for material in globals.materials: 
-                        #Checkbox to select or deselect material
-                        checkbox_value = customtkinter.StringVar(value="off")
-                        checkbox = customtkinter.CTkCheckBox(
-                            master=self.material_adjustment_panel_frame,
-                            width=0,
-                            text="",
-                            command=lambda material=material, checkbox=checkbox_value: self.checkbox_event(material),
-                            variable=checkbox_value,
-                            onvalue="on",
-                            offvalue="off"
-                        )
-                        checkbox.grid(
-                            row=self.row_counter,
-                            column=0,
-                            sticky="",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        globals.materials[material]["Checkbox_id"] = checkbox
+                        #create checkbox to select or deselect material
+                        if(globals.materials[material]["Checkbox_id"] == None):
+                            checkbox_value = customtkinter.StringVar(value="off")
+                            checkbox = customtkinter.CTkCheckBox(
+                                master=self.material_adjustment_panel_frame,
+                                # width=1,
+                                text="",
+                                variable=checkbox_value,
+                                onvalue="on",
+                                offvalue="off",
+                                command=lambda material=material, checkbox=checkbox_value: self.checkbox_event(material),
+                            )
+                            checkbox.grid(
+                                row=row_counter,
+                                column=0,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Checkbox_id"] = checkbox
+                        #Adjust existing checkbox
+                        else:
+                            checkbox_value = customtkinter.StringVar(value="off")
+                            globals.materials[material]["Checkbox_id"].configure(
+                                command=lambda material=material, checkbox=checkbox_value: self.checkbox_event(material),
+                            )
+                            globals.materials[material]["Checkbox_id"].grid(
+                                row=row_counter,
+                                column=0
+                            )
 
                         #if material is substrate, then the checkbox must be "on"
                         if(material.lower() == "substrate"):
                             globals.materials[material]["Checkbox_id"].select()
 
+                        #Create label to display material name
+                        if(globals.materials[material]["Label_name_id"] == None):
+                            label = customtkinter.CTkLabel(
+                                master=self.material_adjustment_panel_frame, 
+                                text=material, 
+                                fg_color=settings.material_adjustment_panel_background_color,
+                                text_color=settings.material_adjustment_panel_text_color
+                            )
+                            label.grid(
+                                row=row_counter, 
+                                column=1, 
+                                sticky="", 
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            #Add label to dictionary
+                            globals.materials[material]["Label_name_id"] = label
+                        #Adjust existing material name label
+                        else:
+                            globals.materials[material]["Label_name_id"].configure(
+                                text=globals.materials[material]["Name"]
+                            )
+                            globals.materials[material]["Label_name_id"].grid(
+                                row=row_counter,
+                                column=1
+                            )
 
-                        #Material name label
-                        label = customtkinter.CTkLabel(
-                            master=self.material_adjustment_panel_frame, 
-                            text=material, 
-                            fg_color=settings.material_adjustment_panel_background_color,
-                            text_color=settings.material_adjustment_panel_text_color
-                        )
-                        label.grid(
-                            row=self.row_counter, 
-                            column=1, 
-                            sticky="", 
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        #Add label to dictionary
-                        globals.materials[material]["Label_name_id"] = label
-
-
-                        #Create Entry, customize it and add it to dictionary
-                        entry = customtkinter.CTkEntry(
-                            master=self.material_adjustment_panel_frame,
-                            # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
-                            fg_color = settings.material_adjustment_panel_entry_background_color,
-                            text_color="black",
-                            width=settings.material_adjustment_panel_entry_width,
-                            height=settings.material_adjustment_panel_entry_height,
-                            justify="center"
-                        )
-                        entry.grid(
-                            row=self.row_counter, 
-                            column=2,
-                            sticky="e",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                        globals.materials[material]["Entry_id"] = entry
-
-                        #Create Slider, customize it and add it to dictionary
-                        slider = customtkinter.CTkSlider(
-                            master=self.material_adjustment_panel_frame, 
-                            width=settings.material_adjustment_panel_slider_width,
-                            height=settings.material_adjustment_panel_slider_height,
-                            from_=settings.material_adjustment_panel_slider_range_min, 
-                            to=settings.material_adjustment_panel_slider_range_max,
-                            progress_color=globals.materials[material]["Color"],
-                            fg_color=settings.material_adjustment_panel_slider_color,
-                            button_hover_color=settings.material_adjustment_panel_slider_hover_color,
-                            command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
-                        )
-                        slider.grid(
-                            row=self.row_counter, 
-                            column=3,
-                            sticky="e",
-                            padx=(0,0),
-                            pady=(0,0)
-                        )
-                        globals.materials[material]["Slider_id"] = slider 
-
-                        #Set slider and entry values
-                        entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-                        slider.set(globals.materials[material]["Thickness"])
-
-                        #Add slider to globals.materials                            
-                        globals.materials[material]["Slider_id"] = slider 
+                        #Create Entry
+                        if(globals.materials[material]["Entry_id"] == None):
+                            entry = customtkinter.CTkEntry(
+                                master=self.material_adjustment_panel_frame,
+                                # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
+                                fg_color = settings.material_adjustment_panel_entry_background_color,
+                                text_color="black",
+                                # width=settings.material_adjustment_panel_entry_width,
+                                # height=settings.material_adjustment_panel_entry_height,
+                                justify="center"
+                            )
+                            entry.grid(
+                                row=row_counter, 
+                                column=2,
+                                sticky="e",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
+                            entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                            globals.materials[material]["Entry_id"] = entry
+                        #Adjust existing Entry
+                        else:
+                            globals.materials[material]["Entry_id"].configure(
+                                textvariable=StringVar(value=str(globals.materials[material]["Thickness"]))
+                            )
+                            globals.materials[material]["Entry_id"].grid(
+                                row=row_counter,
+                                column=2
+                            )
 
 
-                        #Create buttons to move layer up or down
-                        if(len(globals.materials) > 1):
-                            if(material.lower() != "substrate"):
+                        #Create Slider
+                        if(globals.materials[material]["Slider_id"] == None):
+                            slider = customtkinter.CTkSlider(
+                                master=self.material_adjustment_panel_frame, 
+                                # width=settings.material_adjustment_panel_slider_width,
+                                # height=settings.material_adjustment_panel_slider_height,
+                                from_=settings.material_adjustment_panel_slider_range_min, 
+                                to=settings.material_adjustment_panel_slider_range_max,
+                                progress_color=globals.materials[material]["Color"],
+                                fg_color=settings.material_adjustment_panel_slider_color,
+                                button_hover_color=settings.material_adjustment_panel_slider_hover_color,
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                            )
+                            slider.grid(
+                                row=row_counter, 
+                                column=3,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Slider_id"] = slider 
+                            slider.set(globals.materials[material]["Thickness"])
+                        #Adjust existing slider
+                        else:
+                            globals.materials[material]["Slider_id"].configure(
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                            )
+                            globals.materials[material]["Slider_id"].grid(
+                                row=row_counter,
+                                column=3
+                            )
+                            globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+
+                        #Create buttons to move layer up or down, but not for "substrate"
+                        if((len(globals.materials) > 1) and (material.lower() != "substrate")):
+                            #Create down_button
+                            if(globals.materials[material]["Move_down_button_id"] == None):
                                 move_down_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
-                                    width=20,
-                                    height=1,
                                     text="⬇", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, -15),
-                                    fg_color="white", #settings.material_adjustment_panel_button_color,
+                                    font=(settings.text_font, 15),
+                                    fg_color="white",
                                     hover_color=settings.material_adjustment_panel_button_hover_color, 
-                                    text_color="blue", #settings.material_adjustment_panel_text_color,
-                                    command=lambda material=material, up_or_down="down", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                                    text_color="blue",
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_down_button.grid(
-                                    row=self.row_counter,
+                                    row=row_counter,
                                     column=4,
                                     sticky="",
-                                    padx=(5,0),
+                                    padx=(0,0),
                                     pady=(0,0)
+                                )
+                                globals.materials[material]["Move_down_button_id"] = move_down_button
+                            #Adjust existing move_down_button
+                            else:
+                                globals.materials[material]["Move_down_button_id"].configure(
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
+                                )
+                                globals.materials[material]["Move_down_button_id"].grid(
+                                    row=row_counter,
+                                    column=4
                                 )
 
+                            #Create up_button
+                            if(globals.materials[material]["Move_up_button_id"] == None):
                                 move_up_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
-                                    width=20,
-                                    height=1,
                                     text="⬆", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, -15),
-                                    fg_color="white", #settings.material_adjustment_panel_button_color,
+                                    font=(settings.text_font, 15),
+                                    fg_color="white",
                                     hover_color=settings.material_adjustment_panel_button_hover_color, 
-                                    text_color="blue",#settings.material_adjustment_panel_text_color,
-                                    command=lambda material=material, up_or_down="up", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
+                                    text_color="blue",
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_up_button.grid(
-                                    row=self.row_counter,
+                                    row=row_counter,
                                     column=5,
                                     sticky="",
-                                    padx=(7,0),
+                                    padx=(0,0),
                                     pady=(0,0)
+                                )
+                                globals.materials[material]["Move_up_button_id"] = move_up_button
+                            #Adjust existing move_down_button
+                            else:
+                                globals.materials[material]["Move_up_button_id"].configure(
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
+                                )
+                                globals.materials[material]["Move_up_button_id"].grid(
+                                    row=row_counter,
+                                    column=5
                                 )
 
                         #Increment row_counter
-                        self.row_counter+=1
+                        row_counter+=1
+
+        return self.material_adjustment_panel_frame
 
 
+
+    # """???????????????????????????????????????????????????????????????????"""
     def checkbox_event(self, chosen_material):
         # print("CHECKBOX_EVENT()")
 
@@ -594,7 +813,7 @@ class Material_Adjustment_Panel:
                 for material in globals.materials:
                     if(globals.materials[material]["Entry_id"] == entry):
                         #Find entered value
-                        entered_value = int(entry.get())
+                        entered_value = float(entry.get())
                         #Update the thickness value in self.materials
                         globals.materials[material]["Thickness"] = entered_value
 
@@ -606,7 +825,7 @@ class Material_Adjustment_Panel:
                 for material in globals.materials:
                     if(globals.materials[material]["Entry_id"] == entry):
                         #Find entered value
-                        entered_value = int(entry.get())
+                        entered_value = float(entry.get())
                         #Update the thickness value in self.materials
                         globals.materials[material]["Indent [nm]"] = entered_value
 
@@ -618,7 +837,7 @@ class Material_Adjustment_Panel:
                 for material in globals.materials:
                     if(globals.materials[material]["Entry_id"] == entry):
                         #Find entered value
-                        entered_value = int(entry.get())
+                        entered_value = float(entry.get())
                         #Update the thickness value in self.materials
                         globals.materials[material]["Thickness"] = entered_value
 
@@ -670,26 +889,50 @@ class Material_Adjustment_Panel:
 
 
     """
-    -Deletes the material that has the same layer value as 'button_layer' from the materials{} dictionary
-    -Decrements the materials with a layer value above 'button_layer'
-    -Reorders the materials{} dictionary
-    -Re-renders the material adjustment panel
+    -Deletes the material given material from globals.materials{}
+    -Deletes all widgets related to the given material
+    -Sorts globals.materials{} making the "layer" values correct
+    -Updates the widgets in material_adjustment_panel_frame
     -Redraws the material_stack
     """
-    def delete_material(self, button_layer):
-        #print("DELETE_MATERIAL()")
+    def delete_material(self, material):
+        # print("DELETE_MATERIAL()")
 
-        #Go through all materials
-        for material in globals.materials:
-            #Delete the material at the same row as button layer
-            if(globals.materials[material]["Layer"] == button_layer):
-                delete_material = material
+        #Destroy all widgets related to material
+        if(globals.materials[material]["Label_name_id"] != None):
+            globals.materials[material]["Label_name_id"].destroy()
+        if(globals.materials[material]["Delete_material_button_id"] != None):
+            globals.materials[material]["Delete_material_button_id"].destroy()
+        if(globals.materials[material]["Move_down_button_id"] != None):
+            globals.materials[material]["Move_down_button_id"].destroy()
+        if(globals.materials[material]["Move_up_button_id"] != None):
+            globals.materials[material]["Move_up_button_id"].destroy()
+        if(globals.materials[material]["Entry_id"] != None):
+            globals.materials[material]["Entry_id"].destroy()
+        if(globals.materials[material]["Slider_id"] != None):
+            globals.materials[material]["Slider_id"].destroy()
+        if(globals.materials[material]["Checkbox_id"] != None):
+            globals.materials[material]["Checkbox_id"].destroy()
 
-            #Decrement the layer value of materials above button_layer/deleted material
-            if(globals.materials[material]["Layer"] > button_layer):
-                globals.materials[material]["Layer"] -= 1
+        # if(globals.materials[material]["Rectangle_id"] != None):
+        #     globals.materials[material]["Rectangle_id"].destroy()
+        # if(globals.materials[material]["Text_id"] != None):
+        #     globals.materials[material]["Text_id"].destroy()
+        # if(globals.materials[material]["Text_bbox_id"] != None):
+        #     globals.materials[material]["Text_bbox_id"].destroy()
+        # if(globals.materials[material]["Line_id"] != None):
+        #     globals.materials[material]["Line_id"].destroy()
+        # if(globals.materials[material]["Indent_text_id"] != None):
+        #     globals.materials[material]["Indent_text_id"].destroy()
+        # if(globals.materials[material]["Indent_text_bbox_id"] != None):
+        #     globals.materials[material]["Indent_text_bbox_id"].destroy()
+        # if(globals.materials[material]["Indent_line_id"] != None):
+        #     globals.materials[material]["Indent_line_id"].destroy()
+        # if(globals.materials[material]["Indent_arrow_pointer_id"] != None):
+        #     globals.materials[material]["Indent_arrow_pointer_id"].destroy()
 
-        del globals.materials[delete_material]
+        #delete material from dictionary
+        del globals.materials[material]
 
         #Sort the materials{} dictionary
         globals.app.sort_dictionary()
@@ -701,351 +944,45 @@ class Material_Adjustment_Panel:
         globals.layer_stack_canvas.draw_material_stack()
         
 
-        
-
-        # #check if given material key is in dictionary
-        # if chosen_material in globals.materials:
-        #     #The materials with a "layer" value less than chosen material must be decremented to keep materials{} organized by "layer"
-        #     for material in globals.materials:
-        #         if(globals.materials[material]["Layer"] > globals.materials[chosen_material]["Layer"]):
-        #             globals.materials[material]["Layer"] -= 1
-            
-        #     #Delete the key
-        #     del globals.materials[chosen_material]
-
-        #     #Update the material_adjustment_panel
-        #     self.create_material_adjustment_panel()
-
-        #     #Re-draw the material stack
-        #     globals.layer_stack_canvas.draw_material_stack()
-        
-        # else:
-        #     messagebox.showerror("ERROR", "Could not find material-key in globals.materials")
-
-
     """
-    -Switches the places between chosen material and whatever material is over or under it
-    -Organizes materials{} so that the order of "layers" is consistent
+    -Switches the places between chosen material and the material that is over or under it
+    -Organizes globals.materials{} so that the order of "layers" is consistent
     -Redraws the material stack
-    -Switches the grid places of the modified materials Label_name:id, Entry_id and Slider_id in the material_adjustment_panel
+    -Updates the widgets in material_adjustment_panel_frame
     """
-    def move_material(self, chosen_material, up_or_down, button_layer):
+    def move_material(self, chosen_material, up_or_down):
         # print("MOVE_MATERIAL()")
 
         #Find the needed material names
-        chosen_material = None
         above_material = None
         below_material = None
         for material in globals.materials:
-            if(globals.materials[material]["Layer"] == button_layer):
-                chosen_material = material
-
-            if(globals.materials[material]["Layer"] == button_layer-1):
-                above_material = material
-            
-            if(globals.materials[material]["Layer"] == button_layer+1):
+            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] + 1):
                 below_material = material
 
-        #Move chosen_material up one layer and above_material down one layer 
-        if(up_or_down == "up"):
-            #Skip this function if the user tries to move the material to row zero, which does not exist
-            if(button_layer == 1):
-                return
+            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] - 1):
+                above_material = material
 
-            #Switch places of the chosen material and the material above chosen material
-            tmp_layer = globals.materials[chosen_material]["Layer"]
-            globals.materials[chosen_material]["Layer"] = globals.materials[above_material]["Layer"]
-            globals.materials[above_material]["Layer"] = tmp_layer
-
-            #Sort the dictionary
-            globals.app.sort_dictionary()
-
-            #Redraw the material stack
-            globals.layer_stack_canvas.draw_material_stack()
-                    
-            #Move the chosen_material label, entry_id and slider_id
-            globals.materials[chosen_material]["Slider_id"].grid(row=globals.materials[chosen_material]["Layer"])
-            globals.materials[chosen_material]["Entry_id"].grid(row=globals.materials[chosen_material]["Layer"])
-            globals.materials[chosen_material]["Label_name_id"].grid(row=globals.materials[chosen_material]["Layer"])
-
-            #Move the replaced materials label, entry_id and slider_id
-            globals.materials[above_material]["Slider_id"].grid(row=globals.materials[above_material]["Layer"])
-            globals.materials[above_material]["Entry_id"].grid(row=globals.materials[above_material]["Layer"])
-            globals.materials[above_material]["Label_name_id"].grid(row=globals.materials[above_material]["Layer"])
-
-
+        
         #Move chosen_material down one layer and below_material up one layer 
+        if(up_or_down == "down"):
+            if((below_material != None) and (chosen_material.lower() != "substrate") and (below_material.lower() != "substrate")):
+                tmp_layer = globals.materials[chosen_material]["Layer"]
+                globals.materials[chosen_material]["Layer"] = globals.materials[below_material]["Layer"]
+                globals.materials[below_material]["Layer"] = tmp_layer
+
+        #Move chosen_material up one layer and above_material down one layer 
         else:
-            #Switch places of the chosen material and the material above chosen material
-            tmp_layer = globals.materials[chosen_material]["Layer"]
-            globals.materials[chosen_material]["Layer"] = globals.materials[below_material]["Layer"]
-            globals.materials[below_material]["Layer"] = tmp_layer
+            if((above_material != None) and (chosen_material.lower() != "substrate")):
+                tmp_layer = globals.materials[chosen_material]["Layer"]
+                globals.materials[chosen_material]["Layer"] = globals.materials[above_material]["Layer"]
+                globals.materials[above_material]["Layer"] = tmp_layer
 
-            #Sort the dictionary
-            globals.app.sort_dictionary()
+        #Sort the keys in globals.materials after the "layer" value of each material
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
 
-            #Redraw the material stack
-            globals.layer_stack_canvas.draw_material_stack()
-                    
-            #Move the chosen_material label, entry_id and slider_id to its new place in the material_adjustment_panel
-            globals.materials[chosen_material]["Slider_id"].grid(row=globals.materials[chosen_material]["Layer"])
-            globals.materials[chosen_material]["Entry_id"].grid(row=globals.materials[chosen_material]["Layer"])
-            globals.materials[chosen_material]["Label_name_id"].grid(row=globals.materials[chosen_material]["Layer"])
+        #Adjust the widgets in material_adjustment_panel_frame
+        self.create_material_adjustment_panel()
 
-            #Move the below_materials label, entry_id and slider_id to its new place in the material_adjustment_panel
-            globals.materials[below_material]["Slider_id"].grid(row=globals.materials[below_material]["Layer"])
-            globals.materials[below_material]["Entry_id"].grid(row=globals.materials[below_material]["Layer"])
-            globals.materials[below_material]["Label_name_id"].grid(row=globals.materials[below_material]["Layer"])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def create_material_adjustment_panel(self):
-#         # print("CREATE_MATERIAL_ADJUSTMENT_PANEL()")
-
-#         #if material_adjustment_frame has NOT been created before, create it
-#         if not hasattr(self, 'material_adjustment_panel_frame'):
-#             #Create Frame from the control panel and place it within given window
-#             self.material_adjustment_panel_frame = customtkinter.CTkScrollableFrame(
-#                 master=self.window,
-#                 width=settings.material_adjustment_panel_width,
-#                 height=settings.material_adjustment_panel_height,
-#                 fg_color=settings.material_adjustment_panel_background_color
-#             )
-#             self.material_adjustment_panel_frame.grid(
-#                 row=0,
-#                 column=0,
-#                 padx=(settings.material_adjustment_panel_padding_left, settings.material_adjustment_panel_padding_right),
-#                 pady=(settings.material_adjustment_panel_padding_top, settings.material_adjustment_panel_padding_bottom),
-#                 sticky="nw"
-#             )
-        
-#         #delete all widgets in frame
-#         for widget in self.material_adjustment_panel_frame.winfo_children():
-#             widget.destroy()
-#             self.row_counter = 0
-
-#         #Create label headline for "material"
-#         material_headline = customtkinter.CTkLabel(
-#             master=self.material_adjustment_panel_frame, 
-#             text="Material", 
-#             fg_color=settings.material_adjustment_panel_background_color,
-#             text_color="#55b6ff",
-#             font=(settings.text_font, 20, "bold")
-#         )
-#         material_headline.grid(
-#             row=self.row_counter,
-#             column=1,
-#             sticky="n",
-#             padx=(0,0),
-#             pady=(0,0)
-#         )
-
-#         #Create label to display slider functionality and place it
-#         match globals.option_menu:
-#             case "Stacked" | "Realistic" | "Stoney":
-#                 self.slider_label = customtkinter.CTkLabel(
-#                     master=self.material_adjustment_panel_frame, 
-#                     text="Thickness [nm]", 
-#                     fg_color=settings.material_adjustment_panel_background_color,
-#                     text_color="#55b6ff",
-#                     font=(settings.text_font, 20, "bold")
-#                 )
-            
-#             case "Stepped":
-#                 self.slider_label = customtkinter.CTkLabel(
-#                     master=self.material_adjustment_panel_frame, 
-#                     text="Indent [nm]", 
-#                     fg_color=settings.material_adjustment_panel_background_color,
-#                     text_color="#55b6ff",
-#                     font=(settings.text_font, 20, "bold")
-#                 )
-            
-#         self.slider_label.grid(
-#             row=self.row_counter,
-#             column=3,
-#             sticky="n",
-#             padx=(0,0),
-#             pady=(0,0)
-#         )
-
-#         self.row_counter += 1
-        
-#         #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
-#         if(len(globals.materials) > 0):
-
-#             for material in globals.materials: 
-#                 #Button to delete material
-#                 delete_material_button = customtkinter.CTkButton(
-#                     master=self.material_adjustment_panel_frame, 
-#                     width=1,
-#                     height=1,
-#                     text="✕", #✕ 🗑
-#                     font=(settings.text_font, -15, "bold"),
-#                     fg_color="#820000",
-#                     hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
-#                     text_color=settings.material_control_panel_text_color,
-#                     command=lambda button_layer=self.row_counter: self.delete_material(button_layer)
-#                 )
-#                 delete_material_button.grid(
-#                     row=self.row_counter,
-#                     column=0,
-#                     sticky="",
-#                     padx=(0,0),
-#                     pady=(0,0)
-#                 )
-
-#                 label = customtkinter.CTkLabel(
-#                     master=self.material_adjustment_panel_frame, 
-#                     text=material, 
-#                     fg_color=settings.material_adjustment_panel_background_color,
-#                     text_color=settings.material_adjustment_panel_text_color
-#                 )
-#                 label.grid(
-#                     row=self.row_counter, 
-#                     column=1, 
-#                     sticky="", 
-#                     padx=(0,0),
-#                     pady=(0,0)
-#                 )
-#                 #Add label to dictionary
-#                 globals.materials[material]["Label_name_id"] = label
-
-
-#                 #Create Entry, customize it and add it to dictionary
-#                 entry = customtkinter.CTkEntry(
-#                     master=self.material_adjustment_panel_frame,
-#                     # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
-#                     fg_color = settings.material_adjustment_panel_entry_background_color,
-#                     text_color="black",
-#                     width=settings.material_adjustment_panel_entry_width,
-#                     height=settings.material_adjustment_panel_entry_height,
-#                     justify="center"
-#                 )
-#                 entry.grid(
-#                     row=self.row_counter, 
-#                     column=2,
-#                     sticky="e",
-#                     padx=(0,0),
-#                     pady=(0,0)
-#                 )
-#                 entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-#                 globals.materials[material]["Entry_id"] = entry
-
-#                 #Create Slider, customize it and add it to dictionary
-#                 slider = customtkinter.CTkSlider(
-#                     master=self.material_adjustment_panel_frame, 
-#                     width=settings.material_adjustment_panel_slider_width,
-#                     height=settings.material_adjustment_panel_slider_height,
-#                     from_=settings.material_adjustment_panel_slider_range_min, 
-#                     to=settings.material_adjustment_panel_slider_range_max,
-#                     progress_color=globals.materials[material]["Color"],
-#                     fg_color=settings.material_adjustment_panel_slider_color,
-#                     button_hover_color=settings.material_adjustment_panel_slider_hover_color,
-#                     command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
-#                 )
-#                 slider.grid(
-#                     row=self.row_counter, 
-#                     column=3,
-#                     sticky="e",
-#                     padx=(0,0),
-#                     pady=(0,0)
-#                 )
-#                 globals.materials[material]["Slider_id"] = slider 
-
-#                 #Set slider and entry values, based on the option_manu value
-#                 match globals.option_menu:
-#                     case "Stacked" | "Realistic" | "Stoney":
-#                         entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-#                         slider.set(globals.materials[material]["Thickness"])
-                    
-#                     case "Stepped":
-#                         entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
-#                         slider.set(globals.materials[material]["Indent [nm]"])
-
-
-#                 #Disable slider and Entry if specified by the excel-file
-#                 if(globals.materials[material]["Status"] == "inactive"):
-#                     globals.materials[material]["Slider_id"].configure(state="disabled") #Disable slider
-#                     globals.materials[material]["Entry_id"].delete(0, tkinter.END)     #Disable Entry
-#                     globals.materials[material]["Entry_id"].insert(0, "inactive")      #Disable Entry
-#                     globals.materials[material]["Entry_id"].configure(state="disabled")#Disable Entry
-#                 globals.materials[material]["Slider_id"] = slider 
-
-#                 #Create buttons to move layer up or down
-#                 if(len(globals.materials) > 1):
-#                     if(material.lower() != "substrate"):
-#                         move_down_button = customtkinter.CTkButton(
-#                             master=self.material_adjustment_panel_frame, 
-#                             width=20,
-#                             height=1,
-#                             text="⬇", #⬆ ⬇ 🔼 🔽
-#                             font=(settings.text_font, -15),
-#                             fg_color="white", #settings.material_adjustment_panel_button_color,
-#                             hover_color=settings.material_adjustment_panel_button_hover_color, 
-#                             text_color="blue", #settings.material_adjustment_panel_text_color,
-#                             command=lambda material=material, up_or_down="down", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
-#                         )
-#                         move_down_button.grid(
-#                             row=self.row_counter,
-#                             column=4,
-#                             sticky="",
-#                             padx=(5,0),
-#                             pady=(0,0)
-#                         )
-#                         move_up_button = customtkinter.CTkButton(
-#                             master=self.material_adjustment_panel_frame, 
-#                             width=20,
-#                             height=1,
-#                             text="⬆", #⬆ ⬇ 🔼 🔽
-#                             font=(settings.text_font, -15),
-#                             fg_color="white", #settings.material_adjustment_panel_button_color,
-#                             hover_color=settings.material_adjustment_panel_button_hover_color, 
-#                             text_color="blue",#settings.material_adjustment_panel_text_color,
-#                             command=lambda material=material, up_or_down="up", button_layer=self.row_counter: self.move_material(material, up_or_down, button_layer)
-
-#                         )
-#                         move_up_button.grid(
-#                             row=self.row_counter,
-#                             column=5,
-#                             sticky="",
-#                             padx=(7,0),
-#                             pady=(0,0)
-#                         )
-
-
-#                 #Increment row_counter
-#                 self.row_counter+=1
-
-    
+        #Redraw the material stack
+        globals.layer_stack_canvas.draw_material_stack()

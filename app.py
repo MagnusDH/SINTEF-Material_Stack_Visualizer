@@ -9,143 +9,153 @@ import settings
 import globals
 from Material_Adjustment_Panel import Material_Adjustment_Panel
 from Layer_Stack_Canvas import Layer_Stack_Canvas
-from Canvas_Control_Panel import Canvas_Control_Panel
-from Graph import Graph
-from Graph_Control_Panel import Graph_Control_Panel
 from Material_Control_Panel import Material_Control_Panel
+from Canvas_Control_Panel import Canvas_Control_Panel
+# from Graph import Graph
+# from Graph_Control_Panel import Graph_Control_Panel
 
 
 #Main application class
 class App:
     def __init__(self, program_window):
-        #print("CLASS APP INIT()")
+        # print("CLASS APP INIT()")
+        self.counter = 0
 
         #Program window
         self.program_window = program_window
 
-        #If excel file exists and user wants to open load it, then load materials.xlsx
+        #Create background_canvas and main_frame where every widgets is placed
+        # self.main_frame, self.background_canvas = self.create_scrollable_frame(self.program_window)
+
+        #If excel file exists, load it into globals.materials
         if(os.path.isfile("Materials.xlsx")):
             self.load_materials_from_excel()
 
-        #Main frame where every widgets is placed
-        self.main_frame = self.create_scrollable_frame(self.program_window)
-        globals.main_frame = self.main_frame
+        #Create a panel that controls the properties of each material
+        globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window)
 
         #Create canvas to draw materials on. This class also creates a control panel to control the layer_stack_canvas
-        globals.layer_stack_canvas = Layer_Stack_Canvas(self.main_frame)
+        globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window)
 
         #Create a panel that controls the properties of each material
-        globals.material_adjustment_panel = Material_Adjustment_Panel(self.main_frame)
-
-        #Create a panel that controls the properties of each material
-        globals.material_control_panel = Material_Control_Panel(self.main_frame)
+        globals.material_control_panel = Material_Control_Panel(self.program_window)
 
         #Create a panel that controls the actions of the layer_stack_canvas
-        globals.canvas_control_panel = Canvas_Control_Panel(self.main_frame)
+        globals.canvas_control_panel = Canvas_Control_Panel(self.program_window)
 
 
-    """
-    -Creates a scrollable frame on the window given in the class
-    -(To be able to do this a "canvas" is made and a "frame" is placed on top of the canvas. 
-    -(Then scrollbars are placed in the main window which controls scrolling on the canvas)
-    """
-    def create_scrollable_frame(self, window):
-        # print("CREATE_SCROLLABLE_FRAME()")
-        #Create a background canvas (Scrollbars can only be used with a canvas)
-        background_canvas = customtkinter.CTkCanvas(
-            master=window,
-            bg=settings.background_canvas_background_color,
-            highlightthickness=0
-        )
-        background_canvas.grid(
-            row=0, 
-            column=0, 
-            sticky="nsew",
-        )
+    # """
+    # -Creates a scrollable frame on the window given in the class
+    # -(To be able to do this a "canvas" is made and a "frame" is placed on top of the canvas. 
+    # -(Then scrollbars are placed in the main window which controls scrolling on the canvas)
+    # """
+    # def create_scrollable_frame(self, window):
+    #     #print("CREATE_SCROLLABLE_FRAME()")
+    #     #Create a background canvas (Scrollbars can only be used with a canvas)
+    #     background_canvas = customtkinter.CTkCanvas(
+    #         master=window,
+    #         height=window.winfo_height()-settings.scrollbar_width-5,
+    #         width=window.winfo_width()-settings.scrollbar_width-5,
+    #         bg=settings.background_canvas_background_color,
+    #         highlightthickness=0
+    #     )
+    #     background_canvas.grid(
+    #         row=0, 
+    #         column=0, 
+    #         sticky="nsew",
+    #     )
 
-        #Create a frame inside the canvas to hold all the widgets and enable scrolling
-        main_frame = customtkinter.CTkFrame(
-            master=background_canvas, 
-            width=settings.main_frame_width, 
-            height=settings.main_frame_height, 
-            fg_color=settings.main_frame_background_color,
-        )
-        main_frame.grid(
-            row=0,
-            column=0
-        )
+    #     #Prevent the background_canvas to automaticly resize itself to the size of the children widgets inside it
+    #     background_canvas.grid_propagate(False)
 
-        #Add the frame to a window in the background_canvas
-        background_canvas.create_window(
-            (0, 0), 
-            window=main_frame, 
-            anchor="nw"
-        )
+    #     #Create a frame inside the canvas to hold all the widgets
+    #     main_frame = customtkinter.CTkFrame(
+    #         master=background_canvas, 
+    #         width=max(settings.main_frame_minimum_width*0.8, window.winfo_width()*0.8 - settings.scrollbar_width),     #Has to be 80% to get correct size for some reason
+    #         height=max(settings.main_frame_minimum_height*0.8, window.winfo_height()*0.8 - settings.scrollbar_width),   #Has to be 80% to get correct size for some reason
+    #         fg_color=settings.main_frame_background_color,
+    #     )
+    #     main_frame.grid(
+    #         row=0,
+    #         column=0
+    #     )
 
-        #Configure the main_frame to expand with the program_window/background_canvas
-        main_frame.bind("<Configure>", self.on_frame_configure(background_canvas))
+    #     #Prevent the main_frame window to downsize itself to fit widgets placed inside
+    #     main_frame.grid_propagate(False)
 
-        #Prevent the main_frame window to downsize itself to fit widgets placed inside
-        main_frame.grid_propagate(False)
+    #     #Add main_frame to a window in the background_canvas to enable scrolling
+    #     background_canvas.create_window(
+    #         (0, 0), 
+    #         window=main_frame, 
+    #         anchor="nw"
+    #     )
 
-        background_canvas.configure(scrollregion=background_canvas.bbox("all"))
+    #     ####### UNNECESSARY STUFF? ##########
+
+    #     #Configure the main_frame to expand with the background_canvas
+    #     # main_frame.bind("<Configure>", self.on_frame_configure(background_canvas))
+
+    #     # background_canvas.configure(scrollregion=background_canvas.bbox("all"))
+
+    #     # background_canvas.configure(
+    #     #     scrollregion=(0, 0, max(500, background_canvas.winfo_width()), max(500, background_canvas.winfo_height()))
+    #     # )
+    #     ####################################
+
+        
+
+    #     #Add scrollbars to the background_canvas
+    #     canvas_vertical_scrollbar = customtkinter.CTkScrollbar(
+    #         master=window,
+    #         orientation="vertical",
+    #         width=settings.scrollbar_width,
+    #         border_spacing=settings.scrollbar_border_spacing,
+    #         fg_color=settings.scrollbar_background_color,
+    #         command=background_canvas.yview
+    #     )
+    #     canvas_vertical_scrollbar.grid(
+    #         row=0, 
+    #         column=1,
+    #         sticky="ns",
+    #     )
+
+    #     canvas_horizontal_scrollbar = customtkinter.CTkScrollbar(
+    #         master=window,
+    #         orientation="horizontal", 
+    #         width=settings.scrollbar_width,
+    #         border_spacing=settings.scrollbar_border_spacing,
+    #         fg_color=settings.scrollbar_background_color,
+    #         command=background_canvas.xview
+    #     )
+    #     canvas_horizontal_scrollbar.grid(
+    #         row=1, 
+    #         column=0, 
+    #         sticky="ew"
+    #     )
+
+    #     #Set the scrollregion for the scrollbars (x0,y0 to x1,y1) and activate the scrollbars
+    #     background_canvas.configure(
+    #         scrollregion=(0, 0, settings.main_frame_minimum_width, settings.main_frame_minimum_height),
+    #         yscrollcommand=canvas_vertical_scrollbar.set, 
+    #         xscrollcommand=canvas_horizontal_scrollbar.set
+    #     )
+
+    #     return main_frame, background_canvas
 
 
-        #Add scrollbars to the background_canvas
-        canvas_vertical_scrollbar = customtkinter.CTkScrollbar(
-            master=window,
-            orientation="vertical",
-            width=settings.scrollbar_width,
-            border_spacing=settings.scrollbar_border_spacing,
-            fg_color=settings.scrollbar_background_color,
-            command=background_canvas.yview
-        )
-        canvas_vertical_scrollbar.grid(
-            row=0, 
-            column=1,
-            sticky="ns",
-        )
+#     """
+#     Dynamically adjusts the scrollable area of the background_canvas
+#     Ensures that the scrollbars correctly reflect the size of the content inside the canvas
+# #     """
+#     def on_frame_configure(self, canvas, event=None):
+#         #Update the scroll region of the canvas to encompass the entire frame
+#         canvas.configure(scrollregion=canvas.bbox("all"))
 
-        canvas_horizontal_scrollbar = customtkinter.CTkScrollbar(
-            master=window,
-            orientation="horizontal", 
-            width=settings.scrollbar_width,
-            border_spacing=settings.scrollbar_border_spacing,
-            fg_color=settings.scrollbar_background_color,
-            command=background_canvas.xview
-        )
-        canvas_horizontal_scrollbar.grid(
-            row=1, 
-            column=0, 
-            sticky="ew"
-        )
-
-        #Configure the background_canvas to use the scrollbars
-        background_canvas.configure(
-            yscrollcommand=canvas_vertical_scrollbar.set, 
-            xscrollcommand=canvas_horizontal_scrollbar.set
-        )
-
-        #Make the frame resize properly
-        background_canvas.grid_rowconfigure(0, weight=1)
-        background_canvas.grid_columnconfigure(0, weight=1)
-
-        return main_frame
-
-
-    """
-    Dynamically adjusts the scrollable area of the background_canvas
-    Ensures that the scrollbars correctly reflect the size of the content inside the canvas
-    """
-    def on_frame_configure(self, canvas, event=None):
-        #Update the scroll region of the canvas to encompass the entire frame
-        canvas.configure(scrollregion=canvas.bbox("all"))
-    
     
     """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self):
         #print("LOAD_MATERIALS_FROM_EXCEL()")
-        
+
         excel_file = "Materials.xlsx"
 
         #If there is a "materials" file in the folder, read it and populate the self.materials dictionary 
@@ -165,49 +175,127 @@ class App:
                     #Increment "i" to go to the next row
                     i+=1
 
-                    #If some cells are left empty, apply default value
+                    #If some cells are left empty or written in a wrong way -> apply default value
+                    #MATERIAL NAME CHECK
                     if(pandas.isna(row["Material"])):
                         row["Material"] = "No name"
+
+                    #THICKNESS CHECK
                     if(pandas.isna(row["Thickness"])):
-                        row["Thickness"] = 0                    
+                        row["Thickness"] = 0
+                    thickness_conversion = self.convert_decimal_string_to_float(row["Thickness"]) 
+                    if((thickness_conversion != False) and (thickness_conversion >= 0)):
+                        row["Thickness"] = thickness_conversion
+                    else:
+                        row["Thickness"] = 0
+
+                    #UNIT CHECK
                     if(pandas.isna(row["Unit"])):
                         row["Unit"] = "No value"
+
+                    #INDENT CHECK
                     if(pandas.isna(row["Indent [nm]"])):
                         row["Indent [nm]"] = 0
-                    if(pandas.isna(row["Color"])):
+                    indent_conversion = self.convert_decimal_string_to_float(row["Indent [nm]"]) 
+                    if((indent_conversion != False) and (indent_conversion >= 0)):
+                        row["Indent [nm]"] = indent_conversion
+                    else:
+                        row["Indent [nm]"] = 0
+
+
+                    #COLOR CHECK
+                    if((pandas.isna(row["Color"])) or (self.is_valid_color(row["Color"]) == False)):
                         row["Color"] = "white"
+
+
+                    #MODULUS CHECK
                     if(pandas.isna(row["Modulus [GPa]"])):
                         row["Modulus [GPa]"] = 0
+                    modulus_conversion = self.convert_decimal_string_to_float(row["Modulus [GPa]"]) 
+                    if(modulus_conversion != False):
+                        row["Modulus [GPa]"] = abs(modulus_conversion)
+                    else:
+                        row["Modulus [GPa]"] = 0      
+
+
+                    #CTE CHECK
                     if(pandas.isna(row["CTE [ppm/deg]"])):
                         row["CTE [ppm/deg]"] = 0
+                    cte_conversion = self.convert_decimal_string_to_float(row["CTE [ppm/deg]"]) 
+                    if(cte_conversion != False):
+                        row["CTE [ppm/deg]"] = abs(cte_conversion)
+                    else:
+                        row["CTE [ppm/deg]"] = 0 
+
+                    #DENSITY CHECK
                     if(pandas.isna(row["Density [kg/m3]"])):
                         row["Density [kg/m3]"] = 0
+                    density_conversion = self.convert_decimal_string_to_float(row["Density [kg/m3]"]) 
+                    if(density_conversion != False):
+                        row["Density [kg/m3]"] = abs(density_conversion)
+                    else:
+                        row["Density [kg/m3]"] = 0 
+
+
+                    #STRESS CHECK
                     if(pandas.isna(row["Stress_x [MPa]"])):
                         row["Stress_x [MPa]"] = 0
+                    stress_conversion = self.convert_decimal_string_to_float(row["Stress_x [MPa]"]) 
+                    if(stress_conversion != False):
+                        row["Stress_x [MPa]"] = stress_conversion
+                    else:
+                        row["Stress_x [MPa]"] = 0 
+
+                    #POISSON CHECK
                     if(pandas.isna(row["Poisson"])):
                         row["Poisson"] = 0
+                    poisson_conversion = self.convert_decimal_string_to_float(row["Poisson"]) 
+                    if(poisson_conversion != False):
+                        row["Poisson"] = abs(poisson_conversion)
+                    else:
+                        row["Poisson"] = 0
+
+
+                    #R0 CHECK
                     if(pandas.isna(row["R0"])):
                         row["R0"] = 0
+                    R0_conversion = self.convert_decimal_string_to_float(row["R0"]) 
+                    if(R0_conversion != False):
+                        row["R0"] = R0_conversion
+                    else:
+                        row["R0"] = 0
+
+
+                    #R CHECK
                     if(pandas.isna(row["R"])):
                         row["R"] = 0
+                    R_conversion = self.convert_decimal_string_to_float(row["R"]) 
+                    if(R_conversion != False):
+                        row["R"] = R_conversion
+                    else:
+                        row["R"] = 0 
+
 
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
                         "Name": row["Material"],
                         "Layer": int(layer),
-                        "Thickness": int(row["Thickness"]),
+                        "Thickness": float(row["Thickness"]),
                         "Unit": row["Unit"],
-                        "Indent [nm]": int(row["Indent [nm]"]),
+                        "Indent [nm]": float(row["Indent [nm]"]),
                         "Color": row["Color"],
                         "Status": "active",
-                        "Modulus [GPa]": int(row["Modulus [GPa]"]),
-                        "CTE [ppm/deg]": int(row["CTE [ppm/deg]"]),
-                        "Density [kg/m3]": int(row["Density [kg/m3]"]),
-                        "Stress_x [MPa]": int(row["Stress_x [MPa]"]),
-                        "Poisson": int(row["Poisson"]),
-                        "R0": int(row["R0"]),
-                        "R": int(row["R"]),
+                        "Modulus [GPa]": float(row["Modulus [GPa]"]),
+                        "CTE [ppm/deg]": float(row["CTE [ppm/deg]"]),
+                        "Density [kg/m3]": float(row["Density [kg/m3]"]),
+                        "Stress_x [MPa]": float(row["Stress_x [MPa]"]),
+                        "Poisson": float(row["Poisson"]),
+                        "R0": float(row["R0"]),
+                        "R": float(row["R"]),
                         "Label_name_id": None,
+                        "Delete_material_button_id": None,
+                        "Move_down_button_id": None,
+                        "Move_up_button_id": None,
                         "Entry_id": None,
                         "Slider_id": None,
                         "Checkbox_id": None,
@@ -233,25 +321,65 @@ class App:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")
                 return
 
+    
+    """
+    -Converts a string to float no matter if it is written with "," or "." 
+    -Returns the float is sucessfull, returns False if not sucessfull
+    """
+    def convert_decimal_string_to_float(self, string_number):
+        # print("CINVERT_DECIMAL_STRING_TO_FLOAT()")
+        try:
+            new_float = float(string_number)
+            return new_float
+        
+        except:
+            if((isinstance(string_number, str)) and ("," in string_number)):
+                try:
+                    new_float = string_number.replace(",", ".")
+                    new_float = float(new_float)
+                    return new_float
 
-    """Places 'substrate' as the lowest layer and sorts the materials{} dictionary after the 'layer' value of each material"""
+                except:
+                    return False
+            else:
+                return False
+
+
+    """Returns True if given color string is a valid color. Return False if invalid"""
+    def is_valid_color(self, color):
+        #Check if color is accepted by tkinter
+        try:
+            self.program_window.winfo_rgb(color)
+            return True
+        
+        except:
+            #Check if color is valid hexadecimal value
+            if(type(color)==str and color.startswith('#') and len(color)==7):
+                return True
+            else:
+                return False
+
+
+    """
+    -Gives each material a layer value based on the order they are in globals.materials{}. (The top layer is assigned as "layer 1")
+    -Places 'substrate' as the lowest layer
+    """
     def sort_dictionary(self):
         # print("SORT_DICTIONARY()")
 
-        #If "substrate" is in dictionary
-        for key in globals.materials:
-            if(key.lower() == "substrate"):
-                #if "substrate" is not the lowest layer
-                if(globals.materials[key]["Layer"] < len(globals.materials)):
-                    substrate_orig_place = globals.materials[key]["Layer"] 
-                    #place "substrate" as the lowest layer
-                    globals.materials[key]["Layer"] = len(globals.materials)
-
-                    #Decrement the "layer" value of other materials that was higher than the "substrate" layer
-                    for material in globals.materials:
-                        if(material.lower() != "substrate"):
-                            if(globals.materials[material]["Layer"] > substrate_orig_place):
-                                globals.materials[material]["Layer"] -= 1
+        #create a layer counter variable starting at 1
+        layer_counter = 1
+        #Loop through the dictionary
+        for material in globals.materials:
+            #If the material is "substrate"
+            if(material.lower() == "substrate"):
+                #set its layer value to be the length of materials{}
+                globals.materials[material]["Layer"] = len(globals.materials)
+            else:
+                #set material->layer value to be layer_counter
+                globals.materials[material]["Layer"] = layer_counter
+                #increment layer_counter
+                layer_counter += 1
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
@@ -260,6 +388,7 @@ class App:
     """Prints the globals.materials dictionary specifily"""
     def print_dictionary(self):
         for material in globals.materials:
+            print("Dictionary key: ", material)
             print("Name: ", globals.materials[material]["Name"])
             print("Layer: ", globals.materials[material]["Layer"])
             print("Thickness: ", globals.materials[material]["Thickness"])  
@@ -278,42 +407,88 @@ class App:
             print("\n")
 
 
+    """Scales the layer_stack_canvas correctly based on the size of the program_window"""
+    def program_window_resized(self, event): 
+        # print("PROGRAM_WINDOW_RESIZED()")
+
+        #Check if the program window is actually resized
+        if((self.program_window.winfo_width() != globals.current_program_window_width) or (self.program_window.winfo_height() != globals.current_program_window_height)):
+            self.program_window.update_idletasks()
+            
+            #Update the new sizes to globals
+            globals.current_program_window_height = self.program_window.winfo_height()
+            globals.current_program_window_width = self.program_window.winfo_width()
+
+            #Update the boundaries of the layer_stack_canvas
+            globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
+            globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
+
+            globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+            globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
+
+
+            globals.layer_stack_canvas.draw_material_stack()
+
 
 if __name__ == "__main__":
-    #Create the main application window
+    #Create the main program window
     program_window = tkinter.Tk()
     
-    #Other classes needs access to this window 
-    globals.program_window = program_window
-
-    customtkinter.set_widget_scaling(settings.widget_scaling)
-    customtkinter.set_window_scaling(settings.program_window_scaling)
-
-    #Tells row 0 and column 0 in the main_window to expand to the size of the main_window
-    #This makes a widget (background_canvas) placed in (row0,column0) expand with the main_window
-    program_window.grid_rowconfigure(0, weight=1)
-    program_window.grid_columnconfigure(0, weight=1)
-
-    #Set the main window title, dimensions, and background color
-    program_window.title(settings.program_window_title)
+    #Set the dimensions of the program window
+    # program_window.state("zoomed")
     program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
+    
+    #Set the program window title
+    program_window.title(settings.program_window_title)
+
+    #Define the row&column layout of the program window
+    program_window.columnconfigure(0, weight=0, minsize=450, uniform=None)  #set this column to a specific size that won't change
+    program_window.columnconfigure(1, weight=1, uniform="group1")  
+
+    program_window.rowconfigure(0, weight=1, uniform="group1")    
+    program_window.rowconfigure(1, weight=0, minsize=100, uniform=None)   #set this row to a specific size that won't change
+
+    #Set the main window background color
     program_window.configure(bg=settings.program_window_background_color)
         
-
     #Create keyboard shortcuts for the main window
     program_window.bind("<Escape>", lambda event: program_window.destroy())
 
-    # #Resets the canvas position if "r" is pressed
-    # program_window.bind('<KeyPress-r>', app.reset_canvas)
+    #Update program so that correct screen&window sizes can be fetched
+    # program_window.update()
 
-    # #Checks if the program window is being resized
-    # program_window.bind("<Configure>", lambda event: app.program_window_resized(event))
+    # #Create an instance of App and run it
+    globals.app = App(program_window)
     
-    # Create an instance of App and run it
-    app = App(program_window)   
-    globals.app = app
+    # #Checks if the program window is being resized
+    globals.current_program_window_height = program_window.winfo_height()
+    globals.current_program_window_width = program_window.winfo_width()
+    program_window.bind("<Configure>", lambda event: globals.app.program_window_resized(event))
+
 
     #Start the main loop of the program
     program_window.mainloop()
 
+
+
+
+
+
+
+
+    #Makes row 0 and column 0 in the program_window expand to the size of the whole program_window (Makes the "background_canvas" expand with the main_window)
+    # program_window.grid_rowconfigure(0, weight=1)
+    # program_window.grid_columnconfigure(0, weight=1)
+
+#     #Other classes needs access to this window 
+#     globals.program_window = program_window
+
+#     customtkinter.set_widget_scaling(settings.widget_scaling)
+#     customtkinter.set_window_scaling(settings.program_window_scaling)
+
+    
+
+
                
+#     # #Resets the canvas position if "r" is pressed
+#     # program_window.bind('<KeyPress-r>', app.reset_canvas)

@@ -1,11 +1,11 @@
 import tkinter
-from tkinter import messagebox, StringVar
+from tkinter import StringVar #,messagebox
 import customtkinter
 import settings
 import globals
 import os
-import pandas   #Excel-file reading
-import openpyxl #Excel-file reading
+# import pandas   #Excel-file reading
+# import openpyxl #Excel-file reading
 from Graph import Graph
 from Graph_Control_Panel import Graph_Control_Panel
 
@@ -15,10 +15,9 @@ class Canvas_Control_Panel:
     def __init__(self, window):
         # print("CANVAS_CONTROL_PANEL_INIT()")
         
-        self.window = window
+        self.program_window = window
 
-        # self.layer_stack_canvas_control_panel = self.create_canvas_control_panel()
-        self.create_canvas_control_panel()
+        self.canvas_control_panel_frame = self.create_canvas_control_panel()
 
 
     """Creates a frame with widgets that performs actions on the layer_stack_canvas"""
@@ -29,131 +28,137 @@ class Canvas_Control_Panel:
         if not hasattr(self, 'canvas_control_panel_frame'):
 
             #Create Frame from the control panel and place it within given window
-            self.canvas_control_panel_frame = customtkinter.CTkFrame(
-                master=self.window,
-                width=settings.layer_stack_canvas_control_panel_width,
-                height=settings.layer_stack_canvas_control_panel_height,
-                fg_color=settings.layer_stack_canvas_control_panel_background_color
+            canvas_control_panel_frame = customtkinter.CTkFrame(
+                master=self.program_window,
+                #width=settings.layer_stack_canvas_control_panel_width,
+                #height=settings.layer_stack_canvas_control_panel_height,
+                fg_color=settings.canvas_control_panel_background_color
             )
-            self.canvas_control_panel_frame.grid(
+            canvas_control_panel_frame.grid(
                 row=1,
                 column=1,
-                padx=(settings.layer_stack_canvas_control_panel_padding_left, settings.layer_stack_canvas_control_panel_padding_right),
-                pady=(settings.layer_stack_canvas_control_panel_padding_top, settings.layer_stack_canvas_control_panel_padding_bottom),
-                sticky="nw"
+                padx=(settings.canvas_control_panel_padding_left, settings.canvas_control_panel_padding_right),
+                pady=(settings.canvas_control_panel_padding_top, settings.canvas_control_panel_padding_bottom),
+                sticky="nsew"
             )
 
-        #Prevent the frame to downsize itself to fit widgets placed inside
-        self.canvas_control_panel_frame.grid_propagate(False)
+            #Define the row&column layout of the material_control_panel_frame
+            canvas_control_panel_frame.columnconfigure(0, weight=33, uniform="group1")
+            canvas_control_panel_frame.columnconfigure(1, weight=33, uniform="group1")
+            canvas_control_panel_frame.columnconfigure(2, weight=33, uniform="group1")
+
+            canvas_control_panel_frame.rowconfigure(0, weight=50, uniform="group1")
+            canvas_control_panel_frame.rowconfigure(1, weight=50, uniform="group1") 
+
 
         #Reset canvas button
         reset_canvas_button = customtkinter.CTkButton(
-            master=self.canvas_control_panel_frame, 
+            master=canvas_control_panel_frame, 
             text="Reset canvas", 
-            fg_color=settings.layer_stack_canvas_control_panel_button_color, 
-            hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
-            text_color=settings.layer_stack_canvas_control_panel_text_color,
+            fg_color=settings.canvas_control_panel_button_color, 
+            hover_color=settings.canvas_control_panel_button_hover_color, 
+            text_color=settings.canvas_control_panel_text_color,
             width=90,
             command=self.reset_canvas
         )
         reset_canvas_button.grid(
             row=0, 
             column=0, 
-            sticky="nw", 
-            padx=(2,2), 
-            pady=(2,2)
+            sticky="", 
+            padx=(0,0), 
+            pady=(0,0)
         )
 
         #Reset values button
         reset_values_button = customtkinter.CTkButton(
-            master=self.canvas_control_panel_frame,
+            master=canvas_control_panel_frame,
             text="Reset values",
-            fg_color= settings.layer_stack_canvas_control_panel_button_color, 
-            hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
-            text_color=settings.layer_stack_canvas_control_panel_text_color,
+            fg_color= settings.canvas_control_panel_button_color, 
+            hover_color=settings.canvas_control_panel_button_hover_color, 
+            text_color=settings.canvas_control_panel_text_color,
             width=90,
             command=self.reset_values
         )
         reset_values_button.grid(
             row=1, 
             column=0, 
-            sticky="nw", 
-            padx=(2,2), 
-            pady=(2,2)
+            sticky="", 
+            padx=(0,0), 
+            pady=(0,0)
         )       
 
         #Export stack as SVG button
         export_stack_as_svg_button = customtkinter.CTkButton(
-            master=self.canvas_control_panel_frame,
+            master=canvas_control_panel_frame,
             text="Export stack",
-            fg_color= settings.layer_stack_canvas_control_panel_button_color, 
-            hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
-            text_color=settings.layer_stack_canvas_control_panel_text_color,
+            fg_color= settings.canvas_control_panel_button_color, 
+            hover_color=settings.canvas_control_panel_button_hover_color, 
+            text_color=settings.canvas_control_panel_text_color,
             width=90,
             command=self.export_stack_as_svg
         )
         export_stack_as_svg_button.grid(
             row=0, 
             column=1, 
-            sticky="n", 
-            padx=(2,2), 
-            pady=(2,2)
+            sticky="", 
+            padx=(0,0), 
+            pady=(0,0)
         )
 
         #Export layers as SVG button
         export_layers_as_svg_button = customtkinter.CTkButton(
-            master=self.canvas_control_panel_frame,
+            master=canvas_control_panel_frame,
             text="Export layers",
-            fg_color= settings.layer_stack_canvas_control_panel_button_color, 
-            hover_color=settings.layer_stack_canvas_control_panel_button_hover_color, 
-            text_color=settings.layer_stack_canvas_control_panel_text_color,
+            fg_color= settings.canvas_control_panel_button_color, 
+            hover_color=settings.canvas_control_panel_button_hover_color, 
+            text_color=settings.canvas_control_panel_text_color,
             width=90,
             command=self.export_layers_as_svg
         )
         export_layers_as_svg_button.grid(
             row=1, 
             column=1, 
-            sticky="n", 
-            padx=(2,2), 
-            pady=(2,2)
+            sticky="", 
+            padx=(0,0), 
+            pady=(0,0)
         )
 
         #Option menu "view" label
         option_menu_view_label = customtkinter.CTkLabel(
-            master=self.canvas_control_panel_frame,
+            master=canvas_control_panel_frame,
             text="View", 
-            bg_color=settings.layer_stack_canvas_control_panel_background_color,
+            bg_color=settings.canvas_control_panel_background_color,
             text_color="#55b6ff",
             font=(settings.text_font, 15, "bold")
         )
         option_menu_view_label.grid(
             row=0,
             column=2,
-            sticky="s",
+            sticky="",
             padx=(0,0),
             pady=(0,0)
         )
 
         #Switch layout option menu
         self.option_menu = customtkinter.CTkOptionMenu(
-            master=self.canvas_control_panel_frame, 
+            master=canvas_control_panel_frame, 
             values=["Stacked", "Realistic", "Stepped", "Stoney"],
-            width=30,
-            fg_color=settings.layer_stack_canvas_control_panel_button_color, 
-            button_hover_color=settings.layer_stack_canvas_control_panel_button_hover_color,
+            # width=30,
+            fg_color=settings.canvas_control_panel_button_color, 
+            button_hover_color=settings.canvas_control_panel_button_hover_color,
             command=self.switch_layout
         )
         self.option_menu.grid(
             row=1, 
             column=2, 
-            sticky="ne",
-            padx=(2,2), 
-            pady=(2,2)
+            sticky="",
+            padx=(0,0), 
+            pady=(0,0)
         )
 
         self.option_menu.set(globals.option_menu)
 
-        # return layer_stack_canvas_control_panel_frame
+        return canvas_control_panel_frame
 
     
     """Resets the scale of items and the start drawing point on the canvas back to their original scale and place"""
@@ -212,6 +217,7 @@ class Canvas_Control_Panel:
     """
     -Changes the Label explaining what is being modified by sliders and entries in the Material_Adjustment_Panel
     -Changes the values for sliders and entries
+    -Changes the layout of the program window for each 'view' mode
     """
     def switch_layout(self, *event):
         # print("SWITCH_LAYOUT()")
@@ -219,15 +225,17 @@ class Canvas_Control_Panel:
         #Switch the option in globals.option_menu
         globals.option_menu = self.option_menu.get()
 
-        #Destroy the graph if it exists
+        #Remove the graph if it exists
         if hasattr(globals.graph, 'graph_translator'):
             globals.graph.graph_translator.get_tk_widget().destroy()
-            globals.graph = None
-            
-        #Destroy the graph_control_panel if it exists
-        if hasattr(globals.graph_control_panel, 'graph_control_panel'):
-            globals.graph_control_panel.graph_control_panel.destroy()
+            del globals.graph.graph_translator
 
+            
+        #Delete the graph_control_panel if it exists
+        if(hasattr(globals.graph_control_panel, 'graph_control_panel')):
+            globals.graph_control_panel.graph_control_panel.destroy()   #Destroy the widget
+            del globals.graph_control_panel.graph_control_panel         #Delete the reference in memory
+            globals.graph_control_panel = None
 
         #Create a new material_adjustment_panel with a different layout based on the option menu
         globals.material_adjustment_panel.create_material_adjustment_panel()
@@ -235,6 +243,10 @@ class Canvas_Control_Panel:
         #Switch UI layout based on option value
         match self.option_menu.get():
             case "Stacked" | "Realistic":
+                #Change the layout of the program_window to only two columns
+                self.program_window.columnconfigure(0, minsize=450, weight=0, uniform=None)
+                self.program_window.columnconfigure(1, weight=1, uniform="group1")
+                self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
 
                 #Set all material entry and slider values to "thickness" value, and mark all as "active"
                 for material in globals.materials:
@@ -242,72 +254,75 @@ class Canvas_Control_Panel:
                     globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                     globals.materials[material]["Status"] = "active"
 
-                        
-                #Set new dimensions for layer_stack_canvas back to the original
-                globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
 
-                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
-                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
+                #Update the sizes for layer_stack_canvas      
+                self.program_window.update()
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
                 globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
                 globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
 
                 #Draw material stack                
                 globals.layer_stack_canvas.draw_material_stack()
 
-                #Set new dimensions for canvas_control_panel back to the original
-                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
-            
+
             case "Stepped":
+                #Change the layout of the program_window to only two columns
+                self.program_window.columnconfigure(0, minsize=450, weight=0, uniform=None)
+                self.program_window.columnconfigure(1, weight=1, uniform="group1")
+                self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
+
                 #Set all material entry and slider values to "indent" value, and mark all as "active"
                 for material in globals.materials:
                     globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
                     globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
                     globals.materials[material]["Status"] = "active"
-                        
-                #Set new dimensions for layer_stack_canvas back to the original
-                globals.layer_stack_canvas.layer_stack_canvas.configure(width=settings.layer_stack_canvas_width)
 
-                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
-                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
+                #Update the sizes for layer_stack_canvas      
+                self.program_window.update()
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
                 globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
                 globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
                         
                 #Draw the material stack
                 globals.layer_stack_canvas.draw_material_stack()
 
-                #Set new dimensions for canvas_control_panel back to the original
-                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=settings.layer_stack_canvas_control_panel_width)
 
             case "Stoney":
+                #Change the layout of the program_window to make space for Graph
+                self.program_window.columnconfigure(0, minsize=450, weight=0, uniform=None)
+                self.program_window.columnconfigure(1, weight=1, uniform="group2")
+                self.program_window.columnconfigure(2, weight=1, uniform="group2")
+
                 #Set all material entry and slider values to "thickness" value
                 #Set all materials "Status", except "substrate" to "inactive
                 for material in globals.materials:
                     globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
                     globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                     globals.materials[material]["Status"] = "inactive"
+                    globals.materials[material]["Checkbox_id"].deselect()
 
                     if(material.lower() == "substrate"):
                         globals.materials[material]["Status"] = "active"
+                        globals.materials[material]["Checkbox_id"].select()
 
-    
-                #Set new dimensions for layer_stack_canvas
-                globals.layer_stack_canvas.layer_stack_canvas.configure(width=510)
-                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqwidth() - 1
-                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_reqheight() - 1
+
+                #Update the sizes for layer_stack_canvas      
+                self.program_window.update()
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
                 globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
                 globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
 
                 #Redraw material stack
-                globals.layer_stack_canvas.draw_material_stack_limited()
-
-                #Set new dimensions for canvas_control_panel
-                globals.canvas_control_panel.canvas_control_panel_frame.configure(width=globals.layer_stack_canvas.layer_stack_canvas_width*0.8)
+                globals.layer_stack_canvas.draw_material_stack()
 
                 #Create Graph
-                globals.graph = Graph(globals.main_frame)
+                globals.graph = Graph(self.program_window)
 
                 #Create panel that controls the actions of the graph
-                globals.graph_control_panel = Graph_Control_Panel(globals.main_frame)
+                globals.graph_control_panel = Graph_Control_Panel(self.program_window)
 
 
     """Exports the stack without material names as SVG file"""
@@ -341,7 +356,7 @@ class Canvas_Control_Panel:
 
             #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
             # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_reqwidth(), globals.program_window.winfo_reqheight()))
-            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_width(), globals.program_window.winfo_height()))
+            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.program_window.winfo_width(), self.program_window.winfo_height()))
 
 
             #Go through every rectangle found on canvas
@@ -369,7 +384,7 @@ class Canvas_Control_Panel:
    
     """Exports every layer of the stack with text and arrows as SVG-file"""
     def export_layers_as_svg(self):
-        #print("EXPORT_LAYERS_AS_SVG()")
+        # print("EXPORT_LAYERS_AS_SVG()")
 
         #CREATE FOLDER HIERARCHY
         #Specify a folder where the SVG-files should be saved
@@ -394,7 +409,7 @@ class Canvas_Control_Panel:
         previously_created_elements = []
 
         #Iterate through all the materials
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
             #Only create svg element if there is a rectangle
             if(globals.materials[material]["Rectangle_id"] != None):
 
@@ -410,7 +425,7 @@ class Canvas_Control_Panel:
                     f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                     #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
                     # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_reqwidth(), globals.program_window.winfo_reqheight()))
-                    f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_width(), globals.program_window.winfo_height())) 
+                    f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.program_window.winfo_width(), self.program_window.winfo_height())) 
 
 
                     #Write the previous created elements to the current file

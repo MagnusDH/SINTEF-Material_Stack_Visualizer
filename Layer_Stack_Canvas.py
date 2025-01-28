@@ -9,7 +9,7 @@ import globals
 class Layer_Stack_Canvas:
     def __init__(self, window):
         #Create a canvas in a given window
-        self.window = window
+        self.program_window = window
 
         self.current_scale = 1.0
 
@@ -24,26 +24,29 @@ class Layer_Stack_Canvas:
         #print("CREATE_CANVAS()")
         
         layer_stack_canvas = tkinter.Canvas(
-            master=self.window,
-            height=settings.layer_stack_canvas_height, 
-            width=settings.layer_stack_canvas_width,
+            master=self.program_window,
+            # height=settings.layer_stack_canvas_height, 
+            # width=settings.layer_stack_canvas_width,
             bg=settings.layer_stack_canvas_background_color,
-            highlightbackground="red", 
+            # highlightbackground="red", 
             highlightthickness=0,
         )
         layer_stack_canvas.grid(
             row=0, 
             column=1, 
-            sticky="nw", 
+            sticky="nsew", 
             padx=(settings.layer_stack_canvas_padding_left, settings.layer_stack_canvas_padding_right), 
             pady=(settings.layer_stack_canvas_padding_top, settings.layer_stack_canvas_padding_bottom)
         )
 
+        #Update program to get correct screen&frame sizes
+        self.program_window.update()
+
         #Set canvas_bbox coordniates for later use
         self.visible_canvas_bbox_x0 = 0
         self.visible_canvas_bbox_y0 = 0
-        self.visible_canvas_bbox_x1 = layer_stack_canvas.winfo_reqwidth() - 1
-        self.visible_canvas_bbox_y1 = layer_stack_canvas.winfo_reqheight() - 1
+        self.visible_canvas_bbox_x1 = layer_stack_canvas.winfo_width() - 1
+        self.visible_canvas_bbox_y1 = layer_stack_canvas.winfo_height() - 1
         self.layer_stack_canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
         self.layer_stack_canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
         #This is just a usefull function to find the bbox of the canvas: self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
@@ -68,7 +71,6 @@ class Layer_Stack_Canvas:
     """Moves the position of the canvas"""
     def canvas_drag(self, event, canvas):
         #print("CANVAS_DRAG()")
-        
         canvas.scan_dragto(event.x, event.y, gain=1)
 
 
@@ -88,14 +90,14 @@ class Layer_Stack_Canvas:
             self.current_scale /= zoom_factor
 
 
-            #Redraw text on stack
-            match globals.option_menu:
-                case "Stacked" | "Realistic" | "Stoney":
-                    self.write_text_on_stack()
+            # #Redraw text on stack
+            # match globals.option_menu:
+            #     case "Stacked" | "Realistic" | "Stoney":
+            #         self.write_text_on_stack()
                 
-                case "Stepped":
-                    self.write_text_on_stack()
-                    self.write_indent_on_stepped_stack()
+            #     case "Stepped":
+            #         self.write_text_on_stack()
+            #         self.write_indent_on_stepped_stack()
 
 
     """Draws the material stack based on the value in the option box"""
@@ -116,32 +118,12 @@ class Layer_Stack_Canvas:
             case "Stoney":
                 self.draw_material_stack_limited()
 
-            
-            
-
-    # """Scales the material stack according to the program window"""
-    # def program_window_resized(self, event):
-        # print("PROGRAM_WINDOW_RESIZED NOT IMPLEMENTED!!!!!!!!")
-        # #Only do something if the window size is changed. (The <configure> method calls this function everytime something about the program window is changed)
-        # if(event.width != SETTINGS["PROGRAM_WINDOW_WIDTH"] or event.height != SETTINGS["PROGRAM_WINDOW_HEIGHT"]):
-        #     #print("WINDOW RESIZED")
-        
-        #     #Set the new width of the canvas
-        #     self.canvas.config(width=window.winfo_width() - self.user_interface_frame.winfo_reqwidth() - SETTINGS["CANVAS_PROGRAM_BORDER_WIDTH"])
-
-        #     #Update the variables that track the actual visible parts of the canvas
-        #     self.visible_canvas_bbox_x1 = self.canvas.winfo_reqwidth() - 1
-        #     self.visible_canvas_bbox_y1 = self.canvas.winfo_reqheight() - 1
-
-        #     #Redraw the material stack
-        #     self.draw_material_stack()
-
-
+  
     """
     -Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what
     """
     def draw_material_stack_stacked(self):       
-        
+        # print("DRAW_MATERIAL_STACK_STACKED()")
         #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
         for material in globals.materials:
@@ -164,7 +146,7 @@ class Layer_Stack_Canvas:
             if(material.lower() =="substrate"):
                 continue    #Skip substrate
             
-            rectangle_height = int(globals.materials[material]["Thickness"])
+            rectangle_height = float(globals.materials[material]["Thickness"])
             sum_of_all_materials += rectangle_height
         
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
@@ -179,7 +161,7 @@ class Layer_Stack_Canvas:
         #Draw rectangles on canvas
         for material in dict(reversed(globals.materials.items())):
             #Create material rectangle only if "thickness" is > zero
-            if(int(globals.materials[material]["Thickness"]) > 0):
+            if(float(globals.materials[material]["Thickness"]) > 0):
 
                 #"substrate" will be drawn on the bottom 1/10 of the canvas
                 if(material.lower() == "substrate"):  
@@ -197,7 +179,7 @@ class Layer_Stack_Canvas:
                 #Material is not "substrate"
                 else:
                     #find how many percent the current rectangle's height is of the total sum of materials
-                    rectangle_height = int(globals.materials[material]["Thickness"])
+                    rectangle_height = float(globals.materials[material]["Thickness"])
                     rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
                     #Convert rectangle percentage to pixels
                     rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
@@ -245,7 +227,7 @@ class Layer_Stack_Canvas:
         #Find the total height of all materials combined
         sum_of_all_materials = 0
         for material in globals.materials:
-            rectangle_height = int(globals.materials[material]["Thickness"])
+            rectangle_height = float(globals.materials[material]["Thickness"])
             sum_of_all_materials += rectangle_height
         
         #Prepare first rectangle drawing coordinates
@@ -261,9 +243,9 @@ class Layer_Stack_Canvas:
         for material in dict(reversed(globals.materials.items())):
         
             #Create material rectangle only if "thickness" is > zero
-            if(int(globals.materials[material]["Thickness"]) > 0):
+            if(float(globals.materials[material]["Thickness"]) > 0):
                 #find how many percent the current rectangle's height is of the total sum of materials
-                rectangle_height = int(globals.materials[material]["Thickness"])
+                rectangle_height = float(globals.materials[material]["Thickness"])
                 rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
                 #Convert rectangle percentage to pixels
                 rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
@@ -317,9 +299,9 @@ class Layer_Stack_Canvas:
             if(material.lower() == "substrate"):
                 continue    #Skip substrate
 
-            sum_of_all_materials += int(globals.materials[material]["Thickness"])
-            if(biggest_material < int(globals.materials[material]["Thickness"])):
-                biggest_material = int(globals.materials[material]["Thickness"])
+            sum_of_all_materials += float(globals.materials[material]["Thickness"])
+            if(biggest_material < float(globals.materials[material]["Thickness"])):
+                biggest_material = float(globals.materials[material]["Thickness"])
         
         #Find how many nanometers 1 pixel should represent
         nanometers_per_pixel = sum_of_all_materials/round(self.layer_stack_canvas_height * 0.9)
@@ -340,7 +322,7 @@ class Layer_Stack_Canvas:
             #Draw "substrate" on the bottom 1/10 of the canvas
             if(material.lower() == "substrate"):
                 #Find how many pixels is needed to represent the indent of the current material
-                indent_width_pixels = int(globals.materials[material]["Indent [nm]"])/nanometers_per_pixel
+                indent_width_pixels = float(globals.materials[material]["Indent [nm]"])/nanometers_per_pixel
 
                 #Set the width of the rectangle
                 rectangle_x1 = rectangle_x1 - indent_width_pixels
@@ -360,16 +342,16 @@ class Layer_Stack_Canvas:
                 continue
 
             #Create material rectangle only if "thickness" and "indent" is > zero
-            if(int(globals.materials[material]["Thickness"]) > 0):# and int(globals.materials[material]["indent"]) >= 0):
+            if(float(globals.materials[material]["Thickness"]) > 0):# and float(globals.materials[material]["indent"]) >= 0):
 
                 #Find how many pixels is needed to represent the height of the current material
-                rectangle_height_pixels = int(globals.materials[material]["Thickness"])/nanometers_per_pixel
+                rectangle_height_pixels = float(globals.materials[material]["Thickness"])/nanometers_per_pixel
                 
                 #Set the y1 coordinate of the rectangle
                 rectangle_y1 = rectangle_y0 - rectangle_height_pixels
 
                 #Find how many pixels is needed to represent the indent of the current material
-                indent_width_pixels = int(globals.materials[material]["Indent [nm]"])/nanometers_per_pixel
+                indent_width_pixels = float(globals.materials[material]["Indent [nm]"])/nanometers_per_pixel
 
                 #Set the indent width for the current rectangle
                 rectangle_x1 =  rectangle_x1 - indent_width_pixels
@@ -395,7 +377,7 @@ class Layer_Stack_Canvas:
         self.write_indent_on_stepped_stack()
     
 
-    """Draws a material stack only with materials that are "active" in globals.materials"""
+    # """Draws a material stack only with materials that are "active" in globals.materials"""
     def draw_material_stack_limited(self):
         # print("DRAW_MATERIAL_STACK_LIMITED")
 
@@ -422,7 +404,6 @@ class Layer_Stack_Canvas:
 
         #If the are no active materials to draw, then end the function
         if(num_active_materials <= 0):
-            print("BREAKING")
             return
 
         #Find the total height of all materials combined
@@ -432,7 +413,7 @@ class Layer_Stack_Canvas:
                 if(material.lower() =="substrate"):
                     continue    #Skip substrate
                 
-                rectangle_height = int(globals.materials[material]["Thickness"])
+                rectangle_height = float(globals.materials[material]["Thickness"])
                 sum_of_all_materials += rectangle_height
             
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
@@ -445,10 +426,11 @@ class Layer_Stack_Canvas:
         rectangle_y1 = None #Calculated later
             
         #Draw rectangles on canvas
-        for material in globals.materials:
+        # for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
             if(globals.materials[material]["Status"] == "active"):
                 #Create material rectangle only if "thickness" is > zero
-                if(int(globals.materials[material]["Thickness"]) > 0):
+                if(float(globals.materials[material]["Thickness"]) > 0):
 
                     #"substrate" will be drawn on the bottom 1/10 of the canvas
                     if(material.lower() == "substrate"):  
@@ -466,7 +448,7 @@ class Layer_Stack_Canvas:
                     #Material is not "substrate"
                     else:
                         #find how many percent the current rectangle's height is of the total sum of materials
-                        rectangle_height = int(globals.materials[material]["Thickness"])
+                        rectangle_height = float(globals.materials[material]["Thickness"])
                         rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
                         #Convert rectangle percentage to pixels
                         rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
@@ -490,13 +472,12 @@ class Layer_Stack_Canvas:
         self.write_text_on_stack()
 
 
-
-    """
-    -Writes name_labels for each rectangle in the material stack
-        -Labels are created on the left side for "stepped" mode and on the right side for "stacked, realistic and stress" mode
-    -Creates all texts either inside or outside of the rectangle box based on the rectangles height
-    -Loops through all text_boxes, checks for overlaps and potentially moves them around to prevent overlap 
-    """
+    # """
+    # -Writes name_labels for each rectangle in the material stack
+    #     -Labels are created on the left side for "stepped" mode and on the right side for "stacked, realistic and stress" mode
+    # -Creates all texts either inside or outside of the rectangle box based on the rectangles height
+    # -Loops through all text_boxes, checks for overlaps and potentially moves them around to prevent overlap 
+    # """
     def write_text_on_stack(self):
         # print("WRITE_TEXT_ON_STACK()")
 
@@ -675,7 +656,34 @@ class Layer_Stack_Canvas:
                             rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                             #Move the pointer line
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], text_bbox_x0, text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
+
+
+                        #TEST
+                        #if the text_bbox overlaps with canvas left side:
+                        # if(text_bbox_x0 < 0):
+                        #     print("THERE IS OVERLAP")
+                        #     #find the overlap
+                        #     overlap = self.visible_canvas_bbox_x0 - text_bbox_x0
+                        #     #move the text, text_bbox and pointer line to the right
+                        #     self.layer_stack_canvas.move(globals.materials[material]["Text_id"], overlap, 0)
+                        #     self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], overlap, 0)
+
+                        #     #Get the text_bbox new coordinates
+                        #     text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"]) 
+                        #     text_bbox_x0 = text_bbox_coordinates[0]
+                        #     text_bbox_y0 = text_bbox_coordinates[1]
+                        #     text_bbox_x1 = text_bbox_coordinates[2]
+                        #     text_bbox_y1 = text_bbox_coordinates[3]
+                        #     text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2 
+                        #     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
+                        #     #Move the pointer line
+                        #     self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], text_bbox_x1, text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
             
+                        #END TEST
+
+
+
+
             #Text overlaps with canvas left side
             case "Stepped":
                 #Loop through all materials
@@ -689,7 +697,7 @@ class Layer_Stack_Canvas:
                         text_bbox_x1 = text_bbox_coordinates[2]
                         text_bbox_y1 = text_bbox_coordinates[3]
 
-                        #if the text_bbox overlaps with canvas right side:
+                        #if the text_bbox overlaps with canvas left side:
                         if(text_bbox_x0 < self.visible_canvas_bbox_x0):
                             #find the overlap
                             overlap = self.visible_canvas_bbox_x0 - text_bbox_x0
@@ -827,8 +835,6 @@ class Layer_Stack_Canvas:
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
-
-                #########GOOD SO FAR###################
             
                 #if there is a previous text_bbix
                 if(previous_text_bbox_id != None):
@@ -876,7 +882,7 @@ class Layer_Stack_Canvas:
                 previous_text_bbox_id = globals.materials[material]["Text_bbox_id"]
 
         
-    """Writes the indent ranges on the stepped material stack"""
+    # """Writes the indent ranges on the stepped material stack"""
     def write_indent_on_stepped_stack(self):
         # print("WRITE_INDENT_ON_STEPPED_STACK()")
 
@@ -902,7 +908,7 @@ class Layer_Stack_Canvas:
                 #if there is a previous material
                 if(previous_material != None):
                     #Only create indent text if material->indent value is bigger than zero
-                    if(int(globals.materials[material]["Indent [nm]"]) > 0):
+                    if(float(globals.materials[material]["Indent [nm]"]) > 0):
                         current_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])
                         current_rectangle_x0 = current_material_rect_coordinates[0]
                         current_rectangle_y0 = current_material_rect_coordinates[1]
@@ -925,7 +931,7 @@ class Layer_Stack_Canvas:
                         #Create a text on the side of the current material->rectangle with indent number
                         indent_text = self.layer_stack_canvas.create_text(
                             (self.visible_canvas_bbox_x1), (current_rectangle_y1 - 10),
-                            text=f"{int(globals.materials[material]['Indent [nm]'])} {globals.materials[material]['Unit']}",
+                            text=f"{float(globals.materials[material]['Indent [nm]'])} {globals.materials[material]['Unit']}",
                             fill=settings.text_color, 
                             font=(settings.text_font, settings.text_size)
                         )
@@ -1194,5 +1200,5 @@ class Layer_Stack_Canvas:
                     #         self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], current_indent_bbox_x0, current_indent_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y0-3)
 
                 #Set previous_material to current material
-                previous_material = material
+                # previous_material = material
             

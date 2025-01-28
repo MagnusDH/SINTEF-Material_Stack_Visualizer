@@ -48,7 +48,10 @@
                 {"Poisson": int(value),                                 == nu
                 {"R0": int(value)}
                 {"R": int(value)}
-                {"Label_name_id": tkinter(value)},                      == ID of the label in material_adjustment_panel 
+                {"Label_name_id": tkinter(value)},                      == ID of the label in material_adjustment_panel
+                {"Delete_material_button_id": tkinter(value)},
+                {"Move_down_button_id": tkinter(value)},
+                {"Move_up_button_id": tkinter(value)},
                 {"Entry_id": tkinter(value)},
                 {"Slider_id": tkinter(value)},
                 {"Checkbox_id": tkinter(value)},
@@ -84,24 +87,23 @@
     BUGS:
         -If you move a layer up or down in "stoney" view, then the checkbox does not follow the correct layer and messes up the graph values
 
-        I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
+        -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
+
+        -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
 
 
-    TO DO       
-        -Visningen av programmet er forskjellig fra PC til PC. Finn en måte å få alt av frames til å passe korrekt inn i vidden og høyden til program vinduet
-        
-        -I "modify materials" så fungere det ikke å trykke "enter" for å aktivere "Confirm changes"
+    TO DO               
+        -finish write_indent_on_stepped_stack()
+        -in load_materials_from_excel: if an excel headline does not exist, then it causes an error. It should be so that if a headline is not found, then a default value should be added to materials dictionary
             
-        -I "modify materials" så fungerer ikke "digit check". Den godtar ikke decimal tall
-            
-        -I "read materials from excel" så burde den akseptere decimaltall som både er skrevet med "komma" og "punktum" 
-
     
     QUESTIONS:
-        -Ask Runar why the red graph does not show?
-        -How many decimal points does he want for sigma_R value in graph?
+        -How many decimal points does he want for sigma_R value in graph? in the calculations in his previous mail he has rounded every number up. I get 288,6 and he writes 289
+        -Ligningen du har gitt meg kan noen ganger ende i at det er 0 under brøklinjen som fører til en "zero divison error". Akkurat nå får brukeren en beskjed om at verdiene som førte til dette må endre. Ønsker du at det skal håndteres på en annen måte?
 
     POTENTIAL FIXES:
+        -Find a way to resize the scaling of the graph so that everything that is plotted inside it shows correctly?
+        
         -Check the width of a materials name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
 
         -Add a "scrollable frame" in "add material" window
@@ -113,6 +115,39 @@
         -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
         -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
 
-        -Trengs "dissabled/enabled" funksjonen enda å eksistere?
-
         -I "stoney" view: Materialer der tickbox value="off" kan være grå farge, materialer der tickbox value="on" kan være deres egen farge
+
+        -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
+
+
+
+
+
+
+
+
+
+
+
+    #CODE FOR FINDING CORRECT SCREEN AND WINDOW SIZES!
+    def get_window_sizes(program_window):
+        ######################################################################
+        self.program_window.update()
+        self.program_window.update_idletasks()
+        self.background_canvas.update_idletasks() 
+        self.main_frame.update_idletasks()
+
+        screen_width = self.program_window.winfo_screenwidth()
+        screen_height = self.program_window.winfo_screenheight()
+        program_window_width = self.program_window.winfo_width()
+        program_window_height = self.program_window.winfo_height()
+        background_canvas_width = self.background_canvas.winfo_width()
+        background_canvas_height = self.background_canvas.winfo_height()
+        main_frame_width = self.main_frame.winfo_width()
+        main_frame_height = self.main_frame.winfo_height()    
+
+        print("Screen Width:", screen_width, "Screen Height:", screen_height)
+        print("program_window Width:", program_window_width, "program_window height:", program_window_height)
+        print("BG canvas Width:", background_canvas_width, "BG canvas height:", background_canvas_height)
+        print("main_frame width: ", main_frame_width, "main_frame height: ", main_frame_height)
+        ########################################################################

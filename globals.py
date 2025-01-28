@@ -1,31 +1,23 @@
 #The main dictionary where ALL materials and info about each material is stored
 materials = {}
 
-#Instance of class 
+#Instance of classes
 app = None
-
-#Instance of class 
 material_adjustment_panel = None
-
-#Instance of class 
-material_control_panel2 = None
-
-#Instance of class
+# material_control_panel2 = None
 layer_stack_canvas = None
-
-#Instance of class
 canvas_control_panel = None
-
-#Instance of class
 graph = None
-
-#Instance of class
 graph_control_panel = None
 
 #Reference to the dropdown menu in Canvas_Control_Panel
 option_menu = "Stacked"
 
-#Reference to the main program window
+#Reference to windows and frames
 program_window = None
+# background_canvas = None
+# main_frame = None
 
-main_frame = None
+
+current_program_window_height = None
+current_program_window_width = None
