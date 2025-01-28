@@ -51,7 +51,7 @@ class Material_Control_Panel:
         add_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             width=1,
-            height=1,
+            # height=1,
             text="+", 
             fg_color="#008c00",
             hover_color="#00cd00",
@@ -71,7 +71,7 @@ class Material_Control_Panel:
         modify_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             width=1,
-            height=1,
+            # height=1,
             text="⚙️",
             text_color="white", 
             font=(settings.text_font, 20),
@@ -91,7 +91,7 @@ class Material_Control_Panel:
         export_as_excel_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             width=1,
-            height=1,
+            # height=1,
             text="Export values to excel", 
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
