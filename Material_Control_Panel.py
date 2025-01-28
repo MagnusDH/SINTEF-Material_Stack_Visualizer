@@ -51,7 +51,6 @@ class Material_Control_Panel:
         add_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             width=1,
-            # height=1,
             text="+", 
             fg_color="#008c00",
             hover_color="#00cd00",
@@ -71,7 +70,6 @@ class Material_Control_Panel:
         modify_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             width=1,
-            # height=1,
             text="⚙️",
             text_color="white", 
             font=(settings.text_font, 20),
@@ -91,7 +89,6 @@ class Material_Control_Panel:
         export_as_excel_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             width=1,
-            # height=1,
             text="Export values to excel", 
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
@@ -803,8 +800,6 @@ class Material_Control_Panel:
         #Create a scrollable frame for entries to each material
         scrollable_frame = customtkinter.CTkScrollableFrame(
             master=self.modify_material_window,
-            # width=settings.modify_material_window_scrollable_frame_width,
-            # height=settings.modify_material_window_scrollable_frame_height,
             fg_color = settings.modify_material_window_scrollable_frame_color,
         )
         scrollable_frame.grid(
@@ -1024,8 +1019,7 @@ class Material_Control_Panel:
             pady=(0,0)
         )
         
-        
-        
+                
         #Create entries for all materials
         row_counter = 1
         for material in globals.materials:
@@ -1037,8 +1031,6 @@ class Material_Control_Panel:
             material_name_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Name"])),
-                # width=100, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1057,8 +1049,6 @@ class Material_Control_Panel:
             thickness_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
-                # width=100, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1077,8 +1067,6 @@ class Material_Control_Panel:
             unit_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Unit"])),
-                # width=40,#settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1097,8 +1085,6 @@ class Material_Control_Panel:
             indent_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])),
-                # width=100, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1117,8 +1103,6 @@ class Material_Control_Panel:
             color_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Color"])),
-                # width=settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1137,8 +1121,6 @@ class Material_Control_Panel:
             modulus_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Modulus [GPa]"])),
-                # width=120, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1157,8 +1139,6 @@ class Material_Control_Panel:
             CTE_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["CTE [ppm/deg]"])),
-                # width=120, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1177,8 +1157,6 @@ class Material_Control_Panel:
             density_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Density [kg/m3]"])),
-                # width=120, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1197,8 +1175,6 @@ class Material_Control_Panel:
             stress_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Stress_x [MPa]"])),
-                # width=120, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1216,8 +1192,6 @@ class Material_Control_Panel:
             poisson_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Poisson"])),
-                # width=120, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1236,8 +1210,6 @@ class Material_Control_Panel:
             R0_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["R0"])),
-                # width=50, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1256,8 +1228,6 @@ class Material_Control_Panel:
             R_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["R"])),
-                # width=50, #settings.modify_material_window_entry_width,
-                # height=10,
                 fg_color="white",
                 text_color="black",
                 justify="center"
@@ -1283,8 +1253,6 @@ class Material_Control_Panel:
             fg_color=settings.modify_material_window_button_color,
             hover_color=settings.modify_material_window_button_hover_color,
             text_color=settings.modify_material_window_text_color,
-            # width=10,
-            # height=10,
             command=self.choose_color_for_modify_material
         )
         find_color_button.grid(
@@ -1300,8 +1268,6 @@ class Material_Control_Panel:
         self.color_finder_entry = customtkinter.CTkEntry(
             master=self.modify_material_window,
             placeholder_text="No color selected",
-            # width=110,
-            # height=10,
             fg_color="white",
             text_color="black",
             justify="center"
@@ -1442,8 +1408,6 @@ class Material_Control_Panel:
                     return
 
 
-
-        
             #STRESS_X [MPa]
             if(self.entry_dictionary[material]["Stress_entry"].get() != ""):
                 stress_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Stress_entry"].get()) 
@@ -1461,6 +1425,7 @@ class Material_Control_Panel:
                 if(poisson_value < 0):
                     messagebox.showerror("ERROR", f"'Poisson' value for '{material}' can not be a negative number", parent=self.modify_material_window)
                     return
+
 
             #R0
             if(self.entry_dictionary[material]["R0_entry"].get() != ""):

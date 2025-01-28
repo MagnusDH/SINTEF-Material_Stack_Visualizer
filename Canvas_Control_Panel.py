@@ -1,11 +1,9 @@
 import tkinter
-from tkinter import StringVar #,messagebox
+from tkinter import StringVar
 import customtkinter
 import settings
 import globals
 import os
-# import pandas   #Excel-file reading
-# import openpyxl #Excel-file reading
 from Graph import Graph
 from Graph_Control_Panel import Graph_Control_Panel
 
@@ -26,12 +24,11 @@ class Canvas_Control_Panel:
 
         #if canvas_control_panel_frame has NOT been created before, create it
         if not hasattr(self, 'canvas_control_panel_frame'):
-
             #Create Frame from the control panel and place it within given window
             canvas_control_panel_frame = customtkinter.CTkFrame(
                 master=self.program_window,
-                #width=settings.layer_stack_canvas_control_panel_width,
-                #height=settings.layer_stack_canvas_control_panel_height,
+                #width=,
+                #height=,
                 fg_color=settings.canvas_control_panel_background_color
             )
             canvas_control_panel_frame.grid(
@@ -355,7 +352,6 @@ class Canvas_Control_Panel:
             f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
 
             #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-            # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_reqwidth(), globals.program_window.winfo_reqheight()))
             f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.program_window.winfo_width(), self.program_window.winfo_height()))
 
 
@@ -424,7 +420,6 @@ class Canvas_Control_Panel:
                     #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
                     f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                     #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-                    # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.program_window.winfo_reqwidth(), globals.program_window.winfo_reqheight()))
                     f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.program_window.winfo_width(), self.program_window.winfo_height())) 
 
 

@@ -85,6 +85,8 @@
 
 
     BUGS:
+        -If you add a material and then press the "reset values" button, the newly added material is not deleted and its name changes to "substrate". Make sure it is deleted properly and the dict stays updated
+        
         -If you move a layer up or down in "stoney" view, then the checkbox does not follow the correct layer and messes up the graph values
 
         -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
@@ -98,12 +100,11 @@
             
     
     QUESTIONS:
-        -How many decimal points does he want for sigma_R value in graph? in the calculations in his previous mail he has rounded every number up. I get 288,6 and he writes 289
-        -Ligningen du har gitt meg kan noen ganger ende i at det er 0 under brøklinjen som fører til en "zero divison error". Akkurat nå får brukeren en beskjed om at verdiene som førte til dette må endre. Ønsker du at det skal håndteres på en annen måte?
+    
 
     POTENTIAL FIXES:
         -Find a way to resize the scaling of the graph so that everything that is plotted inside it shows correctly?
-        
+
         -Check the width of a materials name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
 
         -Add a "scrollable frame" in "add material" window

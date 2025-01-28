@@ -1,13 +1,7 @@
 import tkinter
-# from tkinter import StringVar
 import customtkinter
 import settings
 import os
-# from tkinter import filedialog
-
-# # from matplotlib.figure import Figure                            #For creating graphs
-# # from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
 import globals
 
 class Graph_Control_Panel:
@@ -18,15 +12,15 @@ class Graph_Control_Panel:
 
         self.graph_control_panel = self.create_graph_control_panel()
     
-#     """Creates a frame with widgets that performs actions on the graph"""
+    """Creates a frame with widgets that performs actions on the graph"""
     def create_graph_control_panel(self):
         # print("CREATE_GRAPH_CONTROL_PANEL()")
 
         #Create Frame for the graph and place it within given window
         graph_control_panel_frame = customtkinter.CTkFrame(
             master=self.program_window,
-#             width=settings.graph_control_panel_width,
-#             height=settings.graph_control_panel_height,
+            # width=,
+            # height=,
             fg_color=settings.graph_control_panel_background_color,
         )
         graph_control_panel_frame.grid(
@@ -37,12 +31,6 @@ class Graph_Control_Panel:
             sticky="nsew",
         )
 
-#         #Prevent the frame to downsize itself to fit widgets placed inside
-#         graph_control_panel_frame.grid_propagate(False)
-#         # graph_control_panel.grid_rowconfigure(0, weight=1)
-#         # graph_control_panel.grid_columnconfigure(0, weight=1)
-
-
         #Export graph button
         export_graph_button = customtkinter.CTkButton(
             master=graph_control_panel_frame,
@@ -50,7 +38,6 @@ class Graph_Control_Panel:
             width=90,
             fg_color= settings.graph_control_panel_button_color, 
             hover_color=settings.graph_control_panel_button_hover_color, 
-            # text_color=settings.,
             command=self.export_graph
         )
         export_graph_button.grid(
@@ -79,23 +66,11 @@ class Graph_Control_Panel:
         sub_folder = "graph"
 
         #Create sub_folder if it does not exist
-        # sub_folder_path = os.path.join(main_folder, sub_folder)
         if not os.path.exists(f"{main_folder}/{sub_folder}"):
             os.makedirs(f"{main_folder}/{sub_folder}")
         
         #Create name for the file
         filename = "graph.svg"
-
-        #Save the file
-        # file_path = filedialog.asksaveasfilename(
-        # defaultextension=".png", 
-        # filetypes=[
-        #     ("PNG files", "*.png"), 
-        #     ("JPEG files", "*.jpg"), 
-        #     ("PDF files", "*.pdf"),
-        #     ("SVG files", "*.svg"), 
-        #     ("All files", "*.*")]
-        # )
 
         #Save the graph as svg file
         globals.graph.graph_container.savefig(f"{main_folder}/{sub_folder}/{filename}")

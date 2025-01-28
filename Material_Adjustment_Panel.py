@@ -13,16 +13,13 @@ class Material_Adjustment_Panel:
         #Window where everything is placed
         self.program_window = window
         
-        #Keeps track of how many rows with widgets has been created in the control panel frame 
-        # self.row_counter = 0
-
         self.material_adjustment_panel_frame = self.create_material_adjustment_panel()
 
         
-# #     """
-# #     -Creates a Frame and material_adjustment_panel in the given window if it does not already exist.
-# #     -If the Frame exists, then the material_adjustment_panel is simply updated corresponding with the materials in globals.materials{} 
-# #     """
+    """
+    -Creates a Frame and material_adjustment_panel in the given window if it does not already exist.
+    -If the Frame exists, then the material_adjustment_panel is simply updated corresponding with the materials in globals.materials{} 
+    """
     def create_material_adjustment_panel(self):
         # print("CREATE_MATERIAL_ADJUSTMENT_PANEL()")
 
@@ -31,8 +28,8 @@ class Material_Adjustment_Panel:
             #Create Frame from the control panel and place it within given window
             self.material_adjustment_panel_frame = customtkinter.CTkScrollableFrame(
                 master=self.program_window,
-                # width=max(settings.material_adjustment_panel_minimum_width, self.main_frame.winfo_width() * 0.5),
-                # height=settings.material_adjustment_panel_height,
+                # width=,
+                # height=,
                 fg_color=settings.material_adjustment_panel_background_color
             )
             self.material_adjustment_panel_frame.grid(
@@ -170,11 +167,11 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Entry_id"] == None):
                             entry = customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
-                                # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
+                                textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
                                 text_color="black",
-                                # width=settings.material_adjustment_panel_entry_width,
-                                # height=settings.material_adjustment_panel_entry_height,
+                                # width=,
+                                # height=,
                                 justify="center"
                             )
                             entry.grid(
@@ -185,7 +182,6 @@ class Material_Adjustment_Panel:
                                 pady=(0,0)
                             )
                             entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                            entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                             globals.materials[material]["Entry_id"] = entry
                         #Adjust existing Entry
                         else:
@@ -202,8 +198,8 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Slider_id"] == None):
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
-                                # width=settings.material_adjustment_panel_slider_width,
-                                # height=settings.material_adjustment_panel_slider_height,
+                                # width=,
+                                # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
                                 progress_color=globals.materials[material]["Color"],
@@ -243,7 +239,7 @@ class Material_Adjustment_Panel:
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color="white",
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color="#009ffb", 
                                     text_color="blue",
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
@@ -272,7 +268,7 @@ class Material_Adjustment_Panel:
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color="white",
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color="#009ffb", 
                                     text_color="blue",
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
@@ -358,7 +354,7 @@ class Material_Adjustment_Panel:
                                 text="✕", #✕ 🗑
                                 font=(settings.text_font, 10, "bold"),
                                 fg_color="#820000",
-                                hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
+                                hover_color="#da0000", 
                                 text_color=settings.material_control_panel_text_color,
                                 command=lambda identifier=material: self.delete_material(identifier)
                             )
@@ -409,11 +405,11 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Entry_id"] == None):
                             entry = customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
-                                # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
+                                textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])),
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
                                 text_color="black",
-                                # width=settings.material_adjustment_panel_entry_width,
-                                # height=settings.material_adjustment_panel_entry_height,
+                                # width=,
+                                # height=,
                                 justify="center"
                             )
                             entry.grid(
@@ -424,7 +420,6 @@ class Material_Adjustment_Panel:
                                 pady=(0,0)
                             )
                             entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                            entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
                             globals.materials[material]["Entry_id"] = entry
                         #Adjust existing Entry
                         else:
@@ -441,8 +436,8 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Slider_id"] == None):
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
-                                # width=settings.material_adjustment_panel_slider_width,
-                                # height=settings.material_adjustment_panel_slider_height,
+                                # width=,
+                                # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
                                 progress_color=globals.materials[material]["Color"],
@@ -480,7 +475,7 @@ class Material_Adjustment_Panel:
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color="white",
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color="#009ffb", 
                                     text_color="blue",
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
@@ -509,7 +504,7 @@ class Material_Adjustment_Panel:
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color="white",
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color="#009ffb", 
                                     text_color="blue",
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
@@ -591,7 +586,6 @@ class Material_Adjustment_Panel:
                             checkbox_value = customtkinter.StringVar(value="off")
                             checkbox = customtkinter.CTkCheckBox(
                                 master=self.material_adjustment_panel_frame,
-                                # width=1,
                                 text="",
                                 variable=checkbox_value,
                                 onvalue="on",
@@ -652,11 +646,11 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Entry_id"] == None):
                             entry = customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
-                                # textvariable=StringVar(value=str(globals.materials[material]["thickness"])),
+                                textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
                                 text_color="black",
-                                # width=settings.material_adjustment_panel_entry_width,
-                                # height=settings.material_adjustment_panel_entry_height,
+                                # width=,
+                                # height=,
                                 justify="center"
                             )
                             entry.grid(
@@ -667,7 +661,6 @@ class Material_Adjustment_Panel:
                                 pady=(0,0)
                             )
                             entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
-                            entry.configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                             globals.materials[material]["Entry_id"] = entry
                         #Adjust existing Entry
                         else:
@@ -684,8 +677,8 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Slider_id"] == None):
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
-                                # width=settings.material_adjustment_panel_slider_width,
-                                # height=settings.material_adjustment_panel_slider_height,
+                                # width=,
+                                # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
                                 progress_color=globals.materials[material]["Color"],
@@ -722,7 +715,7 @@ class Material_Adjustment_Panel:
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color="white",
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color="#009ffb", 
                                     text_color="blue",
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
@@ -751,7 +744,7 @@ class Material_Adjustment_Panel:
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color="white",
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color="#009ffb", 
                                     text_color="blue",
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
@@ -779,8 +772,11 @@ class Material_Adjustment_Panel:
         return self.material_adjustment_panel_frame
 
 
-
-    # """???????????????????????????????????????????????????????????????????"""
+    """
+    -Sets all materials to 'inactive' except for 'substrate'
+    -Deselects checkboxes for all materials except 'substrate'
+    -Draws the material_stack and graph
+    """
     def checkbox_event(self, chosen_material):
         # print("CHECKBOX_EVENT()")
 
@@ -806,7 +802,7 @@ class Material_Adjustment_Panel:
     def material_entry_updated(self, entry):
         # print("MATERIAL_ENTRY_UPDATED()")
     
-        # Update different values in self.materials based on option menu value
+        #Update different values in self.materials based on option menu value
         match globals.option_menu:
             case "Stacked" | "Realistic":
                 #Find material that corresponds to "entry"

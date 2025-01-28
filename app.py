@@ -11,21 +11,14 @@ from Material_Adjustment_Panel import Material_Adjustment_Panel
 from Layer_Stack_Canvas import Layer_Stack_Canvas
 from Material_Control_Panel import Material_Control_Panel
 from Canvas_Control_Panel import Canvas_Control_Panel
-# from Graph import Graph
-# from Graph_Control_Panel import Graph_Control_Panel
-
 
 #Main application class
 class App:
     def __init__(self, program_window):
         # print("CLASS APP INIT()")
-        self.counter = 0
 
         #Program window
         self.program_window = program_window
-
-        #Create background_canvas and main_frame where every widgets is placed
-        # self.main_frame, self.background_canvas = self.create_scrollable_frame(self.program_window)
 
         #If excel file exists, load it into globals.materials
         if(os.path.isfile("Materials.xlsx")):
@@ -42,114 +35,6 @@ class App:
 
         #Create a panel that controls the actions of the layer_stack_canvas
         globals.canvas_control_panel = Canvas_Control_Panel(self.program_window)
-
-
-    # """
-    # -Creates a scrollable frame on the window given in the class
-    # -(To be able to do this a "canvas" is made and a "frame" is placed on top of the canvas. 
-    # -(Then scrollbars are placed in the main window which controls scrolling on the canvas)
-    # """
-    # def create_scrollable_frame(self, window):
-    #     #print("CREATE_SCROLLABLE_FRAME()")
-    #     #Create a background canvas (Scrollbars can only be used with a canvas)
-    #     background_canvas = customtkinter.CTkCanvas(
-    #         master=window,
-    #         height=window.winfo_height()-settings.scrollbar_width-5,
-    #         width=window.winfo_width()-settings.scrollbar_width-5,
-    #         bg=settings.background_canvas_background_color,
-    #         highlightthickness=0
-    #     )
-    #     background_canvas.grid(
-    #         row=0, 
-    #         column=0, 
-    #         sticky="nsew",
-    #     )
-
-    #     #Prevent the background_canvas to automaticly resize itself to the size of the children widgets inside it
-    #     background_canvas.grid_propagate(False)
-
-    #     #Create a frame inside the canvas to hold all the widgets
-    #     main_frame = customtkinter.CTkFrame(
-    #         master=background_canvas, 
-    #         width=max(settings.main_frame_minimum_width*0.8, window.winfo_width()*0.8 - settings.scrollbar_width),     #Has to be 80% to get correct size for some reason
-    #         height=max(settings.main_frame_minimum_height*0.8, window.winfo_height()*0.8 - settings.scrollbar_width),   #Has to be 80% to get correct size for some reason
-    #         fg_color=settings.main_frame_background_color,
-    #     )
-    #     main_frame.grid(
-    #         row=0,
-    #         column=0
-    #     )
-
-    #     #Prevent the main_frame window to downsize itself to fit widgets placed inside
-    #     main_frame.grid_propagate(False)
-
-    #     #Add main_frame to a window in the background_canvas to enable scrolling
-    #     background_canvas.create_window(
-    #         (0, 0), 
-    #         window=main_frame, 
-    #         anchor="nw"
-    #     )
-
-    #     ####### UNNECESSARY STUFF? ##########
-
-    #     #Configure the main_frame to expand with the background_canvas
-    #     # main_frame.bind("<Configure>", self.on_frame_configure(background_canvas))
-
-    #     # background_canvas.configure(scrollregion=background_canvas.bbox("all"))
-
-    #     # background_canvas.configure(
-    #     #     scrollregion=(0, 0, max(500, background_canvas.winfo_width()), max(500, background_canvas.winfo_height()))
-    #     # )
-    #     ####################################
-
-        
-
-    #     #Add scrollbars to the background_canvas
-    #     canvas_vertical_scrollbar = customtkinter.CTkScrollbar(
-    #         master=window,
-    #         orientation="vertical",
-    #         width=settings.scrollbar_width,
-    #         border_spacing=settings.scrollbar_border_spacing,
-    #         fg_color=settings.scrollbar_background_color,
-    #         command=background_canvas.yview
-    #     )
-    #     canvas_vertical_scrollbar.grid(
-    #         row=0, 
-    #         column=1,
-    #         sticky="ns",
-    #     )
-
-    #     canvas_horizontal_scrollbar = customtkinter.CTkScrollbar(
-    #         master=window,
-    #         orientation="horizontal", 
-    #         width=settings.scrollbar_width,
-    #         border_spacing=settings.scrollbar_border_spacing,
-    #         fg_color=settings.scrollbar_background_color,
-    #         command=background_canvas.xview
-    #     )
-    #     canvas_horizontal_scrollbar.grid(
-    #         row=1, 
-    #         column=0, 
-    #         sticky="ew"
-    #     )
-
-    #     #Set the scrollregion for the scrollbars (x0,y0 to x1,y1) and activate the scrollbars
-    #     background_canvas.configure(
-    #         scrollregion=(0, 0, settings.main_frame_minimum_width, settings.main_frame_minimum_height),
-    #         yscrollcommand=canvas_vertical_scrollbar.set, 
-    #         xscrollcommand=canvas_horizontal_scrollbar.set
-    #     )
-
-    #     return main_frame, background_canvas
-
-
-#     """
-#     Dynamically adjusts the scrollable area of the background_canvas
-#     Ensures that the scrollbars correctly reflect the size of the content inside the canvas
-# #     """
-#     def on_frame_configure(self, canvas, event=None):
-#         #Update the scroll region of the canvas to encompass the entire frame
-#         canvas.configure(scrollregion=canvas.bbox("all"))
 
     
     """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
@@ -454,10 +339,7 @@ if __name__ == "__main__":
     #Create keyboard shortcuts for the main window
     program_window.bind("<Escape>", lambda event: program_window.destroy())
 
-    #Update program so that correct screen&window sizes can be fetched
-    # program_window.update()
-
-    # #Create an instance of App and run it
+    #Create an instance of App and run it
     globals.app = App(program_window)
     
     # #Checks if the program window is being resized
@@ -474,21 +356,117 @@ if __name__ == "__main__":
 
 
 
+###################COMMENTED CODE FOR CREATING A SCROLLABLE MAIN_FRAME#####################
+
+#Create background_canvas and main_frame where every widgets is placed
+# self.main_frame, self.background_canvas = self.create_scrollable_frame(self.program_window)
+
+# """
+# -Creates a scrollable frame on the window given in the class
+# -(To be able to do this a "canvas" is made and a "frame" is placed on top of the canvas. 
+# -(Then scrollbars are placed in the main window which controls scrolling on the canvas)
+# """
+# def create_scrollable_frame(self, window):
+    #     #print("CREATE_SCROLLABLE_FRAME()")
+    #     #Create a background canvas (Scrollbars can only be used with a canvas)
+    #     background_canvas = customtkinter.CTkCanvas(
+    #         master=window,
+    #         height=window.winfo_height()-settings.scrollbar_width-5,
+    #         width=window.winfo_width()-settings.scrollbar_width-5,
+    #         bg=settings.background_canvas_background_color,
+    #         highlightthickness=0
+    #     )
+    #     background_canvas.grid(
+    #         row=0, 
+    #         column=0, 
+    #         sticky="nsew",
+    #     )
+
+    #     #Prevent the background_canvas to automaticly resize itself to the size of the children widgets inside it
+    #     background_canvas.grid_propagate(False)
+
+    #     #Create a frame inside the canvas to hold all the widgets
+    #     main_frame = customtkinter.CTkFrame(
+    #         master=background_canvas, 
+    #         width=max(settings.main_frame_minimum_width*0.8, window.winfo_width()*0.8 - settings.scrollbar_width),     #Has to be 80% to get correct size for some reason
+    #         height=max(settings.main_frame_minimum_height*0.8, window.winfo_height()*0.8 - settings.scrollbar_width),   #Has to be 80% to get correct size for some reason
+    #         fg_color=settings.main_frame_background_color,
+    #     )
+    #     main_frame.grid(
+    #         row=0,
+    #         column=0
+    #     )
+
+    #     #Prevent the main_frame window to downsize itself to fit widgets placed inside
+    #     main_frame.grid_propagate(False)
+
+    #     #Add main_frame to a window in the background_canvas to enable scrolling
+    #     background_canvas.create_window(
+    #         (0, 0), 
+    #         window=main_frame, 
+    #         anchor="nw"
+    #     )
+
+    #     ####### UNNECESSARY STUFF? ##########
+
+    #     #Configure the main_frame to expand with the background_canvas
+    #     # main_frame.bind("<Configure>", self.on_frame_configure(background_canvas))
+
+    #     # background_canvas.configure(scrollregion=background_canvas.bbox("all"))
+
+    #     # background_canvas.configure(
+    #     #     scrollregion=(0, 0, max(500, background_canvas.winfo_width()), max(500, background_canvas.winfo_height()))
+    #     # )
+    #     ####################################
+
+        
+
+    #     #Add scrollbars to the background_canvas
+    #     canvas_vertical_scrollbar = customtkinter.CTkScrollbar(
+    #         master=window,
+    #         orientation="vertical",
+    #         width=settings.scrollbar_width,
+    #         border_spacing=settings.scrollbar_border_spacing,
+    #         fg_color=settings.scrollbar_background_color,
+    #         command=background_canvas.yview
+    #     )
+    #     canvas_vertical_scrollbar.grid(
+    #         row=0, 
+    #         column=1,
+    #         sticky="ns",
+    #     )
+
+    #     canvas_horizontal_scrollbar = customtkinter.CTkScrollbar(
+    #         master=window,
+    #         orientation="horizontal", 
+    #         width=settings.scrollbar_width,
+    #         border_spacing=settings.scrollbar_border_spacing,
+    #         fg_color=settings.scrollbar_background_color,
+    #         command=background_canvas.xview
+    #     )
+    #     canvas_horizontal_scrollbar.grid(
+    #         row=1, 
+    #         column=0, 
+    #         sticky="ew"
+    #     )
+
+    #     #Set the scrollregion for the scrollbars (x0,y0 to x1,y1) and activate the scrollbars
+    #     background_canvas.configure(
+    #         scrollregion=(0, 0, settings.main_frame_minimum_width, settings.main_frame_minimum_height),
+    #         yscrollcommand=canvas_vertical_scrollbar.set, 
+    #         xscrollcommand=canvas_horizontal_scrollbar.set
+    #     )
+
+    #     return main_frame, background_canvas
 
 
-    #Makes row 0 and column 0 in the program_window expand to the size of the whole program_window (Makes the "background_canvas" expand with the main_window)
-    # program_window.grid_rowconfigure(0, weight=1)
-    # program_window.grid_columnconfigure(0, weight=1)
 
-#     #Other classes needs access to this window 
-#     globals.program_window = program_window
+#
+# """Dynamically adjusts the scrollable area of the background_canvas
+# Ensures that the scrollbars correctly reflect the size of the content inside the canvas
+# """
+# def on_frame_configure(self, canvas, event=None):
+    #     #Update the scroll region of the canvas to encompass the entire frame
+    #     canvas.configure(scrollregion=canvas.bbox("all"))
 
-#     customtkinter.set_widget_scaling(settings.widget_scaling)
-#     customtkinter.set_window_scaling(settings.program_window_scaling)
-
-    
-
-
-               
-#     # #Resets the canvas position if "r" is pressed
-#     # program_window.bind('<KeyPress-r>', app.reset_canvas)
+###################END COMMENTED CODE FOR CREATING A SCROLLABLE MAIN_FRAME#####################

@@ -3,7 +3,6 @@ from tkinter import messagebox
 import customtkinter
 import settings
 import globals
-
 from matplotlib.figure import Figure                            #For creating graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #For creating graphs
 import numpy
@@ -16,18 +15,15 @@ class Graph:
 
         self.graph = self.create_graph_canvas()
 
-#         # self.x_values = numpy.linspace(-50, 50, 100)  #Generate 100 evenly values from -50 to 50
 
-
-
-    # """Creates a figure/canvas where the graph can be drawn"""
+    """Creates a figure/canvas where the graph can be drawn"""
     def create_graph_canvas(self):
         # print("CREATE_GRAPH()")
 
         #Create an overall container for any created plots/graphs
         if not hasattr(self, 'graph_container'):
             self.graph_container = Figure(
-                # figsize=(settings.graph_width/100, settings.graph_height/100),
+                # figsize=(width, height),
                 dpi=settings.graph_resolution    #Resolution of the graph. Higher number = more detailed graph
             )
 
@@ -47,7 +43,7 @@ class Graph:
             )
 
         #Adjust the margins around the plot
-        # self.graph_container.subplots_adjust(left=0.3)
+        # self.graph_container.subplots_adjust(left=0.3, right, top, bottom)
 
         #Create details in graph
         #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left)
@@ -233,5 +229,4 @@ class Graph:
 
         #Draw the created elements in the graph
         self.graph_translator.draw()
-
     
