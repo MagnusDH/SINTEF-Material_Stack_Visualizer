@@ -87,8 +87,6 @@
     BUGS:
         -If the program window is in full-screen mode and you then change the view to "stoney", the graph does not render itself properly. 
         
-        -If you add a material and then press the "reset values" button, the newly added material is not deleted and its name changes to "substrate". Make sure it is deleted properly and the dict stays updated
-        
         -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
         -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?

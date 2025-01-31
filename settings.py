@@ -30,6 +30,7 @@ material_control_panel_padding_left = 0
 material_control_panel_button_color = "#0080ca"
 material_control_panel_button_hover_color = "#009ffb"
 material_control_panel_text_color = "white"
+material_control_panel_text_size = 12
 
 
 #ADD MATERIAL WINDOW
@@ -75,9 +76,11 @@ canvas_control_panel_padding_bottom = 0
 canvas_control_panel_padding_right = 1
 canvas_control_panel_padding_left = 1
 canvas_control_panel_background_color = material_adjustment_panel_background_color
-canvas_control_panel_text_color = "white"
 canvas_control_panel_button_color = "#0080ca"
 canvas_control_panel_button_hover_color = "#009ffb"
+canvas_control_panel_text_color = "white"
+canvas_control_panel_text_size = 12
+
 
 
 #GRAPH

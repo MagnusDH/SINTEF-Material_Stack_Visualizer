@@ -52,105 +52,90 @@ class Canvas_Control_Panel:
         reset_canvas_button = customtkinter.CTkButton(
             master=canvas_control_panel_frame, 
             text="Reset canvas", 
+            text_color=settings.canvas_control_panel_text_color,
+            font=(settings.text_font, settings.canvas_control_panel_text_size),
             fg_color=settings.canvas_control_panel_button_color, 
             hover_color=settings.canvas_control_panel_button_hover_color, 
-            text_color=settings.canvas_control_panel_text_color,
-            width=90,
             command=self.reset_canvas
         )
         reset_canvas_button.grid(
             row=0, 
             column=0, 
-            sticky="", 
-            padx=(0,0), 
-            pady=(0,0)
-        )
-
-        #Reset values button
-        reset_values_button = customtkinter.CTkButton(
-            master=canvas_control_panel_frame,
-            text="Reset values",
-            fg_color= settings.canvas_control_panel_button_color, 
-            hover_color=settings.canvas_control_panel_button_hover_color, 
-            text_color=settings.canvas_control_panel_text_color,
-            width=90,
-            command=self.reset_values
-        )
-        reset_values_button.grid(
-            row=1, 
-            column=0, 
-            sticky="", 
-            padx=(0,0), 
-            pady=(0,0)
-        )       
+            sticky="nsew", 
+            padx=(5,5), 
+            pady=(5,5)
+        )    
 
         #Export stack as SVG button
         export_stack_as_svg_button = customtkinter.CTkButton(
             master=canvas_control_panel_frame,
             text="Export stack",
+            text_color=settings.canvas_control_panel_text_color,
+            font=(settings.text_font, settings.canvas_control_panel_text_size),
             fg_color= settings.canvas_control_panel_button_color, 
             hover_color=settings.canvas_control_panel_button_hover_color, 
-            text_color=settings.canvas_control_panel_text_color,
-            width=90,
             command=self.export_stack_as_svg
         )
         export_stack_as_svg_button.grid(
             row=0, 
             column=1, 
-            sticky="", 
-            padx=(0,0), 
-            pady=(0,0)
+            sticky="nsew", 
+            padx=(5,5), 
+            pady=(5,5)
         )
 
         #Export layers as SVG button
         export_layers_as_svg_button = customtkinter.CTkButton(
             master=canvas_control_panel_frame,
             text="Export layers",
+            text_color=settings.canvas_control_panel_text_color,
+            font=(settings.text_font, settings.canvas_control_panel_text_size),
             fg_color= settings.canvas_control_panel_button_color, 
             hover_color=settings.canvas_control_panel_button_hover_color, 
-            text_color=settings.canvas_control_panel_text_color,
-            width=90,
             command=self.export_layers_as_svg
         )
         export_layers_as_svg_button.grid(
             row=1, 
             column=1, 
-            sticky="", 
-            padx=(0,0), 
-            pady=(0,0)
+            sticky="nsew", 
+            padx=(5,5), 
+            pady=(5,5)
         )
 
         #Option menu "view" label
         option_menu_view_label = customtkinter.CTkLabel(
             master=canvas_control_panel_frame,
             text="View", 
-            bg_color=settings.canvas_control_panel_background_color,
-            text_color="#55b6ff",
-            font=(settings.text_font, 15, "bold")
+            text_color=settings.canvas_control_panel_text_color,
+            font=(settings.text_font, settings.canvas_control_panel_text_size, "bold"),
+            # font=(settings.text_font, 15, "bold")
+            bg_color=settings.canvas_control_panel_background_color
         )
         option_menu_view_label.grid(
             row=0,
             column=2,
-            sticky="",
-            padx=(0,0),
-            pady=(0,0)
+            sticky="nsew",
+            padx=(5,5),
+            pady=(5,5)
         )
 
         #Switch layout option menu
         self.option_menu = customtkinter.CTkOptionMenu(
             master=canvas_control_panel_frame, 
             values=["Stacked", "Realistic", "Stepped", "Stoney"],
-            # width=30,
+            text_color=settings.canvas_control_panel_text_color,
+            font=(settings.text_font, settings.canvas_control_panel_text_size),
             fg_color=settings.canvas_control_panel_button_color, 
+            bg_color=settings.canvas_control_panel_background_color,
             button_hover_color=settings.canvas_control_panel_button_hover_color,
             command=self.switch_layout
         )
         self.option_menu.grid(
             row=1, 
             column=2, 
-            sticky="",
-            padx=(0,0), 
-            pady=(0,0)
+            sticky="nsew",
+            padx=(5,5), 
+            pady=(5,5)
         )
 
         self.option_menu.set(globals.option_menu)
@@ -177,42 +162,6 @@ class Canvas_Control_Panel:
 
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
-
-
-    """Repopulates globals.materials dictionary with values from the excel file and recreates the material_adjustment_panel """
-    def reset_values(self):
-        # print("RESET_VALUES")
-
-        #TODO
-            #Delete all widgets in material_adjustment_panel_frame and make them again with the values from the excel sheet
-            #Move this function and its button to material_control_panel
-        
-        excel_file = "Materials.xlsx"
-
-        #If there is a "materials" file in the folder, read it and reset the thickness values of each material
-        if(os.path.isfile(excel_file)):
-            #Clear the existing globals.materials
-            globals.materials.clear()
-
-            #Reload the values from the excel file in to the dictionary
-            globals.app.load_materials_from_excel()
-
-            #Stoney view is special and needs all materials to be "inactive" except "substrate"
-            if(globals.option_menu == "Stoney"):
-                for material in globals.materials:
-                    globals.materials[material]["Status"] = "inactive"
-
-                    if(material.lower() == "substrate"):
-                        globals.materials[material]["Status"] = "active"
-
-            #Redraw the material stack
-            globals.layer_stack_canvas.draw_material_stack()
-
-            #Recreate the material_adjustment_panel
-            globals.material_adjustment_panel.create_material_adjustment_panel()
-
-        else:
-            messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")
 
 
     """

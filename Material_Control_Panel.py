@@ -40,67 +40,84 @@ class Material_Control_Panel:
             )
 
             #Define the row&column layout of the material_control_panel_frame
-            material_control_panel_frame.columnconfigure(0, weight=25, uniform="group1")
-            material_control_panel_frame.columnconfigure(1, weight=25, uniform="group1")
-            material_control_panel_frame.columnconfigure(2, weight=50, uniform="group1")
+            material_control_panel_frame.columnconfigure(0, weight=50, uniform="group1")
+            material_control_panel_frame.columnconfigure(1, weight=50, uniform="group1")
 
-            material_control_panel_frame.rowconfigure(0, weight=100, uniform="group1")    
+            material_control_panel_frame.rowconfigure(0, weight=50, uniform="group1")   
+            material_control_panel_frame.rowconfigure(1, weight=50, uniform="group1")    
+
             
 
         #Create button to "add material" and place it
         add_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
-            width=1,
-            text="+", 
+            text="Add material", #"+" 
             fg_color="#008c00",
             hover_color="#00cd00",
             text_color=settings.material_control_panel_text_color,
-            font=(settings.text_font, 20),
+            font=(settings.text_font, settings.material_control_panel_text_size),
             command=self.add_material
         )
         add_material_button.grid(
             row=0,
             column=0,
-            sticky="",
-            padx=(0,0),
-            pady=(0,0)
+            sticky="nsew",
+            padx=(5,5),
+            pady=(5,5)
         )
 
         #Create button to modify the materials
         modify_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
-            width=1,
-            text="⚙️",
+            text="Modify material",#"⚙️",
             text_color="white", 
-            font=(settings.text_font, 20),
+            font=(settings.text_font, settings.material_control_panel_text_size),
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
             command=self.modify_material
         )
         modify_material_button.grid(
-            row=0,
-            column=1,
-            sticky="",
-            padx=(0,0),
-            pady=(0,0)
+            row=1,
+            column=0,
+            sticky="nsew",
+            padx=(5,5),
+            pady=(5,5)
         ) 
+
+        #Reset values button
+        reset_values_button = customtkinter.CTkButton(
+            master=material_control_panel_frame,
+            text="Reset values",
+            text_color=settings.material_control_panel_text_color,
+            font=(settings.text_font, settings.material_control_panel_text_size),
+            fg_color= settings.material_control_panel_button_color, 
+            hover_color=settings.material_control_panel_button_hover_color, 
+            command=self.reset_values
+        )
+        reset_values_button.grid(
+            row=0, 
+            column=1, 
+            sticky="nsew", 
+            padx=(5,5), 
+            pady=(5,5)
+        )           
 
         #Create button to export materials{} and stack to a excel file
         export_as_excel_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
-            width=1,
             text="Export values to excel", 
+            text_color=settings.material_control_panel_text_color,
+            font=(settings.text_font, settings.material_control_panel_text_size),
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
-            text_color=settings.material_control_panel_text_color,
             command=self.export_to_excel
         )
         export_as_excel_button.grid(
-            row=0,
-            column=2,
-            sticky="",
-            padx=(0,0),
-            pady=(0,0)
+            row=1,
+            column=1,
+            sticky="nsew",
+            padx=(5,5),
+            pady=(5,5)
         )
 
         return material_control_panel_frame
@@ -1485,6 +1502,45 @@ class Material_Control_Panel:
         #Destroy modify_material_window
         self.modify_material_window.destroy()
 
+
+    """Repopulates globals.materials dictionary with values from the excel file and recreates the material_adjustment_panel """
+    def reset_values(self):
+        # print("RESET_VALUES")
+
+        excel_file = "Materials.xlsx"
+
+        #If there is a "materials" file in the folder, read it and reset the thickness values of each material
+        if(os.path.isfile(excel_file)):
+            #Delete all widgets in material_adjustment_panel_frame
+            for widget in globals.material_adjustment_panel.material_adjustment_panel_frame.winfo_children():
+                widget.destroy()
+            
+            del globals.material_adjustment_panel.material_headline
+            del globals.material_adjustment_panel.slider_label
+
+            
+            #Clear the existing globals.materials
+            globals.materials.clear()
+
+            #Reload the values from the excel file in to the dictionary
+            globals.app.load_materials_from_excel()
+
+            #Stoney view is special and needs all materials to be "inactive" except "substrate"
+            if(globals.option_menu == "Stoney"):
+                for material in globals.materials:
+                    globals.materials[material]["Status"] = "inactive"
+
+                    if(material.lower() == "substrate"):
+                        globals.materials[material]["Status"] = "active"
+
+            #Redraw the material stack
+            globals.layer_stack_canvas.draw_material_stack()
+
+            #Recreate the material_adjustment_panel
+            globals.material_adjustment_panel.create_material_adjustment_panel()
+
+        else:
+            messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")
 
     """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
     def export_to_excel(self):
