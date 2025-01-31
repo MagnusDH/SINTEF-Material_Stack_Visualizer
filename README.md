@@ -85,18 +85,16 @@
 
 
     BUGS:
+        -If the program window is in full-screen mode and you then change the view to "stoney", the graph does not render itself properly. 
+        
         -If you add a material and then press the "reset values" button, the newly added material is not deleted and its name changes to "substrate". Make sure it is deleted properly and the dict stays updated
         
-        -If you move a layer up or down in "stoney" view, then the checkbox does not follow the correct layer and messes up the graph values
-
         -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
         -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
 
 
     TO DO               
-        -finish write_indent_on_stepped_stack()
-        -in load_materials_from_excel: if an excel headline does not exist, then it causes an error. It should be so that if a headline is not found, then a default value should be added to materials dictionary
             
     
     QUESTIONS:
@@ -119,6 +117,8 @@
         -I "stoney" view: Materialer der tickbox value="off" kan være grå farge, materialer der tickbox value="on" kan være deres egen farge
 
         -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
+
+        -Make a button that gives the user the option to load an excel file
 
 
 

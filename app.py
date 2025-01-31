@@ -49,6 +49,9 @@ class App:
                 #Read given excel file into Pandas dataframe
                 excel_data = pandas.read_excel(excel_file)
 
+                #Convert column names to lowercase
+                excel_data.columns = excel_data.columns.str.lower()
+
                 #Open excel-file to read background colors of each cell
                 work_book = openpyxl.load_workbook(excel_file, data_only=True)
                 fs = work_book.active
@@ -60,123 +63,168 @@ class App:
                     #Increment "i" to go to the next row
                     i+=1
 
-                    #If some cells are left empty or written in a wrong way -> apply default value
+                    #If some cells are left empty, has an invalid value or headline does not exist -> apply default value
                     #MATERIAL NAME CHECK
-                    if(pandas.isna(row["Material"])):
-                        row["Material"] = "No name"
+                    if("material" in row.index):
+                        if((pandas.isna(row["material"])) or (row["material"].isspace())):
+                            row["material"] = "No name"
+                    else:
+                        row["material"] = "No name"
+
 
                     #THICKNESS CHECK
-                    if(pandas.isna(row["Thickness"])):
-                        row["Thickness"] = 0
-                    thickness_conversion = self.convert_decimal_string_to_float(row["Thickness"]) 
-                    if((thickness_conversion != False) and (thickness_conversion >= 0)):
-                        row["Thickness"] = thickness_conversion
+                    if("thickness" in row.index):
+                        if(pandas.isna(row["thickness"])):
+                            row["thickness"] = 0
+                        thickness_conversion = self.convert_decimal_string_to_float(row["thickness"]) 
+                        if((thickness_conversion != False) and (thickness_conversion >= 0)):
+                            row["thickness"] = thickness_conversion
+                        else:
+                            row["thickness"] = 0
                     else:
-                        row["Thickness"] = 0
+                        row["thickness"] = 0
+
 
                     #UNIT CHECK
-                    if(pandas.isna(row["Unit"])):
-                        row["Unit"] = "No value"
+                    if("unit" in row.index):
+                        if((pandas.isna(row["unit"])) or (row["unit"].isspace())):
+                            row["unit"] = "No value"
+                    else:
+                        row["unit"] = "No value"
+
 
                     #INDENT CHECK
-                    if(pandas.isna(row["Indent [nm]"])):
-                        row["Indent [nm]"] = 0
-                    indent_conversion = self.convert_decimal_string_to_float(row["Indent [nm]"]) 
-                    if((indent_conversion != False) and (indent_conversion >= 0)):
-                        row["Indent [nm]"] = indent_conversion
+                    if("indent [nm]" in row.index):
+                        if(pandas.isna(row["indent [nm]"])):
+                            row["indent [nm]"] = 0
+                        indent_conversion = self.convert_decimal_string_to_float(row["indent [nm]"]) 
+                        if((indent_conversion != False) and (indent_conversion >= 0)):
+                            row["indent [nm]"] = indent_conversion
+                        else:
+                            row["indent [nm]"] = 0
                     else:
-                        row["Indent [nm]"] = 0
+                        row["indent [nm]"] = 0
+                    
 
 
                     #COLOR CHECK
-                    if((pandas.isna(row["Color"])) or (self.is_valid_color(row["Color"]) == False)):
-                        row["Color"] = "white"
+                    if("color" in row.index):
+                        if((pandas.isna(row["color"])) or (self.is_valid_color(row["color"]) == False)):
+                            row["color"] = "white"
+                    else:
+                        row["color"] = "white"
 
 
                     #MODULUS CHECK
-                    if(pandas.isna(row["Modulus [GPa]"])):
-                        row["Modulus [GPa]"] = 0
-                    modulus_conversion = self.convert_decimal_string_to_float(row["Modulus [GPa]"]) 
-                    if(modulus_conversion != False):
-                        row["Modulus [GPa]"] = abs(modulus_conversion)
+                    if("modulus [gpa]" in row.index):
+                        if(pandas.isna(row["modulus [gpa]"])):
+                            row["modulus [gpa]"] = 0
+                        modulus_conversion = self.convert_decimal_string_to_float(row["modulus [gpa]"]) 
+                        if(modulus_conversion != False):
+                            row["modulus [gpa]"] = abs(modulus_conversion)
+                        else:
+                            row["modulus [gpa]"] = 0  
                     else:
-                        row["Modulus [GPa]"] = 0      
+                        row["modulus [gpa]"] = 0    
+
 
 
                     #CTE CHECK
-                    if(pandas.isna(row["CTE [ppm/deg]"])):
-                        row["CTE [ppm/deg]"] = 0
-                    cte_conversion = self.convert_decimal_string_to_float(row["CTE [ppm/deg]"]) 
-                    if(cte_conversion != False):
-                        row["CTE [ppm/deg]"] = abs(cte_conversion)
+                    if("cte [ppm/deg]" in row.index):
+                        if(pandas.isna(row["cte [ppm/deg]"])):
+                            row["cte [ppm/deg]"] = 0
+                        cte_conversion = self.convert_decimal_string_to_float(row["cte [ppm/deg]"]) 
+                        if(cte_conversion != False):
+                            row["cte [ppm/deg]"] = abs(cte_conversion)
+                        else:
+                            row["cte [ppm/deg]"] = 0 
                     else:
-                        row["CTE [ppm/deg]"] = 0 
+                        row["cte [ppm/deg]"] = 0 
+
+
 
                     #DENSITY CHECK
-                    if(pandas.isna(row["Density [kg/m3]"])):
-                        row["Density [kg/m3]"] = 0
-                    density_conversion = self.convert_decimal_string_to_float(row["Density [kg/m3]"]) 
-                    if(density_conversion != False):
-                        row["Density [kg/m3]"] = abs(density_conversion)
+                    if("density [kg/m3]" in row.index):
+                        if(pandas.isna(row["density [kg/m3]"])):
+                            row["density [kg/m3]"] = 0
+                        density_conversion = self.convert_decimal_string_to_float(row["density [kg/m3]"]) 
+                        if(density_conversion != False):
+                            row["density [kg/m3]"] = abs(density_conversion)
+                        else:
+                            row["density [kg/m3]"] = 0 
                     else:
-                        row["Density [kg/m3]"] = 0 
+                        row["density [kg/m3]"] = 0 
+
 
 
                     #STRESS CHECK
-                    if(pandas.isna(row["Stress_x [MPa]"])):
-                        row["Stress_x [MPa]"] = 0
-                    stress_conversion = self.convert_decimal_string_to_float(row["Stress_x [MPa]"]) 
-                    if(stress_conversion != False):
-                        row["Stress_x [MPa]"] = stress_conversion
+                    if("stress_x [mpa]" in row.index):
+                        if(pandas.isna(row["stress_x [mpa]"])):
+                            row["stress_x [mpa]"] = 0
+                        stress_conversion = self.convert_decimal_string_to_float(row["stress_x [mpa]"]) 
+                        if(stress_conversion != False):
+                            row["stress_x [mpa]"] = stress_conversion
+                        else:
+                            row["stress_x [mpa]"] = 0 
                     else:
-                        row["Stress_x [MPa]"] = 0 
+                        row["stress_x [mpa]"] = 0 
+
 
                     #POISSON CHECK
-                    if(pandas.isna(row["Poisson"])):
-                        row["Poisson"] = 0
-                    poisson_conversion = self.convert_decimal_string_to_float(row["Poisson"]) 
-                    if(poisson_conversion != False):
-                        row["Poisson"] = abs(poisson_conversion)
+                    if("poisson" in row.index):
+                        if(pandas.isna(row["poisson"])):
+                            row["poisson"] = 0
+                        poisson_conversion = self.convert_decimal_string_to_float(row["poisson"]) 
+                        if(poisson_conversion != False):
+                            row["poisson"] = abs(poisson_conversion)
+                        else:
+                            row["poisson"] = 0
                     else:
-                        row["Poisson"] = 0
+                        row["poisson"] = 0
 
 
                     #R0 CHECK
-                    if(pandas.isna(row["R0"])):
-                        row["R0"] = 0
-                    R0_conversion = self.convert_decimal_string_to_float(row["R0"]) 
-                    if(R0_conversion != False):
-                        row["R0"] = R0_conversion
+                    if("r0" in row.index):
+                        if(pandas.isna(row["r0"])):
+                            row["r0"] = 0
+                        R0_conversion = self.convert_decimal_string_to_float(row["r0"]) 
+                        if(R0_conversion != False):
+                            row["r0"] = R0_conversion
+                        else:
+                            row["r0"] = 0
                     else:
-                        row["R0"] = 0
+                        row["r0"] = 0
 
 
                     #R CHECK
-                    if(pandas.isna(row["R"])):
-                        row["R"] = 0
-                    R_conversion = self.convert_decimal_string_to_float(row["R"]) 
-                    if(R_conversion != False):
-                        row["R"] = R_conversion
+                    if("r" in row.index):
+                        if(pandas.isna(row["r"])):
+                            row["r"] = 0
+                        R_conversion = self.convert_decimal_string_to_float(row["r"]) 
+                        if(R_conversion != False):
+                            row["r"] = R_conversion
+                        else:
+                            row["r"] = 0 
                     else:
-                        row["R"] = 0 
+                        row["r"] = 0 
 
-
+                    
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
-                        "Name": row["Material"],
+                        "Name": row["material"],
                         "Layer": int(layer),
-                        "Thickness": float(row["Thickness"]),
-                        "Unit": row["Unit"],
-                        "Indent [nm]": float(row["Indent [nm]"]),
-                        "Color": row["Color"],
+                        "Thickness": float(row["thickness"]),
+                        "Unit": row["unit"],
+                        "Indent [nm]": float(row["indent [nm]"]),
+                        "Color": row["color"],
                         "Status": "active",
-                        "Modulus [GPa]": float(row["Modulus [GPa]"]),
-                        "CTE [ppm/deg]": float(row["CTE [ppm/deg]"]),
-                        "Density [kg/m3]": float(row["Density [kg/m3]"]),
-                        "Stress_x [MPa]": float(row["Stress_x [MPa]"]),
-                        "Poisson": float(row["Poisson"]),
-                        "R0": float(row["R0"]),
-                        "R": float(row["R"]),
+                        "Modulus [GPa]": float(row["modulus [gpa]"]),
+                        "CTE [ppm/deg]": float(row["cte [ppm/deg]"]),
+                        "Density [kg/m3]": float(row["density [kg/m3]"]),
+                        "Stress_x [MPa]": float(row["stress_x [mpa]"]),
+                        "Poisson": float(row["poisson"]),
+                        "R0": float(row["r0"]),
+                        "R": float(row["r"]),
                         "Label_name_id": None,
                         "Delete_material_button_id": None,
                         "Move_down_button_id": None,
@@ -195,7 +243,7 @@ class App:
                     }
 
                     #Put "info" dictionary into self.materials dictionary
-                    globals.materials[row["Material"]] = info
+                    globals.materials[row["material"]] = info
 
                     layer += 1
                 
@@ -470,3 +518,239 @@ if __name__ == "__main__":
     #     canvas.configure(scrollregion=canvas.bbox("all"))
 
 ###################END COMMENTED CODE FOR CREATING A SCROLLABLE MAIN_FRAME#####################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#LOAD MATERIAL FROM EXCEL ORIGINAL#
+# """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
+#     def load_materials_from_excel(self):
+#         #print("LOAD_MATERIALS_FROM_EXCEL()")
+
+#         excel_file = "Materials.xlsx"
+
+#         #If there is a "materials" file in the folder, read it and populate the self.materials dictionary 
+#         if(os.path.isfile(excel_file)):
+#             try:
+#                 #Read given excel file into Pandas dataframe
+#                 excel_data = pandas.read_excel(excel_file)
+
+#                 # Convert column names to lowercase
+#                 # excel_data.columns = excel_data.columns.str.lower()
+
+#                 #Open excel-file to read background colors of each cell
+#                 work_book = openpyxl.load_workbook(excel_file, data_only=True)
+#                 fs = work_book.active
+
+#                 #Loop through the rows in excel_file
+#                 i = 2
+#                 layer = 1
+#                 for column, row in excel_data.iterrows():
+#                     #Increment "i" to go to the next row
+#                     i+=1
+
+#                     #If some cells are left empty, has an invalid value or headline does not exist -> apply default value
+#                     #MATERIAL NAME CHECK
+#                     if("Material" in row.index):
+#                         if(pandas.isna(row["Material"])):
+#                             row["Material"] = "No name"
+#                     else:
+#                         row["Material"] = "No name"
+
+
+#                     #THICKNESS CHECK
+#                     if("Thickness" in row.index):
+#                         if(pandas.isna(row["Thickness"])):
+#                             row["Thickness"] = 0
+#                         thickness_conversion = self.convert_decimal_string_to_float(row["Thickness"]) 
+#                         if((thickness_conversion != False) and (thickness_conversion >= 0)):
+#                             row["Thickness"] = thickness_conversion
+#                         else:
+#                             row["Thickness"] = 0
+#                     else:
+#                         row["Thickness"] = 0
+
+
+#                     #UNIT CHECK
+#                     if("Unit" in row.index):
+#                         if(pandas.isna(row["Unit"])):
+#                             row["Unit"] = "No value"
+#                     else:
+#                         row["Unit"] = "No value"
+
+
+#                     #INDENT CHECK
+#                     if("Unit" in row.index):
+#                         if(pandas.isna(row["Indent [nm]"])):
+#                             row["Indent [nm]"] = 0
+#                         indent_conversion = self.convert_decimal_string_to_float(row["Indent [nm]"]) 
+#                         if((indent_conversion != False) and (indent_conversion >= 0)):
+#                             row["Indent [nm]"] = indent_conversion
+#                         else:
+#                             row["Indent [nm]"] = 0
+#                     else:
+#                         row["Indent [nm]"] = 0
+                    
+
+
+#                     #COLOR CHECK
+#                     if("Color" in row.index):
+#                         if((pandas.isna(row["Color"])) or (self.is_valid_color(row["Color"]) == False)):
+#                             row["Color"] = "white"
+#                     else:
+#                         row["Color"] = "white"
+
+
+#                     #MODULUS CHECK
+#                     if("Modulus [GPa]" in row.index):
+#                         if(pandas.isna(row["Modulus [GPa]"])):
+#                             row["Modulus [GPa]"] = 0
+#                         modulus_conversion = self.convert_decimal_string_to_float(row["Modulus [GPa]"]) 
+#                         if(modulus_conversion != False):
+#                             row["Modulus [GPa]"] = abs(modulus_conversion)
+#                         else:
+#                             row["Modulus [GPa]"] = 0  
+#                     else:
+#                         row["Modulus [GPa]"] = 0    
+
+
+
+#                     #CTE CHECK
+#                     if("CTE [ppm/deg]" in row.index):
+#                         if(pandas.isna(row["CTE [ppm/deg]"])):
+#                             row["CTE [ppm/deg]"] = 0
+#                         cte_conversion = self.convert_decimal_string_to_float(row["CTE [ppm/deg]"]) 
+#                         if(cte_conversion != False):
+#                             row["CTE [ppm/deg]"] = abs(cte_conversion)
+#                         else:
+#                             row["CTE [ppm/deg]"] = 0 
+#                     else:
+#                         row["CTE [ppm/deg]"] = 0 
+
+
+
+#                     #DENSITY CHECK
+#                     if("Density [kg/m3]" in row.index):
+#                         if(pandas.isna(row["Density [kg/m3]"])):
+#                             row["Density [kg/m3]"] = 0
+#                         density_conversion = self.convert_decimal_string_to_float(row["Density [kg/m3]"]) 
+#                         if(density_conversion != False):
+#                             row["Density [kg/m3]"] = abs(density_conversion)
+#                         else:
+#                             row["Density [kg/m3]"] = 0 
+#                     else:
+#                         row["Density [kg/m3]"] = 0 
+
+
+
+#                     #STRESS CHECK
+#                     if("Stress_x [MPa]" in row.index):
+#                         if(pandas.isna(row["Stress_x [MPa]"])):
+#                             row["Stress_x [MPa]"] = 0
+#                         stress_conversion = self.convert_decimal_string_to_float(row["Stress_x [MPa]"]) 
+#                         if(stress_conversion != False):
+#                             row["Stress_x [MPa]"] = stress_conversion
+#                         else:
+#                             row["Stress_x [MPa]"] = 0 
+#                     else:
+#                         row["Stress_x [MPa]"] = 0 
+
+
+#                     #POISSON CHECK
+#                     if("Poisson" in row.index):
+#                         if(pandas.isna(row["Poisson"])):
+#                             row["Poisson"] = 0
+#                         poisson_conversion = self.convert_decimal_string_to_float(row["Poisson"]) 
+#                         if(poisson_conversion != False):
+#                             row["Poisson"] = abs(poisson_conversion)
+#                         else:
+#                             row["Poisson"] = 0
+#                     else:
+#                         row["Poisson"] = 0
+
+
+#                     #R0 CHECK
+#                     if("R0" in row.index):
+#                         if(pandas.isna(row["R0"])):
+#                             row["R0"] = 0
+#                         R0_conversion = self.convert_decimal_string_to_float(row["R0"]) 
+#                         if(R0_conversion != False):
+#                             row["R0"] = R0_conversion
+#                         else:
+#                             row["R0"] = 0
+#                     else:
+#                         row["R0"] = 0
+
+
+#                     #R CHECK
+#                     if("R" in row.index):
+#                         if(pandas.isna(row["R"])):
+#                             row["R"] = 0
+#                         R_conversion = self.convert_decimal_string_to_float(row["R"]) 
+#                         if(R_conversion != False):
+#                             row["R"] = R_conversion
+#                         else:
+#                             row["R"] = 0 
+#                     else:
+#                         row["R"] = 0 
+
+                    
+#                     #Create an "info" dictionary to contain all info from excel-file
+#                     info = {
+#                         "Name": row["Material"],
+#                         "Layer": int(layer),
+#                         "Thickness": float(row["Thickness"]),
+#                         "Unit": row["Unit"],
+#                         "Indent [nm]": float(row["Indent [nm]"]),
+#                         "Color": row["Color"],
+#                         "Status": "active",
+#                         "Modulus [GPa]": float(row["Modulus [GPa]"]),
+#                         "CTE [ppm/deg]": float(row["CTE [ppm/deg]"]),
+#                         "Density [kg/m3]": float(row["Density [kg/m3]"]),
+#                         "Stress_x [MPa]": float(row["Stress_x [MPa]"]),
+#                         "Poisson": float(row["Poisson"]),
+#                         "R0": float(row["R0"]),
+#                         "R": float(row["R"]),
+#                         "Label_name_id": None,
+#                         "Delete_material_button_id": None,
+#                         "Move_down_button_id": None,
+#                         "Move_up_button_id": None,
+#                         "Entry_id": None,
+#                         "Slider_id": None,
+#                         "Checkbox_id": None,
+#                         "Rectangle_id": None,
+#                         "Text_id": None,
+#                         "Text_bbox_id" : None,
+#                         "Line_id": None,
+#                         "Indent_text_id": None,
+#                         "Indent_text_bbox_id": None,
+#                         "Indent_line_id": None,
+#                         "Indent_arrow_pointer_id": None
+#                     }
+
+#                     #Put "info" dictionary into self.materials dictionary
+#                     globals.materials[row["Material"]] = info
+
+#                     layer += 1
+                
+#                 #Sort the materials dictionary
+#                 self.sort_dictionary()
+                
+#             except Exception as error:
+#                 messagebox.showerror("Error", "Could not load materials from Excel-file")
+#                 return
+
+    

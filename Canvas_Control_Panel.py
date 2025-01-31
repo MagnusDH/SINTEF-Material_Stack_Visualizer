@@ -182,6 +182,10 @@ class Canvas_Control_Panel:
     """Repopulates globals.materials dictionary with values from the excel file and recreates the material_adjustment_panel """
     def reset_values(self):
         # print("RESET_VALUES")
+
+        #TODO
+            #Delete all widgets in material_adjustment_panel_frame and make them again with the values from the excel sheet
+            #Move this function and its button to material_control_panel
         
         excel_file = "Materials.xlsx"
 
