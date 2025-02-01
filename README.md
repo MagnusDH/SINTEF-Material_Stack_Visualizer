@@ -93,7 +93,9 @@
 
 
     TO DO               
-            
+        -In graph_control_panel, create a frame to contain the toolbar instead and the export graph button. This frame must be managed by pack()
+        -Remember to destroy the toolbar and the graph_control_panel_frame where it needs to be destroyed
+        -Check if the resizing of all the frames is correct -> it should be correct I think
     
     QUESTIONS:
     

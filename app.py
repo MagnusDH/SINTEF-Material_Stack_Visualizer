@@ -342,10 +342,10 @@ class App:
 
     """Scales the layer_stack_canvas correctly based on the size of the program_window"""
     def program_window_resized(self, event): 
-        # print("PROGRAM_WINDOW_RESIZED()")
 
         #Check if the program window is actually resized
         if((self.program_window.winfo_width() != globals.current_program_window_width) or (self.program_window.winfo_height() != globals.current_program_window_height)):
+            # print("PROGRAM_WINDOW_RESIZED()")
             self.program_window.update_idletasks()
             
             #Update the new sizes to globals
@@ -359,7 +359,7 @@ class App:
             globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
             globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
 
-
+            #Redraw the layer_stack_canvas
             globals.layer_stack_canvas.draw_material_stack()
 
 
@@ -380,7 +380,7 @@ if __name__ == "__main__":
 
     program_window.rowconfigure(0, weight=1, uniform="group1")    
     program_window.rowconfigure(1, weight=0, minsize=100, uniform=None)   #set this row to a specific size that won't change
-
+    
     #Set the main window background color
     program_window.configure(bg=settings.program_window_background_color)
         

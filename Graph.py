@@ -7,6 +7,8 @@ from matplotlib.figure import Figure                            #For creating gr
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #For creating graphs
 import numpy
 
+
+
 class Graph:
     def __init__(self, program_window):
         # print("CLASS: GRAPH_INIT()")
@@ -23,7 +25,7 @@ class Graph:
         #Create an overall container for any created plots/graphs
         if not hasattr(self, 'graph_container'):
             self.graph_container = Figure(
-                # figsize=(width, height),
+                # figsize=(6, 4),       #Figure size of 600x400 pixels
                 dpi=settings.graph_resolution    #Resolution of the graph. Higher number = more detailed graph
             )
 
@@ -39,9 +41,11 @@ class Graph:
                 column=2,
                 sticky="nsew",
                 padx=(1,1),
-                pady=(1,1)
+                pady=(1,1),
             )
 
+        
+        
         #Adjust the margins around the plot
         # self.graph_container.subplots_adjust(left=0.3, right, top, bottom)
 
@@ -59,6 +63,7 @@ class Graph:
         
         #Set the display limits of the x and y axises 
         graph.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+
         graph.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
         
         #Display the grid of the graph
@@ -69,19 +74,11 @@ class Graph:
         graph.axvline(0, color="black", linewidth=1)
 
         ########## THIS IS A WORK AROUND TO MAKE THE GRAPH RESIZE TO PROPERLY FIT THE WINDOW ##########
-        #Save the current window geometry
-        current_geometry = self.program_window.geometry()
-
-        #Temporarily resize the window slightly
-        self.program_window.geometry(f"{self.program_window.winfo_width() + 1}x{self.program_window.winfo_height() + 1}")
-
-        #Restore the original geometry to simulate a resize
         self.program_window.update()
-        self.program_window.geometry(current_geometry)
+        #Upscale and downscale the program window so that the graph adjusts properly  
+        self.program_window.geometry(f"{self.program_window.winfo_width()+1}x{self.program_window.winfo_height()+1}")
+        self.program_window.geometry(f"{self.program_window.winfo_width()-1}x{self.program_window.winfo_height()-1}")
         ########## END OF WORK AROUND ##########
-
-        #Make everything fit within the grid window
-        # self.graph_container.tight_layout()
 
         return graph
 

@@ -27,8 +27,6 @@ class Canvas_Control_Panel:
             #Create Frame from the control panel and place it within given window
             canvas_control_panel_frame = customtkinter.CTkFrame(
                 master=self.program_window,
-                #width=,
-                #height=,
                 fg_color=settings.canvas_control_panel_background_color
             )
             canvas_control_panel_frame.grid(
@@ -47,25 +45,6 @@ class Canvas_Control_Panel:
             canvas_control_panel_frame.rowconfigure(0, weight=50, uniform="group1")
             canvas_control_panel_frame.rowconfigure(1, weight=50, uniform="group1") 
 
-
-        #Reset canvas button
-        reset_canvas_button = customtkinter.CTkButton(
-            master=canvas_control_panel_frame, 
-            text="Reset canvas", 
-            text_color=settings.canvas_control_panel_text_color,
-            font=(settings.text_font, settings.canvas_control_panel_text_size),
-            fg_color=settings.canvas_control_panel_button_color, 
-            hover_color=settings.canvas_control_panel_button_hover_color, 
-            command=self.reset_canvas
-        )
-        reset_canvas_button.grid(
-            row=0, 
-            column=0, 
-            sticky="nsew", 
-            padx=(5,5), 
-            pady=(5,5)
-        )    
-
         #Export stack as SVG button
         export_stack_as_svg_button = customtkinter.CTkButton(
             master=canvas_control_panel_frame,
@@ -78,7 +57,7 @@ class Canvas_Control_Panel:
         )
         export_stack_as_svg_button.grid(
             row=0, 
-            column=1, 
+            column=0, 
             sticky="nsew", 
             padx=(5,5), 
             pady=(5,5)
@@ -96,11 +75,29 @@ class Canvas_Control_Panel:
         )
         export_layers_as_svg_button.grid(
             row=1, 
-            column=1, 
+            column=0, 
             sticky="nsew", 
             padx=(5,5), 
             pady=(5,5)
         )
+
+        #Reset canvas button
+        reset_canvas_button = customtkinter.CTkButton(
+            master=canvas_control_panel_frame, 
+            text="Reset canvas", 
+            text_color=settings.canvas_control_panel_text_color,
+            font=(settings.text_font, settings.canvas_control_panel_text_size),
+            fg_color=settings.canvas_control_panel_button_color, 
+            hover_color=settings.canvas_control_panel_button_hover_color, 
+            command=self.reset_canvas
+        )
+        reset_canvas_button.grid(
+            row=1, 
+            column=1, 
+            sticky="nsew", 
+            padx=(5,5), 
+            pady=(5,5)
+        )    
 
         #Option menu "view" label
         option_menu_view_label = customtkinter.CTkLabel(
@@ -180,12 +177,10 @@ class Canvas_Control_Panel:
             globals.graph.graph_translator.get_tk_widget().destroy()
             del globals.graph.graph_translator
 
-            
         #Delete the graph_control_panel if it exists
         if(hasattr(globals.graph_control_panel, 'graph_control_panel')):
             globals.graph_control_panel.graph_control_panel.destroy()   #Destroy the widget
             del globals.graph_control_panel.graph_control_panel         #Delete the reference in memory
-            globals.graph_control_panel = None
 
         #Create a new material_adjustment_panel with a different layout based on the option menu
         globals.material_adjustment_panel.create_material_adjustment_panel()

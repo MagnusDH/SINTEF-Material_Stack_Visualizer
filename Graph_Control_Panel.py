@@ -4,6 +4,12 @@ import settings
 import os
 import globals
 
+import matplotlib
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk #For creating graphs
+matplotlib.use('TkAgg')
+
+
+
 class Graph_Control_Panel:
     def __init__(self, program_window):
         # print("CLASS: GRAPH_CONTROL_PANEL_INIT()")
@@ -15,37 +21,52 @@ class Graph_Control_Panel:
     """Creates a frame with widgets that performs actions on the graph"""
     def create_graph_control_panel(self):
         # print("CREATE_GRAPH_CONTROL_PANEL()")
-
+        
         #Create Frame for the graph and place it within given window
-        graph_control_panel_frame = customtkinter.CTkFrame(
-            master=self.program_window,
-            # width=,
-            # height=,
-            fg_color=settings.graph_control_panel_background_color,
+        if not hasattr(self, 'graph_control_panel_frame'):
+            graph_control_panel_frame = customtkinter.CTkFrame(
+                master=self.program_window,
+                fg_color=settings.graph_control_panel_background_color,
+            )
+            graph_control_panel_frame.grid(
+                row=1,
+                column=2,
+                padx=(settings.graph_control_panel_padding_left, settings.graph_control_panel_padding_right),
+                pady=(settings.graph_control_panel_padding_top, settings.graph_control_panel_padding_bottom),
+                sticky="nsew"
+            )
+
+        #Create a toolbar for the graph
+        toolbar = NavigationToolbar2Tk(
+            globals.graph.graph_translator,
+            graph_control_panel_frame,
         )
-        graph_control_panel_frame.grid(
-            row=1,
-            column=2,
-            padx=(settings.graph_control_panel_padding_left, settings.graph_control_panel_padding_right),
-            pady=(settings.graph_control_panel_padding_top, settings.graph_control_panel_padding_bottom),
-            sticky="nsew",
+        toolbar.pack(
+            padx=(3,3),
+            pady=(1,1),
         )
+        toolbar.config(
+            background=settings.graph_control_panel_background_color,
+        
+        )
+
+        for widget in toolbar.winfo_children():
+            widget.config(
+                background="white"#settings.graph_control_panel_button_color, 
+            )
+
 
         #Export graph button
         export_graph_button = customtkinter.CTkButton(
             master=graph_control_panel_frame,
             text="Export graph",
-            width=90,
             fg_color= settings.graph_control_panel_button_color, 
             hover_color=settings.graph_control_panel_button_hover_color, 
             command=self.export_graph
         )
-        export_graph_button.grid(
-            row=2,
-            column=0,
-            sticky="",
+        export_graph_button.pack(
             padx=(0,0),
-            pady=(0,0)
+            pady=(5,0)
         )
 
         return graph_control_panel_frame
