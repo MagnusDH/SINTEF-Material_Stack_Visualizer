@@ -85,10 +85,10 @@ canvas_control_panel_text_size = 12
 
 #GRAPH
 graph_resolution = 75                  #resolution (100 = 100% original size)
-graph_x_axis_range_min = -250
-graph_x_axis_range_max = 250
-graph_y_axis_range_min = -250
-graph_y_axis_range_max = 250
+graph_x_axis_range_min = -100
+graph_x_axis_range_max = 100
+graph_y_axis_range_min = 0
+graph_y_axis_range_max = 50
 
 
 #GRAPH CONTROL PANEL

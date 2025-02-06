@@ -211,8 +211,14 @@ class Graph:
             # y1 = sqrt((R**2) - (x**2)) 
 
         #calculate values for y1 and y0
-        y0 = numpy.sqrt((R0**2) - (x_values**2))
-        y1 = numpy.sqrt((R**2) - (x_values**2))
+        # y0 = numpy.sqrt((R0**2) - (x_values**2))
+        # y1 = numpy.sqrt((R**2) - (x_values**2))
+
+
+        y0 = R0 - numpy.sqrt(R0**2 - x_values**2)
+        y1 = R - numpy.sqrt(R**2 - x_values**2)
+
+
 
         #Plot y1 and y0 values
         self.graph.plot(x_values, y0, color="red")

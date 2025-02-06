@@ -92,11 +92,21 @@
         -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
 
 
-    TO DO               
-        -In graph_control_panel, create a frame to contain the toolbar instead and the export graph button. This frame must be managed by pack()
-        -Remember to destroy the toolbar and the graph_control_panel_frame where it needs to be destroyed
-        -Check if the resizing of all the frames is correct -> it should be correct I think
-    
+    TO DO         
+        -R og R0 og sigma_R skal vises ved siden av hverandre i grafen
+
+        -endre stoney view navn til "stress/curve"
+
+        -Lag en ny graf med en graf
+            -I grafen skal det plottes fra x=0 og y=0 frem x=100 og y=100
+            -variablene som skal inn i ligningen
+                -Modulus til hvert material
+                -density til hvert material
+                -stress til hvert material
+                -poisson til hvert material
+                -thickness til hvert material
+
+
     QUESTIONS:
     
 
