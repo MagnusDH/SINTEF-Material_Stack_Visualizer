@@ -795,7 +795,7 @@ class Material_Adjustment_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
         #Create graph with the two given materials
-        globals.graph.draw_graph()
+        globals.graph.draw_stoney_graph()
             
     
     """Updates the thickness value in globals.materials with the entered value and updates corresponding slider-widget"""
@@ -841,7 +841,7 @@ class Material_Adjustment_Panel:
                         globals.materials[material]["Slider_id"].set(entered_value)
                 
                 #Redraw the graph
-                globals.graph.draw_graph()
+                globals.graph.draw_stoney_graph()
         
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
@@ -878,7 +878,7 @@ class Material_Adjustment_Panel:
                 globals.materials[identifier]["Entry_id"].insert(0, value)
 
                 #Redraw the graph
-                globals.graph.draw_graph()
+                globals.graph.draw_stoney_graph()
 
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()

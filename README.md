@@ -93,10 +93,6 @@
 
 
     TO DO         
-        -R og R0 og sigma_R skal vises ved siden av hverandre i grafen
-
-        -endre stoney view navn til "stress/curve"
-
         -Lag en ny graf med en graf
             -I grafen skal det plottes fra x=0 og y=0 frem x=100 og y=100
             -variablene som skal inn i ligningen

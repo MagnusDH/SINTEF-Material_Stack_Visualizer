@@ -61,13 +61,12 @@ layer_stack_canvas_padding_left = 1
 layer_stack_canvas_padding_right = 2
 layer_stack_canvas_background_color = "white"
 layer_stack_canvas_outline_color = "black"
-layer_stack_canvas_text_indent = 150                                                #WIDTH OF RECTANGLES
 layer_stack_canvas_text_color = "black"
 layer_stack_canvas_text_size = 10
 layer_stack_canvas_rectangle_outline_color = "black"
-layer_stack_canvas_indent_right_side = 100
-layer_stack_canvas_indent_left_side = 150
-layer_stack_canvas_stepped_indent_top = 0
+layer_stack_canvas_stacked_text_indent_right_side = 230             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STACKED/REALISTIC/STONEY VIEW
+layer_stack_canvas_stepped_text_indent_right_side = 100             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STEPPED VIEW 
+layer_stack_canvas_stepped_text_indent_left_side = 200              #HOW MUCH SPACE IS GIVEN TO TEXT ON THE LEFT SIDE OF THE CANVAS IN STEPPED VIEW
 
 
 #CANVAS CONTROL PANEL
@@ -83,12 +82,17 @@ canvas_control_panel_text_size = 12
 
 
 
-#GRAPH
+#GRAPHS
 graph_resolution = 75                  #resolution (100 = 100% original size)
-graph_x_axis_range_min = -100
-graph_x_axis_range_max = 100
-graph_y_axis_range_min = 0
-graph_y_axis_range_max = 50
+stoney_graph_x_axis_range_min = -100
+stoney_graph_x_axis_range_max = 100
+stoney_graph_y_axis_range_min = -10
+stoney_graph_y_axis_range_max = 50
+
+stress_graph_x_axis_range_min = -100
+stress_graph_x_axis_range_max = 100
+stress_graph_y_axis_range_min = -100
+stress_graph_y_axis_range_max = 100
 
 
 #GRAPH CONTROL PANEL

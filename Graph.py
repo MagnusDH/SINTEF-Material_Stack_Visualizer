@@ -15,7 +15,7 @@ class Graph:
         
         self.program_window = program_window
 
-        self.graph = self.create_graph_canvas()
+        self.graph_translator = self.create_graph_canvas()
 
 
     """Creates a figure/canvas where the graph can be drawn"""
@@ -49,29 +49,44 @@ class Graph:
         #Adjust the margins around the plot
         # self.graph_container.subplots_adjust(left=0.3, right, top, bottom)
 
-        #Create details in graph
-        #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left)
-        graph = self.graph_container.add_subplot(111)  
+        # #Create details in graph
+        # #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left)
+        self.stoney_graph = self.graph_container.add_subplot(211)  
+        self.stress_graph = self.graph_container.add_subplot(212)  
 
-        #Make each side of the graph equal, making the graph a square
-        graph.set_aspect('equal')
+        # self.graph_container.tight_layout()
+
+
+        # #Make each side of the graph equal, making the graph a square
+        # stoney_graph.set_aspect('equal')
         
-        #Set labels for the graph
-        # self.graph.set_title("This is a simple graph")
-        graph.set_xlabel("X [mm]", fontsize=10, labelpad=3)
-        graph.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
+        # #Set labels for the graph
+        # # self.graph.set_title("This is a simple graph")
+        # graph.set_xlabel("X [mm]", fontsize=10, labelpad=3)
+        # graph.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
         
         #Set the display limits of the x and y axises 
-        graph.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
+        self.stoney_graph.set_xlim([settings.stoney_graph_x_axis_range_min, settings.stoney_graph_x_axis_range_max])
+        self.stoney_graph.set_ylim([settings.stoney_graph_y_axis_range_min, settings.stoney_graph_y_axis_range_max])
 
-        graph.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
+        self.stress_graph.set_xlim([settings.stress_graph_x_axis_range_min, settings.stress_graph_x_axis_range_max])
+        self.stress_graph.set_ylim([settings.stress_graph_y_axis_range_min, settings.stress_graph_y_axis_range_max])
         
-        #Display the grid of the graph
-        graph.grid(True)
+        # #Display the grid of the graph
+        self.stoney_graph.grid(True)
+        self.stress_graph.grid(True)
+
         
         #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
-        graph.axhline(0, color="black", linewidth=1)
-        graph.axvline(0, color="black", linewidth=1)
+        self.stoney_graph.axhline(0, color="black", linewidth=1)
+        self.stoney_graph.axvline(0, color="black", linewidth=1)
+
+        self.stress_graph.axhline(0, color="black", linewidth=1)
+        self.stress_graph.axvline(0, color="black", linewidth=1)
+
+        #Create legends to display more info about each element in the graph
+        # stoney_graph.legend()
+        # stress_graph.legend()
 
         ########## THIS IS A WORK AROUND TO MAKE THE GRAPH RESIZE TO PROPERLY FIT THE WINDOW ##########
         self.program_window.update()
@@ -80,32 +95,31 @@ class Graph:
         self.program_window.geometry(f"{self.program_window.winfo_width()-1}x{self.program_window.winfo_height()-1}")
         ########## END OF WORK AROUND ##########
 
-        return graph
+        return self.graph_translator
 
 
-    """Draws the graph with materials that are "active" in the materials dictionary"""
-    def draw_graph(self):
-        # print("DRAW_GRAPH()")
+    """Draws the stoney graph with materials that are "active" in the materials dictionary"""
+    def draw_stoney_graph(self):
+        # print("DRAW_STONEY_GRAPH()")
 
         #Clear the graph
-        self.graph.clear()
+        self.stoney_graph.clear()
 
-        #Create details in graph
         #Set labels for the graph
         # self.graph.set_title("This is a simple graph")
-        self.graph.set_xlabel("X [mm]", fontsize=10, labelpad=3)
-        self.graph.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
+        self.stoney_graph.set_xlabel("X [mm]", fontsize=10, labelpad=3)
+        self.stoney_graph.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
         
-        #Set the display limits of the x and y axises 
-        self.graph.set_xlim([settings.graph_x_axis_range_min, settings.graph_x_axis_range_max])
-        self.graph.set_ylim([settings.graph_y_axis_range_min, settings.graph_y_axis_range_max])
+        # #Set the display limits of the x and y axises 
+        self.stoney_graph.set_xlim([settings.stoney_graph_x_axis_range_min, settings.stoney_graph_x_axis_range_max])
+        self.stoney_graph.set_ylim([settings.stoney_graph_y_axis_range_min, settings.stoney_graph_y_axis_range_max])
 
-        #Display the grid of the graph
-        self.graph.grid(True)
+        # #Display the grid of the graph
+        self.stoney_graph.grid(True)
 
-        #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
-        self.graph.axhline(0, color="black", linewidth=1)
-        self.graph.axvline(0, color="black", linewidth=1)
+        # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        self.stoney_graph.axhline(0, color="black", linewidth=1)
+        self.stoney_graph.axvline(0, color="black", linewidth=1)
 
         #Fetch the correct materials by checking which are "active"
         material_counter = 0
@@ -128,8 +142,6 @@ class Graph:
         if(chosen_material == None):
             messagebox.showerror("No filament selected", f"Please select a filament")
             return
-
-
 
 
         #Fetch necessary values
@@ -171,65 +183,106 @@ class Graph:
         #Limit value to 2 decimals
         sigma_R = round(sigma_R, 2)
 
-        #Display the sigma_R value in the graph
-        self.graph.text(
-            0.50, 1.10,                              # X and Y Coordinates of the text (relative to axes in percentages)
-            f"σR = {sigma_R}MPa",                      # Text
-            transform=self.graph.transAxes,            # Transform to make the coordinates relative to the axes
-            fontsize=12,                            # Set the font size
-            verticalalignment='top',                # Align text to the top
-            bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
-        )
-
         #Display the R0 value in the graph
-        self.graph.text(
-            0.00, 1.20,                              # X and Y Coordinates of the text (relative to axes in percentages)
+        self.stoney_graph.text(
+            -0.0, 1.15,                              # X and Y Coordinates of the text (relative to axes in percentages)
             f"R0 = {R0}",                         # Text
             color="blue",
-            transform=self.graph.transAxes,            # Transform to make the coordinates relative to the axes
-            fontsize=12,                            # Set the font size
+            transform=self.stoney_graph.transAxes,            # Transform to make the coordinates relative to the axes
+            fontsize=10,                            # Set the font size
             verticalalignment='top',                # Align text to the top
             bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
         )
 
         #Display the R value in the graph
-        self.graph.text(
-            0.00, 1.10,                              # X and Y Coordinates of the text (relative to axes in percentages)
-            f"R = {R}",                      # Text
+        self.stoney_graph.text(
+            0.3, 1.15,
+            f"R = {R}",                     
             color="red",
-            transform=self.graph.transAxes,            # Transform to make the coordinates relative to the axes
-            fontsize=12,                            # Set the font size
-            verticalalignment='top',                # Align text to the top
-            bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
+            transform=self.stoney_graph.transAxes,
+            fontsize=10,
+            verticalalignment='top',
+            bbox=dict(facecolor='white', alpha=0.5)
         )
+
+        self.stoney_graph.text(
+            0.6, 1.15,
+            f"σR = {sigma_R}MPa",
+            transform=self.stoney_graph.transAxes,
+            fontsize=10,
+            verticalalignment='top',
+            bbox=dict(facecolor='white', alpha=0.5)
+        )
+
 
         #Create a  range of X values 
         x_values = numpy.linspace(-min(R, R0), min(R, R0), 100)
 
-        #Plot the following values in the graph
-            # y0 = sqrt((R0**2) - (x**2)) 
-            # y1 = sqrt((R**2) - (x**2)) 
-
-        #calculate values for y1 and y0
-        # y0 = numpy.sqrt((R0**2) - (x_values**2))
-        # y1 = numpy.sqrt((R**2) - (x_values**2))
-
-
+        #Create values to plot in the graph
         y0 = R0 - numpy.sqrt(R0**2 - x_values**2)
         y1 = R - numpy.sqrt(R**2 - x_values**2)
 
-
-
         #Plot y1 and y0 values
-        self.graph.plot(x_values, y0, color="red")
-        self.graph.plot(x_values, y1, color="blue")
+        self.stoney_graph.plot(x_values, y0, color="red")
+        self.stoney_graph.plot(x_values, y1, color="blue")
 
-        # # #Add a legend???????
-        # # # self.graph.legend()
+        # # Redraw the canvas to display the updates (check if this draws only this graph)
+        self.stoney_graph.figure.canvas.draw()
 
-        # # Redraw the canvas to display the updates
-        # self.graph.figure.canvas.draw()
+        #Draw the created elements in the graph (check if this draws both of the graphs)
+        # self.graph_translator.draw()
 
-        #Draw the created elements in the graph
-        self.graph_translator.draw()
-    
+
+    """????????????????????????????????????????????????"""
+    def draw_stress_graph(self):
+        print("DRAW_STRESS_GRAPH()")
+
+        #Clear the graph
+        self.stress_graph.clear()
+
+        #Set labels for the graph
+        # self.stress_graph.set_title("This is a simple graph")
+        # self.stress_graph.set_xlabel("X [mm]", fontsize=10, labelpad=3)
+        # self.stress_graph.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
+        
+        # #Set the display limits of the x and y axises 
+        self.stress_graph.set_xlim([settings.stress_graph_x_axis_range_min, settings.stress_graph_x_axis_range_max])
+        self.stress_graph.set_ylim([settings.stress_graph_y_axis_range_min, settings.stress_graph_y_axis_range_max])
+
+        # #Display the grid of the graph
+        self.stress_graph.grid(True)
+
+        # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        self.stress_graph.axhline(0, color="black", linewidth=1)
+        self.stress_graph.axvline(0, color="black", linewidth=1)
+
+        #Fetch some values?
+
+        
+        #Display some text?
+        # self.stress_graph.text(
+        #     0.0, 1.15,                              # X and Y Coordinates of the text (relative to axes in percentages)
+        #     f"Some example text",                         # Text
+        #     color="blue",
+        #     transform=self.stress_graph.transAxes,            # Transform to make the coordinates relative to the axes
+        #     fontsize=10,                            # Set the font size
+        #     verticalalignment='top',                # Align text to the top
+        #     bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
+        # )
+
+        #Create some x_values values? 
+        # x_values = numpy.linspace(-min(100, 100), min(100, 100), 100)
+
+        # #Create some y values?
+        # y0 = 50 - numpy.sqrt(50**2 - x_values**2)
+        # y1 = 60 - numpy.sqrt(60**2 - x_values**2)
+
+        # #Plot some values? 
+        # self.stress_graph.plot(x_values, y0, color="red")
+        # self.stress_graph.plot(x_values, y1, color="blue")
+
+        # #Redraw the canvas to display the updates (check if this draws only this graph)
+        # self.stress_graph.figure.canvas.draw()
+
+        #Draw the created elements in the graph (check if this draws both of the graphs)
+        # self.graph_translator.draw()

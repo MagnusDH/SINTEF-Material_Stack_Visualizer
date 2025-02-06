@@ -143,7 +143,7 @@ class Layer_Stack_Canvas:
         #Prepare first rectangle drawing coordinates
         rectangle_x0 = self.visible_canvas_bbox_x0
         rectangle_y0 = self.visible_canvas_bbox_y0 + (self.layer_stack_canvas_height*0.9)
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_text_indent
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stacked_text_indent_right_side
         rectangle_y1 = None #Calculated later
         
         #Draw rectangles on canvas
@@ -221,7 +221,7 @@ class Layer_Stack_Canvas:
         #Prepare first rectangle drawing coordinates
         rectangle_x0 = self.visible_canvas_bbox_x0
         rectangle_y0 = self.visible_canvas_bbox_y1
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_text_indent
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stacked_text_indent_right_side
         rectangle_y1 = None #Calculated later
 
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
@@ -295,9 +295,9 @@ class Layer_Stack_Canvas:
         nanometers_per_pixel = sum_of_all_materials/round(self.layer_stack_canvas_height * 0.9)
 
         #Prepare first rectangle drawing coordinates (from bottom left corner)
-        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_indent_left_side
-        rectangle_y0 = round(self.layer_stack_canvas_height*0.9) + settings.layer_stack_canvas_stepped_indent_top
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_indent_right_side
+        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_stepped_text_indent_left_side
+        rectangle_y0 = round(self.layer_stack_canvas_height*0.9)
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stepped_text_indent_right_side
         rectangle_y1 = None #calculated later
         previous_rectangle_x1 = self.visible_canvas_bbox_x1
 
@@ -410,7 +410,7 @@ class Layer_Stack_Canvas:
         #Prepare first rectangle drawing coordinates
         rectangle_x0 = self.visible_canvas_bbox_x0
         rectangle_y0 = self.visible_canvas_bbox_y0 + (self.layer_stack_canvas_height*0.9)
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_text_indent
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stacked_text_indent_right_side
         rectangle_y1 = None #Calculated later
             
         #Draw rectangles on canvas
