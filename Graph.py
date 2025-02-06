@@ -170,10 +170,7 @@ class Graph:
             messagebox.showerror("Division by zero Error", f"The 'R0' value for '{chosen_material}' can not be zero")
             return
         if(1-Vs) == 0:
-            messagebox.showerror("Division by zero Error", "The calculation (1 - Vs) resulted in zero")
-            return
-        if(6* (1-Vs) *Tf) == 0:
-            messagebox.showerror("Division by zero Error", "The calculation: '6*(1-Vs) *Tf' resulted in zero")
+            messagebox.showerror("Division by zero Error", f"The 'poisson' value for '{substrate_material}' can not be 1.\nCalculation (1 - Vs) resulted in zero")
             return
         
         #Calculate the sigma_R value

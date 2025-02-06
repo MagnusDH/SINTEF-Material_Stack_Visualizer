@@ -72,13 +72,6 @@
         -From this "globals.py" file you can access the attributes and methods of each class
 
 
-    *Window/Frame hierarchy of the application:
-        #To be able to have scrolling functionality in the application I had to have this hierarchy of windows and frames:
-            1. "Main_window": The main program window hosting the entire application
-            2. "self.background_canvas": a canvas needed for horizontal scrolling
-            3. "self.main_frame": a frame that lays on top of the background_canvas. This frame is the main frame for all other widgets in the application
-
-
     #HOW TO CREATE AN EXECUTABLE FILE:
         -Navigate to the folder containing the python program
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
@@ -107,8 +100,6 @@
     
 
     POTENTIAL FIXES:
-        -Find a way to resize the scaling of the graph so that everything that is plotted inside it shows correctly?
-
         -Check the width of a materials name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
 
         -Add a "scrollable frame" in "add material" window
@@ -126,35 +117,3 @@
 
         -Make a button that gives the user the option to load an excel file
 
-
-
-
-
-
-
-
-
-
-
-    #CODE FOR FINDING CORRECT SCREEN AND WINDOW SIZES!
-    def get_window_sizes(program_window):
-        ######################################################################
-        self.program_window.update()
-        self.program_window.update_idletasks()
-        self.background_canvas.update_idletasks() 
-        self.main_frame.update_idletasks()
-
-        screen_width = self.program_window.winfo_screenwidth()
-        screen_height = self.program_window.winfo_screenheight()
-        program_window_width = self.program_window.winfo_width()
-        program_window_height = self.program_window.winfo_height()
-        background_canvas_width = self.background_canvas.winfo_width()
-        background_canvas_height = self.background_canvas.winfo_height()
-        main_frame_width = self.main_frame.winfo_width()
-        main_frame_height = self.main_frame.winfo_height()    
-
-        print("Screen Width:", screen_width, "Screen Height:", screen_height)
-        print("program_window Width:", program_window_width, "program_window height:", program_window_height)
-        print("BG canvas Width:", background_canvas_width, "BG canvas height:", background_canvas_height)
-        print("main_frame width: ", main_frame_width, "main_frame height: ", main_frame_height)
-        ########################################################################
