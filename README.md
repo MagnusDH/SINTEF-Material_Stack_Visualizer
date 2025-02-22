@@ -24,9 +24,13 @@
             -For a more modern look of the app
             -"pip install customtkinter"
         
-        5.Pillow
+        5. Pillow
             -For taking screenshot of the canvas
             -"pip install pillow"
+        
+        6. matplotlib
+            -For creating graphs
+            -"pip install matplotlib"
 
     
 
