@@ -375,12 +375,13 @@ if __name__ == "__main__":
     program_window.title(settings.program_window_title)
 
     #Define the row&column layout of the program window
-    program_window.columnconfigure(0, weight=0, minsize=450, uniform=None)  #set this column to a specific size that won't change
-    program_window.columnconfigure(1, weight=1, uniform="group1")  
+    program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
+    program_window.columnconfigure(1, weight=9, uniform="group1")  
 
-    program_window.rowconfigure(0, weight=1, uniform="group1")    
-    program_window.rowconfigure(1, weight=0, minsize=100, uniform=None)   #set this row to a specific size that won't change
+    program_window.rowconfigure(0, weight=9, uniform="group1")    
+    program_window.rowconfigure(1, weight=1, minsize=100, uniform="group1")   #set this row to a specific size that won't change
     
+
     #Set the main window background color
     program_window.configure(bg=settings.program_window_background_color)
         
