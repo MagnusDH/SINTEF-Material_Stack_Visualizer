@@ -90,20 +90,16 @@
 
 
     TO DO         
-        -Lag en ny graf med en graf
-            -I grafen skal det plottes fra x=0 og y=0 frem x=100 og y=100
-            -variablene som skal inn i ligningen
-                -Modulus til hvert material
-                -density til hvert material
-                -stress til hvert material
-                -poisson til hvert material
-                -thickness til hvert material
-
-
+        -Lag en ny view "new view"
+        -draw the layer stack with a "neutral line" in this view
+        
+        
     QUESTIONS:
     
 
     POTENTIAL FIXES:
+        -The entire program is set up as if "substrate" is the layer with the highest number. Change this so "substrate" is the lowest layer number and the rest follows
+
         -Check the width of a materials name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
 
         -Add a "scrollable frame" in "add material" window

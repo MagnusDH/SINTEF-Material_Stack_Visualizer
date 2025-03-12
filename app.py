@@ -11,6 +11,7 @@ from Material_Adjustment_Panel import Material_Adjustment_Panel
 from Layer_Stack_Canvas import Layer_Stack_Canvas
 from Material_Control_Panel import Material_Control_Panel
 from Canvas_Control_Panel import Canvas_Control_Panel
+from Equations import Equations
 
 #Main application class
 class App:
@@ -23,6 +24,9 @@ class App:
         #If excel file exists, load it into globals.materials
         if(os.path.isfile("Materials.xlsx")):
             self.load_materials_from_excel()
+
+        #??????????????????????????????????????????????????????????????
+        globals.equations = Equations()
 
         #Create a panel that controls the properties of each material
         globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window)
@@ -58,7 +62,7 @@ class App:
 
                 #Loop through the rows in excel_file
                 i = 2
-                layer = 1
+                layer = len(excel_data)
                 for column, row in excel_data.iterrows():
                     #Increment "i" to go to the next row
                     i+=1
@@ -245,7 +249,7 @@ class App:
                     #Put "info" dictionary into self.materials dictionary
                     globals.materials[row["material"]] = info
 
-                    layer += 1
+                    layer -= 1
                 
                 #Sort the materials dictionary
                 self.sort_dictionary()
@@ -301,18 +305,19 @@ class App:
         # print("SORT_DICTIONARY()")
 
         #create a layer counter variable starting at 1
-        layer_counter = 1
+        layer_counter = len(globals.materials)
         #Loop through the dictionary
         for material in globals.materials:
             #If the material is "substrate"
             if(material.lower() == "substrate"):
                 #set its layer value to be the length of materials{}
-                globals.materials[material]["Layer"] = len(globals.materials)
+                globals.materials[material]["Layer"] = 1
+
             else:
                 #set material->layer value to be layer_counter
                 globals.materials[material]["Layer"] = layer_counter
                 #increment layer_counter
-                layer_counter += 1
+                layer_counter -= 1
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))

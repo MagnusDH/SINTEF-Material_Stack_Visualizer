@@ -119,7 +119,7 @@ class Canvas_Control_Panel:
         #Switch layout option menu
         self.option_menu = customtkinter.CTkOptionMenu(
             master=canvas_control_panel_frame, 
-            values=["Stacked", "Realistic", "Stepped", "Stoney"],
+            values=["Stacked", "Realistic", "Stepped", "Stoney", "Multi"],
             text_color=settings.canvas_control_panel_text_color,
             font=(settings.text_font, settings.canvas_control_panel_text_size),
             fg_color=settings.canvas_control_panel_button_color, 
@@ -189,8 +189,8 @@ class Canvas_Control_Panel:
         match self.option_menu.get():
             case "Stacked" | "Realistic":
                 #Change the layout of the program_window to only two columns
-                self.program_window.columnconfigure(0, minsize=450, weight=0, uniform=None)
-                self.program_window.columnconfigure(1, weight=1, uniform="group1")
+                self.program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
+                self.program_window.columnconfigure(1, weight=9, uniform="group1")  
                 self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
 
                 #Set all material entry and slider values to "thickness" value, and mark all as "active"
@@ -213,9 +213,10 @@ class Canvas_Control_Panel:
 
             case "Stepped":
                 #Change the layout of the program_window to only two columns
-                self.program_window.columnconfigure(0, minsize=450, weight=0, uniform=None)
-                self.program_window.columnconfigure(1, weight=1, uniform="group1")
+                self.program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
+                self.program_window.columnconfigure(1, weight=9, uniform="group1")  
                 self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
+
 
                 #Set all material entry and slider values to "indent" value, and mark all as "active"
                 for material in globals.materials:
@@ -269,6 +270,28 @@ class Canvas_Control_Panel:
                 #Create panel that controls the actions of the graph
                 globals.graph_control_panel = Graph_Control_Panel(self.program_window)
 
+            case "Multi":
+                #Change the layout of the program_window to only two columns
+                self.program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
+                self.program_window.columnconfigure(1, weight=9, uniform="group1")  
+                self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
+
+                #Set all material entry and slider values to "thickness" value, and mark all as "active"
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    globals.materials[material]["Status"] = "active"
+
+
+                #Update the sizes for layer_stack_canvas      
+                self.program_window.update()
+                globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
+                globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
+                globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
+                globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+
+                #Draw material stack                
+                globals.layer_stack_canvas.draw_material_stack()
 
     """Exports the stack without material names as SVG file"""
     def export_stack_as_svg(self):

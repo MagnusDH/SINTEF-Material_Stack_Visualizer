@@ -17,7 +17,7 @@ class Layer_Stack_Canvas:
 
         #Draw material stack
         self.draw_material_stack()
-    
+
 
     """Returns a canvas created in the program window"""
     def create_canvas(self):
@@ -105,7 +105,8 @@ class Layer_Stack_Canvas:
                 self.draw_material_stack_stepped()
             case "Stoney":
                 self.draw_material_stack_limited()
-
+            case "Multi":
+                self.draw_material_stack_multi()
   
     """
     -Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what
@@ -147,7 +148,7 @@ class Layer_Stack_Canvas:
         rectangle_y1 = None #Calculated later
         
         #Draw rectangles on canvas
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
             #Create material rectangle only if "thickness" is > zero
             if(float(globals.materials[material]["Thickness"]) > 0):
 
@@ -228,7 +229,7 @@ class Layer_Stack_Canvas:
         canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
         
         #Draw rectangles on canvas
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
         
             #Create material rectangle only if "thickness" is > zero
             if(float(globals.materials[material]["Thickness"]) > 0):
@@ -305,7 +306,7 @@ class Layer_Stack_Canvas:
         original_rectangle_x0 = rectangle_x0
 
         #Draw rectangles on canvas
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
 
             #Draw "substrate" on the bottom 1/10 of the canvas
             if(material.lower() == "substrate"):
@@ -415,7 +416,7 @@ class Layer_Stack_Canvas:
             
         #Draw rectangles on canvas
         # for material in globals.materials:
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
             if(globals.materials[material]["Status"] == "active"):
                 #Create material rectangle only if "thickness" is > zero
                 if(float(globals.materials[material]["Thickness"]) > 0):
@@ -460,6 +461,14 @@ class Layer_Stack_Canvas:
         self.write_text_on_stack()
 
 
+    """Draws a stacked material stack but with the 'neutral axis'"""
+    def draw_material_stack_multi(self):
+        print("DRAW_MATERIAL_STACK_MULTI()")
+
+        self.draw_material_stack_stacked()
+        self.draw_neutral_axis()
+
+
     """
     -Writes name_labels for each rectangle in the material stack
         -Labels are created on the left side for "stepped" mode and on the right side for "stacked, realistic and stress" mode
@@ -485,7 +494,7 @@ class Layer_Stack_Canvas:
 
         #CREATION OF TEXT, TEXT_BBOX AND LINES
         match globals.option_menu:
-            case "Stacked" | "Realistic" | "Stoney":
+            case "Stacked" | "Realistic" | "Stoney" | "Multi":
 
                 #Loop through every material:
                 for material in globals.materials:
@@ -614,7 +623,7 @@ class Layer_Stack_Canvas:
         #ADJUSTMENT OF TEXT: LEFT AND RIGHT            
         match globals.option_menu:
             #Text overlaps with canvas right side
-            case "Stacked" | "Realistic" | "Stoney":
+            case "Stacked" | "Realistic" | "Stoney" | "Multi":
                 #Loop through all materials
                 for material in globals.materials:
                     if(globals.materials[material]["Text_bbox_id"] != None):
@@ -682,7 +691,7 @@ class Layer_Stack_Canvas:
         #ADJUSTMENT OF TEXT: UP, DOWN AND OVERLAP
         #Loop through every material from TOP layer to LOWEST layer
         previous_text_bbox_id = None
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
             if(globals.materials[material]["Text_bbox_id"] != None):
                 #Get the coordinates of the current_material_text_bbox
                 current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
@@ -710,7 +719,7 @@ class Layer_Stack_Canvas:
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
                     match globals.option_menu:
-                        case "Stacked" | "Realistic" | "Stoney":
+                        case "Stacked" | "Realistic" | "Stoney" | "Multi":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
@@ -753,7 +762,7 @@ class Layer_Stack_Canvas:
                         
                         #Move the pointer line based on stack view
                         match globals.option_menu:
-                            case "Stacked" | "Realistic" | "Stoney":
+                            case "Stacked" | "Realistic" | "Stoney" | "Multi":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                             case "Stepped":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
@@ -765,7 +774,7 @@ class Layer_Stack_Canvas:
 
         #Loop through every material from LOWEST layer to TOP layer
         previous_text_bbox_id = None
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
             if(globals.materials[material]["Text_bbox_id"] != None):
                 #Get the coordinates of the current_material_text_bbox
                 current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
@@ -793,7 +802,7 @@ class Layer_Stack_Canvas:
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
                     match globals.option_menu:
-                        case "Stacked" | "Realistic" | "Stoney":
+                        case "Stacked" | "Realistic" | "Stoney" | "Multi":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
@@ -835,7 +844,7 @@ class Layer_Stack_Canvas:
                         
                         #Move the pointer line based on stack view
                         match globals.option_menu:
-                            case "Stacked" | "Realistic" | "Stoney":
+                            case "Stacked" | "Realistic" | "Stoney" | "Multi":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                             case "Stepped":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x1, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0], rectangle_middle_y)
@@ -864,7 +873,7 @@ class Layer_Stack_Canvas:
         #CREATION OF INDENT_LINE, INDENT_TEXT, INDENT_TEXT_BBOX AND INDENT_ARROW_POINTER
         previous_material = None
         #Go through every material from LOWEST layer to TOP layer
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
             #Only create indent text if the material has a rectangle that indent can be drawn on
             if(globals.materials[material]["Rectangle_id"] != None):
                 #if there is a previous material
@@ -936,7 +945,7 @@ class Layer_Stack_Canvas:
         #ADJUSTMENT OF TEXT: LEFT AND RIGHT   
         previous_material = None
         #Go through every material
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
             if(globals.materials[material]["Rectangle_id"] != None):
                 #if current material has a indent_text_bbox
                 if(globals.materials[material]["Indent_text_bbox_id"] != None):
@@ -979,7 +988,7 @@ class Layer_Stack_Canvas:
         #ADJUSTMENT OF TEXT: UP, DOWN AND OVERLAP
         previous_material = None
         #Go through every material from LOWEST layer to TOP layer
-        for material in dict(reversed(globals.materials.items())):
+        for material in globals.materials:
             #If current material has a rectangle
             if(globals.materials[material]["Rectangle_id"] != None):
                 #if current material has a indent_text_bbox
@@ -1066,3 +1075,35 @@ class Layer_Stack_Canvas:
 
                 #Set previous_material to current material
                 previous_material = material
+
+
+    """?????????????????????????????????????????????????????????"""
+    def draw_neutral_axis(self):
+        print("DRAW_NEUTRAL_AXIS()")
+
+        #Find the total height of all materials combined
+        total_height_of_materials_nm = 0
+        for material in globals.materials:
+            total_height_of_materials_nm += float(globals.materials[material]["Thickness"])
+
+        #Find the height of the canvas is pixels
+        canvas_height_pixels = self.layer_stack_canvas_height
+
+        #Find nanometers needed to represent 1 pixel
+        nm_per_pixel = total_height_of_materials_nm / canvas_height_pixels
+
+        #Calculate Zn
+        Zn = globals.equations.calculate_Zn()
+
+        #Convert Zn to pixels
+        Zn_pixels = Zn / nm_per_pixel 
+
+        #Draw the neutral line on the canvas
+        self.layer_stack_canvas.create_line(
+            self.visible_canvas_bbox_x0, Zn_pixels,
+            self.visible_canvas_bbox_x1, Zn_pixels, 
+            fill="orange",
+            width=5,
+            dash=1
+        )
+

@@ -53,7 +53,7 @@ class Material_Adjustment_Panel:
         row_counter = 1
         #Create a different layout based on the "view"
         match globals.option_menu:
-            case "Stacked" | "Realistic":
+            case "Stacked" | "Realistic" | "Multi":
                 #If checkboxes has been made, disable it
                 for material in globals.materials:
                     if(globals.materials[material]["Checkbox_id"] != None):
@@ -106,7 +106,7 @@ class Material_Adjustment_Panel:
                 #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
                 if(len(globals.materials) > 0):
                     
-                    for material in globals.materials: 
+                    for material in dict(reversed(globals.materials.items())): 
                         #Create button to delete material
                         if(globals.materials[material]["Delete_material_button_id"] == None):
                             delete_material_button = customtkinter.CTkButton(
@@ -344,7 +344,7 @@ class Material_Adjustment_Panel:
 
                 #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
                 if(len(globals.materials) > 0):
-                    for material in globals.materials: 
+                    for material in dict(reversed(globals.materials.items())): 
                         #Create button to delete material
                         if(globals.materials[material]["Delete_material_button_id"] == None):
                             delete_material_button = customtkinter.CTkButton(
@@ -580,7 +580,7 @@ class Material_Adjustment_Panel:
 
                 #If materials dictionary is not empty, go through it and add label, entry and slider for each material in it
                 if(len(globals.materials) > 0):
-                    for material in globals.materials: 
+                    for material in dict(reversed(globals.materials.items())): 
                         #create checkbox to select or deselect material
                         if(globals.materials[material]["Checkbox_id"] == None):
                             checkbox_value = customtkinter.StringVar(value="off")
@@ -804,7 +804,7 @@ class Material_Adjustment_Panel:
     
         #Update different values in self.materials based on option menu value
         match globals.option_menu:
-            case "Stacked" | "Realistic":
+            case "Stacked" | "Realistic" | "Multi":
                 #Find material that corresponds to "entry"
                 for material in globals.materials:
                     if(globals.materials[material]["Entry_id"] == entry):
@@ -840,7 +840,7 @@ class Material_Adjustment_Panel:
                         #Update the slider corresponding to the key
                         globals.materials[material]["Slider_id"].set(entered_value)
                 
-                #Redraw the graph
+                # #Redraw the graph
                 globals.graph.draw_stoney_graph()
         
         #Redraw material stack
@@ -852,8 +852,8 @@ class Material_Adjustment_Panel:
         # print("MATERIAL_SLIDER_UPDATED()")
       
         #Update different values in self.materials based on option value
-        match globals.canvas_control_panel.option_menu.get():
-            case "Stacked"|"Realistic":
+        match globals.option_menu:
+            case "Stacked"|"Realistic" | "Multi":
                 #Update the thickness value in self.materials
                 globals.materials[identifier]["Thickness"] = value
 
@@ -953,10 +953,10 @@ class Material_Adjustment_Panel:
         above_material = None
         below_material = None
         for material in globals.materials:
-            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] + 1):
+            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] - 1):
                 below_material = material
 
-            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] - 1):
+            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] + 1):
                 above_material = material
 
         

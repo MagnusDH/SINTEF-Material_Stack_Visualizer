@@ -8,6 +8,7 @@ layer_stack_canvas = None
 canvas_control_panel = None
 graph = None
 graph_control_panel = None
+equations = None
 
 #Reference to the dropdown menu in Canvas_Control_Panel
 option_menu = "Stacked"

@@ -751,13 +751,13 @@ class Material_Control_Panel:
 
 
         #Loop through all materials and increment "layer" with 1, assuring that the new material is placed on top of the stack
-        for material in globals.materials:
-            globals.materials[material]["Layer"] += 1
+        # for material in globals.materials:
+            # globals.materials[material]["Layer"] += 1
 
         #Add values to dictionary
         info = {
             "Name": str(self.material_name_entry.get()),
-            "Layer": 1,
+            "Layer": len(globals.materials)+1,
             "Thickness": material_thickness,
             "Unit": "nm",
             "Indent [nm]": material_indent,
@@ -792,6 +792,8 @@ class Material_Control_Panel:
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+
+        globals.app.print_dictionary()
 
 
     """Creates a new 'modify_material' window where the user can change the attributes of each material"""
@@ -1039,7 +1041,7 @@ class Material_Control_Panel:
                 
         #Create entries for all materials
         row_counter = 1
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
             inner_dictionary = {}
             
             #Create entries for each category in materials
@@ -1630,7 +1632,7 @@ class Material_Control_Panel:
         #Loop through materials{} and place values in excel file
         row_counter = 2
 
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
             sheet.cell(row=row_counter, column=1, value=globals.materials[material]["Name"])
             sheet.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness"])
             sheet.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"])
@@ -1666,7 +1668,7 @@ class Material_Control_Panel:
 
         #Set the width and height of image placed in excel file
         match globals.option_menu:
-            case "Stacked" | "Realistic" | "Stepped":
+            case "Stacked" | "Realistic" | "Stepped" | "Multi":
                 canvas_screenshot.width = 750
                 canvas_screenshot.height = 350
             case "Stoney":
