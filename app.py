@@ -13,6 +13,9 @@ from Material_Control_Panel import Material_Control_Panel
 from Canvas_Control_Panel import Canvas_Control_Panel
 from Equations import Equations
 
+
+import traceback
+
 #Main application class
 class App:
     def __init__(self, program_window):
@@ -70,7 +73,7 @@ class App:
                     #If some cells are left empty, has an invalid value or headline does not exist -> apply default value
                     #MATERIAL NAME CHECK
                     if("material" in row.index):
-                        if((pandas.isna(row["material"])) or (row["material"].isspace())):
+                        if((pandas.isna(row["material"])) or str(row["material"]).isspace()):
                             row["material"] = "No name"
                     else:
                         row["material"] = "No name"
@@ -215,7 +218,7 @@ class App:
                     
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
-                        "Name": row["material"],
+                        "Name": str(row["material"]),
                         "Layer": int(layer),
                         "Thickness": float(row["thickness"]),
                         "Unit": row["unit"],
@@ -247,7 +250,7 @@ class App:
                     }
 
                     #Put "info" dictionary into self.materials dictionary
-                    globals.materials[row["material"]] = info
+                    globals.materials[str(row["material"])] = info
 
                     layer -= 1
                 
@@ -256,6 +259,7 @@ class App:
                 
             except Exception as error:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")
+                traceback.print_exc()
                 return
 
     
@@ -326,21 +330,21 @@ class App:
     """Prints the globals.materials dictionary specifily"""
     def print_dictionary(self):
         for material in globals.materials:
-            print("Dictionary key: ", material)
-            print("Name: ", globals.materials[material]["Name"])
-            print("Layer: ", globals.materials[material]["Layer"])
-            print("Thickness: ", globals.materials[material]["Thickness"])  
-            print("Unit: ", globals.materials[material]["Unit"])  
-            print("Indent [nm]: ", globals.materials[material]["Indent [nm]"])  
-            print("Color: ", globals.materials[material]["Color"])  
-            print("Status: ", globals.materials[material]["Status"])  
-            print("Modulus [GPa]: ", globals.materials[material]["Modulus [GPa]"])  
-            print("CTE [ppm/deg]: ", globals.materials[material]["CTE [ppm/deg]"])  
-            print("Density [kg/m3]: ", globals.materials[material]["Density [kg/m3]"])  
-            print("Stress_x [MPa]: ", globals.materials[material]["Stress_x [MPa]"])  
-            print("Poisson: ", globals.materials[material]["Poisson"])  
-            print("R0: ", globals.materials[material]["R0"])  
-            print("R: ", globals.materials[material]["R"])  
+            print("Dictionary key:", material, "    |", type(material))
+            print("Name:", globals.materials[material]["Name"], "   |", type(globals.materials[material]["Name"]))
+            print("Layer:", globals.materials[material]["Layer"], "     |", type(globals.materials[material]["Layer"]))
+            print("Thickness:", globals.materials[material]["Thickness"], "     |", type(globals.materials[material]["Thickness"]))  
+            print("Unit:", globals.materials[material]["Unit"], "   |", type(globals.materials[material]["Unit"]))  
+            print("Indent [nm]:", globals.materials[material]["Indent [nm]"], "     |", type(globals.materials[material]["Indent [nm]"]))  
+            print("Color:", globals.materials[material]["Color"], "     |", type(globals.materials[material]["Color"]))  
+            print("Status:", globals.materials[material]["Status"], "   |", type(globals.materials[material]["Status"]))  
+            print("Modulus [GPa]:", globals.materials[material]["Modulus [GPa]"], "     |", type(globals.materials[material]["Modulus [GPa]"]))  
+            print("CTE [ppm/deg]:", globals.materials[material]["CTE [ppm/deg]"], "     |", type(globals.materials[material]["CTE [ppm/deg]"]))  
+            print("Density [kg/m3]:", globals.materials[material]["Density [kg/m3]"], "     |", type(globals.materials[material]["Density [kg/m3]"]))  
+            print("Stress_x [MPa]:", globals.materials[material]["Stress_x [MPa]"], "   |", type(globals.materials[material]["Stress_x [MPa]"]))  
+            print("Poisson:", globals.materials[material]["Poisson"], "     |", type(globals.materials[material]["Poisson"]))  
+            print("R0:", globals.materials[material]["R0"], "   |", type(globals.materials[material]["R0"]))  
+            print("R:", globals.materials[material]["R"], "     |", type(globals.materials[material]["R"]))  
             
             print("\n")
 

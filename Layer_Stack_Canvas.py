@@ -257,7 +257,7 @@ class Layer_Stack_Canvas:
         
         #Write text on the stack
         self.write_text_on_stack()
-    
+
 
     """
     Draws a stepped rectangle stack where "indent" decide the width of each rectangle
@@ -465,7 +465,20 @@ class Layer_Stack_Canvas:
     def draw_material_stack_multi(self):
         print("DRAW_MATERIAL_STACK_MULTI()")
 
+        #TODO
+            #tegn en stacked layer stack med plass til tekst på begge sider
+            #Legg til en pil på høyre side av stacken fra bunnen til toppen
+            #Legg til et tall ved pilen som viser antall nanometer hele stacken er
+            #Legg til neutral axis linje
+            #Legg til en pil fra bunnen av stacken opp til neutral axis
+            #Legg til en tekst "Zn" ved siden av pilen 
+            
+
+
         self.draw_material_stack_stacked()
+
+
+
         self.draw_neutral_axis()
 
 
@@ -1097,6 +1110,8 @@ class Layer_Stack_Canvas:
 
         #Convert Zn to pixels
         Zn_pixels = Zn / nm_per_pixel 
+
+        print("ZN pixels: ", Zn_pixels)
 
         #Draw the neutral line on the canvas
         self.layer_stack_canvas.create_line(

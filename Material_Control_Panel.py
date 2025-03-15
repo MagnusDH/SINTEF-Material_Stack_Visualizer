@@ -788,12 +788,10 @@ class Material_Control_Panel:
         }
         
         #Put "info" dictionary into self.materials dictionary
-        globals.materials[self.material_name_entry.get()] = info
+        globals.materials[str(self.material_name_entry.get())] = info
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
-
-        globals.app.print_dictionary()
 
 
     """Creates a new 'modify_material' window where the user can change the attributes of each material"""
