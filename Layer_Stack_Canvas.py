@@ -463,22 +463,88 @@ class Layer_Stack_Canvas:
 
     """Draws a stacked material stack but with the 'neutral axis'"""
     def draw_material_stack_multi(self):
-        print("DRAW_MATERIAL_STACK_MULTI()")
+        # print("DRAW_MATERIAL_STACK_MULTI()")
 
-        #TODO
-            #tegn en stacked layer stack med plass til tekst på begge sider
-            #Legg til en pil på høyre side av stacken fra bunnen til toppen
-            #Legg til et tall ved pilen som viser antall nanometer hele stacken er
-            #Legg til neutral axis linje
-            #Legg til en pil fra bunnen av stacken opp til neutral axis
-            #Legg til en tekst "Zn" ved siden av pilen 
-            
+        #Clear all existing elements on canvas and in dictionary
+        self.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            globals.materials[material]["Rectangle_id"] = None
+            globals.materials[material]["Text_id"] = None
+            globals.materials[material]["Text_bbox_id"] = None
+            globals.materials[material]["Line_id"] = None
+            globals.materials[material]["Indent_text_id"] = None
+            globals.materials[material]["Indent_text_bbox_id"] = None
+            globals.materials[material]["Indent_line_id"] = None
+            globals.materials[material]["Indent_arrow_pointer_id"] = None
+
+        #Draw bounding box around canvas
+        self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color , tags="canvas_bounding_box_rectangle")
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in globals.materials:
+            rectangle_height = float(globals.materials[material]["Thickness"])
+            sum_of_all_materials += rectangle_height
+        
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side
+        rectangle_y0 = self.visible_canvas_bbox_y1
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side
+        rectangle_y1 = None #Calculated later
+
+        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
+        
+        #Draw rectangles on canvas
+        for material in globals.materials:
+            #Create material rectangle only if "thickness" is > zero
+            if(float(globals.materials[material]["Thickness"]) > 0):
+                #find how many percent the current rectangle's height is of the total sum of materials
+                rectangle_height = float(globals.materials[material]["Thickness"])
+                rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+                #Convert rectangle percentage to pixels
+                rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
+
+                #draw rectangle from bottom left corner of canvas to its number of pixles in height
+                rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+                created_rectangle = self.layer_stack_canvas.create_rectangle(
+                    rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
+                    fill=globals.materials[material]["Color"],
+                    outline=settings.layer_stack_canvas_rectangle_outline_color, 
+                    tags="material_rectangle"
+                )
+
+                #Add rectangle_id to its place in self.materials
+                globals.materials[material]["Rectangle_id"] = created_rectangle
+
+                #Add rectangle height to prevent overlaping
+                rectangle_y0 -= rectangle_height_pixels
+
+        #Write text on the stack
+        self.write_text_on_stack()
 
 
-        self.draw_material_stack_stacked()
+        #Create line and text to explain the total height of the stack in "nm"
+        line_x0 = self.visible_canvas_bbox_x1 - 100
+        line_y0 = self.visible_canvas_bbox_y1
+        line_x1 = self.visible_canvas_bbox_x1 - 100
+        line_y1 = self.visible_canvas_bbox_y0
 
 
+        stack_height_line = self.layer_stack_canvas.create_line(
+            (line_x0, line_y0), (line_x1, line_y1), 
+            arrow=tkinter.BOTH, 
+            fill="black",
+        ) 
 
+        stack_height_text = self.layer_stack_canvas.create_text(
+            line_x0+1, self.layer_stack_canvas_height/2,
+            anchor="w",
+            text=f"{sum_of_all_materials} nm", 
+            fill=settings.layer_stack_canvas_text_color, 
+            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+        )
+
+        #Draw neutral axis
         self.draw_neutral_axis()
 
 
@@ -1090,9 +1156,9 @@ class Layer_Stack_Canvas:
                 previous_material = material
 
 
-    """?????????????????????????????????????????????????????????"""
+    """Draws lines on the stack describing the Zn value"""
     def draw_neutral_axis(self):
-        print("DRAW_NEUTRAL_AXIS()")
+        # print("DRAW_NEUTRAL_AXIS()")
 
         #Find the total height of all materials combined
         total_height_of_materials_nm = 0
@@ -1106,19 +1172,117 @@ class Layer_Stack_Canvas:
         nm_per_pixel = total_height_of_materials_nm / canvas_height_pixels
 
         #Calculate Zn
-        Zn = globals.equations.calculate_Zn()
+        Zn = round(globals.equations.calculate_Zn(), 1)
+
 
         #Convert Zn to pixels
         Zn_pixels = Zn / nm_per_pixel 
 
-        print("ZN pixels: ", Zn_pixels)
-
         #Draw the neutral line on the canvas
         self.layer_stack_canvas.create_line(
-            self.visible_canvas_bbox_x0, Zn_pixels,
-            self.visible_canvas_bbox_x1, Zn_pixels, 
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels,
+            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zn_pixels, 
             fill="orange",
-            width=5,
+            width=7,
             dash=1
         )
 
+        #Draw line from bottom of stack up to neutral axis
+        neutral_axis_line_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
+        neutral_axis_line_y0 = self.visible_canvas_bbox_y1
+        neutral_axis_line_x1 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
+        neutral_axis_line_y1 = Zn_pixels
+
+
+        neutral_axis_line = self.layer_stack_canvas.create_line(
+            (neutral_axis_line_x0, neutral_axis_line_y0), (neutral_axis_line_x1, neutral_axis_line_y1), 
+            arrow=tkinter.BOTH, 
+            arrowshape=(10,10,5),
+            fill="black",
+            width = 3
+        ) 
+
+        #Write "neutral axis" text
+        neutral_axis_text = self.layer_stack_canvas.create_text(
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 20, Zn_pixels,
+            anchor="e",
+            text=f"Neutral axis", 
+            fill="black", 
+            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+        )
+
+        #Write "Zn" text
+        Zn_text = self.layer_stack_canvas.create_text(
+            neutral_axis_line_x0 - 5, neutral_axis_line_y0 - (neutral_axis_line_y0 - neutral_axis_line_y1)/2,
+            anchor="e",
+            text=f"Zn = {Zn}", 
+            fill="black", 
+            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+        )
+
+
+    def draw_mid_piezo(self):
+        # print("DRAW_MID_PIEZO()")
+        Zp = globals.equations.calculate_mid_piezo()
+
+
+        # #Find the total height of all materials combined
+        # total_height_of_materials_nm = 0
+        # for material in globals.materials:
+        #     total_height_of_materials_nm += float(globals.materials[material]["Thickness"])
+
+        # #Find the height of the canvas is pixels
+        # canvas_height_pixels = self.layer_stack_canvas_height
+
+        # #Find nanometers needed to represent 1 pixel
+        # nm_per_pixel = total_height_of_materials_nm / canvas_height_pixels
+
+        # #Calculate Zn
+        # Zn = round(globals.equations.calculate_Zn(), 1)
+
+
+        # #Convert Zn to pixels
+        # Zn_pixels = Zn / nm_per_pixel 
+
+        # #Draw the neutral line on the canvas
+        # self.layer_stack_canvas.create_line(
+        #     self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels,
+        #     self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zn_pixels, 
+        #     fill="orange",
+        #     width=7,
+        #     dash=1
+        # )
+
+        # #Draw line from bottom of stack up to neutral axis
+        # neutral_axis_line_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
+        # neutral_axis_line_y0 = self.visible_canvas_bbox_y1
+        # neutral_axis_line_x1 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
+        # neutral_axis_line_y1 = Zn_pixels
+
+
+        # neutral_axis_line = self.layer_stack_canvas.create_line(
+        #     (neutral_axis_line_x0, neutral_axis_line_y0), (neutral_axis_line_x1, neutral_axis_line_y1), 
+        #     arrow=tkinter.BOTH, 
+        #     arrowshape=(10,10,5),
+        #     fill="black",
+        #     width = 3
+        # ) 
+
+        # #Write "neutral axis" text
+        # neutral_axis_text = self.layer_stack_canvas.create_text(
+        #     self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 20, Zn_pixels,
+        #     anchor="e",
+        #     text=f"Neutral axis", 
+        #     fill="black", 
+        #     font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+        # )
+
+        # #Write "Zn" text
+        # Zn_text = self.layer_stack_canvas.create_text(
+        #     neutral_axis_line_x0 - 5, neutral_axis_line_y0 - (neutral_axis_line_y0 - neutral_axis_line_y1)/2,
+        #     anchor="e",
+        #     text=f"Zn = {Zn}", 
+        #     fill="black", 
+        #     font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+        # )
+        

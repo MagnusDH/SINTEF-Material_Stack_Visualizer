@@ -90,9 +90,8 @@
 
 
     TO DO         
-        -Lag en ny view "new view"
-        -draw the layer stack with a "neutral line" in this view
-        
+        -Lag en ny linje i "multi view" som går fra neutral axis og opp til midten av PZT laget
+        -Lag "export multi view as svg"        
         
     QUESTIONS:
     
