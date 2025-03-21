@@ -536,3 +536,81 @@ class Canvas_Control_Panel:
 
                 #Increment layer_counter
                 layer_counter += 1
+
+
+    def new_export_layers_as_svg(self):
+        all_items = globals.layer_stack_canvas.layer_stack_canvas.find_all()
+
+        print(len(all_items))
+
+        for item in all_items:
+            print(globals.layer_stack_canvas.layer_stack_canvas.type(item))
+
+
+
+
+        #CHATGPT
+    #     """Export a Tkinter Canvas to an SVG file."""
+    #     width = canvas.winfo_width()
+    #     height = canvas.winfo_height()
+        
+    #     svg_content = [f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">']
+
+    #     for item in canvas.find_all():
+    #         item_type = canvas.type(item)
+    #         coords = canvas.coords(item)
+    #         color = canvas.itemcget(item, "fill")
+    #         outline = canvas.itemcget(item, "outline")
+    #         stroke_width = canvas.itemcget(item, "width")
+
+    #         if item_type == "rectangle":
+    #             x1, y1, x2, y2 = coords
+    #             svg_content.append(
+    #                 f'<rect x="{x1}" y="{y1}" width="{x2-x1}" height="{y2-y1}" fill="{color}" stroke="{outline}" stroke-width="{stroke_width}" />'
+    #             )
+
+    #         elif item_type == "oval":
+    #             x1, y1, x2, y2 = coords
+    #             rx = (x2 - x1) / 2
+    #             ry = (y2 - y1) / 2
+    #             cx = x1 + rx
+    #             cy = y1 + ry
+    #             svg_content.append(
+    #                 f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" fill="{color}" stroke="{outline}" stroke-width="{stroke_width}" />'
+    #             )
+
+    #         elif item_type == "line":
+    #             points = " ".join(f"{coords[i]},{coords[i+1]}" for i in range(0, len(coords), 2))
+    #             svg_content.append(
+    #                 f'<polyline points="{points}" fill="none" stroke="{outline}" stroke-width="{stroke_width}" />'
+    #             )
+
+    #         elif item_type == "text":
+    #             x, y = coords
+    #             text = canvas.itemcget(item, "text")
+    #             font_size = canvas.itemcget(item, "font").split()[-1]  # Extract font size
+    #             svg_content.append(
+    #                 f'<text x="{x}" y="{y}" fill="{color}" font-size="{font_size}" text-anchor="middle">{text}</text>'
+    #             )
+
+    #     svg_content.append("</svg>")
+
+    #     with open(filename, "w") as f:
+    #         f.write("\n".join(svg_content))
+
+    #     print(f"SVG file saved as {filename}")
+
+    # # Example usage
+    # root = tk.Tk()
+    # canvas = tk.Canvas(root, width=400, height=300, bg="white")
+    # canvas.pack()
+
+    # # Create shapes
+    # canvas.create_rectangle(50, 50, 150, 150, fill="blue", outline="black")
+    # canvas.create_oval(200, 50, 300, 150, fill="red", outline="black")
+    # canvas.create_line(50, 200, 350, 200, width=3, fill="green")
+    # canvas.create_text(200, 250, text="Hello SVG", font=("Arial", 14), fill="black")
+
+    # # Convert to SVG
+    # canvas_to_svg(canvas, "canvas_output.svg")
+

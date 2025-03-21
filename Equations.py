@@ -11,109 +11,10 @@ class Equations:
         # pass
 
 
-    # def calculate_Zn(self):
-    #     print("CALCULATE_Zn()")
-
-    #     """
-    #     E = modulus *1e9
-    #     V = poisson
-    #     t = thickness * 1e-9
-    #     """
-
-    #     #Get the total number of materials
-    #     n = len(globals.materials)
-
-    #     #Check for "zero division errors"
-    #     for i in range(1, n+1):
-    #         v_i = self.return_poisson(i)
-    #         if(1 - (v_i**2) == 0):
-    #             messagebox.showerror("Equation error", f"the equation: '1 - (v_{i}**2))' causes a zero division error")
-    #             return 
-
-    #     #Term1:
-    #     """
-    #         E₀          (t₀)²
-    #     _________   *   _____
-    #     1 - (V₀)²        2            
-    #     """
-
-    #     #Calculate term1
-    #     E0 = self.return_modulus(1) * 1e9
-    #     v0 = self.return_poisson(1)
-    #     t0 = self.return_thickness(1) * 1e-9
-    #     term1 = (E0 / (1-v0**2))  *   ((t0**2)/2)
-
-
-
-        
-    #     #Term2 a loop going from i=1 to n=tot materials. j=1
-    #     """
-    #         Eᵢ
-    #     _________   *   tᵢ  *   (sum(tj) (from: j=1 to: i-1))     +       (tᵢ/2)) 
-    #     1 - (Vᵢ)²
-
-    #     """
-
-
-    #     #Calculate term2
-    #     term2 = 0
-
-    #     for i in range(2, n+1):
-    #         Ei = self.return_modulus(i) * 1e9
-    #         vi = self.return_poisson(i)
-    #         Ai = Ei / (1 - vi**2) 
-
-    #         ti = self.return_thickness(i) * 1e-9
-
-    #         tj = sum((self.return_thickness(j) * 1e-9) for j in range(2, i-1))    #!!!!!!!!!!!i-1 KAN være feil her
-
-    #         second_sum = tj + (ti / 2)
-
-    #         term2 += Ai * ti * second_sum
-
-
-    #     #Calculate numerator
-    #     numerator = term1 + term2
-
-
-    #     ####GOOD SO FAR######
-
-
-    #     #Denominator: a loop going from i=0 to n=tot materials
-    #     """
-    #         Eᵢ
-    #     _________   *   tᵢ 
-    #     1 - (Vᵢ)²
-
-    #     """
-
-    #     denominator = 0
-
-    #     for i in range(1, n+1):
-    #         Ei = self.return_modulus(i) * 1e9
-    #         vi = self.return_poisson(i)
-    #         ti = self.return_thickness(i) * 1e-9
-
-    #         denominator += (Ei / 1 - (vi**2)) * ti
-
-
-        
-
-
-
-    #     #Total calculation:
-    #     Zn = (numerator / denominator) * 1e9
-
-    #     print(Zn)
-
-    #     return Zn
-
-
-
-
-
-
-    """??????????? explain how it calculates the neutral axis"""
+    """
+    -Calculates the neutral axis value for the materials in the stack
+    -Returns the 'Zn' value
+    """
     def calculate_Zn(self):
         #Create a list of all the necessary variables
         E = []
@@ -124,6 +25,12 @@ class Equations:
             t.append(globals.materials[material]["Thickness"])
             nu.append(globals.materials[material]["Poisson"])
 
+        #Check for "zero division errors"
+        for i in range(len(nu)):
+            if(1 - (nu[i]**2) == 0):
+                messagebox.showerror("Equation error", f"the equation: '1 - (nu{i}**2))' causes a zero division error because the 'poisson' value of a material equals 1")
+                return 
+
         #Calculate term1
         term1 = (E[0] * (t[0] ** 2)) / (2 * (1 - (nu[0] ** 2)))
 
@@ -133,7 +40,8 @@ class Equations:
             term2 += (E[i] * t[i] / (1 - (nu[i] ** 2))) * (sum(t[:i]) + t[i] / 2)
 
         numerator = term1 + term2
-        
+
+        #Calculate denominator        
         denominator = 0
         for i in range(0, len(E)):
             denominator += E[i] / (1-nu[i]**2) * t[i] 
@@ -142,30 +50,28 @@ class Equations:
         
         return Zn
     
-    # Function to calculate mid-plane location for the nth layer (z_mid_n)
-    def calculate_mid_piezo(self):
 
-        piezo_thickness = globals.materials["PZT"]["Thickness"]
-
-
-        n = int(globals.materials["PZT"]["Layer"])
-
-        # print(n)
+    """????????????????????????????????????????"""
+    #Function to calculate mid-plane location for the nth layer (z_mid_n)
+    def calculate_mid_piezo(self, Zn):
+        # print("CALCULATE_MID_PIEZO()")
 
         #j = lag nummer 1 i en setting der lag starter på 0
 
+        piezo_thickness = 0
         #populer en liste som går fra lag 1 til og med PZT laget
-        #Regn ut Zp med disse verdiene
+        t = []
+        for material in globals.materials:
+            t.append(globals.materials[material]["Thickness"])
+            
+            if(material.lower() == "pzt"):
+                piezo_thickness = globals.materials[material]["Thickness"]
+                break
 
-        # t = []
-        # for i in range(1, n+1):
-        #     t.append(globals.materials)
+        Zp = (piezo_thickness / 2) - Zn + sum(t[:-1])
 
+        return Zp 
 
-        # return (piezo_thickness / 2) + np.sum(t[:layer-1])
-        #FASIT: ZP = 2518.5
-        return None
-        
 
     """Returns the 'Modulus [GPa]' value for a material at the given layer"""
     def return_modulus(self, layer):

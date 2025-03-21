@@ -524,28 +524,31 @@ class Layer_Stack_Canvas:
 
 
         #Create line and text to explain the total height of the stack in "nm"
-        line_x0 = self.visible_canvas_bbox_x1 - 100
+        line_x0 = self.visible_canvas_bbox_x0 + 10
         line_y0 = self.visible_canvas_bbox_y1
-        line_x1 = self.visible_canvas_bbox_x1 - 100
+        line_x1 = self.visible_canvas_bbox_x0 + 10
         line_y1 = self.visible_canvas_bbox_y0
 
 
         stack_height_line = self.layer_stack_canvas.create_line(
             (line_x0, line_y0), (line_x1, line_y1), 
             arrow=tkinter.BOTH, 
+            arrowshape=(10,10,5),
+            width=3,
             fill="black",
         ) 
 
         stack_height_text = self.layer_stack_canvas.create_text(
-            line_x0+1, self.layer_stack_canvas_height/2,
+            # line_x0+1, self.layer_stack_canvas_height/2,
+            line_x0+8, self.visible_canvas_bbox_y0 +30,
             anchor="w",
-            text=f"{sum_of_all_materials} nm", 
+            text=f"Total height:\n{sum_of_all_materials} nm", 
             fill=settings.layer_stack_canvas_text_color, 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
         )
 
         #Draw neutral axis
-        self.draw_neutral_axis()
+        self.draw_Zn_and_Zp()
 
 
     """
@@ -1157,7 +1160,7 @@ class Layer_Stack_Canvas:
 
 
     """Draws lines on the stack describing the Zn value"""
-    def draw_neutral_axis(self):
+    def draw_Zn_and_Zp(self):
         # print("DRAW_NEUTRAL_AXIS()")
 
         #Find the total height of all materials combined
@@ -1173,7 +1176,6 @@ class Layer_Stack_Canvas:
 
         #Calculate Zn
         Zn = round(globals.equations.calculate_Zn(), 1)
-
 
         #Convert Zn to pixels
         Zn_pixels = Zn / nm_per_pixel 
@@ -1221,68 +1223,43 @@ class Layer_Stack_Canvas:
         )
 
 
-    def draw_mid_piezo(self):
-        # print("DRAW_MID_PIEZO()")
-        Zp = globals.equations.calculate_mid_piezo()
+        #Calculate Zp
+        Zp = round(globals.equations.calculate_mid_piezo(Zn), 1)
+
+        #Convert Zp to pixels
+        Zp_pixels = Zp / nm_per_pixel 
+
+        #Draw the Zp line on the canvas
+        self.layer_stack_canvas.create_line(
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zp_pixels,
+            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zp_pixels, 
+            fill="blue",
+            width=7,
+            dash=1
+        )
+
+        #Draw line from Zn to Zp
+        Zp_line_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
+        Zp_line_y0 = Zn_pixels
+        Zp_line_x1 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
+        Zp_line_y1 = Zp_pixels
 
 
-        # #Find the total height of all materials combined
-        # total_height_of_materials_nm = 0
-        # for material in globals.materials:
-        #     total_height_of_materials_nm += float(globals.materials[material]["Thickness"])
-
-        # #Find the height of the canvas is pixels
-        # canvas_height_pixels = self.layer_stack_canvas_height
-
-        # #Find nanometers needed to represent 1 pixel
-        # nm_per_pixel = total_height_of_materials_nm / canvas_height_pixels
-
-        # #Calculate Zn
-        # Zn = round(globals.equations.calculate_Zn(), 1)
+        Zp_line = self.layer_stack_canvas.create_line(
+            (Zp_line_x0, Zp_line_y0), (Zp_line_x1, Zp_line_y1), 
+            arrow=tkinter.BOTH, 
+            arrowshape=(10,10,5),
+            fill="black",
+            width = 3
+        ) 
 
 
-        # #Convert Zn to pixels
-        # Zn_pixels = Zn / nm_per_pixel 
-
-        # #Draw the neutral line on the canvas
-        # self.layer_stack_canvas.create_line(
-        #     self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels,
-        #     self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zn_pixels, 
-        #     fill="orange",
-        #     width=7,
-        #     dash=1
-        # )
-
-        # #Draw line from bottom of stack up to neutral axis
-        # neutral_axis_line_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
-        # neutral_axis_line_y0 = self.visible_canvas_bbox_y1
-        # neutral_axis_line_x1 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
-        # neutral_axis_line_y1 = Zn_pixels
-
-
-        # neutral_axis_line = self.layer_stack_canvas.create_line(
-        #     (neutral_axis_line_x0, neutral_axis_line_y0), (neutral_axis_line_x1, neutral_axis_line_y1), 
-        #     arrow=tkinter.BOTH, 
-        #     arrowshape=(10,10,5),
-        #     fill="black",
-        #     width = 3
-        # ) 
-
-        # #Write "neutral axis" text
-        # neutral_axis_text = self.layer_stack_canvas.create_text(
-        #     self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 20, Zn_pixels,
-        #     anchor="e",
-        #     text=f"Neutral axis", 
-        #     fill="black", 
-        #     font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-        # )
-
-        # #Write "Zn" text
-        # Zn_text = self.layer_stack_canvas.create_text(
-        #     neutral_axis_line_x0 - 5, neutral_axis_line_y0 - (neutral_axis_line_y0 - neutral_axis_line_y1)/2,
-        #     anchor="e",
-        #     text=f"Zn = {Zn}", 
-        #     fill="black", 
-        #     font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-        # )
+        #Write "Zp" text
+        Zp_text = self.layer_stack_canvas.create_text(
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 20, Zn_pixels - (Zn_pixels - Zp_pixels)/2,
+            anchor="e",
+            text=f"Zp = {Zp}", 
+            fill="black", 
+            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+        )
         

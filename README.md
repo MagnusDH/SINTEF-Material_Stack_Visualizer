@@ -90,9 +90,9 @@
 
 
     TO DO         
-        -Lag en ny linje i "multi view" som går fra neutral axis og opp til midten av PZT laget
         -Lag "export multi view as svg"        
-        
+        -Bare sett "substrate" som nederste lag hvis den finnes. Hvis ikke tegnes alle stacks som vanlig
+
     QUESTIONS:
     
 
