@@ -16,11 +16,11 @@ class Material_Adjustment_Panel:
         self.material_adjustment_panel_frame = self.create_material_adjustment_panel()
 
         
-    """
-    -Creates a Frame and material_adjustment_panel in the given window if it does not already exist.
-    -If the Frame exists, then the material_adjustment_panel is simply updated corresponding with the materials in globals.materials{} 
-    """
     def create_material_adjustment_panel(self):
+        """
+        -Creates a Frame and material_adjustment_panel in the given window if it does not already exist\n
+        -If the Frame exists, then the material_adjustment_panel is simply updated corresponding with the materials in globals.materials{} 
+        """
         # print("CREATE_MATERIAL_ADJUSTMENT_PANEL()")
 
         #if material_adjustment_frame has NOT been created before, create it
@@ -772,12 +772,12 @@ class Material_Adjustment_Panel:
         return self.material_adjustment_panel_frame
 
 
-    """
-    -Sets all materials to 'inactive' except for 'substrate'
-    -Deselects checkboxes for all materials except 'substrate'
-    -Draws the material_stack and graph
-    """
     def checkbox_event(self, chosen_material):
+        """
+        -Sets all materials to 'inactive' except for 'substrate'\n
+        -Deselects checkboxes for all materials except 'substrate'\n
+        -Draws the material_stack and graph
+        """
         # print("CHECKBOX_EVENT()")
 
         #Turn off all materials->checkboxes and mark them as "inactive"
@@ -798,8 +798,8 @@ class Material_Adjustment_Panel:
         globals.graph.draw_stoney_graph()
             
     
-    """Updates the thickness value in globals.materials with the entered value and updates corresponding slider-widget"""
     def material_entry_updated(self, entry):
+        """Updates the thickness value in globals.materials with the entered value and updates corresponding slider-widget"""
         # print("MATERIAL_ENTRY_UPDATED()")
     
         #Update different values in self.materials based on option menu value
@@ -847,8 +847,9 @@ class Material_Adjustment_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    """Updates the thickness value in self.materials with the slider value and updates corresponding entry-widget"""
     def material_slider_updated(self, value, identifier): 
+        """Updates the thickness value in self.materials with the slider value and updates corresponding entry-widget"""
+      
         # print("MATERIAL_SLIDER_UPDATED()")
       
         #Update different values in self.materials based on option value
@@ -884,14 +885,14 @@ class Material_Adjustment_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    """
-    -Deletes the material given material from globals.materials{}
-    -Deletes all widgets related to the given material
-    -Sorts globals.materials{} making the "layer" values correct
-    -Updates the widgets in material_adjustment_panel_frame
-    -Redraws the material_stack
-    """
     def delete_material(self, material):
+        """
+        -Deletes the material given material from globals.materials{}\n
+        -Deletes all widgets related to the given material\n
+        -Sorts globals.materials{} making the "layer" values correct\n
+        -Updates the widgets in material_adjustment_panel_frame\n
+        -Redraws the material_stack
+        """
         # print("DELETE_MATERIAL()")
 
         #Destroy all widgets related to material
@@ -940,13 +941,13 @@ class Material_Adjustment_Panel:
         globals.layer_stack_canvas.draw_material_stack()
         
 
-    """
-    -Switches the places between chosen material and the material that is over or under it
-    -Organizes globals.materials{} so that the order of "layers" is consistent
-    -Redraws the material stack
-    -Updates the widgets in material_adjustment_panel_frame
-    """
     def move_material(self, chosen_material, up_or_down):
+        """
+        -Switches the places between chosen material and the material that is over or under it\n
+        -Organizes globals.materials{} so that the order of "layers" is consistent\n
+        -Redraws the material stack\n
+        -Updates the widgets in material_adjustment_panel_frame
+        """
         # print("MOVE_MATERIAL()")
 
         #Find the needed material names

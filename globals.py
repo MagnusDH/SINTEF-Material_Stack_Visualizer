@@ -11,7 +11,6 @@ graph_control_panel = None
 equations = None
 
 #Reference to the dropdown menu in Canvas_Control_Panel
-# option_menu = "Stacked"
 option_menu = "Multi"
 
 #Reference to current sizes of program window

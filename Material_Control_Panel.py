@@ -20,8 +20,8 @@ class Material_Control_Panel:
         self.material_control_panel_frame = self.create_material_control_panel()
 
 
-    """Creates a control panel frame to control actions of materials"""
     def create_material_control_panel(self):
+        """Creates a control panel frame to control actions of materials"""
         # print("CREATE_MATERIAL_CONTROL_PANEL")
 
         #if material_control_frame has NOT been created before, create it
@@ -123,8 +123,9 @@ class Material_Control_Panel:
         return material_control_panel_frame
     
 
-    """Creates a popup window with value entries to add a new material in 'materials{}'"""
     def add_material(self):
+        """Creates a popup window with value entries to add a new material in 'materials{}'"""
+        # print("ADD_MATERIAL()")
         #Open up new program window
         self.add_material_window = tkinter.Toplevel(self.program_window)
         self.add_material_window.title("Add material")
@@ -546,12 +547,12 @@ class Material_Control_Panel:
         self.add_material_window.bind('<Return>', lambda event: self.validate_add_material_inputs())
 
 
-    """
-    Checks if the entry values from "add_material_window" are valid.
-    Calls 'add_material_to_dictionary' if inputs are valid
-    """
     def validate_add_material_inputs(self):
-        # print("VALIDATE_INPUTS()")
+        """
+        -Checks if the entry values from "add_material_window" are valid\n
+        -Calls 'add_material_to_dictionary' if inputs are valid\n
+        """
+        #print("VALIDATE_INPUTS()")
 
         #Check if no entries are empty
         if(not self.material_name_entry.get()):
@@ -664,8 +665,9 @@ class Material_Control_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    """Opens up a color palette window and inserts the color code to 'material_color_entry' in 'add_material_window'"""
     def choose_color_for_add_material(self):
+        """Opens up a color palette window and inserts the color code to 'material_color_entry' in 'add_material_window'"""
+        # print("CHOOSE_COLOR_FOR_ADD_MATERIAL()")
         color_code = colorchooser.askcolor(title="Choose a color")[1]
         if(color_code):
             #Delete existing string in entry and insert new one
@@ -675,8 +677,9 @@ class Material_Control_Panel:
         self.add_material_window.lift()
 
     
-    """Returns True if given color string is a valid color. Return False if invalid"""
     def is_valid_color(self, color):
+        """Returns True if given color string is a valid color. Return False if invalid"""
+        # print("IS_VALID_COLOR()")
         #Check if color is accepted by tkinter
         try:
             self.program_window.winfo_rgb(color)
@@ -690,8 +693,8 @@ class Material_Control_Panel:
                 return False
     
 
-    """Adds values from entries to 'materials' dictionary"""
     def add_material_to_dictionary(self):
+        """Adds values from entries to 'materials' dictionary"""
         # print("ADD_MATERIAL_TO_DICTIONARY")
 
         #If some entries in "add_material_window" are not set, the values is automaticly set to zero
@@ -794,8 +797,8 @@ class Material_Control_Panel:
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
 
 
-    """Creates a new 'modify_material' window where the user can change the attributes of each material"""
     def modify_material(self):
+        """Creates a new 'modify_material' window where the user can change the attributes of each material"""
         # print("MODIFY_MATERIAL()")
 
         #Create dictionary to contain ALL entries
@@ -1312,8 +1315,9 @@ class Material_Control_Panel:
         )
     
 
-    """Opens a color palette window and inserts the color code to 'self.color_finder_entry' in modify_materials_window'"""
     def choose_color_for_modify_material(self):
+        """Opens a color palette window and inserts the color code to 'self.color_finder_entry' in modify_materials_window'"""
+        # print("CHOOSE_COLOR_FOR_MODIFY_MATERIAL()")
         color_code = colorchooser.askcolor(title="Choose a color")[1]
 
         if(color_code):
@@ -1324,8 +1328,9 @@ class Material_Control_Panel:
         self.modify_material_window.lift()
 
 
-    """Goes through all entries in self.entry_dictionary and validates all entries"""
     def validate_modify_material_inputs(self):
+        """Goes through all entries in self.entry_dictionary and validates all entries"""
+        # print("VALIDATE_MODIFY_MATERIAL_INPUTS()")
         for material in self.entry_dictionary:
             #NAME
             try:
@@ -1463,11 +1468,11 @@ class Material_Control_Panel:
         self.confirm_material_changes()
 
     
-    """
-    -Makes changes to the materials{} dictionary based on the values given by user
-    -If the user modified the 'material_name' then the main key in materials{} is changed to the new name 
-    """
     def confirm_material_changes(self):
+        """
+        -Makes changes to the materials{} dictionary based on the values given by user\n
+        -If the user modified the 'material_name' then the main key in materials{} is changed to the new name 
+        """
         # print("CONFIRM_MATERIAL_CHANGES()")
 
         for material in self.entry_dictionary:
@@ -1503,8 +1508,9 @@ class Material_Control_Panel:
         self.modify_material_window.destroy()
 
 
-    """Repopulates globals.materials dictionary with values from the excel file and recreates the material_adjustment_panel """
     def reset_values(self):
+        """Repopulates globals.materials dictionary with values from the excel file and recreates the material_adjustment_panel """
+       
         # print("RESET_VALUES")
 
         excel_file = "Materials.xlsx"
@@ -1543,8 +1549,8 @@ class Material_Control_Panel:
             messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")
 
 
-    """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
     def export_to_excel(self):
+        """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
         # print("EXPORT_TO_EXCEL()")
 
         #Create an filename and a workbook to contain data

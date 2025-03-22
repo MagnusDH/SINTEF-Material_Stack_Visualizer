@@ -104,6 +104,7 @@
     TO DO         
         -fiks "export_layers_as_svg"
         -Bare sett "substrate" som nederste lag hvis den finnes. Hvis ikke tegnes alle stacks som vanlig
+        -finn en annen måte å finne keys på istedetfor key = None
 
     QUESTIONS:
     

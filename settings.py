@@ -66,6 +66,9 @@ layer_stack_canvas_text_size = 10
 layer_stack_canvas_rectangle_outline_color = "black"
 #STACKED
 layer_stack_canvas_stacked_text_indent_right_side = 230             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STACKED/REALISTIC/STONEY VIEW
+#REALISTIC
+layer_stack_canvas_realistic_offset_left_side = 0
+layer_stack_canvas_realistic_offset_right_side = 230
 #STEPPED
 layer_stack_canvas_stepped_text_indent_right_side = 100             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STEPPED VIEW 
 layer_stack_canvas_stepped_text_indent_left_side = 200              #HOW MUCH SPACE IS GIVEN TO TEXT ON THE LEFT SIDE OF THE CANVAS IN STEPPED VIEW
@@ -84,7 +87,6 @@ canvas_control_panel_button_color = "#0080ca"
 canvas_control_panel_button_hover_color = "#009ffb"
 canvas_control_panel_text_color = "white"
 canvas_control_panel_text_size = 12
-
 
 
 #GRAPHS

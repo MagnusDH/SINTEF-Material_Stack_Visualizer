@@ -1,8 +1,6 @@
 import globals
 from tkinter import messagebox
 
-import numpy as np
-
 
 #This class handles all equations
 class Equations:
@@ -11,11 +9,12 @@ class Equations:
         # pass
 
 
-    """
-    -Calculates the neutral axis value for the materials in the stack
-    -Returns the 'Zn' value
-    """
     def calculate_Zn(self):
+        """
+        -Calculates the neutral axis value for the materials in the stack\n
+        -Returns the 'Zn' value
+        """
+        # print("CALCULATE_ZN()")
         #Create a list of all the necessary variables
         E = []
         t = []
@@ -73,8 +72,8 @@ class Equations:
         return Zp 
 
 
-    """Returns the 'Modulus [GPa]' value for a material at the given layer"""
-    def return_modulus(self, layer):
+    def return_modulus(self, layer:int):
+        """Returns the 'Modulus [GPa]' value for a material at the given layer"""
         # print("RETURN_MODULUS()")
 
         #loop through all materials and find the material with the correct layer number
@@ -85,9 +84,9 @@ class Equations:
         return None
 
 
-    """Returns the 'Thickness' value for a material at the given layer"""
-    def return_thickness(self, layer):
-        # print("RETURN_THICKNESS()")
+    def return_thickness(self, layer:int):
+        """Returns the 'Thickness' value for a material at the given layer"""
+        #print("RETURN_THICKNESS()")
 
         #loop through all materials and find the material with the correct layer number
         for material in globals.materials:
@@ -97,8 +96,8 @@ class Equations:
         return None
 
 
-    """Returns the 'Poisson' value for a material at the given layer"""
-    def return_poisson(self, layer):
+    def return_poisson(self, layer:int):
+        """Returns the 'Poisson' value for a material at the given layer"""
         # print("RETURN_V()")
 
         #loop through all materials and find the material with the correct layer number

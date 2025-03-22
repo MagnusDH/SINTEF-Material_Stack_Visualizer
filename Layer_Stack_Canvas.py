@@ -19,8 +19,8 @@ class Layer_Stack_Canvas:
         self.draw_material_stack()
 
 
-    """Returns a canvas created in the program window"""
     def create_canvas(self):
+        """Returns a canvas created in the program window"""
         #print("CREATE_CANVAS()")
         
         layer_stack_canvas = tkinter.Canvas(
@@ -66,20 +66,21 @@ class Layer_Stack_Canvas:
         return layer_stack_canvas
 
 
-    """Remembers the initial mouse click-position on the canvas"""
     def click_on_canvas(self, event, canvas):
+        """Remembers the initial mouse click-position on the canvas"""
         #print("CLICK_ON_CANVAS()")
         canvas.scan_mark(event.x, event.y)
     
 
-    """Moves the position of the canvas"""
     def canvas_drag(self, event, canvas):
+        """Moves the position of the canvas"""
         #print("CANVAS_DRAG()")
         canvas.scan_dragto(event.x, event.y, gain=1)
 
 
-    """Scales all the elements on the canvas up or down"""
     def canvas_zoom(self, event, canvas):
+        """Scales all the elements on the canvas up or down"""
+        
         # print("CANVAS_ZOOM()")
         zoom_factor = 1.05
 
@@ -94,8 +95,8 @@ class Layer_Stack_Canvas:
             self.current_scale /= zoom_factor
 
 
-    """Draws the material stack based on the value in the option box"""
     def draw_material_stack(self, *event):
+        """Draws the material stack based on the value in the option box"""
         # print("DRAW MATERIAL STACK()")
 
         #Sort the materials dictionary after the "layer" value
@@ -105,20 +106,31 @@ class Layer_Stack_Canvas:
         match globals.option_menu:
             case "Stacked":
                 self.draw_material_stack_stacked()
+                self.write_text_on_stack()
+
             case "Realistic":
                 self.draw_material_stack_realistic()
+                self.write_text_on_stack()
+
             case "Stepped":
                 self.draw_material_stack_stepped()
+                self.write_text_on_stack()
+                self.write_indent_on_stepped_stack()
+
             case "Stoney":
                 self.draw_material_stack_limited()
-            case "Multi":
-                self.draw_material_stack_multi()
-  
+                self.write_text_on_stack()
 
-    """
-    -Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what
-    """
+            case "Multi":
+                # self.draw_material_stack_multi()
+                self.draw_material_stack_realistic()
+                self.write_text_on_stack()
+                self.draw_Zn_and_Zp()
+
+  
     def draw_material_stack_stacked(self):       
+        """Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what"""
+        
         # print("DRAW_MATERIAL_STACK_STACKED()")
         #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
@@ -199,14 +211,10 @@ class Layer_Stack_Canvas:
                     #Add rectangle height to prevent overlaping
                     rectangle_y0 -= rectangle_height_pixels
 
-        #Write text on the stack
-        self.write_text_on_stack()
-
-              
-    """
-    -Draws a realistic version of the rectangle stack
-    """
+        
     def draw_material_stack_realistic(self):
+        """Draws a realistic version of the rectangle stack"""
+
         # print("DRAW_MATERIAL_STACK_REALISTIC()")
             
         #Clear all existing elements on canvas and in dictionary
@@ -234,11 +242,26 @@ class Layer_Stack_Canvas:
             rectangle_height = float(globals.materials[material]["Thickness"])
             sum_of_all_materials += rectangle_height
         
-        #Prepare first rectangle drawing coordinates
-        rectangle_x0 = self.visible_canvas_bbox_x0
-        rectangle_y0 = self.visible_canvas_bbox_y1
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stacked_text_indent_right_side
-        rectangle_y1 = None #Calculated later
+        #Prepare first rectangle coordinates based on view
+        match globals.option_menu:
+            case "Realistic":
+                rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_realistic_offset_left_side
+                rectangle_y0 = self.visible_canvas_bbox_y1
+                rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_realistic_offset_right_side
+                rectangle_y1 = None #Calculated later
+            
+            case "Multi":
+                rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side
+                rectangle_y0 = self.visible_canvas_bbox_y1
+                rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side
+                rectangle_y1 = None #Calculated later
+
+            case _:
+                rectangle_x0 = self.visible_canvas_bbox_x0
+                rectangle_y0 = self.visible_canvas_bbox_y1
+                rectangle_x1 = self.visible_canvas_bbox_x1
+                rectangle_y1 = None #Calculated later
+
 
         #Materials (except "substrate") will be drawn on 9/10 of the canvas
         canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
@@ -268,17 +291,13 @@ class Layer_Stack_Canvas:
 
                 #Add rectangle height to prevent overlaping
                 rectangle_y0 -= rectangle_height_pixels
-            
         
-        #Write text on the stack
-        self.write_text_on_stack()
 
-
-    """
-    Draws a stepped rectangle stack where "indent" decide the width of each rectangle
-    -Each material is drawn from the bottom left corner
-    """
     def draw_material_stack_stepped(self):
+        """
+        -Draws a stepped rectangle stack where "indent" decide the width of each rectangle\n
+        -Each material is drawn from the bottom left corner
+        """
         # print("DRAW_MATERIAL_STACK_STEPPED()")
 
         #Clear all existing elements on canvas and in dictionary
@@ -378,15 +397,10 @@ class Layer_Stack_Canvas:
 
                 #Add rectangle height to prevent overlaping
                 rectangle_y0 -= rectangle_height_pixels
-
-
-        #Write text and indent on stack
-        self.write_text_on_stack()
-        self.write_indent_on_stepped_stack()
     
 
-    """Draws a material stack only with materials that are "active" in globals.materials"""
     def draw_material_stack_limited(self):
+        """Draws a material stack only with materials that are "active" in globals.materials"""
         # print("DRAW_MATERIAL_STACK_LIMITED")
 
         num_active_materials = 0
@@ -480,108 +494,15 @@ class Layer_Stack_Canvas:
                         #Add rectangle height to prevent overlaping
                         rectangle_y0 -= rectangle_height_pixels
 
-        #Write text on the stack
-        self.write_text_on_stack()
 
-
-    """Draws a stacked material stack but with the 'neutral axis'"""
-    def draw_material_stack_multi(self):
-        # print("DRAW_MATERIAL_STACK_MULTI()")
-
-        #Clear all existing elements on canvas and in dictionary
-        self.layer_stack_canvas.delete("all")
-        for material in globals.materials:
-            globals.materials[material]["Rectangle_id"] = None
-            globals.materials[material]["Text_id"] = None
-            globals.materials[material]["Text_bbox_id"] = None
-            globals.materials[material]["Line_id"] = None
-            globals.materials[material]["Indent_text_id"] = None
-            globals.materials[material]["Indent_text_bbox_id"] = None
-            globals.materials[material]["Indent_line_id"] = None
-            globals.materials[material]["Indent_arrow_pointer_id"] = None
-
-        #Draw bounding box around canvas
-        self.layer_stack_canvas.create_rectangle(
-            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
-            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
-            outline=settings.layer_stack_canvas_outline_color , 
-            tags="layer_stack_canvas_bounding_rectangle")
-
-        #Find the total height of all materials combined
-        sum_of_all_materials = 0
-        for material in globals.materials:
-            rectangle_height = float(globals.materials[material]["Thickness"])
-            sum_of_all_materials += rectangle_height
-        
-        #Prepare first rectangle drawing coordinates
-        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side
-        rectangle_y0 = self.visible_canvas_bbox_y1
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side
-        rectangle_y1 = None #Calculated later
-
-        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
-        
-        #Draw rectangles on canvas
-        for material in globals.materials:
-            #Create material rectangle only if "thickness" is > zero
-            if(float(globals.materials[material]["Thickness"]) > 0):
-                #find how many percent the current rectangle's height is of the total sum of materials
-                rectangle_height = float(globals.materials[material]["Thickness"])
-                rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
-                #Convert rectangle percentage to pixels
-                rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
-
-                #draw rectangle from bottom left corner of canvas to its number of pixles in height
-                rectangle_y1 = rectangle_y0 - rectangle_height_pixels
-                created_rectangle = self.layer_stack_canvas.create_rectangle(
-                    rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                    fill=globals.materials[material]["Color"],
-                    outline=settings.layer_stack_canvas_rectangle_outline_color, 
-                    tags="material_rectangle"
-                )
-
-                #Add rectangle_id to its place in self.materials
-                globals.materials[material]["Rectangle_id"] = created_rectangle
-
-                #Add rectangle height to prevent overlaping
-                rectangle_y0 -= rectangle_height_pixels
-
-        #Write text on the stack
-        self.write_text_on_stack()
-
-
-        #Create line from bottom of stack to top of stack (total height line)
-        self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y1), 
-            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y0), 
-            arrow=tkinter.BOTH, 
-            arrowshape=(10,10,5),
-            width=3,
-            fill="black",
-            tags="arrow_line_both"
-        ) 
-
-        #Create text to explain the total height of the stack in "nm"
-        self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y0 + 30,
-            text=f"Total height:\n{sum_of_all_materials} nm", 
-            fill=settings.layer_stack_canvas_text_color, 
-            font=(settings.text_font, settings.layer_stack_canvas_text_size),
-            tags="text" 
-        )
-
-        #Draw neutral axis
-        self.draw_Zn_and_Zp()
-
-
-    """
-    -Writes name_labels for each rectangle in the material stack
-        -Labels are created on the left side for "stepped" mode and on the right side for "stacked, realistic and stress" mode
-    -Creates all texts either inside or outside of the rectangle box based on the rectangles height
-    -Loops through all text_boxes, checks for overlaps and potentially moves them around to prevent overlap 
-    """
     def write_text_on_stack(self):
-        # print("WRITE_TEXT_ON_STACK()")
+        """
+        -Writes name_labels for each rectangle in the material stack
+            -Labels are created on the left side for "stepped" mode and on the right side for "stacked, realistic and stoney" mode
+        -Creates all texts either inside or outside of the rectangle box based on the rectangles height
+        -Loops through all text_boxes, checks for overlaps and potentially moves them around to prevent overlap 
+        """
+        #print("WRITE_TEXT_ON_STACK()")
 
         #Delete all texts from canvas and dictionary
         for material in globals.materials:
@@ -958,8 +879,9 @@ class Layer_Stack_Canvas:
                 previous_text_bbox_id = globals.materials[material]["Text_bbox_id"]
 
         
-    """Writes the indent ranges on the stepped material stack"""
     def write_indent_on_stepped_stack(self):
+        """Writes the indent ranges on the stepped material stack"""
+        
         # print("WRITE_INDENT_ON_STEPPED_STACK()")
 
         #Delete all indent texts and arrows from canvas and dictionary
@@ -1184,9 +1106,40 @@ class Layer_Stack_Canvas:
                 previous_material = material
 
 
-    """Draws lines on the stack describing the Zn value"""
     def draw_Zn_and_Zp(self):
-        # print("DRAW_NEUTRAL_AXIS()")
+        """
+        -Draws Zn and Zp lines on the stack\n
+        -Draws neutral axis on the stack\n
+        -Draws total height line on the stack
+        """
+        # print("DRAW_ZN_AND_ZP()")
+
+        #Create line from bottom of stack to top of stack (total height line)
+        self.layer_stack_canvas.create_line(
+            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y1), 
+            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y0), 
+            arrow=tkinter.BOTH, 
+            arrowshape=(10,10,5),
+            width=3,
+            fill="black",
+            tags="arrow_line_both"
+        ) 
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in globals.materials:
+            rectangle_height = float(globals.materials[material]["Thickness"])
+            sum_of_all_materials += rectangle_height
+
+        #Create text to explain the total height of the stack in "nm"
+        self.layer_stack_canvas.create_text(
+            self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y0 + 30,
+            text=f"Total height:\n{sum_of_all_materials} nm", 
+            fill=settings.layer_stack_canvas_text_color, 
+            font=(settings.text_font, settings.layer_stack_canvas_text_size),
+            tags="text" 
+        )
+
 
         #Find the total height of all materials combined
         total_height_of_materials_nm = 0
@@ -1210,7 +1163,7 @@ class Layer_Stack_Canvas:
             self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels,
             self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zn_pixels, 
             fill="orange",
-            width=7,
+            width=4,
             dash=1,
             tags="dotted_line"
         )
@@ -1257,7 +1210,7 @@ class Layer_Stack_Canvas:
             self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zp_pixels,
             self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zp_pixels, 
             fill="blue",
-            width=7,
+            width=4,
             dash=1,
             tags="dotted_line"
         )

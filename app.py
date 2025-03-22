@@ -12,8 +12,6 @@ from Layer_Stack_Canvas import Layer_Stack_Canvas
 from Material_Control_Panel import Material_Control_Panel
 from Canvas_Control_Panel import Canvas_Control_Panel
 from Equations import Equations
-
-
 import traceback
 
 #Main application class
@@ -44,8 +42,8 @@ class App:
         globals.canvas_control_panel = Canvas_Control_Panel(self.program_window)
 
     
-    """Reads the given excel-file and populates the self.materials dictionary with info about each material"""
     def load_materials_from_excel(self):
+        """Reads the excel-file in the folder and populates the self.materials dictionary with info about each material"""
         #print("LOAD_MATERIALS_FROM_EXCEL()")
 
         excel_file = "Materials.xlsx"
@@ -263,11 +261,11 @@ class App:
                 return
 
     
-    """
-    -Converts a string to float no matter if it is written with "," or "." 
-    -Returns the float is sucessfull, returns False if not sucessfull
-    """
-    def convert_decimal_string_to_float(self, string_number):
+    def convert_decimal_string_to_float(self, string_number:str):
+        """
+        -Converts a string to float no matter if it is written with "," or "."\n 
+        -Returns the float is sucessfull, returns False if not sucessfull
+        """
         # print("CINVERT_DECIMAL_STRING_TO_FLOAT()")
         try:
             new_float = float(string_number)
@@ -286,8 +284,9 @@ class App:
                 return False
 
 
-    """Returns True if given color string is a valid color. Return False if invalid"""
-    def is_valid_color(self, color):
+    def is_valid_color(self, color:str):
+        """Returns True if given color string is a valid color. Return False if invalid"""
+        # print("IS_VALID_COLOR()")
         #Check if color is accepted by tkinter
         try:
             self.program_window.winfo_rgb(color)
@@ -301,11 +300,11 @@ class App:
                 return False
 
 
-    """
-    -Gives each material a layer value based on the order they are in globals.materials{}. (The top layer is assigned as "layer 1")
-    -Places 'substrate' as the lowest layer
-    """
     def sort_dictionary(self):
+        """
+        -Gives each material a layer value based on the order they are in globals.materials{}. (The top layer is assigned as "layer 1")\n
+        -Places 'substrate' as the lowest layer
+        """
         # print("SORT_DICTIONARY()")
 
         #create a layer counter variable starting at 1
@@ -325,10 +324,12 @@ class App:
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+       
 
-
-    """Prints the globals.materials dictionary specifily"""
     def print_dictionary(self):
+        """Prints the globals.materials dictionary specifily"""
+        #print("PRINT_DICTIONARY()")
+
         for material in globals.materials:
             print("Dictionary key:", material, "    |", type(material))
             print("Name:", globals.materials[material]["Name"], "   |", type(globals.materials[material]["Name"]))
@@ -349,9 +350,10 @@ class App:
             print("\n")
 
 
-    """Scales the layer_stack_canvas correctly based on the size of the program_window"""
     def program_window_resized(self, event): 
-
+        """Scales the layer_stack_canvas correctly based on the size of the program_window"""
+        # print("PROGRAM_WINDOW_RESIZED()")
+        
         #Check if the program window is actually resized
         if((self.program_window.winfo_width() != globals.current_program_window_width) or (self.program_window.winfo_height() != globals.current_program_window_height)):
             # print("PROGRAM_WINDOW_RESIZED()")

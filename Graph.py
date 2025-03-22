@@ -8,7 +8,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #For creating gr
 import numpy
 
 
-
 class Graph:
     def __init__(self, program_window):
         # print("CLASS: GRAPH_INIT()")
@@ -18,8 +17,8 @@ class Graph:
         self.graph_translator = self.create_graph_canvas()
 
 
-    """Creates a figure/canvas where the graph can be drawn"""
     def create_graph_canvas(self):
+        """Creates a figure/canvas where the graph can be drawn"""
         # print("CREATE_GRAPH()")
 
         #Create an overall container for any created plots/graphs
@@ -98,8 +97,9 @@ class Graph:
         return self.graph_translator
 
 
-    """Draws the stoney graph with materials that are "active" in the materials dictionary"""
     def draw_stoney_graph(self):
+        """Draws the stoney graph with materials that are "active" in the materials dictionary"""
+        
         # print("DRAW_STONEY_GRAPH()")
 
         #Clear the graph

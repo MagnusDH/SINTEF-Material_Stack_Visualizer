@@ -18,8 +18,9 @@ class Canvas_Control_Panel:
         self.canvas_control_panel_frame = self.create_canvas_control_panel()
 
 
-    """Creates a frame with widgets that performs actions on the layer_stack_canvas"""
     def create_canvas_control_panel(self):
+        """Creates a frame with widgets that performs actions on the layer_stack_canvas"""
+
         # print("CREATE_CANVAS_CONTROL_PANEL()")
 
         #if canvas_control_panel_frame has NOT been created before, create it
@@ -141,8 +142,9 @@ class Canvas_Control_Panel:
         return canvas_control_panel_frame
 
     
-    """Resets the scale of items and the start drawing point on the canvas back to their original scale and place"""
     def reset_canvas(self):
+        """Resets the scale of items and the start drawing point on the canvas back to their original scale and place"""
+        
         # print("CLASS CANVAS_CONTROL_PANEL -> RESET_CANVAS()")
 
         #Find the original scale of the canvas
@@ -162,12 +164,12 @@ class Canvas_Control_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    """
-    -Changes the Label explaining what is being modified by sliders and entries in the Material_Adjustment_Panel
-    -Changes the values for sliders and entries
-    -Changes the layout of the program window for each 'view' mode
-    """
     def switch_layout(self, *event):
+        """
+        -Changes the Label explaining what is being modified by sliders and entries in the Material_Adjustment_Panel\n
+        -Changes the values for sliders and entries\n
+        -Changes the layout of the program window for each 'view' mode\n
+        """
         # print("SWITCH_LAYOUT()")
 
         #Switch the option in globals.option_menu
@@ -295,8 +297,9 @@ class Canvas_Control_Panel:
                 globals.layer_stack_canvas.draw_material_stack()
 
 
-    """Calls different export functions based on the 'export_option_menu' value"""
     def choose_stack_export(self, *event):
+        """Calls different export functions based on the 'export_option_menu' value"""
+       
         # print("CHOOSE_STACK_EXPORT()")
 
         #Call functions based on export_option_menu value
@@ -311,8 +314,9 @@ class Canvas_Control_Panel:
                 self.export_layers_as_svg()
 
 
-    """Exports only the material rectangles from the stack as SVG file"""
     def export_material_stack_as_svg(self):
+        """Exports only the material rectangles from the stack as SVG file"""
+
         # print("EXPORT_MATERIAL_STACK_AS_SVG")
         all_items = globals.layer_stack_canvas.layer_stack_canvas.find_all()
 
@@ -370,7 +374,12 @@ class Canvas_Control_Panel:
    
     """Exports every layer of the stack with text and arrows as SVG-file"""
     def export_layers_as_svg(self):
+        
         # print("EXPORT_LAYERS_AS_SVG()")
+
+        #TODO
+            #line from text bbox to small rectangle is not exported to svg
+
 
         #Create folders and filenames
         main_folder = "exports"
@@ -557,8 +566,8 @@ class Canvas_Control_Panel:
                 layer_counter += 1
         
 
-    """Exports all details on the stack as SVG-file"""
     def export_full_stack_as_svg(self):
+        """Exports all details on the stack as SVG-file"""
         # print("EXPORT_FULL_STACK_AS_SVG")
         all_items = globals.layer_stack_canvas.layer_stack_canvas.find_all()
 
@@ -628,7 +637,6 @@ class Canvas_Control_Panel:
                             f.write(svg_rectangle_element)
                         
                         case "line":
-                            print("a regular line")
                             #Create line SVG-element
                             line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(item)
                             line_color = globals.layer_stack_canvas.layer_stack_canvas.itemcget(item, "fill")
@@ -662,8 +670,6 @@ class Canvas_Control_Panel:
                             f.write(svg_line_element)
 
                         case "arrow_line_both":
-                            print("arrow_line_both")
-
                             line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(item)
                             line_color = globals.layer_stack_canvas.layer_stack_canvas.itemcget(item, "fill")
                             svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(line_coords[0], line_coords[1], line_coords[2], line_coords[3], line_color)

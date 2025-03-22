@@ -9,7 +9,6 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk #For creating
 matplotlib.use('TkAgg')
 
 
-
 class Graph_Control_Panel:
     def __init__(self, program_window):
         # print("CLASS: GRAPH_CONTROL_PANEL_INIT()")
@@ -18,9 +17,11 @@ class Graph_Control_Panel:
 
         self.graph_control_panel = self.create_graph_control_panel()
     
-    """Creates a frame with widgets that performs actions on the graph"""
+
     def create_graph_control_panel(self):
-        # print("CREATE_GRAPH_CONTROL_PANEL()")
+        """Creates a frame with widgets that performs actions on the graph"""
+        
+        #print("CREATE_GRAPH_CONTROL_PANEL()")
         
         #Create Frame for the graph and place it within given window
         if not hasattr(self, 'graph_control_panel_frame'):
@@ -72,9 +73,10 @@ class Graph_Control_Panel:
         return graph_control_panel_frame
 
 
-    """Exports the graph as svg file"""
     def export_graph(self):
-        # print("EXPORT_GRAPH()")
+        """Exports the graph as svg file"""
+        
+        #print("EXPORT_GRAPH()")
 
         #CREATE FOLDER HIERARCHY
         main_folder = "exports"
