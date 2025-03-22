@@ -80,9 +80,6 @@
         -"arrow_line_both"                                          == a line with two arrowheads pointing in both directions
 
 
-            
-
-
     *Class Organization and inheritance
         -The main class "App" creates ONE instance of each class which is stored in the "globals.py" file
         -From this "globals.py" file you can access the attributes and methods of each class
@@ -93,20 +90,19 @@
         -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
 
+
+
+
     BUGS:
         -If the program window is in full-screen mode and you then change the view to "stoney", the graph does not render itself properly. 
         
         -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
-        -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
-
-
     TO DO         
-        -fiks "export_layers_as_svg"
         -Bare sett "substrate" som nederste lag hvis den finnes. Hvis ikke tegnes alle stacks som vanlig
-        -finn en annen måte å finne keys på istedetfor key = None
 
     QUESTIONS:
+        -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
     
 
     POTENTIAL FIXES:

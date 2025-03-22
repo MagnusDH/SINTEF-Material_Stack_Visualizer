@@ -456,40 +456,46 @@ class Canvas_Control_Panel:
                     #Create SVG-element for arrow line pointing from box to rectangle
                     if(globals.materials[material]["Line_id"] != None):
                         #Line must be drawn from the right side of stack to left side of text
-                        if(globals.option_menu == "Stacked" or globals.option_menu == "Realistic" or globals.option_menu == "Stoney"):
-                            line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
-                            #Construct an SVG <line> element for arrows
-                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                            svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
+                        match globals.option_menu:
+                            case "Stacked" | "Realistic" | "Stoney" | "Multi":
+                                line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
+                                #Construct an SVG <line> element for arrows
+                                bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                                svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x0, line_coords[1], line_coords[2]+7, line_coords[3], settings.text_color)
 
-                            #Add arrowhead on the left side of the line
-                            svg_line_element += (
-                            '<defs>\n'
-                            '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="180">\n'
-                            '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
-                            '    </marker>\n'
-                            '</defs>\n'
-                            )
-
-                        #Line must be drawn from the left side of stack to right side of text
-                        elif(globals.option_menu == "Stepped"):
-                            line_x0, line_y0, line_x1, line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
-                            #Construct an SVG <line> element for arrows
-                            bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
-                            svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x1, line_y0, line_x1-7, line_y1, settings.text_color)
-                            
-                            #Add arrowhead on right side of the line
-                            svg_line_element += (
+                                #Add arrowhead on the left side of the line
+                                svg_line_element += (
                                 '<defs>\n'
-                                '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="180">\n'
-                                '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
+                                '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="180">\n'
+                                '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
                                 '    </marker>\n'
                                 '</defs>\n'
-                            )
+                                )
 
-                            #Write the SVG representation of the arrow to the file
-                            f.write(svg_line_element)
-                            previously_created_elements.append(svg_line_element)
+                                #Write the SVG representation of the arrow to the file
+                                f.write(svg_line_element)
+                                previously_created_elements.append(svg_line_element)
+
+
+                            #Line must be drawn from the left side of stack to right side of text
+                            case "Stepped":
+                                line_x0, line_y0, line_x1, line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
+                                #Construct an SVG <line> element for arrows
+                                bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
+                                svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-end="url(#arrow-end)" />\n'.format(bbox_x1, line_y0, line_x1-7, line_y1, settings.text_color)
+                                
+                                #Add arrowhead on right side of the line
+                                svg_line_element += (
+                                    '<defs>\n'
+                                    '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="180">\n'
+                                    '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
+                                    '    </marker>\n'
+                                    '</defs>\n'
+                                )
+
+                                #Write the SVG representation of the arrow to the file
+                                f.write(svg_line_element)
+                                previously_created_elements.append(svg_line_element)
 
 
                     #Create SVG-element for indent_text
