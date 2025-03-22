@@ -68,6 +68,18 @@
                 {"Indent_line_id": tkinter(value)},
                 {"Indent_arrow_pointer_id": tkinter(value)}
         }
+    
+    *Layer Stack Canvas ITEM TAGS
+        -"layer_stack_canvas_bounding_rectangle"                    == a rectangle representing the canvas boundaries 
+        -"material_rectangle"                                       == a rectangle representing the material in the stack
+        -"text"                                                     == a plain text
+        -"text_bbox"                                                == a rectangle representing the bounding box around a text
+        -"line"                                                     == a plain line
+        -"dotted_line"                                              == a dotted line
+        -"arrow_line"                                               == a line with an arrowhead at the end of the line
+        -"arrow_line_both"                                          == a line with two arrowheads pointing in both directions
+
+
             
 
 
@@ -90,7 +102,7 @@
 
 
     TO DO         
-        -Lag "export multi view as svg"        
+        -fiks "export_layers_as_svg"
         -Bare sett "substrate" som nederste lag hvis den finnes. Hvis ikke tegnes alle stacks som vanlig
 
     QUESTIONS:

@@ -50,7 +50,13 @@ class Layer_Stack_Canvas:
         #This is just a usefull function to find the bbox of the canvas: self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
 
         #Draw bounding box around canvas
-        layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color, width=1)
+        layer_stack_canvas.create_rectangle(
+            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
+            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
+            outline=settings.layer_stack_canvas_outline_color, 
+            width=1,
+            tags="layer_stack_canvas_bounding_rectangle"
+        )
 
         #Listen to mouse: buttonpress, motion and zoom events
         layer_stack_canvas.bind("<ButtonPress-1>", lambda event, canvas=layer_stack_canvas: self.click_on_canvas(event, layer_stack_canvas))
@@ -108,6 +114,7 @@ class Layer_Stack_Canvas:
             case "Multi":
                 self.draw_material_stack_multi()
   
+
     """
     -Draws the rectangle stack where "substrate" is 1/10 of the canvas no matter what
     """
@@ -127,7 +134,11 @@ class Layer_Stack_Canvas:
 
 
         #Draw bounding box around canvas
-        self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color, tags="canvas_bounding_box_rectangle")
+        self.layer_stack_canvas.create_rectangle(
+            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
+            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
+            outline=settings.layer_stack_canvas_outline_color, 
+            tags="layer_stack_canvas_bounding_rectangle")
 
         #Find the total height of all materials combined
         sum_of_all_materials = 0
@@ -211,7 +222,11 @@ class Layer_Stack_Canvas:
             globals.materials[material]["Indent_arrow_pointer_id"] = None
 
         #Draw bounding box around canvas
-        self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color , tags="canvas_bounding_box_rectangle")
+        self.layer_stack_canvas.create_rectangle(
+            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
+            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
+            outline=settings.layer_stack_canvas_outline_color , 
+            tags="layer_stack_canvas_bounding_rectangle")
 
         #Find the total height of all materials combined
         sum_of_all_materials = 0
@@ -279,7 +294,11 @@ class Layer_Stack_Canvas:
             globals.materials[material]["Indent_arrow_pointer_id"] = None
 
         #Draw bounding box around canvas
-        self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color, tags="canvas_bounding_box_rectangle")
+        self.layer_stack_canvas.create_rectangle(
+            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0,
+            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
+            outline=settings.layer_stack_canvas_outline_color, 
+            tags="layer_stack_canvas_bounding_rectangle")
         
         #Find the total height of all materials combined and the thickest material
         sum_of_all_materials = 0
@@ -389,7 +408,11 @@ class Layer_Stack_Canvas:
 
 
         #Draw bounding box around canvas
-        self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color, tags="canvas_bounding_box_rectangle")
+        self.layer_stack_canvas.create_rectangle(
+            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
+            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
+            outline=settings.layer_stack_canvas_outline_color, 
+            tags="layer_stack_canvas_bounding_rectangle")
 
         #If the are no active materials to draw, then end the function
         if(num_active_materials <= 0):
@@ -478,7 +501,11 @@ class Layer_Stack_Canvas:
             globals.materials[material]["Indent_arrow_pointer_id"] = None
 
         #Draw bounding box around canvas
-        self.layer_stack_canvas.create_rectangle(self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, outline=settings.layer_stack_canvas_outline_color , tags="canvas_bounding_box_rectangle")
+        self.layer_stack_canvas.create_rectangle(
+            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
+            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
+            outline=settings.layer_stack_canvas_outline_color , 
+            tags="layer_stack_canvas_bounding_rectangle")
 
         #Find the total height of all materials combined
         sum_of_all_materials = 0
@@ -523,28 +550,24 @@ class Layer_Stack_Canvas:
         self.write_text_on_stack()
 
 
-        #Create line and text to explain the total height of the stack in "nm"
-        line_x0 = self.visible_canvas_bbox_x0 + 10
-        line_y0 = self.visible_canvas_bbox_y1
-        line_x1 = self.visible_canvas_bbox_x0 + 10
-        line_y1 = self.visible_canvas_bbox_y0
-
-
-        stack_height_line = self.layer_stack_canvas.create_line(
-            (line_x0, line_y0), (line_x1, line_y1), 
+        #Create line from bottom of stack to top of stack (total height line)
+        self.layer_stack_canvas.create_line(
+            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y1), 
+            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y0), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             width=3,
             fill="black",
+            tags="arrow_line_both"
         ) 
 
-        stack_height_text = self.layer_stack_canvas.create_text(
-            # line_x0+1, self.layer_stack_canvas_height/2,
-            line_x0+8, self.visible_canvas_bbox_y0 +30,
-            anchor="w",
+        #Create text to explain the total height of the stack in "nm"
+        self.layer_stack_canvas.create_text(
+            self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y0 + 30,
             text=f"Total height:\n{sum_of_all_materials} nm", 
             fill=settings.layer_stack_canvas_text_color, 
-            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+            font=(settings.text_font, settings.layer_stack_canvas_text_size),
+            tags="text" 
         )
 
         #Draw neutral axis
@@ -599,7 +622,7 @@ class Layer_Stack_Canvas:
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
                                 anchor="center", 
-                                tags="Material_label"
+                                tags="text"
                             )
 
                             #Add text element to dictionary
@@ -612,7 +635,7 @@ class Layer_Stack_Canvas:
                                 text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-                                tags="Material_label"
+                                tags="text"
                             )
                             created_text_bbox = self.layer_stack_canvas.create_rectangle(
                                 self.layer_stack_canvas.bbox(created_text), 
@@ -661,7 +684,7 @@ class Layer_Stack_Canvas:
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
                                 anchor="center", 
-                                tags="Material_label"
+                                tags="text"
                             )
 
                             #Add text element to dictionary
@@ -674,7 +697,7 @@ class Layer_Stack_Canvas:
                                 text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-                                tags="Material_label"
+                                tags="text"
                             )
                             created_text_bbox = self.layer_stack_canvas.create_rectangle(
                                 self.layer_stack_canvas.bbox(created_text), 
@@ -978,7 +1001,8 @@ class Layer_Stack_Canvas:
                         indent_line = self.layer_stack_canvas.create_line(
                             current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, previous_rectangle_y0-3,                       
                             fill=settings.text_color,
-                            arrow=tkinter.BOTH
+                            arrow=tkinter.BOTH,
+                            tags="arrow_line_both"
                         )
 
                         #Create a text on the side of the current material->rectangle with indent number
@@ -986,14 +1010,15 @@ class Layer_Stack_Canvas:
                             (self.visible_canvas_bbox_x1), (current_rectangle_y1 - 10),
                             text=f"{float(globals.materials[material]['Indent [nm]'])} {globals.materials[material]['Unit']}",
                             fill=settings.text_color, 
-                            font=(settings.text_font, settings.text_size)
+                            font=(settings.text_font, settings.text_size),
+                            tags="text"
                         )
 
                         #Create a bbox around the indent_text
                         indent_text_bbox = self.layer_stack_canvas.create_rectangle(
                             self.layer_stack_canvas.bbox(indent_text), 
                             outline=settings.text_color, 
-                            tags="indent_bbox"
+                            tags="text_bbox"
                         )
 
                         #Find the coordinates of the indent_text_bbox
@@ -1010,7 +1035,7 @@ class Layer_Stack_Canvas:
                             previous_rectangle_x1+3, previous_rectangle_y0-2,
                             arrow=tkinter.LAST, 
                             fill=settings.text_color,
-                            tags="indent_pointer_arrow"
+                            tags="arrow_line"
                         )
 
                         #add all elements to materials{} dictionary
@@ -1180,46 +1205,44 @@ class Layer_Stack_Canvas:
         #Convert Zn to pixels
         Zn_pixels = Zn / nm_per_pixel 
 
-        #Draw the neutral line on the canvas
+        #Draw the neutral axis line on the canvas
         self.layer_stack_canvas.create_line(
             self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels,
             self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zn_pixels, 
             fill="orange",
             width=7,
-            dash=1
+            dash=1,
+            tags="dotted_line"
         )
 
         #Draw line from bottom of stack up to neutral axis
-        neutral_axis_line_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
-        neutral_axis_line_y0 = self.visible_canvas_bbox_y1
-        neutral_axis_line_x1 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
-        neutral_axis_line_y1 = Zn_pixels
-
-
-        neutral_axis_line = self.layer_stack_canvas.create_line(
-            (neutral_axis_line_x0, neutral_axis_line_y0), (neutral_axis_line_x1, neutral_axis_line_y1), 
+        self.layer_stack_canvas.create_line(
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1),
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             fill="black",
-            width = 3
+            width = 3,
+            tags="arrow_line_both"
         ) 
 
         #Write "neutral axis" text
-        neutral_axis_text = self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 20, Zn_pixels,
-            anchor="e",
+        self.layer_stack_canvas.create_text(
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, Zn_pixels,
             text=f"Neutral axis", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+            tags="text"
         )
 
         #Write "Zn" text
-        Zn_text = self.layer_stack_canvas.create_text(
-            neutral_axis_line_x0 - 5, neutral_axis_line_y0 - (neutral_axis_line_y0 - neutral_axis_line_y1)/2,
-            anchor="e",
+        self.layer_stack_canvas.create_text(
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80,
+            self.visible_canvas_bbox_y1 - (self.visible_canvas_bbox_y1 - Zn_pixels)/2,
             text=f"Zn = {Zn}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+            tags="text"
         )
 
 
@@ -1235,31 +1258,27 @@ class Layer_Stack_Canvas:
             self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zp_pixels, 
             fill="blue",
             width=7,
-            dash=1
+            dash=1,
+            tags="dotted_line"
         )
 
         #Draw line from Zn to Zp
-        Zp_line_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
-        Zp_line_y0 = Zn_pixels
-        Zp_line_x1 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10
-        Zp_line_y1 = Zp_pixels
-
-
-        Zp_line = self.layer_stack_canvas.create_line(
-            (Zp_line_x0, Zp_line_y0), (Zp_line_x1, Zp_line_y1), 
+        self.layer_stack_canvas.create_line(
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels),
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zp_pixels), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             fill="black",
-            width = 3
+            width = 3,
+            tags="arrow_line_both"
         ) 
 
 
         #Write "Zp" text
-        Zp_text = self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 20, Zn_pixels - (Zn_pixels - Zp_pixels)/2,
-            anchor="e",
+        self.layer_stack_canvas.create_text(
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80, Zn_pixels - (Zn_pixels - Zp_pixels)/2,
             text=f"Zp = {Zp}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+            tags="text"
         )
-        

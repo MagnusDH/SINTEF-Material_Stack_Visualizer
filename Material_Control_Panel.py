@@ -1542,6 +1542,7 @@ class Material_Control_Panel:
         else:
             messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")
 
+
     """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
     def export_to_excel(self):
         # print("EXPORT_TO_EXCEL()")

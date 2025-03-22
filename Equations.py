@@ -84,6 +84,7 @@ class Equations:
         
         return None
 
+
     """Returns the 'Thickness' value for a material at the given layer"""
     def return_thickness(self, layer):
         # print("RETURN_THICKNESS()")
@@ -94,6 +95,7 @@ class Equations:
                 return globals.materials[material]["Thickness"]
         
         return None
+
 
     """Returns the 'Poisson' value for a material at the given layer"""
     def return_poisson(self, layer):
