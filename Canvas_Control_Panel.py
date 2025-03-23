@@ -53,7 +53,6 @@ class Canvas_Control_Panel:
             text="Export", 
             text_color=settings.canvas_control_panel_text_color,
             font=(settings.text_font, settings.canvas_control_panel_text_size, "bold"),
-            # font=(settings.text_font, 15, "bold")
             bg_color=settings.canvas_control_panel_background_color
         )
         export_option_menu_label.grid(
@@ -68,11 +67,15 @@ class Canvas_Control_Panel:
         self.export_option_menu = customtkinter.CTkOptionMenu(
             master=canvas_control_panel_frame, 
             values=["Full stack", "Material rectangles", "Layers"],
-            text_color=settings.canvas_control_panel_text_color,
             font=(settings.text_font, settings.canvas_control_panel_text_size),
-            fg_color=settings.canvas_control_panel_button_color, 
             bg_color=settings.canvas_control_panel_background_color,
-            button_hover_color=settings.canvas_control_panel_button_hover_color,
+            fg_color=settings.canvas_control_panel_dropdown_color,
+            text_color=settings.canvas_control_panel_dropdown_text_color,
+            button_color=settings.canvas_control_panel_dropdown_button_color,
+            button_hover_color=settings.canvas_control_panel_dropdown_button_hover_color,
+            dropdown_text_color=settings.canvas_control_panel_dropdown_text_color,
+            dropdown_fg_color=settings.canvas_control_panel_dropdown_background_color,
+            dropdown_hover_color=settings.canvas_control_panel_dropdown_hover_color,
             command=self.choose_stack_export
         )
         self.export_option_menu.grid(
@@ -87,10 +90,10 @@ class Canvas_Control_Panel:
         reset_canvas_button = customtkinter.CTkButton(
             master=canvas_control_panel_frame, 
             text="Reset canvas", 
-            text_color=settings.canvas_control_panel_text_color,
             font=(settings.text_font, settings.canvas_control_panel_text_size),
             fg_color=settings.canvas_control_panel_button_color, 
             hover_color=settings.canvas_control_panel_button_hover_color, 
+            text_color=settings.canvas_control_panel_button_text_color,
             command=self.reset_canvas
         )
         reset_canvas_button.grid(
@@ -122,11 +125,15 @@ class Canvas_Control_Panel:
         self.option_menu = customtkinter.CTkOptionMenu(
             master=canvas_control_panel_frame, 
             values=["Stacked", "Realistic", "Stepped", "Stoney", "Multi"],
-            text_color=settings.canvas_control_panel_text_color,
             font=(settings.text_font, settings.canvas_control_panel_text_size),
-            fg_color=settings.canvas_control_panel_button_color, 
             bg_color=settings.canvas_control_panel_background_color,
-            button_hover_color=settings.canvas_control_panel_button_hover_color,
+            fg_color=settings.canvas_control_panel_dropdown_color,
+            text_color=settings.canvas_control_panel_dropdown_text_color,
+            button_color=settings.canvas_control_panel_dropdown_button_color,
+            button_hover_color=settings.canvas_control_panel_dropdown_button_hover_color,
+            dropdown_text_color=settings.canvas_control_panel_dropdown_text_color,
+            dropdown_fg_color=settings.canvas_control_panel_dropdown_background_color,
+            dropdown_hover_color=settings.canvas_control_panel_dropdown_hover_color,
             command=self.switch_layout
         )
         self.option_menu.grid(

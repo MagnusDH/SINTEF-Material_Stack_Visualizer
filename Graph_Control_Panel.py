@@ -48,12 +48,11 @@ class Graph_Control_Panel:
         )
         toolbar.config(
             background=settings.graph_control_panel_background_color,
-        
         )
 
         for widget in toolbar.winfo_children():
             widget.config(
-                background="white"#settings.graph_control_panel_button_color, 
+                background=settings.graph_control_panel_button_color, 
             )
 
 
@@ -63,6 +62,7 @@ class Graph_Control_Panel:
             text="Export graph",
             fg_color= settings.graph_control_panel_button_color, 
             hover_color=settings.graph_control_panel_button_hover_color, 
+            text_color=settings.graph_control_panel_button_text_color,
             command=self.export_graph
         )
         export_graph_button.pack(

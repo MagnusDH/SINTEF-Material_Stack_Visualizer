@@ -1146,22 +1146,25 @@ class Layer_Stack_Canvas:
         for material in globals.materials:
             total_height_of_materials_nm += float(globals.materials[material]["Thickness"])
 
+
+        #Find nanometers needed to represent 1 pixel
+        nm_per_pixel = total_height_of_materials_nm/self.layer_stack_canvas_height
+
+
         #Find the height of the canvas is pixels
         canvas_height_pixels = self.layer_stack_canvas_height
 
-        #Find nanometers needed to represent 1 pixel
-        nm_per_pixel = total_height_of_materials_nm / canvas_height_pixels
 
         #Calculate Zn
         Zn = round(globals.equations.calculate_Zn(), 1)
 
         #Convert Zn to pixels
-        Zn_pixels = Zn / nm_per_pixel 
+        Zn_pixels = Zn / nm_per_pixel
 
         #Draw the neutral axis line on the canvas
         self.layer_stack_canvas.create_line(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels,
-            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zn_pixels, 
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zn_pixels,
+            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y1 - Zn_pixels, 
             fill="orange",
             width=4,
             dash=1,
@@ -1171,7 +1174,7 @@ class Layer_Stack_Canvas:
         #Draw line from bottom of stack up to neutral axis
         self.layer_stack_canvas.create_line(
             (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1),
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels), 
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zn_pixels), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             fill="black",
@@ -1181,7 +1184,7 @@ class Layer_Stack_Canvas:
 
         #Write "neutral axis" text
         self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, Zn_pixels,
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y1 - Zn_pixels,
             text=f"Neutral axis", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
@@ -1191,7 +1194,7 @@ class Layer_Stack_Canvas:
         #Write "Zn" text
         self.layer_stack_canvas.create_text(
             self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80,
-            self.visible_canvas_bbox_y1 - (self.visible_canvas_bbox_y1 - Zn_pixels)/2,
+            self.visible_canvas_bbox_y1 - (self.visible_canvas_bbox_y1 - (self.visible_canvas_bbox_y1 - Zn_pixels))/2,
             text=f"Zn = {Zn}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
@@ -1207,8 +1210,8 @@ class Layer_Stack_Canvas:
 
         #Draw the Zp line on the canvas
         self.layer_stack_canvas.create_line(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zp_pixels,
-            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, Zp_pixels, 
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zp_pixels,
+            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y1 - Zp_pixels, 
             fill="blue",
             width=4,
             dash=1,
@@ -1217,8 +1220,8 @@ class Layer_Stack_Canvas:
 
         #Draw line from Zn to Zp
         self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zn_pixels),
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, Zp_pixels), 
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zn_pixels),
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zp_pixels), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             fill="black",
@@ -1229,7 +1232,7 @@ class Layer_Stack_Canvas:
 
         #Write "Zp" text
         self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80, Zn_pixels - (Zn_pixels - Zp_pixels)/2,
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80, self.visible_canvas_bbox_y1 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
             text=f"Zp = {Zp}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 

@@ -28,8 +28,6 @@ class Material_Adjustment_Panel:
             #Create Frame from the control panel and place it within given window
             self.material_adjustment_panel_frame = customtkinter.CTkScrollableFrame(
                 master=self.program_window,
-                # width=,
-                # height=,
                 fg_color=settings.material_adjustment_panel_background_color
             )
             self.material_adjustment_panel_frame.grid(
@@ -66,8 +64,8 @@ class Material_Adjustment_Panel:
                         master=self.material_adjustment_panel_frame, 
                         text="Material", 
                         fg_color=settings.material_adjustment_panel_background_color,
-                        text_color="#55b6ff",
-                        font=(settings.text_font, 18, "bold")
+                        text_color=settings.material_adjustment_panel_text_color,
+                        font=(settings.text_font, settings.material_adjustment_panel_label_size, "bold")
                     )
                     self.material_headline.grid(
                         row=0,
@@ -87,8 +85,8 @@ class Material_Adjustment_Panel:
                         master=self.material_adjustment_panel_frame, 
                         text="Thickness [nm]", 
                         fg_color=settings.material_adjustment_panel_background_color,
-                        text_color="#55b6ff",
-                        font=(settings.text_font, 15, "bold")
+                        text_color=settings.material_adjustment_panel_text_color,
+                        font=(settings.text_font, settings.material_adjustment_panel_label_size, "bold")
                     )                    
                     self.slider_label.grid(
                         row=0,
@@ -115,9 +113,9 @@ class Material_Adjustment_Panel:
                                 height=1,
                                 text="✕", #✕ 🗑
                                 font=(settings.text_font, 10, "bold"),
-                                fg_color="#820000",
-                                hover_color="#da0000", #settings.material_control_panel_button_hover_color, 
-                                text_color=settings.material_control_panel_text_color,
+                                fg_color=settings.material_adjustment_panel_delete_button_color,
+                                hover_color=settings.material_adjustment_panel_delete_button_hover_color, 
+                                text_color="black",#settings.material_control_panel_text_color,
                                 command=lambda identifier=material: self.delete_material(identifier)
                             )
                             delete_material_button.grid(
@@ -169,9 +167,9 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame,
                                 textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
-                                text_color="black",
-                                # width=,
-                                # height=,
+                                border_color=settings.material_adjustment_panel_entry_border_color,
+                                border_width=0.4,
+                                text_color=settings.material_adjustment_panel_entry_text_color,
                                 justify="center"
                             )
                             entry.grid(
@@ -198,12 +196,11 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Slider_id"] == None):
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
-                                # width=,
-                                # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
-                                progress_color=globals.materials[material]["Color"],
-                                fg_color=settings.material_adjustment_panel_slider_color,
+                                fg_color=settings.material_adjustment_panel_slider_background_color,
+                                button_color=settings.material_adjustment_panel_slider_button_color,
+                                progress_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_slider_progress_color,
                                 button_hover_color=settings.material_adjustment_panel_slider_hover_color,
                                 command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
                             )
@@ -238,9 +235,9 @@ class Material_Adjustment_Panel:
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
-                                    fg_color="white",
-                                    hover_color="#009ffb", 
-                                    text_color="blue",
+                                    fg_color=settings.material_adjustment_panel_button_color,
+                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_down_button.grid(
@@ -267,9 +264,9 @@ class Material_Adjustment_Panel:
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
-                                    fg_color="white",
-                                    hover_color="#009ffb", 
-                                    text_color="blue",
+                                    fg_color=settings.material_adjustment_panel_button_color,
+                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_up_button.grid(
@@ -307,7 +304,7 @@ class Material_Adjustment_Panel:
                         text="Material", 
                         fg_color=settings.material_adjustment_panel_background_color,
                         text_color="#55b6ff",
-                        font=(settings.text_font, 18, "bold")
+                        font=(settings.text_font, settings.material_adjustment_panel_label_size, "bold")
                     )
                     self.material_headline.grid(
                         row=0,
@@ -328,7 +325,7 @@ class Material_Adjustment_Panel:
                         text="Indent [nm]", 
                         fg_color=settings.material_adjustment_panel_background_color,
                         text_color="#55b6ff",
-                        font=(settings.text_font, 15, "bold")
+                        font=(settings.text_font, settings.material_adjustment_panel_label_size, "bold")
                     )                    
                     self.slider_label.grid(
                         row=0,
@@ -353,9 +350,9 @@ class Material_Adjustment_Panel:
                                 height=1,
                                 text="✕", #✕ 🗑
                                 font=(settings.text_font, 10, "bold"),
-                                fg_color="#820000",
-                                hover_color="#da0000", 
-                                text_color=settings.material_control_panel_text_color,
+                                fg_color=settings.material_adjustment_panel_delete_button_color,
+                                hover_color=settings.material_adjustment_panel_delete_button_hover_color, 
+                                text_color="black",#settings.material_control_panel_text_color,
                                 command=lambda identifier=material: self.delete_material(identifier)
                             )
                             delete_material_button.grid(
@@ -407,9 +404,9 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame,
                                 textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])),
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
-                                text_color="black",
-                                # width=,
-                                # height=,
+                                border_color=settings.material_adjustment_panel_entry_border_color,
+                                border_width=0.4,
+                                text_color=settings.material_adjustment_panel_entry_text_color,
                                 justify="center"
                             )
                             entry.grid(
@@ -440,8 +437,9 @@ class Material_Adjustment_Panel:
                                 # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
-                                progress_color=globals.materials[material]["Color"],
-                                fg_color=settings.material_adjustment_panel_slider_color,
+                                fg_color=settings.material_adjustment_panel_slider_background_color,
+                                button_color=settings.material_adjustment_panel_slider_button_color,
+                                progress_color=settings.material_adjustment_panel_slider_progress_color,
                                 button_hover_color=settings.material_adjustment_panel_slider_hover_color,
                                 command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
                             )
@@ -474,9 +472,9 @@ class Material_Adjustment_Panel:
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
-                                    fg_color="white",
-                                    hover_color="#009ffb", 
-                                    text_color="blue",
+                                    fg_color=settings.material_adjustment_panel_button_color,
+                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_down_button.grid(
@@ -503,9 +501,9 @@ class Material_Adjustment_Panel:
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
-                                    fg_color="white",
-                                    hover_color="#009ffb", 
-                                    text_color="blue",
+                                    fg_color=settings.material_adjustment_panel_button_color,
+                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_up_button.grid(
@@ -543,7 +541,7 @@ class Material_Adjustment_Panel:
                         text="Material", 
                         fg_color=settings.material_adjustment_panel_background_color,
                         text_color="#55b6ff",
-                        font=(settings.text_font, 18, "bold")
+                        font=(settings.text_font, settings.material_adjustment_panel_label_size, "bold")
                     )
                     self.material_headline.grid(
                         row=0,
@@ -564,7 +562,7 @@ class Material_Adjustment_Panel:
                         text="Thickness [nm]", 
                         fg_color=settings.material_adjustment_panel_background_color,
                         text_color="#55b6ff",
-                        font=(settings.text_font, 15, "bold")
+                        font=(settings.text_font, settings.material_adjustment_panel_label_size, "bold")
                     )                    
                     self.slider_label.grid(
                         row=0,
@@ -587,6 +585,10 @@ class Material_Adjustment_Panel:
                             checkbox = customtkinter.CTkCheckBox(
                                 master=self.material_adjustment_panel_frame,
                                 text="",
+                                fg_color=settings.material_adjustment_panel_checkbox_background_color,
+                                border_color=settings.material_adjustment_panel_checkbox_border_color,
+                                hover_color=settings.material_adjustment_panel_checkbox_hover_color,
+                                checkmark_color=settings.material_adjustment_panel_checkbox_checkmark_color,
                                 variable=checkbox_value,
                                 onvalue="on",
                                 offvalue="off",
@@ -648,9 +650,9 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame,
                                 textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
-                                text_color="black",
-                                # width=,
-                                # height=,
+                                border_color=settings.material_adjustment_panel_entry_border_color,
+                                border_width=0.4,
+                                text_color=settings.material_adjustment_panel_entry_text_color,
                                 justify="center"
                             )
                             entry.grid(
@@ -681,8 +683,9 @@ class Material_Adjustment_Panel:
                                 # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
-                                progress_color=globals.materials[material]["Color"],
-                                fg_color=settings.material_adjustment_panel_slider_color,
+                                fg_color=settings.material_adjustment_panel_slider_background_color,
+                                button_color=settings.material_adjustment_panel_slider_button_color,
+                                progress_color=settings.material_adjustment_panel_slider_progress_color,
                                 button_hover_color=settings.material_adjustment_panel_slider_hover_color,
                                 command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
                             )
@@ -714,9 +717,9 @@ class Material_Adjustment_Panel:
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
-                                    fg_color="white",
-                                    hover_color="#009ffb", 
-                                    text_color="blue",
+                                    fg_color=settings.material_adjustment_panel_button_color,
+                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_down_button.grid(
@@ -743,9 +746,9 @@ class Material_Adjustment_Panel:
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
-                                    fg_color="white",
-                                    hover_color="#009ffb", 
-                                    text_color="blue",
+                                    fg_color=settings.material_adjustment_panel_button_color,
+                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
                                 move_up_button.grid(

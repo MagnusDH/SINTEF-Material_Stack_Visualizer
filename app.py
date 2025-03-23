@@ -407,6 +407,18 @@ if __name__ == "__main__":
     globals.current_program_window_width = program_window.winfo_width()
     program_window.bind("<Configure>", lambda event: globals.app.program_window_resized(event))
 
+    #CODE TO CHANGE TITLE BAR COLOR
+    # import ctypes
+    # # Convert hex color to BGR format
+    # color_hex = "#ffffff"
+    # color_bgr = int(color_hex[1:], 16)  # Convert "#RRGGBB" to integer 0xBBGGRR
+    # # Set title bar color
+    # ctypes.windll.dwmapi.DwmSetWindowAttribute(
+    #     ctypes.windll.user32.GetForegroundWindow(), 35, 
+    #     ctypes.byref(ctypes.c_int(color_bgr)), 4
+    # )
+    #END TITLE BAR CODE#
+
 
     #Start the main loop of the program
     program_window.mainloop()

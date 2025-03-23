@@ -52,9 +52,9 @@ class Material_Control_Panel:
         add_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             text="Add material", #"+" 
-            fg_color="#008c00",
-            hover_color="#00cd00",
-            text_color=settings.material_control_panel_text_color,
+            fg_color=settings.material_control_panel_button_color,
+            hover_color=settings.material_control_panel_button_hover_color,
+            text_color=settings.material_control_panel_button_text_color,#settings.material_control_panel_text_color,
             font=(settings.text_font, settings.material_control_panel_text_size),
             command=self.add_material
         )
@@ -70,10 +70,10 @@ class Material_Control_Panel:
         modify_material_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             text="Modify material",#"⚙️",
-            text_color="white", 
             font=(settings.text_font, settings.material_control_panel_text_size),
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
+            text_color=settings.material_control_panel_button_text_color, 
             command=self.modify_material
         )
         modify_material_button.grid(
@@ -88,10 +88,10 @@ class Material_Control_Panel:
         reset_values_button = customtkinter.CTkButton(
             master=material_control_panel_frame,
             text="Reset values",
-            text_color=settings.material_control_panel_text_color,
             font=(settings.text_font, settings.material_control_panel_text_size),
             fg_color= settings.material_control_panel_button_color, 
             hover_color=settings.material_control_panel_button_hover_color, 
+            text_color=settings.material_control_panel_button_text_color,
             command=self.reset_values
         )
         reset_values_button.grid(
@@ -106,10 +106,10 @@ class Material_Control_Panel:
         export_as_excel_button = customtkinter.CTkButton(
             master=material_control_panel_frame, 
             text="Export values to excel", 
-            text_color=settings.material_control_panel_text_color,
             font=(settings.text_font, settings.material_control_panel_text_size),
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
+            text_color=settings.material_control_panel_button_text_color,
             command=self.export_to_excel
         )
         export_as_excel_button.grid(
@@ -158,8 +158,10 @@ class Material_Control_Panel:
         #Name
         self.material_name_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color="white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -188,8 +190,10 @@ class Material_Control_Panel:
 
         self.material_thickness_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -249,8 +253,10 @@ class Material_Control_Panel:
 
         self.material_indent_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -279,8 +285,10 @@ class Material_Control_Panel:
 
         self.material_color_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -310,8 +318,10 @@ class Material_Control_Panel:
 
         self.Modulus_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -340,8 +350,10 @@ class Material_Control_Panel:
 
         self.CTE_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -371,8 +383,10 @@ class Material_Control_Panel:
 
         self.Density_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -402,8 +416,10 @@ class Material_Control_Panel:
 
         self.Stress_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -433,8 +449,10 @@ class Material_Control_Panel:
 
         self.Poisson_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -463,8 +481,10 @@ class Material_Control_Panel:
 
         self.R0_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -493,8 +513,10 @@ class Material_Control_Panel:
 
         self.R_value_entry = customtkinter.CTkEntry(
             master=self.add_material_window,
-            fg_color = "white",
-            text_color="black",
+            fg_color = settings.add_material_window_entry_background_color,
+            border_color=settings.add_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.add_material_window_entry_text_color,
             width=70,
             justify="center"
         )
@@ -513,7 +535,7 @@ class Material_Control_Panel:
             text="Find color",
             fg_color=settings.add_material_window_button_color,
             hover_color=settings.add_material_window_button_hover_color,
-            text_color=settings.add_material_window_text_color,
+            text_color=settings.add_material_window_button_text_color,
             width=15,
             command=self.choose_color_for_add_material
         )
@@ -529,9 +551,9 @@ class Material_Control_Panel:
         confirm_button = customtkinter.CTkButton(
             master=self.add_material_window,
             text="Confirm",
-            fg_color="#008c00", 
-            hover_color="#00cd00",
-            text_color=settings.add_material_window_text_color,
+            fg_color=settings.add_material_window_button_color,
+            hover_color=settings.add_material_window_button_hover_color,
+            text_color=settings.add_material_window_button_text_color,
             width=15,
             command=self.validate_add_material_inputs
         )
@@ -820,7 +842,7 @@ class Material_Control_Panel:
         #Create a scrollable frame for entries to each material
         scrollable_frame = customtkinter.CTkScrollableFrame(
             master=self.modify_material_window,
-            fg_color = settings.modify_material_window_scrollable_frame_color,
+            fg_color = settings.modify_material_window_scrollable_frame_background_color,
         )
         scrollable_frame.grid(
             row=0,
@@ -852,8 +874,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Name",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color=settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color,
         )
         name_label.grid(
             row=0,
@@ -868,8 +890,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Thickness",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         thickness_label.grid(
             row=0,
@@ -884,8 +906,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Unit",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         unit_label.grid(
             row=0,
@@ -900,8 +922,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Indent[nm]",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         indent_label.grid(
             row=0,
@@ -916,8 +938,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Color",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         color_label.grid(
             row=0,
@@ -932,8 +954,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Modulus [GPa]",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         modulus_label.grid(
             row=0,
@@ -948,8 +970,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="CTE [ppm/deg]",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         CTE_label.grid(
             row=0,
@@ -964,8 +986,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Density [kg/m3]",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         density_label.grid(
             row=0,
@@ -980,8 +1002,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Stress_x [MPa]",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         stress_label.grid(
             row=0,
@@ -996,8 +1018,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="Poisson",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         poisson_label.grid(
             row=0,
@@ -1012,8 +1034,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="R0",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         R0_label.grid(
             row=0,
@@ -1028,8 +1050,8 @@ class Material_Control_Panel:
             master=scrollable_frame,
             text="R",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
-            text_color="white",
-            fg_color=settings.modify_material_window_scrollable_frame_color
+            text_color = settings.modify_material_window_text_color,
+            fg_color=settings.modify_material_window_scrollable_frame_background_color
         )
         R_label.grid(
             row=0,
@@ -1051,8 +1073,10 @@ class Material_Control_Panel:
             material_name_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Name"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             material_name_entry.grid(
@@ -1069,8 +1093,10 @@ class Material_Control_Panel:
             thickness_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             thickness_entry.grid(
@@ -1087,8 +1113,10 @@ class Material_Control_Panel:
             unit_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Unit"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             unit_entry.grid(
@@ -1105,8 +1133,10 @@ class Material_Control_Panel:
             indent_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             indent_entry.grid(
@@ -1123,8 +1153,10 @@ class Material_Control_Panel:
             color_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Color"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             color_entry.grid(
@@ -1141,8 +1173,10 @@ class Material_Control_Panel:
             modulus_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Modulus [GPa]"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             modulus_entry.grid(
@@ -1159,8 +1193,10 @@ class Material_Control_Panel:
             CTE_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["CTE [ppm/deg]"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             CTE_entry.grid(
@@ -1177,8 +1213,10 @@ class Material_Control_Panel:
             density_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Density [kg/m3]"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             density_entry.grid(
@@ -1195,8 +1233,10 @@ class Material_Control_Panel:
             stress_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Stress_x [MPa]"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             stress_entry.grid(
@@ -1212,8 +1252,10 @@ class Material_Control_Panel:
             poisson_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["Poisson"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             poisson_entry.grid(
@@ -1230,8 +1272,10 @@ class Material_Control_Panel:
             R0_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["R0"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             R0_entry.grid(
@@ -1248,8 +1292,10 @@ class Material_Control_Panel:
             R_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
                 textvariable=StringVar(value=str(globals.materials[material]["R"])),
-                fg_color="white",
-                text_color="black",
+                fg_color = settings.modify_material_window_entry_background_color,
+                border_color=settings.modify_material_window_entry_border_color,
+                border_width=0.4,
+                text_color=settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             R_entry.grid(
@@ -1272,7 +1318,7 @@ class Material_Control_Panel:
             text="Find color",
             fg_color=settings.modify_material_window_button_color,
             hover_color=settings.modify_material_window_button_hover_color,
-            text_color=settings.modify_material_window_text_color,
+            text_color=settings.modify_material_window_button_text_color,
             command=self.choose_color_for_modify_material
         )
         find_color_button.grid(
@@ -1288,8 +1334,10 @@ class Material_Control_Panel:
         self.color_finder_entry = customtkinter.CTkEntry(
             master=self.modify_material_window,
             placeholder_text="No color selected",
-            fg_color="white",
-            text_color="black",
+            fg_color = settings.modify_material_window_entry_background_color,
+            border_color=settings.modify_material_window_entry_border_color,
+            border_width=0.4,
+            text_color=settings.modify_material_window_entry_text_color,
             justify="center"
         )
         self.color_finder_entry.grid(
@@ -1304,6 +1352,9 @@ class Material_Control_Panel:
         confirm_button = customtkinter.CTkButton(
             master=self.modify_material_window,
             text="Confirm changes",
+            fg_color=settings.modify_material_window_button_color,
+            hover_color=settings.modify_material_window_button_hover_color,
+            text_color=settings.modify_material_window_button_text_color,
             command=self.validate_modify_material_inputs
         )
         confirm_button.grid(

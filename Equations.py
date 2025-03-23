@@ -61,13 +61,17 @@ class Equations:
         #populer en liste som går fra lag 1 til og med PZT laget
         t = []
         for material in globals.materials:
-            t.append(globals.materials[material]["Thickness"])
-            
             if(material.lower() == "pzt"):
-                piezo_thickness = globals.materials[material]["Thickness"]
                 break
 
-        Zp = (piezo_thickness / 2) - Zn + sum(t[:-1])
+            t.append(globals.materials[material]["Thickness"])
+            
+
+
+        piezo_thickness = globals.materials[material]["Thickness"]
+
+        # Zp = (piezo_thickness / 2) + sum(t) - Zn
+        Zp = (piezo_thickness / 2) + sum(t)
 
         return Zp 
 

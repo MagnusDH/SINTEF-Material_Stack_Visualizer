@@ -99,7 +99,13 @@
         -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
     TO DO         
-        -Bare sett "substrate" som nederste lag hvis den finnes. Hvis ikke tegnes alle stacks som vanlig
+        -Fjern all funksjon som gjør at "substrate" blir lagt nederst
+        -Fix slik at "visible canvas" variabler alltid starter fra nedre venstre hjørne
+        -Regn ut og sjekk nye ligninger fra Runar
+        -Legg til to grafer i "multi" view
+            -Top graf i multi view skal ha (0,0) nede i venstre hjørne (blå halvsirkel skal ikke være der)
+        -Lag grid-layout for "add material window"
+        
 
     QUESTIONS:
         -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
