@@ -15,6 +15,8 @@ class Canvas_Control_Panel:
         
         self.program_window = window
 
+        self.option_menu = None
+
         self.canvas_control_panel_frame = self.create_canvas_control_panel()
 
 
@@ -252,14 +254,14 @@ class Canvas_Control_Panel:
                 self.program_window.columnconfigure(2, weight=1, uniform="group2")
 
                 #Set all material entry and slider values to "thickness" value
-                #Set all materials "Status", except "substrate" to "inactive
+                #Set all materials->Status to "inactive" (except the lowest layer material)
                 for material in globals.materials:
                     globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
                     globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
                     globals.materials[material]["Status"] = "inactive"
                     globals.materials[material]["Checkbox_id"].deselect()
 
-                    if(material.lower() == "substrate"):
+                    if(globals.materials[material]["Layer"] == 1):
                         globals.materials[material]["Status"] = "active"
                         globals.materials[material]["Checkbox_id"].select()
 
@@ -379,9 +381,8 @@ class Canvas_Control_Panel:
         f.close()
 
    
-    """Exports every layer of the stack with text and arrows as SVG-file"""
     def export_layers_as_svg(self):
-        
+        """Exports every layer of the stack with text and arrows as SVG-file"""     
         # print("EXPORT_LAYERS_AS_SVG()")
 
         #TODO

@@ -74,39 +74,3 @@ class Equations:
         Zp = (piezo_thickness / 2) + sum(t)
 
         return Zp 
-
-
-    def return_modulus(self, layer:int):
-        """Returns the 'Modulus [GPa]' value for a material at the given layer"""
-        # print("RETURN_MODULUS()")
-
-        #loop through all materials and find the material with the correct layer number
-        for material in globals.materials:
-            if(globals.materials[material]["Layer"] == layer):
-                return globals.materials[material]["Modulus [GPa]"]
-        
-        return None
-
-
-    def return_thickness(self, layer:int):
-        """Returns the 'Thickness' value for a material at the given layer"""
-        #print("RETURN_THICKNESS()")
-
-        #loop through all materials and find the material with the correct layer number
-        for material in globals.materials:
-            if(globals.materials[material]["Layer"] == layer):
-                return globals.materials[material]["Thickness"]
-        
-        return None
-
-
-    def return_poisson(self, layer:int):
-        """Returns the 'Poisson' value for a material at the given layer"""
-        # print("RETURN_V()")
-
-        #loop through all materials and find the material with the correct layer number
-        for material in globals.materials:
-            if(globals.materials[material]["Layer"] == layer):
-                return globals.materials[material]["Poisson"]
-        
-        return None

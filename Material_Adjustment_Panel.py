@@ -129,7 +129,8 @@ class Material_Adjustment_Panel:
                         #Adjust existing delete_button
                         else:
                             globals.materials[material]["Delete_material_button_id"].configure(
-                                command=lambda identifier=material: self.delete_material(identifier)
+                                command=lambda identifier=material: self.delete_material(identifier),
+                                hover_color=settings.material_adjustment_panel_delete_button_hover_color
                             )
                             globals.materials[material]["Delete_material_button_id"].grid(
                                 row=row_counter,
@@ -142,7 +143,7 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame, 
                                 text=material, 
                                 fg_color=settings.material_adjustment_panel_background_color,
-                                text_color=settings.material_adjustment_panel_text_color
+                                text_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_text_color
                             )
                             label.grid(
                                 row=row_counter, 
@@ -155,7 +156,10 @@ class Material_Adjustment_Panel:
                             globals.materials[material]["Label_name_id"] = label
                         #Adjust existing material name label
                         else:
-                            globals.materials[material]["Label_name_id"].configure(text=globals.materials[material]["Name"])
+                            globals.materials[material]["Label_name_id"].configure(
+                                text=globals.materials[material]["Name"],
+                                text_color=globals.materials[material]["Color"]
+                            )
                             globals.materials[material]["Label_name_id"].grid(
                                 row=row_counter,
                                 column=1
@@ -216,7 +220,8 @@ class Material_Adjustment_Panel:
                         #Adjust existing slider
                         else:
                             globals.materials[material]["Slider_id"].configure(
-                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier),
+                                progress_color=globals.materials[material]["Color"]
                             )
 
                             globals.materials[material]["Slider_id"].grid(
@@ -226,9 +231,8 @@ class Material_Adjustment_Panel:
                             globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
 
 
-                        
-                        #Create buttons to move layer up or down, but not for "substrate"
-                        if((len(globals.materials) > 1) and (material.lower() != "substrate")):
+                        #Create buttons to move layer up or down
+                        if(len(globals.materials) > 1):
                             #Create down_button
                             if(globals.materials[material]["Move_down_button_id"] == None):
                                 move_down_button = customtkinter.CTkButton(
@@ -236,7 +240,7 @@ class Material_Adjustment_Panel:
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
@@ -251,7 +255,8 @@ class Material_Adjustment_Panel:
                             #Adjust existing move_down_button
                             else:
                                 globals.materials[material]["Move_down_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down),
+                                    hover_color=globals.materials[material]["Color"]
                                 )
                                 globals.materials[material]["Move_down_button_id"].grid(
                                     row=row_counter,
@@ -265,7 +270,7 @@ class Material_Adjustment_Panel:
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
@@ -280,7 +285,8 @@ class Material_Adjustment_Panel:
                             #Adjust existing move_down_button
                             else:
                                 globals.materials[material]["Move_up_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down),
+                                    hover_color=globals.materials[material]["Color"]
                                 )
                                 globals.materials[material]["Move_up_button_id"].grid(
                                     row=row_counter,
@@ -379,7 +385,7 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame, 
                                 text=material, 
                                 fg_color=settings.material_adjustment_panel_background_color,
-                                text_color=settings.material_adjustment_panel_text_color
+                                text_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_text_color
                             )
                             label.grid(
                                 row=row_counter, 
@@ -392,7 +398,10 @@ class Material_Adjustment_Panel:
                             globals.materials[material]["Label_name_id"] = label
                         #Adjust existing material name label
                         else:
-                            globals.materials[material]["Label_name_id"].configure(text=globals.materials[material]["Name"])
+                            globals.materials[material]["Label_name_id"].configure(
+                                text=globals.materials[material]["Name"],
+                                text_color=globals.materials[material]["Color"]
+                            )
                             globals.materials[material]["Label_name_id"].grid(
                                 row=row_counter,
                                 column=1
@@ -433,13 +442,11 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Slider_id"] == None):
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
-                                # width=,
-                                # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
                                 fg_color=settings.material_adjustment_panel_slider_background_color,
                                 button_color=settings.material_adjustment_panel_slider_button_color,
-                                progress_color=settings.material_adjustment_panel_slider_progress_color,
+                                progress_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_slider_progress_color,
                                 button_hover_color=settings.material_adjustment_panel_slider_hover_color,
                                 command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
                             )
@@ -455,7 +462,8 @@ class Material_Adjustment_Panel:
                         #Adjust existing slider
                         else:
                             globals.materials[material]["Slider_id"].configure(
-                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier),
+                                progress_color=globals.materials[material]["Color"]
                             )
                             globals.materials[material]["Slider_id"].grid(
                                 row=row_counter,
@@ -464,8 +472,8 @@ class Material_Adjustment_Panel:
                             globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
 
                         
-                        #Create buttons to move layer up or down, but not for "substrate"
-                        if((len(globals.materials) > 1) and (material.lower() != "substrate")):
+                        #Create buttons to move layer up or down
+                        if(len(globals.materials) > 1):
                             #Create down_button
                             if(globals.materials[material]["Move_down_button_id"] == None):
                                 move_down_button = customtkinter.CTkButton(
@@ -473,7 +481,7 @@ class Material_Adjustment_Panel:
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
@@ -488,7 +496,8 @@ class Material_Adjustment_Panel:
                             #Adjust existing move_down_button
                             else:
                                 globals.materials[material]["Move_down_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down),
+                                    hover_color=globals.materials[material]["Color"]
                                 )
                                 globals.materials[material]["Move_down_button_id"].grid(
                                     row=row_counter,
@@ -502,7 +511,7 @@ class Material_Adjustment_Panel:
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
@@ -517,7 +526,8 @@ class Material_Adjustment_Panel:
                             #Adjust existing move_down_button
                             else:
                                 globals.materials[material]["Move_up_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down),
+                                    hover_color=globals.materials[material]["Color"]
                                 )
                                 globals.materials[material]["Move_up_button_id"].grid(
                                     row=row_counter,
@@ -613,8 +623,8 @@ class Material_Adjustment_Panel:
                                 column=0
                             )
 
-                        #if material is substrate, then the checkbox must be "on"
-                        if(material.lower() == "substrate"):
+                        #if material is the lowest layer material, then the checkbox must be "on"
+                        if(globals.materials[material]["Layer"] == 1):
                             globals.materials[material]["Checkbox_id"].select()
 
                         #Create label to display material name
@@ -623,7 +633,7 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame, 
                                 text=material, 
                                 fg_color=settings.material_adjustment_panel_background_color,
-                                text_color=settings.material_adjustment_panel_text_color
+                                text_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_text_color
                             )
                             label.grid(
                                 row=row_counter, 
@@ -637,7 +647,8 @@ class Material_Adjustment_Panel:
                         #Adjust existing material name label
                         else:
                             globals.materials[material]["Label_name_id"].configure(
-                                text=globals.materials[material]["Name"]
+                                text=globals.materials[material]["Name"],
+                                text_color=globals.materials[material]["Color"]
                             )
                             globals.materials[material]["Label_name_id"].grid(
                                 row=row_counter,
@@ -679,13 +690,11 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Slider_id"] == None):
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
-                                # width=,
-                                # height=,
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
                                 fg_color=settings.material_adjustment_panel_slider_background_color,
                                 button_color=settings.material_adjustment_panel_slider_button_color,
-                                progress_color=settings.material_adjustment_panel_slider_progress_color,
+                                progress_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_slider_progress_color,
                                 button_hover_color=settings.material_adjustment_panel_slider_hover_color,
                                 command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
                             )
@@ -701,7 +710,8 @@ class Material_Adjustment_Panel:
                         #Adjust existing slider
                         else:
                             globals.materials[material]["Slider_id"].configure(
-                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier),
+                                progress_color=globals.materials[material]["Color"]
                             )
                             globals.materials[material]["Slider_id"].grid(
                                 row=row_counter,
@@ -709,8 +719,8 @@ class Material_Adjustment_Panel:
                             )
                             globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
 
-                        #Create buttons to move layer up or down, but not for "substrate"
-                        if((len(globals.materials) > 1) and (material.lower() != "substrate")):
+                        #Create buttons to move layer up or down
+                        if(len(globals.materials) > 1):
                             #Create down_button
                             if(globals.materials[material]["Move_down_button_id"] == None):
                                 move_down_button = customtkinter.CTkButton(
@@ -718,7 +728,7 @@ class Material_Adjustment_Panel:
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
@@ -733,7 +743,8 @@ class Material_Adjustment_Panel:
                             #Adjust existing move_down_button
                             else:
                                 globals.materials[material]["Move_down_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
+                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down),
+                                    hover_color=globals.materials[material]["Color"]
                                 )
                                 globals.materials[material]["Move_down_button_id"].grid(
                                     row=row_counter,
@@ -747,7 +758,7 @@ class Material_Adjustment_Panel:
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
@@ -762,7 +773,8 @@ class Material_Adjustment_Panel:
                             #Adjust existing move_down_button
                             else:
                                 globals.materials[material]["Move_up_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
+                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down),
+                                    hover_color=globals.materials[material]["Color"]
                                 )
                                 globals.materials[material]["Move_up_button_id"].grid(
                                     row=row_counter,
@@ -785,8 +797,8 @@ class Material_Adjustment_Panel:
 
         #Turn off all materials->checkboxes and mark them as "inactive"
         for material in globals.materials:
-            #Mark the chosen material and "substrate" as "active" and turn on their checkboxes
-            if((material.lower() == "substrate") or material == chosen_material):
+            #Mark the chosen material and the lowest layer material as "active" and turn on their checkboxes
+            if((globals.materials[material]["Layer"] == 1) or material == chosen_material):
                 globals.materials[material]["Checkbox_id"].select()
                 globals.materials[material]["Status"] = "active"
             #for every other material: Turn off checkboxes and mark them as "inactive"
@@ -966,14 +978,14 @@ class Material_Adjustment_Panel:
         
         #Move chosen_material down one layer and below_material up one layer 
         if(up_or_down == "down"):
-            if((below_material != None) and (chosen_material.lower() != "substrate") and (below_material.lower() != "substrate")):
+            if(below_material != None):
                 tmp_layer = globals.materials[chosen_material]["Layer"]
                 globals.materials[chosen_material]["Layer"] = globals.materials[below_material]["Layer"]
                 globals.materials[below_material]["Layer"] = tmp_layer
 
         #Move chosen_material up one layer and above_material down one layer 
         else:
-            if((above_material != None) and (chosen_material.lower() != "substrate")):
+            if(above_material != None):
                 tmp_layer = globals.materials[chosen_material]["Layer"]
                 globals.materials[chosen_material]["Layer"] = globals.materials[above_material]["Layer"]
                 globals.materials[above_material]["Layer"] = tmp_layer

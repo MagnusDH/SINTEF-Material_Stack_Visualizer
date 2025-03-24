@@ -124,10 +124,11 @@ class Graph:
         #Fetch the correct materials by checking which are "active"
         material_counter = 0
         chosen_material = None
+        lowest_material = None
         for material in globals.materials:
-            if(material.lower() == "substrate"):
-                substrate_material = material
-                continue     #Skip to next material
+            if(globals.materials[material]["Layer"] == 1):
+                lowest_material = material
+                continue
 
             if(globals.materials[material]["Status"] == "active"):
                 chosen_material = material
@@ -146,11 +147,11 @@ class Graph:
 
         #Fetch necessary values
         #Es = modulus for the substrate (multiplied by 1billion)
-        Es = globals.materials[substrate_material]["Modulus [GPa]"] * 1000000000
+        Es = globals.materials[lowest_material]["Modulus [GPa]"] * 1000000000
         #Vs = poisson til substratet
-        Vs = globals.materials[substrate_material]["Poisson"]
+        Vs = globals.materials[lowest_material]["Poisson"]
         #Ts = thickness for the substrate in nanometers (value divided by 1billion)
-        Ts = globals.materials[substrate_material]["Thickness"] / 1000000000
+        Ts = globals.materials[lowest_material]["Thickness"] / 1000000000
         #Tf = thickness for material/filament in nanometers (value divided by 1billion)
         Tf = globals.materials[chosen_material]["Thickness"] / 1000000000
         #R0 = R0 til filamentet
@@ -170,7 +171,7 @@ class Graph:
             messagebox.showerror("Division by zero Error", f"The 'R0' value for '{chosen_material}' can not be zero")
             return
         if(1-Vs) == 0:
-            messagebox.showerror("Division by zero Error", f"The 'poisson' value for '{substrate_material}' can not be 1.\nCalculation (1 - Vs) resulted in zero")
+            messagebox.showerror("Division by zero Error", f"The 'poisson' value for '{lowest_material}' can not be 1.\nCalculation (1 - Vs) resulted in zero")
             return
         
         #Calculate the sigma_R value

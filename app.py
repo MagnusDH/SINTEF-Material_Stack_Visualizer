@@ -302,8 +302,7 @@ class App:
 
     def sort_dictionary(self):
         """
-        -Gives each material a layer value based on the order they are in globals.materials{}. (The top layer is assigned as "layer 1")\n
-        -Places 'substrate' as the lowest layer
+        -Gives each material a layer value based on the order they are in globals.materials{}. (The lowest layer in the stack is assigned as "layer 1")\n
         """
         # print("SORT_DICTIONARY()")
 
@@ -311,16 +310,10 @@ class App:
         layer_counter = len(globals.materials)
         #Loop through the dictionary
         for material in globals.materials:
-            #If the material is "substrate"
-            if(material.lower() == "substrate"):
-                #set its layer value to be the length of materials{}
-                globals.materials[material]["Layer"] = 1
-
-            else:
-                #set material->layer value to be layer_counter
-                globals.materials[material]["Layer"] = layer_counter
-                #increment layer_counter
-                layer_counter -= 1
+            #set material->layer value to be layer_counter
+            globals.materials[material]["Layer"] = layer_counter
+            #increment layer_counter
+            layer_counter -= 1
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))

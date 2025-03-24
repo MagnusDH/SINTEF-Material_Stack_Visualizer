@@ -837,7 +837,7 @@ class Material_Control_Panel:
         self.modify_material_window.rowconfigure(0, weight=100, uniform="group1")
 
         #Bind the "renter/return" button to call "confirm_material_changes" function when pressed
-        self.modify_material_window.bind('<Return>', lambda event: self.confirm_material_changes())
+        self.modify_material_window.bind('<Return>', lambda event: self.validate_modify_material_inputs())
 
         #Create a scrollable frame for entries to each material
         scrollable_frame = customtkinter.CTkScrollableFrame(
@@ -1076,7 +1076,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             material_name_entry.grid(
@@ -1096,7 +1096,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             thickness_entry.grid(
@@ -1116,7 +1116,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             unit_entry.grid(
@@ -1136,7 +1136,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             indent_entry.grid(
@@ -1156,7 +1156,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             color_entry.grid(
@@ -1176,7 +1176,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             modulus_entry.grid(
@@ -1196,7 +1196,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             CTE_entry.grid(
@@ -1216,7 +1216,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             density_entry.grid(
@@ -1236,7 +1236,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             stress_entry.grid(
@@ -1255,7 +1255,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             poisson_entry.grid(
@@ -1275,7 +1275,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             R0_entry.grid(
@@ -1295,7 +1295,7 @@ class Material_Control_Panel:
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
                 justify="center"
             )
             R_entry.grid(
@@ -1582,12 +1582,12 @@ class Material_Control_Panel:
             #Reload the values from the excel file in to the dictionary
             globals.app.load_materials_from_excel()
 
-            #Stoney view is special and needs all materials to be "inactive" except "substrate"
+            #Stoney view is special and needs all materials to be "inactive" except the lowest layer material
             if(globals.option_menu == "Stoney"):
                 for material in globals.materials:
                     globals.materials[material]["Status"] = "inactive"
 
-                    if(material.lower() == "substrate"):
+                    if(globals.materials[material]["Layer"] == 1):
                         globals.materials[material]["Status"] = "active"
 
             #Redraw the material stack
