@@ -97,10 +97,10 @@
 
     TO DO         
         -Fix slik at "visible canvas" variabler alltid starter fra nedre venstre hjørne
+        -Lag grid-layout for "add material window"
         -Regn ut og sjekk nye ligninger fra Runar
         -Legg til to grafer i "multi" view
             -Top graf i multi view skal ha (0,0) nede i venstre hjørne (blå halvsirkel skal ikke være der)
-        -Lag grid-layout for "add material window"
         -ZN blir regnet ut feil ifølge Runar, snakk om dette
 
     QUESTIONS:
@@ -112,22 +112,16 @@
         -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 
     POTENTIAL FIXES:
-        -The entire program is set up as if "substrate" is the layer with the highest number. Change this so "substrate" is the lowest layer number and the rest follows
-
-        -Check the width of a materials name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
+        -Check the width of a materials->name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
 
         -Add a "scrollable frame" in "add material" window
-
-        -If "materials.xlsx" exists, give the user the option to load this file or start an empty project?
 
         -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
 
         -Fjerne "reset values" knappen? hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes
-        -When the "reset values" button is pressed, then the integer values are converted to "str" which causes bugs when you try to "modify material". Check the reset_values function
-
-        -I "stoney" view: Materialer der tickbox value="off" kan være grå farge, materialer der tickbox value="on" kan være deres egen farge
 
         -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
 
         -Make a button that gives the user the option to load an excel file
+
 
