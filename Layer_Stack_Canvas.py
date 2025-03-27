@@ -20,7 +20,9 @@ class Layer_Stack_Canvas:
 
 
     def create_canvas(self):
-        """Returns a canvas created in the program window"""
+        """
+        -Returns a canvas created in the program window\n
+        -Canvas coordinates x0/y0 = bottom left corner and x1/y1 = top right corner"""
         #print("CREATE_CANVAS()")
         
         layer_stack_canvas = tkinter.Canvas(
@@ -42,10 +44,10 @@ class Layer_Stack_Canvas:
 
         #Set canvas_bbox coordniates for later use
         self.visible_canvas_bbox_x0 = 0
-        self.visible_canvas_bbox_y0 = 0
+        self.visible_canvas_bbox_y0 = layer_stack_canvas.winfo_height() - 1
         self.visible_canvas_bbox_x1 = layer_stack_canvas.winfo_width() - 1
-        self.visible_canvas_bbox_y1 = layer_stack_canvas.winfo_height() - 1
-        self.layer_stack_canvas_height = self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0
+        self.visible_canvas_bbox_y1 = 0
+        self.layer_stack_canvas_height = self.visible_canvas_bbox_y0 - self.visible_canvas_bbox_y1
         self.layer_stack_canvas_width = self.visible_canvas_bbox_x1 - self.visible_canvas_bbox_x0
         #This is just a usefull function to find the bbox of the canvas: self.canvas.coords(self.canvas.find_withtag("canvas_bounding_box_rectangle"))[2]
 
@@ -99,6 +101,18 @@ class Layer_Stack_Canvas:
         """Draws the material stack based on the value in the option box"""
         # print("DRAW MATERIAL STACK()")
 
+        #Clear all existing elements on canvas and in dictionary
+        self.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            globals.materials[material]["Rectangle_id"] = None
+            globals.materials[material]["Text_id"] = None
+            globals.materials[material]["Text_bbox_id"] = None
+            globals.materials[material]["Line_id"] = None
+            globals.materials[material]["Indent_text_id"] = None
+            globals.materials[material]["Indent_text_bbox_id"] = None
+            globals.materials[material]["Indent_line_id"] = None
+            globals.materials[material]["Indent_arrow_pointer_id"] = None
+
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
                 
@@ -132,19 +146,7 @@ class Layer_Stack_Canvas:
         """Draws the rectangle stack where the lowest layer is 1/10 of the canvas no matter what"""
         
         # print("DRAW_MATERIAL_STACK_STACKED()")
-        #Clear all existing elements on canvas and in dictionary
-        self.layer_stack_canvas.delete("all")
-        for material in globals.materials:
-            globals.materials[material]["Rectangle_id"] = None
-            globals.materials[material]["Text_id"] = None
-            globals.materials[material]["Text_bbox_id"] = None
-            globals.materials[material]["Line_id"] = None
-            globals.materials[material]["Indent_text_id"] = None
-            globals.materials[material]["Indent_text_bbox_id"] = None
-            globals.materials[material]["Indent_line_id"] = None
-            globals.materials[material]["Indent_arrow_pointer_id"] = None
-
-
+        
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(
             self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
@@ -165,9 +167,9 @@ class Layer_Stack_Canvas:
         canvas_height = round(self.layer_stack_canvas_height * 0.9)
 
         #Prepare first rectangle drawing coordinates
-        rectangle_x0 = self.visible_canvas_bbox_x0
-        rectangle_y0 = self.visible_canvas_bbox_y0 + (self.layer_stack_canvas_height*0.9)
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stacked_text_indent_right_side
+        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_stacked_offset_left_side
+        rectangle_y0 = self.visible_canvas_bbox_y0 - (self.layer_stack_canvas_height*0.1)
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stacked_offset_right_side
         rectangle_y1 = None #Calculated later
         
         #Draw rectangles on canvas
@@ -178,7 +180,7 @@ class Layer_Stack_Canvas:
                 #Lowest material will be drawn on the bottom 1/10 of the canvas
                 if(globals.materials[material]["Layer"] == 1 ):  
                     created_rectangle = self.layer_stack_canvas.create_rectangle(
-                        self.visible_canvas_bbox_x0, round(self.layer_stack_canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
+                        self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, rectangle_x1, rectangle_y0, 
                         fill=globals.materials[material]["Color"], 
                         outline=settings.layer_stack_canvas_rectangle_outline_color,
                         tags="material_rectangle"
@@ -215,18 +217,6 @@ class Layer_Stack_Canvas:
         """Draws a realistic version of the rectangle stack"""
 
         # print("DRAW_MATERIAL_STACK_REALISTIC()")
-            
-        #Clear all existing elements on canvas and in dictionary
-        self.layer_stack_canvas.delete("all")
-        for material in globals.materials:
-            globals.materials[material]["Rectangle_id"] = None
-            globals.materials[material]["Text_id"] = None
-            globals.materials[material]["Text_bbox_id"] = None
-            globals.materials[material]["Line_id"] = None
-            globals.materials[material]["Indent_text_id"] = None
-            globals.materials[material]["Indent_text_bbox_id"] = None
-            globals.materials[material]["Indent_line_id"] = None
-            globals.materials[material]["Indent_arrow_pointer_id"] = None
 
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(
@@ -245,25 +235,25 @@ class Layer_Stack_Canvas:
         match globals.option_menu:
             case "Realistic":
                 rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_realistic_offset_left_side
-                rectangle_y0 = self.visible_canvas_bbox_y1
+                rectangle_y0 = self.visible_canvas_bbox_y0
                 rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_realistic_offset_right_side
                 rectangle_y1 = None #Calculated later
             
             case "Multi":
                 rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side
-                rectangle_y0 = self.visible_canvas_bbox_y1
+                rectangle_y0 = self.visible_canvas_bbox_y0
                 rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side
                 rectangle_y1 = None #Calculated later
 
             case _:
                 rectangle_x0 = self.visible_canvas_bbox_x0
-                rectangle_y0 = self.visible_canvas_bbox_y1
+                rectangle_y0 = self.visible_canvas_bbox_y0
                 rectangle_x1 = self.visible_canvas_bbox_x1
                 rectangle_y1 = None #Calculated later
 
 
         #Materials (except the lowest layer material) will be drawn on 9/10 of the canvas
-        canvas_height = (self.visible_canvas_bbox_y1 - self.visible_canvas_bbox_y0)
+        canvas_height = self.layer_stack_canvas_height
         
         #Draw rectangles on canvas
         for material in globals.materials:
@@ -299,18 +289,6 @@ class Layer_Stack_Canvas:
         """
         # print("DRAW_MATERIAL_STACK_STEPPED()")
 
-        #Clear all existing elements on canvas and in dictionary
-        self.layer_stack_canvas.delete("all")
-        for material in globals.materials:
-            globals.materials[material]["Rectangle_id"] = None
-            globals.materials[material]["Text_id"] = None
-            globals.materials[material]["Text_bbox_id"] = None
-            globals.materials[material]["Line_id"] = None
-            globals.materials[material]["Indent_text_id"] = None
-            globals.materials[material]["Indent_text_bbox_id"] = None
-            globals.materials[material]["Indent_line_id"] = None
-            globals.materials[material]["Indent_arrow_pointer_id"] = None
-
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(
             self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0,
@@ -333,9 +311,9 @@ class Layer_Stack_Canvas:
         nanometers_per_pixel = sum_of_all_materials/round(self.layer_stack_canvas_height * 0.9)
 
         #Prepare first rectangle drawing coordinates (from bottom left corner)
-        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_stepped_text_indent_left_side
-        rectangle_y0 = round(self.layer_stack_canvas_height*0.9)
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stepped_text_indent_right_side
+        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_stepped_offset_left_side
+        rectangle_y0 = self.visible_canvas_bbox_y0 - (self.layer_stack_canvas_height*0.1)
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stepped_offset_right_side
         rectangle_y1 = None #calculated later
         previous_rectangle_x1 = self.visible_canvas_bbox_x1
 
@@ -349,22 +327,25 @@ class Layer_Stack_Canvas:
 
                 #Draw lowest layer material on the bottom 1/10 of the canvas
                 if(globals.materials[material]["Layer"] == 1):
+                    
                     #Find how many pixels is needed to represent the indent of the current material
                     indent_width_pixels = float(globals.materials[material]["Indent [nm]"])/nanometers_per_pixel
 
                     #Set the width of the rectangle
                     rectangle_x1 = rectangle_x1 - indent_width_pixels
 
-                    #Create rectangle
-                    created_rectangle = self.layer_stack_canvas.create_rectangle(
-                        rectangle_x0, rectangle_y0, rectangle_x1, self.visible_canvas_bbox_y1,
-                        fill=globals.materials[material]["Color"],
-                        outline=settings.layer_stack_canvas_rectangle_outline_color, 
-                        tags="material_rectangle"
-                    )
-                    
-                    #Add created rectangle to materials{}
-                    globals.materials[material]["Rectangle_id"] = created_rectangle
+                    #Draw and create rectangle if its width is greater than the original start drawing point for rectangles
+                    if(rectangle_x1 >= original_rectangle_x0):
+                        #Create rectangle
+                        created_rectangle = self.layer_stack_canvas.create_rectangle(
+                            rectangle_x0, self.visible_canvas_bbox_y0, rectangle_x1, rectangle_y0,
+                            fill=globals.materials[material]["Color"],
+                            outline=settings.layer_stack_canvas_rectangle_outline_color, 
+                            tags="material_rectangle"
+                        )
+                        
+                        #Add created rectangle to materials{}
+                        globals.materials[material]["Rectangle_id"] = created_rectangle
 
                 #Material is not the lowest in the stack
                 else:
@@ -396,27 +377,7 @@ class Layer_Stack_Canvas:
                     rectangle_y0 -= rectangle_height_pixels
     
 
-    def draw_material_stack_limited(self):
-        """Draws a material stack only with materials that are "active" in globals.materials"""
-        # print("DRAW_MATERIAL_STACK_LIMITED")
-
-        num_active_materials = 0
-        for material in globals.materials:
-            if(globals.materials[material]["Status"] == "active"):
-                num_active_materials += 1
-                
-        #Clear all existing elements on canvas and in dictionary
-        self.layer_stack_canvas.delete("all")
-        for material in globals.materials:
-            globals.materials[material]["Rectangle_id"] = None
-            globals.materials[material]["Text_id"] = None
-            globals.materials[material]["Text_bbox_id"] = None
-            globals.materials[material]["Line_id"] = None
-            globals.materials[material]["Indent_text_id"] = None
-            globals.materials[material]["Indent_text_bbox_id"] = None
-            globals.materials[material]["Indent_line_id"] = None
-            globals.materials[material]["Indent_arrow_pointer_id"] = None
-
+    def draw_material_stack_stepped_new(self):
 
         #Draw bounding box around canvas
         self.layer_stack_canvas.create_rectangle(
@@ -424,6 +385,113 @@ class Layer_Stack_Canvas:
             self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
             outline=settings.layer_stack_canvas_outline_color, 
             tags="layer_stack_canvas_bounding_rectangle")
+
+        #Find the total height of all materials combined
+        sum_of_all_materials = 0
+        for material in globals.materials:
+            if(globals.materials[material]["Layer"] == 1):
+                continue    #Skip lowest layer
+            
+            sum_of_all_materials += float(globals.materials[material]["Thickness"])
+
+        
+        total_stack_height = 0
+        for material in globals.materials:
+            total_stack_height += float(globals.materials[material]["Thickness"])
+        
+        #Materials (except the lowest layer material) will be drawn on 9/10 of the canvas
+        canvas_height = round(self.layer_stack_canvas_height * 0.9)
+        
+
+        #Prepare first rectangle drawing coordinates
+        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_stepped_offset_left_side
+        rectangle_y0 = self.visible_canvas_bbox_y0 - (self.layer_stack_canvas_height*0.1)
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stepped_offset_right_side
+        rectangle_y1 = None #Calculated later
+        original_rectangle_x0 = rectangle_x0
+        stack_width = rectangle_x1 - rectangle_x0
+        
+        #INDENT skal være proposjonalt til høyden av stacken. Hvis stacken er 6000nm høy så er maksimal indent 6000nm
+        
+        #Draw rectangles on canvas
+        for material in globals.materials:
+            #Create material rectangle only if "thickness" is > zero
+            if(float(globals.materials[material]["Thickness"]) > 0):
+
+                #Find how many percent the current rectangles->indent is of the total thickness sum of all materials
+                rectangle_width = float(globals.materials[material]["Indent [nm]"])
+                width_percentage = (rectangle_width/total_stack_height)*100
+                #Convert rectangle width percentage to pixels
+                rectangle_width_pixels = (width_percentage/100)*(stack_width)
+                #Set the indent width for the current rectangle
+                rectangle_x1 -= rectangle_width_pixels
+
+                #Lowest material will be drawn on the bottom 1/10 of the canvas
+                if(globals.materials[material]["Layer"] == 1):  
+                    #Only create rectangle if it does not to thin
+                    if(rectangle_x1 >= original_rectangle_x0):
+                        created_rectangle = self.layer_stack_canvas.create_rectangle(
+                            rectangle_x0, self.visible_canvas_bbox_y0, rectangle_x1, rectangle_y0, 
+                            fill=globals.materials[material]["Color"], 
+                            outline=settings.layer_stack_canvas_rectangle_outline_color,
+                            tags="material_rectangle"
+                        )
+                        
+                        #Add rectangle_id to its place in self.materials
+                        globals.materials[material]["Rectangle_id"] = created_rectangle
+                
+                #Material is not the lowest in the stack
+                else:
+                    #find how many percent the current rectangle's height is of the total sum of materials
+                    rectangle_height = float(globals.materials[material]["Thickness"])
+                    rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
+                    #Convert rectangle percentage to pixels
+                    rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
+
+                    #Find how many percent the current rectangles->indent is of the total thickness sum of all materials
+                    rectangle_width = float(globals.materials[material]["Indent [nm]"])
+                    width_percentage = (rectangle_width/total_stack_height)*100
+                    #Convert rectangle width percentage to pixels
+                    rectangle_width_pixels = (width_percentage/100)*(stack_width)
+                    #Set the indent width for the current rectangle
+                    rectangle_x1 =  rectangle_x1 - rectangle_width_pixels
+
+                    #draw rectangle from top of canvas to its number of pixles in height
+                    rectangle_y1 = rectangle_y0 - rectangle_height_pixels
+
+                    #Only create rectangle if it does not to thin
+                    if(rectangle_x1 >= original_rectangle_x0):
+                        created_rectangle = self.layer_stack_canvas.create_rectangle(
+                            rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
+                            fill=globals.materials[material]["Color"],
+                            outline=settings.layer_stack_canvas_rectangle_outline_color, 
+                            tags="material_rectangle"
+                        )
+
+                        #Add rectangle_id to its place in globals.materials
+                        globals.materials[material]["Rectangle_id"] = created_rectangle
+
+                    #Add rectangle height to prevent overlaping
+                    rectangle_y0 -= rectangle_height_pixels
+
+
+    def draw_material_stack_limited(self):
+        """Draws a material stack only with materials that are "active" in globals.materials"""
+        # print("DRAW_MATERIAL_STACK_LIMITED")
+
+                
+        #Draw bounding box around canvas
+        self.layer_stack_canvas.create_rectangle(
+            self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, 
+            self.visible_canvas_bbox_x1, self.visible_canvas_bbox_y1, 
+            outline=settings.layer_stack_canvas_outline_color, 
+            tags="layer_stack_canvas_bounding_rectangle")
+        
+        #Check how many materials are marked as "active"
+        num_active_materials = 0
+        for material in globals.materials:
+            if(globals.materials[material]["Status"] == "active"):
+                num_active_materials += 1
 
         #If the are no active materials to draw, then end the function
         if(num_active_materials <= 0):
@@ -443,9 +511,9 @@ class Layer_Stack_Canvas:
         canvas_height = round(self.layer_stack_canvas_height * 0.9)
 
         #Prepare first rectangle drawing coordinates
-        rectangle_x0 = self.visible_canvas_bbox_x0
-        rectangle_y0 = self.visible_canvas_bbox_y0 + (self.layer_stack_canvas_height*0.9)
-        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_stacked_text_indent_right_side
+        rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_limited_offset_left_side
+        rectangle_y0 = self.visible_canvas_bbox_y0 - self.layer_stack_canvas_height*0.1
+        rectangle_x1 = self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_limited_offset_right_side
         rectangle_y1 = None #Calculated later
             
         #Draw rectangles on canvas
@@ -458,7 +526,7 @@ class Layer_Stack_Canvas:
                     #Lowest layer material will be drawn on the bottom 1/10 of the canvas
                     if(globals.materials[material]["Layer"] == 1):  
                         created_rectangle = self.layer_stack_canvas.create_rectangle(
-                            self.visible_canvas_bbox_x0, round(self.layer_stack_canvas_height*0.9), rectangle_x1, self.visible_canvas_bbox_y1, 
+                            rectangle_x0, self.visible_canvas_bbox_y0, rectangle_x1, rectangle_y0, 
                             fill=globals.materials[material]["Color"], 
                             outline=settings.layer_stack_canvas_rectangle_outline_color,
                             tags="material_rectangle"
@@ -498,17 +566,7 @@ class Layer_Stack_Canvas:
         -Creates all texts either inside or outside of the rectangle box based on the rectangles height
         -Loops through all text_boxes, checks for overlaps and potentially moves them around to prevent overlap 
         """
-        #print("WRITE_TEXT_ON_STACK()")
-
-        #Delete all texts from canvas and dictionary
-        for material in globals.materials:
-            self.layer_stack_canvas.delete(globals.materials[material]["Text_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["Text_bbox_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["Line_id"])
-
-            globals.materials[material]["Text_id"] = None
-            globals.materials[material]["Text_bbox_id"] = None
-            globals.materials[material]["Line_id"] = None
+        # print("WRITE_TEXT_ON_STACK()")              
 
         #Find what the height of a text's bounding box will be
         text_font = font.Font(family=settings.text_font, size=settings.text_size)
@@ -653,9 +711,9 @@ class Layer_Stack_Canvas:
                         #Get the coordinates of the text_bbox
                         text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         text_bbox_x0 = text_bbox_coordinates[0]
-                        text_bbox_y0 = text_bbox_coordinates[1]
+                        text_bbox_y0 = text_bbox_coordinates[3]
                         text_bbox_x1 = text_bbox_coordinates[2]
-                        text_bbox_y1 = text_bbox_coordinates[3]
+                        text_bbox_y1 = text_bbox_coordinates[1]
 
                         #if the text_bbox overlaps with canvas right side:
                         if(text_bbox_x1 > self.visible_canvas_bbox_x1):
@@ -668,9 +726,9 @@ class Layer_Stack_Canvas:
                             #Get the text_bbox new coordinates
                             text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"]) 
                             text_bbox_x0 = text_bbox_coordinates[0]
-                            text_bbox_y0 = text_bbox_coordinates[1]
+                            text_bbox_y0 = text_bbox_coordinates[3]
                             text_bbox_x1 = text_bbox_coordinates[2]
-                            text_bbox_y1 = text_bbox_coordinates[3]
+                            text_bbox_y1 = text_bbox_coordinates[1]
                             text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2 
                             rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                             #Move the pointer line
@@ -686,9 +744,9 @@ class Layer_Stack_Canvas:
                         #Get the coordinates of the text_bbox
                         text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         text_bbox_x0 = text_bbox_coordinates[0]
-                        text_bbox_y0 = text_bbox_coordinates[1]
+                        text_bbox_y0 = text_bbox_coordinates[3]
                         text_bbox_x1 = text_bbox_coordinates[2]
-                        text_bbox_y1 = text_bbox_coordinates[3]
+                        text_bbox_y1 = text_bbox_coordinates[1]
 
                         #if the text_bbox overlaps with canvas left side:
                         if(text_bbox_x0 < self.visible_canvas_bbox_x0):
@@ -701,9 +759,9 @@ class Layer_Stack_Canvas:
                             #Get the text_bbox new coordinates
                             text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"]) 
                             text_bbox_x0 = text_bbox_coordinates[0]
-                            text_bbox_y0 = text_bbox_coordinates[1]
+                            text_bbox_y0 = text_bbox_coordinates[3]
                             text_bbox_x1 = text_bbox_coordinates[2]
-                            text_bbox_y1 = text_bbox_coordinates[3]
+                            text_bbox_y1 = text_bbox_coordinates[1]
                             text_bbox_middle_y = (text_bbox_y0 + text_bbox_y1) / 2 
                             rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                             #Move the pointer line
@@ -718,14 +776,14 @@ class Layer_Stack_Canvas:
                 #Get the coordinates of the current_material_text_bbox
                 current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                 current_text_bbox_x0 = current_text_bbox[0]
-                current_text_bbox_y0 = current_text_bbox[1]
+                current_text_bbox_y0 = current_text_bbox[3]
                 current_text_bbox_x1 = current_text_bbox[2]
-                current_text_bbox_y1 = current_text_bbox[3]
+                current_text_bbox_y1 = current_text_bbox[1]
 
                 #if the text_bbox top overlaps with the canvas top
-                if(current_text_bbox_y0 < self.visible_canvas_bbox_y0):
+                if(current_text_bbox_y1 < self.visible_canvas_bbox_y1):
                     #find the overlap
-                    overlap = self.visible_canvas_bbox_y0 - current_text_bbox_y0
+                    overlap = self.visible_canvas_bbox_y1 - current_text_bbox_y1
                     #Move the text, text_bbox and line_id down
                     self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, overlap)
                     self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, overlap)
@@ -733,9 +791,9 @@ class Layer_Stack_Canvas:
                     #Get the new text_bbox coordinates
                     current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                     current_text_bbox_x0 = current_text_bbox[0]
-                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_y0 = current_text_bbox[3]
                     current_text_bbox_x1 = current_text_bbox[2]
-                    current_text_bbox_y1 = current_text_bbox[3]
+                    current_text_bbox_y1 = current_text_bbox[1]
                     current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
                     #Get coordinates of matching rectangle
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
@@ -752,22 +810,22 @@ class Layer_Stack_Canvas:
                     #Get the coordinates of the current_material text_bbox
                     current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                     current_text_bbox_x0 = current_text_bbox[0]
-                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_y0 = current_text_bbox[3]
                     current_text_bbox_x1 = current_text_bbox[2]
-                    current_text_bbox_y1 = current_text_bbox[3]
+                    current_text_bbox_y1 = current_text_bbox[1]
                     
                     #Get the coordinates of the previous_material text_bbox
                     previous_text_bbox = self.layer_stack_canvas.bbox(previous_text_bbox_id)
                     previous_text_bbox_x0 = previous_text_bbox[0]
-                    previous_text_bbox_y0 = previous_text_bbox[1]
+                    previous_text_bbox_y0 = previous_text_bbox[3]
                     previous_text_bbox_x1 = previous_text_bbox[2]
-                    previous_text_bbox_y1 = previous_text_bbox[3]
+                    previous_text_bbox_y1 = previous_text_bbox[1]
 
 
                     #if the current_material text_bbox top is overlapping the previous_material text_bbox bottom
-                    if(current_text_bbox_y0 < previous_text_bbox_y1):
+                    if(current_text_bbox_y1 < previous_text_bbox_y0):
                         #find the overlap
-                        overlap = previous_text_bbox_y1 - current_text_bbox_y0 
+                        overlap = previous_text_bbox_y0 - current_text_bbox_y1 
                         #move the current_materials->text, text_bbox and line down
                         self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, overlap)
                         self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, overlap)
@@ -775,9 +833,9 @@ class Layer_Stack_Canvas:
                         #Get the new text_bbox coordinates
                         current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         current_text_bbox_x0 = current_text_bbox[0]
-                        current_text_bbox_y0 = current_text_bbox[1]
+                        current_text_bbox_y0 = current_text_bbox[3]
                         current_text_bbox_x1 = current_text_bbox[2]
-                        current_text_bbox_y1 = current_text_bbox[3]
+                        current_text_bbox_y1 = current_text_bbox[1]
                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
                         #Get coordinates of matching rectangle
                         rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
@@ -801,14 +859,14 @@ class Layer_Stack_Canvas:
                 #Get the coordinates of the current_material_text_bbox
                 current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                 current_text_bbox_x0 = current_text_bbox[0]
-                current_text_bbox_y0 = current_text_bbox[1]
+                current_text_bbox_y0 = current_text_bbox[3]
                 current_text_bbox_x1 = current_text_bbox[2]
-                current_text_bbox_y1 = current_text_bbox[3]
+                current_text_bbox_y1 = current_text_bbox[1]
 
                 #if the text_bbox bottom overlaps with the canvas bottom
-                if(current_text_bbox_y1 > self.visible_canvas_bbox_y1):
+                if(current_text_bbox_y0 > self.visible_canvas_bbox_y0):
                     #find the overlap
-                    overlap = current_text_bbox_y1 - self.visible_canvas_bbox_y1 
+                    overlap = current_text_bbox_y0 - self.visible_canvas_bbox_y0 
                     #Move the text, text_bbox and line_id down
                     self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, -overlap)
                     self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, -overlap)
@@ -816,9 +874,9 @@ class Layer_Stack_Canvas:
                     #Get the new text_bbox coordinates
                     current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                     current_text_bbox_x0 = current_text_bbox[0]
-                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_y0 = current_text_bbox[3]
                     current_text_bbox_x1 = current_text_bbox[2]
-                    current_text_bbox_y1 = current_text_bbox[3]
+                    current_text_bbox_y1 = current_text_bbox[1]
                     current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
                     #Get coordinates of matching rectangle
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
@@ -834,22 +892,22 @@ class Layer_Stack_Canvas:
                     #Get the coordinates of the current_material text_bbox
                     current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                     current_text_bbox_x0 = current_text_bbox[0]
-                    current_text_bbox_y0 = current_text_bbox[1]
+                    current_text_bbox_y0 = current_text_bbox[3]
                     current_text_bbox_x1 = current_text_bbox[2]
-                    current_text_bbox_y1 = current_text_bbox[3]
+                    current_text_bbox_y1 = current_text_bbox[1]
                     
                     #Get the coordinates of the previous_material_text_bbox text_bbox
                     previous_text_bbox = self.layer_stack_canvas.bbox(previous_text_bbox_id)
                     previous_text_bbox_x0 = previous_text_bbox[0]
-                    previous_text_bbox_y0 = previous_text_bbox[1]
+                    previous_text_bbox_y0 = previous_text_bbox[3]
                     previous_text_bbox_x1 = previous_text_bbox[2]
-                    previous_text_bbox_y1 = previous_text_bbox[3]
+                    previous_text_bbox_y1 = previous_text_bbox[1]
 
 
                     #if the current_material text_bbox bottom is overlapping the previous_material text_bbox top
-                    if(current_text_bbox_y1 > previous_text_bbox_y0):
+                    if(current_text_bbox_y0 > previous_text_bbox_y1):
                         #find the overlap
-                        overlap = current_text_bbox_y1 - previous_text_bbox_y0  
+                        overlap = current_text_bbox_y0 - previous_text_bbox_y1  
                         #move the current_materials->text, text_bbox and line down
                         self.layer_stack_canvas.move(globals.materials[material]["Text_id"], 0, -overlap)
                         self.layer_stack_canvas.move(globals.materials[material]["Text_bbox_id"], 0, -overlap)
@@ -857,9 +915,9 @@ class Layer_Stack_Canvas:
                         #Get the new text_bbox coordinates
                         current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         current_text_bbox_x0 = current_text_bbox[0]
-                        current_text_bbox_y0 = current_text_bbox[1]
+                        current_text_bbox_y0 = current_text_bbox[3]
                         current_text_bbox_x1 = current_text_bbox[2]
-                        current_text_bbox_y1 = current_text_bbox[3]
+                        current_text_bbox_y1 = current_text_bbox[1]
                         current_text_bbox_middle_y = (current_text_bbox_y0 + current_text_bbox_y1) / 2
                         #Get coordinates of matching rectangle
                         rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
@@ -878,19 +936,29 @@ class Layer_Stack_Canvas:
     def write_indent_on_stepped_stack(self):
         """Writes the indent ranges on the stepped material stack"""
         
-        # print("WRITE_INDENT_ON_STEPPED_STACK()")
+        #print("WRITE_INDENT_ON_STEPPED_STACK()")
 
-        #Delete all indent texts and arrows from canvas and dictionary
-        for material in globals.materials:
-            self.layer_stack_canvas.delete(globals.materials[material]["Indent_text_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["Indent_text_bbox_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["Indent_line_id"])
-            self.layer_stack_canvas.delete(globals.materials[material]["Indent_arrow_pointer_id"])
+        #TODO
+            #loop through materials from top layer to bottom layer
+            #if text_bbox_top overlaps with canvas_top
+                #move text_bbox down
+        
+            #if text_bbox_bottom overlaps with canvas_bottom
+                #move text_bbox_up
 
-            globals.materials[material]["Indent_text_id"] = None
-            globals.materials[material]["Indent_text_bbox_id"] = None
-            globals.materials[material]["Indent_line_id"] = None
-            globals.materials[material]["Indent_arrow_pointer_id"] = None 
+            #if current_text_bbox_top overlaps previous_text_bbox_bottom
+                #move current_text_bbox down
+    
+
+            #loop through materials from bottom layer to top layer
+            #if text_bbox_top overlaps with canvas_top
+                #move text_bbox down
+        
+            #if text_bbox_bottom overlaps with canvas_bottom
+                #move text_bbox_up
+
+            #if current_text_bbox_bottom overlaps with previous_text_bbox_top
+                #move current_text_bbox up 
 
 
         #CREATION OF INDENT_LINE, INDENT_TEXT, INDENT_TEXT_BBOX AND INDENT_ARROW_POINTER
@@ -905,19 +973,19 @@ class Layer_Stack_Canvas:
                     if(float(globals.materials[material]["Indent [nm]"]) > 0):
                         current_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])
                         current_rectangle_x0 = current_material_rect_coordinates[0]
-                        current_rectangle_y0 = current_material_rect_coordinates[1]
+                        current_rectangle_y0 = current_material_rect_coordinates[3]
                         current_rectangle_x1 = current_material_rect_coordinates[2]
-                        current_rectangle_y1 = current_material_rect_coordinates[3]
+                        current_rectangle_y1 = current_material_rect_coordinates[1]
 
                         previous_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])
                         previous_rectangle_x0 = previous_material_rect_coordinates[0]
-                        previous_rectangle_y0 = previous_material_rect_coordinates[1]
+                        previous_rectangle_y0 = previous_material_rect_coordinates[3]
                         previous_rectangle_x1 = previous_material_rect_coordinates[2]
-                        previous_rectangle_y1 = previous_material_rect_coordinates[3]
+                        previous_rectangle_y1 = previous_material_rect_coordinates[1]
 
                         #Create a two sided arrow line between the differense of the two rectangles
                         indent_line = self.layer_stack_canvas.create_line(
-                            current_rectangle_x1, current_rectangle_y1-5, previous_rectangle_x1, previous_rectangle_y0-3,                       
+                            current_rectangle_x1, current_rectangle_y0-5, previous_rectangle_x1, previous_rectangle_y1-3,                       
                             fill=settings.text_color,
                             arrow=tkinter.BOTH,
                             tags="arrow_line_both"
@@ -925,7 +993,7 @@ class Layer_Stack_Canvas:
 
                         #Create a text on the side of the current material->rectangle with indent number
                         indent_text = self.layer_stack_canvas.create_text(
-                            (self.visible_canvas_bbox_x1), (current_rectangle_y1 - 10),
+                            (self.visible_canvas_bbox_x1), (current_rectangle_y0 - 10),
                             text=f"{float(globals.materials[material]['Indent [nm]'])} {globals.materials[material]['Unit']}",
                             fill=settings.text_color, 
                             font=(settings.text_font, settings.text_size),
@@ -942,15 +1010,15 @@ class Layer_Stack_Canvas:
                         #Find the coordinates of the indent_text_bbox
                         indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(indent_text_bbox)
                         indent_text_bbox_x0 = indent_text_bbox_coordinates[0]
-                        indent_text_bbox_y0 = indent_text_bbox_coordinates[1]
+                        indent_text_bbox_y0 = indent_text_bbox_coordinates[3]
                         indent_text_bbox_x1 = indent_text_bbox_coordinates[2]
-                        indent_text_bbox_y1 = indent_text_bbox_coordinates[3]
+                        indent_text_bbox_y1 = indent_text_bbox_coordinates[1]
 
 
                         #Draw an indent_arrow_pointer from indent_text_bbox to indent_line 
                         indent_arrow_pointer = self.layer_stack_canvas.create_line(
                             indent_text_bbox_x0, (indent_text_bbox_y1+indent_text_bbox_y0)/2,
-                            previous_rectangle_x1+3, previous_rectangle_y0-2,
+                            previous_rectangle_x1+3, previous_rectangle_y1-2,
                             arrow=tkinter.LAST, 
                             fill=settings.text_color,
                             tags="arrow_line"
@@ -977,9 +1045,9 @@ class Layer_Stack_Canvas:
                     #Get coordinates of indent_text_bbox
                     indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                     indent_text_bbox_x0 = indent_text_bbox_coordinates[0]
-                    indent_text_bbox_y0 = indent_text_bbox_coordinates[1]
+                    indent_text_bbox_y0 = indent_text_bbox_coordinates[3]
                     indent_text_bbox_x1 = indent_text_bbox_coordinates[2]
-                    indent_text_bbox_y1 = indent_text_bbox_coordinates[3]
+                    indent_text_bbox_y1 = indent_text_bbox_coordinates[1]
 
                     #if indent_text_bbox overlaps with canvas RIGHT side
                     if(indent_text_bbox_x1 > self.visible_canvas_bbox_x1):
@@ -992,20 +1060,20 @@ class Layer_Stack_Canvas:
                         #Get new coordinates of indent_text_bbox
                         indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                         indent_text_bbox_x0 = indent_text_bbox_coordinates[0]
-                        indent_text_bbox_y0 = indent_text_bbox_coordinates[1]
+                        indent_text_bbox_y0 = indent_text_bbox_coordinates[3]
                         indent_text_bbox_x1 = indent_text_bbox_coordinates[2]
-                        indent_text_bbox_y1 = indent_text_bbox_coordinates[3]
+                        indent_text_bbox_y1 = indent_text_bbox_coordinates[1]
                         indent_text_bbox_middle_y = (indent_text_bbox_y0 + indent_text_bbox_y1) / 2 
 
                         #Get coordinates of previous_material->rectangle
                         previous_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])
                         previous_rectangle_x0 = previous_material_rect_coordinates[0]
-                        previous_rectangle_y0 = previous_material_rect_coordinates[1]
+                        previous_rectangle_y0 = previous_material_rect_coordinates[3]
                         previous_rectangle_x1 = previous_material_rect_coordinates[2]
-                        previous_rectangle_y1 = previous_material_rect_coordinates[3]
+                        previous_rectangle_y1 = previous_material_rect_coordinates[1]
 
                         #Move indent_arrow_pointer to the left
-                        self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], indent_text_bbox_x0, indent_text_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y0-3)
+                        self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], indent_text_bbox_x0, indent_text_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y1-3)
 
                 previous_material = material
 
@@ -1021,15 +1089,15 @@ class Layer_Stack_Canvas:
                     #Get current_indent_text_bbox coordinates
                     current_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                     current_indent_bbox_x0 = current_indent_text_bbox_coordinates[0]
-                    current_indent_bbox_y0 = current_indent_text_bbox_coordinates[1]
+                    current_indent_bbox_y0 = current_indent_text_bbox_coordinates[3]
                     current_indent_bbox_x1 = current_indent_text_bbox_coordinates[2]
-                    current_indent_bbox_y1 = current_indent_text_bbox_coordinates[3]
+                    current_indent_bbox_y1 = current_indent_text_bbox_coordinates[1]
                     current_indent_bbox_middle_y = (current_indent_bbox_y0 + current_indent_bbox_y1) / 2 
 
                     #if current_indent_text_bbox bottom overlaps with canvas bottom
-                    if(current_indent_bbox_y1 > self.visible_canvas_bbox_y1):
+                    if(current_indent_bbox_y0 > self.visible_canvas_bbox_y0):
                         #Find overlap
-                        overlap = current_indent_bbox_y1 - self.visible_canvas_bbox_y1
+                        overlap = current_indent_bbox_y0 - self.visible_canvas_bbox_y0
 
                         #move indent_text, indent_text_bbox and indent_arrow_pointer up
                         self.layer_stack_canvas.move(globals.materials[material]["Indent_text_id"], 0, -overlap)
@@ -1038,43 +1106,70 @@ class Layer_Stack_Canvas:
                         #Get new coordinates of indent_text_bbox
                         current_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                         current_indent_bbox_x0 = current_indent_text_bbox_coordinates[0]
-                        current_indent_bbox_y0 = current_indent_text_bbox_coordinates[1]
+                        current_indent_bbox_y0 = current_indent_text_bbox_coordinates[3]
                         current_indent_bbox_x1 = current_indent_text_bbox_coordinates[2]
-                        current_indent_bbox_y1 = current_indent_text_bbox_coordinates[3]
+                        current_indent_bbox_y1 = current_indent_text_bbox_coordinates[1]
                         current_indent_bbox_middle_y = (current_indent_bbox_y0 + current_indent_bbox_y1) / 2  
 
                         #Get coordinates of previous_material->rectangle
                         previous_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])
                         previous_rectangle_x0 = previous_material_rect_coordinates[0]
-                        previous_rectangle_y0 = previous_material_rect_coordinates[1]
+                        previous_rectangle_y0 = previous_material_rect_coordinates[3]
                         previous_rectangle_x1 = previous_material_rect_coordinates[2]
-                        previous_rectangle_y1 = previous_material_rect_coordinates[3]
+                        previous_rectangle_y1 = previous_material_rect_coordinates[1]
 
                         #Move indent_arrow_pointer up
-                        self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], current_indent_bbox_x0, current_indent_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y0-3)
+                        self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], current_indent_bbox_x0, current_indent_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y1-3)
 
+                    #current_indent_text_bbox top overlaps with canvas top
+                    if(current_indent_bbox_y1 < self.visible_canvas_bbox_y1):
+                        #Find overlap
+                        overlap = current_indent_bbox_y1 - self.visible_canvas_bbox_y1
+                        print(overlap)
+                        #move indent_text, indent_text_bbox and indent_arrow_pointer down
+                        self.layer_stack_canvas.move(globals.materials[material]["Indent_text_id"], 0, -overlap)
+                        self.layer_stack_canvas.move(globals.materials[material]["Indent_text_bbox_id"], 0, -overlap)
+
+
+                        #Get new coordinates of indent_text_bbox
+                        current_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
+                        current_indent_bbox_x0 = current_indent_text_bbox_coordinates[0]
+                        current_indent_bbox_y0 = current_indent_text_bbox_coordinates[3]
+                        current_indent_bbox_x1 = current_indent_text_bbox_coordinates[2]
+                        current_indent_bbox_y1 = current_indent_text_bbox_coordinates[1]
+                        current_indent_bbox_middle_y = (current_indent_bbox_y0 + current_indent_bbox_y1) / 2  
+
+                        #Get coordinates of previous_material->rectangle
+                        previous_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])
+                        previous_rectangle_x0 = previous_material_rect_coordinates[0]
+                        previous_rectangle_y0 = previous_material_rect_coordinates[3]
+                        previous_rectangle_x1 = previous_material_rect_coordinates[2]
+                        previous_rectangle_y1 = previous_material_rect_coordinates[1]
+
+                        #Move indent_arrow_pointer down
+                        self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], current_indent_bbox_x0, current_indent_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y1-3)
 
                     #if there is a previous_indent_text_bbox
                     if(globals.materials[previous_material]["Indent_text_bbox_id"] != None):
                         #get coordinates of current material indent_text_bbox
                         current_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                         current_indent_bbox_x0 = current_indent_text_bbox_coordinates[0]
-                        current_indent_bbox_y0 = current_indent_text_bbox_coordinates[1]
+                        current_indent_bbox_y0 = current_indent_text_bbox_coordinates[3]
                         current_indent_bbox_x1 = current_indent_text_bbox_coordinates[2]
-                        current_indent_bbox_y1 = current_indent_text_bbox_coordinates[3]
+                        current_indent_bbox_y1 = current_indent_text_bbox_coordinates[1]
                         current_indent_bbox_middle_y = (current_indent_bbox_y0 + current_indent_bbox_y1) / 2 
 
                         #get coordinates of previous material indent_text_bbox
                         previous_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Indent_text_bbox_id"])
                         previous_indent_bbox_x0 = previous_indent_text_bbox_coordinates[0]
-                        previous_indent_bbox_y0 = previous_indent_text_bbox_coordinates[1]
+                        previous_indent_bbox_y0 = previous_indent_text_bbox_coordinates[3]
                         previous_indent_bbox_x1 = previous_indent_text_bbox_coordinates[2]
-                        previous_indent_bbox_y1 = previous_indent_text_bbox_coordinates[3]
+                        previous_indent_bbox_y1 = previous_indent_text_bbox_coordinates[1]
 
                         #if current_indent_text_bbox bottom overlaps with previous indent_text_bbox top
-                        if(current_indent_bbox_y1 > previous_indent_bbox_y0):
+                        if(current_indent_bbox_y0 > previous_indent_bbox_y1):
                             #find overlap
-                            overlap = current_indent_bbox_y1 - previous_indent_bbox_y0
+                            overlap = current_indent_bbox_y0 - previous_indent_bbox_y1
 
                             #move current indent_text_bbox, indent_text and arrow pointer up
                             self.layer_stack_canvas.move(globals.materials[material]["Indent_text_id"], 0, -overlap)
@@ -1083,20 +1178,26 @@ class Layer_Stack_Canvas:
                             #Get new coordinates of indent_text_bbox
                             current_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                             current_indent_bbox_x0 = current_indent_text_bbox_coordinates[0]
-                            current_indent_bbox_y0 = current_indent_text_bbox_coordinates[1]
+                            current_indent_bbox_y0 = current_indent_text_bbox_coordinates[3]
                             current_indent_bbox_x1 = current_indent_text_bbox_coordinates[2]
-                            current_indent_bbox_y1 = current_indent_text_bbox_coordinates[3]
+                            current_indent_bbox_y1 = current_indent_text_bbox_coordinates[1]
                             current_indent_bbox_middle_y = (current_indent_bbox_y0 + current_indent_bbox_y1) / 2  
 
                             #Get coordinates of previous_material->rectangle
                             previous_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[previous_material]["Rectangle_id"])
                             previous_rectangle_x0 = previous_material_rect_coordinates[0]
-                            previous_rectangle_y0 = previous_material_rect_coordinates[1]
+                            previous_rectangle_y0 = previous_material_rect_coordinates[3]
                             previous_rectangle_x1 = previous_material_rect_coordinates[2]
-                            previous_rectangle_y1 = previous_material_rect_coordinates[3]
+                            previous_rectangle_y1 = previous_material_rect_coordinates[1]
 
                             #Move indent_arrow_pointer up
-                            self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], current_indent_bbox_x0, current_indent_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y0-3)
+                            self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], current_indent_bbox_x0, current_indent_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y1-3)
+
+
+                        #if current_indent_text_bbox bottom overlaps with previous indent_text_bbox top
+
+
+
 
                 #Set previous_material to current material
                 previous_material = material
@@ -1112,8 +1213,8 @@ class Layer_Stack_Canvas:
 
         #Create line from bottom of stack to top of stack (total height line)
         self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y1), 
             (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y0), 
+            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y1), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             width=3,
@@ -1121,30 +1222,24 @@ class Layer_Stack_Canvas:
             tags="arrow_line_both"
         ) 
 
+        
         #Find the total height of all materials combined
-        sum_of_all_materials = 0
+        total_height_of_materials = 0
         for material in globals.materials:
-            rectangle_height = float(globals.materials[material]["Thickness"])
-            sum_of_all_materials += rectangle_height
-
+            total_height_of_materials += float(globals.materials[material]["Thickness"])
+        
         #Create text to explain the total height of the stack in "nm"
         self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y0 + 30,
-            text=f"Total height:\n{sum_of_all_materials} nm", 
+            self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y1 + 30,
+            text=f"Total height:\n{total_height_of_materials} nm", 
             fill=settings.layer_stack_canvas_text_color, 
             font=(settings.text_font, settings.layer_stack_canvas_text_size),
             tags="text" 
         )
 
 
-        #Find the total height of all materials combined
-        total_height_of_materials_nm = 0
-        for material in globals.materials:
-            total_height_of_materials_nm += float(globals.materials[material]["Thickness"])
-
-
         #Find nanometers needed to represent 1 pixel
-        nm_per_pixel = total_height_of_materials_nm/self.layer_stack_canvas_height
+        nm_per_pixel = total_height_of_materials/self.layer_stack_canvas_height
 
         #Calculate Zn
         Zn = round(globals.equations.calculate_Zn(), 1)
@@ -1154,8 +1249,8 @@ class Layer_Stack_Canvas:
 
         #Draw the neutral axis line on the canvas
         self.layer_stack_canvas.create_line(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zn_pixels,
-            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y1 - Zn_pixels, 
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels,
+            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zn_pixels, 
             fill="orange",
             width=4,
             dash=1,
@@ -1164,8 +1259,8 @@ class Layer_Stack_Canvas:
 
         #Draw line from bottom of stack up to neutral axis
         self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1),
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zn_pixels), 
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0),
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             fill="black",
@@ -1175,7 +1270,7 @@ class Layer_Stack_Canvas:
 
         #Write "neutral axis" text
         self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y1 - Zn_pixels,
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zn_pixels,
             text=f"Neutral axis", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
@@ -1185,7 +1280,7 @@ class Layer_Stack_Canvas:
         #Write "Zn" text
         self.layer_stack_canvas.create_text(
             self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80,
-            self.visible_canvas_bbox_y1 - (self.visible_canvas_bbox_y1 - (self.visible_canvas_bbox_y1 - Zn_pixels))/2,
+            self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - Zn_pixels))/2,
             text=f"Zn = {Zn}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
@@ -1201,8 +1296,8 @@ class Layer_Stack_Canvas:
 
         #Draw the Zp line on the canvas
         self.layer_stack_canvas.create_line(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zp_pixels,
-            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y1 - Zp_pixels, 
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels,
+            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zp_pixels, 
             fill="blue",
             width=4,
             dash=1,
@@ -1211,19 +1306,19 @@ class Layer_Stack_Canvas:
 
         #Draw line from Zn to Zp
         self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zn_pixels),
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y1 - Zp_pixels), 
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels),
+            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels), 
             arrow=tkinter.BOTH, 
             arrowshape=(10,10,5),
             fill="black",
             width = 3,
             tags="arrow_line_both"
-        ) 
+        )
 
 
         #Write "Zp" text
         self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80, self.visible_canvas_bbox_y1 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
             text=f"Zp = {Zp}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 

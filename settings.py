@@ -99,13 +99,17 @@ layer_stack_canvas_text_color = "black"
 layer_stack_canvas_text_size = 10
 layer_stack_canvas_rectangle_outline_color = "black"
 #STACKED
-layer_stack_canvas_stacked_text_indent_right_side = 230             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STACKED/REALISTIC/STONEY VIEW
+layer_stack_canvas_stacked_offset_right_side = 230             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STACKED/REALISTIC/STONEY VIEW
+layer_stack_canvas_stacked_offset_left_side = 0
 #REALISTIC
 layer_stack_canvas_realistic_offset_left_side = 0
 layer_stack_canvas_realistic_offset_right_side = 230
 #STEPPED
-layer_stack_canvas_stepped_text_indent_right_side = 100             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STEPPED VIEW 
-layer_stack_canvas_stepped_text_indent_left_side = 200              #HOW MUCH SPACE IS GIVEN TO TEXT ON THE LEFT SIDE OF THE CANVAS IN STEPPED VIEW
+layer_stack_canvas_stepped_offset_right_side = 200             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STEPPED VIEW 
+layer_stack_canvas_stepped_offset_left_side = 200              #HOW MUCH SPACE IS GIVEN TO TEXT ON THE LEFT SIDE OF THE CANVAS IN STEPPED VIEW
+#LIMITED
+layer_stack_canvas_limited_offset_left_side = 0
+layer_stack_canvas_limited_offset_right_side = 230
 #MULTI
 layer_stack_canvas_multi_offset_left_side = 250                     #HOW MUCH SPACE IS BETWEEN CANVAS WALL AND START OF STACK IN THE MULTI-VIEW
 layer_stack_canvas_multi_offset_right_side = 150                    #HOW MUCH SPACE IS BETWEEN CANVAS WALL AND START OF STACK IN THE MULTI-VIEW

@@ -79,6 +79,7 @@
         -"arrow_line"                                               == a line with an arrowhead at the end of the line
         -"arrow_line_both"                                          == a line with two arrowheads pointing in both directions
 
+    *All rectangles on the canvas is drawn from the bottom left corner to top right corner. x0/y0 = bottom left corner, x1/y1 = top right corner
 
     *Class Organization and inheritance
         -The main class "App" creates ONE instance of each class which is stored in the "globals.py" file
@@ -96,12 +97,16 @@
 
 
     TO DO         
-        -Fix slik at "visible canvas" variabler alltid starter fra nedre venstre hjørne
+        -Når "delete material" knappen blir trykt, så skjer det noe rart med rekkefølgen på materialene i material_adjustment_panel
+        -Finne ut av hvordan "stepped" stack og dens indent'er egentlig skal regnes ut. slik det er nå gir ikke så mye mening
+        -Finne ut hvordan verdien på slidere skal fungere, hva skal de gå til?
         -Lag grid-layout for "add material window"
         -Regn ut og sjekk nye ligninger fra Runar
         -Legg til to grafer i "multi" view
             -Top graf i multi view skal ha (0,0) nede i venstre hjørne (blå halvsirkel skal ikke være der)
         -ZN blir regnet ut feil ifølge Runar, snakk om dette
+        -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?
+        -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert
 
     QUESTIONS:
         -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
@@ -123,5 +128,12 @@
         -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
 
         -Make a button that gives the user the option to load an excel file
+
+
+
+
+
+
+
 
 

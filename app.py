@@ -357,11 +357,14 @@ class App:
             globals.current_program_window_width = self.program_window.winfo_width()
 
             #Update the boundaries of the layer_stack_canvas
+            globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
+            globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
             globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
-            globals.layer_stack_canvas.visible_canvas_bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
+            globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
+            
 
-            globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-            globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y1 - globals.layer_stack_canvas.visible_canvas_bbox_y0
+            globals.layer_stack_canvas.layer_stack_canvas_width =  globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+            globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
 
             #Redraw the layer_stack_canvas
             globals.layer_stack_canvas.draw_material_stack()
