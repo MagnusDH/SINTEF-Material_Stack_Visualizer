@@ -289,9 +289,12 @@ class Canvas_Control_Panel:
                 globals.graph_control_panel = Graph_Control_Panel(self.program_window)
 
             case "Multi":
-                #Change the layout of the program_window to only two columns
-                self.program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
-                self.program_window.columnconfigure(1, weight=9, uniform="group1")  
+                #Change the layout of the program_window to three rows
+                self.program_window.rowconfigure(0, weight=90, uniform="group1")    
+                self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")   #set this row to a specific size that won't change    
+                
+                self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")  #set this column to a specific size that won't change
+                self.program_window.columnconfigure(1, weight=90, uniform="group1")
                 self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
 
                 #Set all material entry and slider values to "thickness" value, and mark all as "active"

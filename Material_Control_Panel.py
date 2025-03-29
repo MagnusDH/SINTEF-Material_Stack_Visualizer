@@ -133,11 +133,11 @@ class Material_Control_Panel:
         self.add_material_window.configure(bg=settings.add_material_window_background_color)
 
         #Define the row&column layout of the material_control_panel_frame
-        self.add_material_window.columnconfigure(0, weight=33, uniform="group1")
+        self.add_material_window.columnconfigure(0, weight=34, uniform="group1")
         self.add_material_window.columnconfigure(1, weight=33, uniform="group1")
         self.add_material_window.columnconfigure(2, weight=33, uniform="group1")
 
-        self.add_material_window.rowconfigure((0,1,2,3,4,5,6,7,8,9,10,11,12), weight=100, uniform="group1")
+        self.add_material_window.rowconfigure((0,1,2,3,4,5,6,7,8,9,10,11), weight=100, uniform="group1")
 
 
         #Create Labels and Entries for material properties 
@@ -168,8 +168,8 @@ class Material_Control_Panel:
         self.material_name_entry.grid(
             row=0, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -200,8 +200,8 @@ class Material_Control_Panel:
         self.material_thickness_entry.grid(
             row=1, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -263,8 +263,8 @@ class Material_Control_Panel:
         self.material_indent_entry.grid(
             row=2, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -295,8 +295,8 @@ class Material_Control_Panel:
         self.material_color_entry.grid(
             row=3, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -328,8 +328,8 @@ class Material_Control_Panel:
         self.Modulus_value_entry.grid(
             row=4, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -360,8 +360,8 @@ class Material_Control_Panel:
         self.CTE_value_entry.grid(
             row=5, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -393,8 +393,8 @@ class Material_Control_Panel:
         self.Density_value_entry.grid(
             row=6, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -426,8 +426,8 @@ class Material_Control_Panel:
         self.Stress_value_entry.grid(
             row=7, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
             
@@ -459,8 +459,8 @@ class Material_Control_Panel:
         self.Poisson_value_entry.grid(
             row=8, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -491,8 +491,8 @@ class Material_Control_Panel:
         self.R0_value_entry.grid(
             row=9, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -523,8 +523,8 @@ class Material_Control_Panel:
         self.R_value_entry.grid(
             row=10, 
             column=1,
-            sticky="e",
-            padx=(0,0),
+            sticky="ew",
+            padx=(5,0),
             pady=(0,0)
         )
 
@@ -542,7 +542,7 @@ class Material_Control_Panel:
         find_color_button.grid(
             row=3,
             column=2,
-            sticky="n",
+            sticky="w",
             padx=(5,0),
             pady=(0,0)
         ) 
@@ -559,10 +559,10 @@ class Material_Control_Panel:
         )
         confirm_button.grid(
             row=11,
-            column=2,
-            sticky="n",
+            column=1,
+            sticky="ew",
             padx=(0,0),
-            pady=(0,0)
+            pady=(3,0)
         )
 
         #Bind the "enter/return" button to call validate_add_material_inputs function when pressed

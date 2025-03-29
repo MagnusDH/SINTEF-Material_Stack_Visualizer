@@ -866,7 +866,26 @@ class Material_Adjustment_Panel:
         """Updates the thickness value in self.materials with the slider value and updates corresponding entry-widget"""
       
         # print("MATERIAL_SLIDER_UPDATED()")
-      
+
+        ################################################################################################
+
+        # #Calculate slider range value
+        # slider_max_value = 0
+        # for material in globals.materials:
+        #     #Do not include the first layer
+        #     if(globals.materials[material]["Layer"] == 1):
+        #         continue
+        #     slider_max_value += globals.materials[material]["Thickness"]
+
+        # for material in globals.materials:
+        #     globals.materials[material]["Slider_id"].configure(
+        #         to=slider_max_value)
+
+        #     globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+
+
+        ################################################################################################
+            
         #Update different values in self.materials based on option value
         match globals.option_menu:
             case "Stacked"|"Realistic" | "Multi":
