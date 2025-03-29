@@ -254,7 +254,7 @@ class App:
                 
                 #Sort the materials dictionary
                 self.sort_dictionary()
-                
+
             except Exception as error:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")
                 traceback.print_exc()
@@ -302,25 +302,26 @@ class App:
 
     def sort_dictionary(self):
         """
-        -Gives each material a layer value based on the order they are in globals.materials{}. (The lowest layer in the stack is assigned as "layer 1")\n
+        -Sorts the materials in the materials dictionary after their layer value\n
+        -Assigns new layer values based on the order of the materials in the dictionary. (First material in the dictionary is assigned as layer 1)
         """
         # print("SORT_DICTIONARY()")
 
+        #Sort the materials dictionary after the "layer" value
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+
         #create a layer counter variable starting at 1
-        layer_counter = len(globals.materials)
+        layer_counter = 1
         #Loop through the dictionary
         for material in globals.materials:
             #set material->layer value to be layer_counter
             globals.materials[material]["Layer"] = layer_counter
             #increment layer_counter
-            layer_counter -= 1
+            layer_counter += 1
 
-        #Sort the materials dictionary after the "layer" value
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
-       
 
     def print_dictionary(self):
-        """Prints the globals.materials dictionary specifily"""
+        """Prints the globals.materials dictionary in its original order"""
         #print("PRINT_DICTIONARY()")
 
         for material in globals.materials:

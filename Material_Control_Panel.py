@@ -1325,7 +1325,7 @@ class Material_Control_Panel:
             row=1,
             column=0,
             sticky="w",
-            padx=(0,0),
+            padx=(5,0),
             pady=(0,0)
         )
         
@@ -1362,7 +1362,7 @@ class Material_Control_Panel:
             column=0,
             sticky="",
             padx=(0,0),
-            pady=(0,0)
+            pady=(0,5)
         )
     
 
