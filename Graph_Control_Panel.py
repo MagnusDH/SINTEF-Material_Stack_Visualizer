@@ -10,12 +10,16 @@ matplotlib.use('TkAgg')
 
 
 class Graph_Control_Panel:
-    def __init__(self, program_window):
+    def __init__(self, program_window, row_placement:int, column_placement:int):
         # print("CLASS: GRAPH_CONTROL_PANEL_INIT()")
         
         self.program_window = program_window
 
-        self.graph_control_panel = self.create_graph_control_panel()
+        #Row/column placement in main program window
+        self.row_placement = row_placement
+        self.column_placement = column_placement
+
+        self.graph_control_panel_frame = self.create_graph_control_panel()
     
 
     def create_graph_control_panel(self):
@@ -30,8 +34,8 @@ class Graph_Control_Panel:
                 fg_color=settings.graph_control_panel_background_color,
             )
             graph_control_panel_frame.grid(
-                row=1,
-                column=2,
+                row=self.row_placement,
+                column=self.column_placement,
                 padx=(settings.graph_control_panel_padding_left, settings.graph_control_panel_padding_right),
                 pady=(settings.graph_control_panel_padding_top, settings.graph_control_panel_padding_bottom),
                 sticky="nsew"

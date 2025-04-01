@@ -9,10 +9,14 @@ import numpy
 
 
 class Graph:
-    def __init__(self, program_window):
+    def __init__(self, program_window, row_placement:int, column_placement:int):
         # print("CLASS: GRAPH_INIT()")
         
         self.program_window = program_window
+
+        #Row/column placement in main program window
+        self.row_placement = row_placement
+        self.column_placement = column_placement
 
         self.graph_translator = self.create_graph_canvas()
 
@@ -36,11 +40,11 @@ class Graph:
                 master=self.program_window,
             )
             self.graph_translator.get_tk_widget().grid(
-                row=0,
-                column=2,
+                row=self.row_placement,
+                column=self.column_placement,
                 sticky="nsew",
-                padx=(1,1),
-                pady=(1,1),
+                padx=(settings.graph_padding_left, settings.graph_padding_right),
+                pady=(settings.graph_padding_top, settings.graph_padding_bottom),
             )
 
         

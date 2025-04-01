@@ -87,6 +87,13 @@ modify_material_window_entry_text_color = "#B1E0FF"
 
 modify_material_window_text_size = 12
 
+#NEW PANEL
+new_panel_padding_top = 2 
+new_panel_padding_bottom = 2 
+new_panel_padding_left = 4 
+new_panel_padding_right = 2
+new_panel_background_color = material_adjustment_panel_background_color
+
 
 #LAYER STACK CANVAS
 layer_stack_canvas_background_color = "white"
@@ -111,7 +118,7 @@ layer_stack_canvas_stepped_offset_left_side = 200              #HOW MUCH SPACE I
 layer_stack_canvas_limited_offset_left_side = 0
 layer_stack_canvas_limited_offset_right_side = 230
 #MULTI
-layer_stack_canvas_multi_offset_left_side = 250                     #HOW MUCH SPACE IS BETWEEN CANVAS WALL AND START OF STACK IN THE MULTI-VIEW
+layer_stack_canvas_multi_offset_left_side = 150                     #HOW MUCH SPACE IS BETWEEN CANVAS WALL AND START OF STACK IN THE MULTI-VIEW
 layer_stack_canvas_multi_offset_right_side = 150                    #HOW MUCH SPACE IS BETWEEN CANVAS WALL AND START OF STACK IN THE MULTI-VIEW
 
 
@@ -119,7 +126,7 @@ layer_stack_canvas_multi_offset_right_side = 150                    #HOW MUCH SP
 canvas_control_panel_background_color = material_adjustment_panel_background_color
 canvas_control_panel_padding_top = 2
 canvas_control_panel_padding_bottom = 4
-canvas_control_panel_padding_right = 4
+canvas_control_panel_padding_right = 2
 canvas_control_panel_padding_left = 2
 canvas_control_panel_text_color = "#B1E0FF"
 canvas_control_panel_button_color = "#B1E0FF"
@@ -137,6 +144,11 @@ canvas_control_panel_text_size = 12
 
 #GRAPHS
 graph_resolution = 75                  #resolution (100 = 100% original size)
+graph_padding_top = 4
+graph_padding_bottom = 2
+graph_padding_left = 2
+graph_padding_right = 4
+
 stoney_graph_x_axis_range_min = -100
 stoney_graph_x_axis_range_max = 100
 stoney_graph_y_axis_range_min = -10
@@ -150,10 +162,10 @@ stress_graph_y_axis_range_max = 100
 
 #GRAPH CONTROL PANEL
 graph_control_panel_background_color = material_adjustment_panel_background_color
-graph_control_panel_padding_top = 1
-graph_control_panel_padding_bottom = 0
-graph_control_panel_padding_left = 1
-graph_control_panel_padding_right = 0
+graph_control_panel_padding_top = 2
+graph_control_panel_padding_bottom = 4
+graph_control_panel_padding_left = 2
+graph_control_panel_padding_right = 4
 graph_control_panel_button_color = "#B1E0FF"
 graph_control_panel_button_hover_color = "#85A8BF"
 graph_control_panel_button_text_color = "black"

@@ -1,5 +1,5 @@
 import tkinter
-from tkinter import messagebox
+from tkinter import messagebox, StringVar
 import customtkinter
 import pyautogui  # For better user interface visual effects
 import os
@@ -10,7 +10,10 @@ import globals
 from Material_Adjustment_Panel import Material_Adjustment_Panel
 from Layer_Stack_Canvas import Layer_Stack_Canvas
 from Material_Control_Panel import Material_Control_Panel
+from New_Panel import New_Panel
 from Canvas_Control_Panel import Canvas_Control_Panel
+from Graph import Graph
+from Graph_Control_Panel import Graph_Control_Panel
 from Equations import Equations
 import traceback
 
@@ -25,21 +28,25 @@ class App:
         #If excel file exists, load it into globals.materials
         if(os.path.isfile("Materials.xlsx")):
             self.load_materials_from_excel()
-
+        
         #??????????????????????????????????????????????????????????????
         globals.equations = Equations()
 
-        #Create a panel that controls the properties of each material
-        globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window)
+        #Set correct row/column configuration and widget layout based on the "view"
+        self.set_layout()
 
-        #Create canvas to draw materials on. This class also creates a control panel to control the layer_stack_canvas
-        globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window)
 
-        #Create a panel that controls the properties of each material
-        globals.material_control_panel = Material_Control_Panel(self.program_window)
+        # #Create a panel that controls the properties of each material
+        # globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
 
-        #Create a panel that controls the actions of the layer_stack_canvas
-        globals.canvas_control_panel = Canvas_Control_Panel(self.program_window)
+        # #Create canvas to draw materials on. This class also creates a control panel to control the layer_stack_canvas
+        # globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
+
+        # #Create a panel that controls the properties of each material
+        # globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
+
+        # #Create a panel that controls the actions of the layer_stack_canvas
+        # globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
 
     
     def load_materials_from_excel(self):
@@ -371,6 +378,256 @@ class App:
             globals.layer_stack_canvas.draw_material_stack()
 
 
+    def set_layout(self):
+        """
+        -Sets the correct column and row configuration for the main program window based on the "view"\n
+        -Creates the widgets in the main program window for the specific "view"
+        -Adjusts sliders, entries, checkboxes etc... for the sepcific view
+        """
+        # print("SET_LAYOUT()")
+
+        #Remove all widgets from main program window
+        for widget in self.program_window.winfo_children():
+            widget.grid_remove()
+
+        #Reset the grid in main program window
+        num_columns = self.program_window.grid_size()[0]
+        num_rows = self.program_window.grid_size()[1]
+        for i in range(num_columns):
+            self.program_window.columnconfigure(i, weight=0, minsize=0, uniform=None)
+        for i in range(num_rows):
+            self.program_window.rowconfigure(i, weight=0, minsize=0, uniform=None)
+
+        #Set different layouts based on the current_view
+        match globals.current_view:
+            case "Stacked" | "Realistic":
+                #Change the layout of the program_window to only two columns
+                self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")
+                self.program_window.columnconfigure(1, weight=90, uniform="group1")
+
+                self.program_window.rowconfigure(0, weight=90, uniform="group1")    
+                self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
+
+                #Create "Material_adjustment_panel"
+                if(globals.material_adjustment_panel == None):
+                    globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
+                else:
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+                    globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
+                
+                #Set all material entry and slider values to "thickness" value, and mark all as "active"
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    globals.materials[material]["Status"] = "active"
+
+
+                #Create "Material_control_panel"
+                if(globals.material_control_panel == None):
+                    globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
+                else:
+                    globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0)
+
+                #Create "Layer_stack_canvas"
+                if(globals.layer_stack_canvas == None):
+                    globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
+                else:
+                    globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1)
+                
+
+                #Create "canvas_control_panel"
+                if(globals.canvas_control_panel == None):
+                    globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
+                else:
+                    globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
+
+
+            case "Stepped":
+                #Change the layout of the program_window to only two columns
+                self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")  #set this column to a specific size that won't change
+                self.program_window.columnconfigure(1, weight=90, uniform="group1")  
+
+                self.program_window.rowconfigure(0, weight=90, uniform="group1")    
+                self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
+
+                
+                #Create "Material_adjustment_panel"
+                if(globals.material_adjustment_panel == None):
+                    globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
+                else:
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+                    globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
+
+                #Set all material entry and slider values to "indent" value, and mark all as "active"
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
+                    globals.materials[material]["Status"] = "active"
+
+
+                #Create "Material_control_panel"
+                if(globals.material_control_panel == None):
+                    globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
+                else:
+                    globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0)
+
+                #Create "Layer_stack_canvas"
+                if(globals.layer_stack_canvas == None):
+                    globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
+                else:
+                    globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1)
+                    
+                #Create "canvas_control_panel"
+                if(globals.canvas_control_panel == None):
+                    globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
+                else:
+                    globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
+   
+
+            case "Stoney":
+                self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")  #set this column to a specific size that won't change
+                self.program_window.columnconfigure(1, weight=45, uniform="group1")  
+                self.program_window.columnconfigure(2, weight=45, uniform="group1")  
+
+                self.program_window.rowconfigure(0, weight=90, uniform="group1")    
+                self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
+
+                #Create "Material_adjustment_panel"
+                if(globals.material_control_panel == None):
+                    globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
+                else:
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+                    globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
+
+                #Set all material entry and slider values to "thickness" value, and mark all as "inactive" expect the lowest layer
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    globals.materials[material]["Status"] = "inactive"
+                    globals.materials[material]["Checkbox_id"].deselect()
+
+                    if(globals.materials[material]["Layer"] == 1):
+                        globals.materials[material]["Status"] = "active"
+                        globals.materials[material]["Checkbox_id"].select()
+
+                #Create "Material_control_panel"
+                if(globals.material_control_panel == None):
+                    globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
+                else:
+                    globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0)
+
+
+                #Create "Layer_stack_canvas"
+                if(globals.layer_stack_canvas == None):
+                    globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
+                else:
+                    globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1)
+
+
+                #Create "canvas_control_panel"
+                if(globals.canvas_control_panel == None):
+                    globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
+                else:
+                    globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
+
+
+                #Create "Graph"
+                if(globals.graph == None):
+                    globals.graph = Graph(self.program_window, 0, 2)
+                else:
+                    globals.graph.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=1)
+
+
+                #Create "graph_control_panel"
+                if(globals.graph_control_panel == None):
+                    globals.graph_control_panel = Graph_Control_Panel(self.program_window, 1, 2)
+                else:
+                    globals.graph_control_panel.graph_control_panel_frame.grid(row=1, column=2)
+
+
+            case "Multi":
+                self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")
+                self.program_window.columnconfigure(1, weight=45, uniform="group1")  
+                self.program_window.columnconfigure(2, weight=45, uniform="group1")  
+
+                self.program_window.rowconfigure(0, weight=45, uniform="group1")    
+                self.program_window.rowconfigure(1, weight=45, uniform="group1")
+                self.program_window.rowconfigure(2, weight=10, minsize=100, uniform="group1")
+
+
+                #Create "Material_adjustment_panel"
+                if(globals.material_adjustment_panel == None):
+                    globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
+                else:
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+                    globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
+
+
+                #Set all material entry and slider values to "thickness" value, and mark all as "active"
+                for material in globals.materials:
+                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
+                    globals.materials[material]["Status"] = "active"
+
+
+                #Create "NEW_PANEL"
+                if(globals.new_panel == None):
+                    globals.new_panel = New_Panel(self.program_window, 1, 0)
+                else:
+                    globals.new_panel.new_panel_frame.grid(row=1, column=0)
+
+
+                #Create "Material_control_panel"
+                if(globals.material_control_panel == None):
+                    globals.material_control_panel = Material_Control_Panel(self.program_window, 2, 0)
+                else:
+                    globals.material_control_panel.material_control_panel_frame.grid(row=2,column=0)
+
+
+                #Create "Layer_stack_canvas"
+                if(globals.layer_stack_canvas == None):
+                    globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
+                    globals.layer_stack_canvas.layer_stack_canvas.grid(rowspan=2)
+                else:
+                    globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan = 2)
+                    globals.layer_stack_canvas.layer_stack_canvas.grid(rowspan=2)
+
+
+                #Create "canvas_control_panel"
+                if(globals.canvas_control_panel == None):
+                    globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 2, 1)
+                else:
+                    globals.canvas_control_panel.canvas_control_panel_frame.grid(row=2, column=1)
+
+
+                #Create "Graph"
+                if(globals.graph == None):
+                    globals.graph = Graph(self.program_window, 0, 2)
+                    globals.graph.graph_translator.get_tk_widget().grid(rowspan=2)
+                else:
+                    globals.graph.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
+
+
+                #Create "graph_control_panel"
+                if(globals.graph_control_panel == None):
+                    globals.graph_control_panel = Graph_Control_Panel(self.program_window, 2, 2)
+                else:
+                    globals.graph_control_panel.graph_control_panel_frame.grid(row=2, column=2)
+
+
+        #Update the sizes for layer_stack_canvas         
+        self.program_window.update()
+        globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
+        globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
+        globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
+        globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
+        globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
+        globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+
+        #Draw the material stack
+        globals.layer_stack_canvas.draw_material_stack()
+    
+
 if __name__ == "__main__":
     #Create the main program window
     program_window = tkinter.Tk()
@@ -381,14 +638,6 @@ if __name__ == "__main__":
     
     #Set the program window title
     program_window.title(settings.program_window_title)
-
-    #Define the row&column layout of the program window
-    program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
-    program_window.columnconfigure(1, weight=9, uniform="group1")  
-
-    program_window.rowconfigure(0, weight=9, uniform="group1")    
-    program_window.rowconfigure(1, weight=1, minsize=100, uniform="group1")   #set this row to a specific size that won't change
-    
 
     #Set the main window background color
     program_window.configure(bg=settings.program_window_background_color)

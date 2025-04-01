@@ -100,25 +100,23 @@
 # TO DO         
     -VIS RUNAR DETTE: "material_slider_updated()" Slider verdi skal gå fra 0 opp til summen av alle lag utenom layer1
     
-    -Del material_adjustment_panel i 2 deler
-        -del1 for slidere og materialer som det er nå
-        -del2: legg til:
-            label1  entry1
-            label2  entry2
-            label3  entry3
-            label4  entry4
-            label5  slider
+    -Når man har view i "multi" og så bytter til en annen view så skjer det noe rart med grid layout'en, den blir plutselig svart nederst
+    -Legg til i "new_panel":
+        label1  entry1
+        label2  entry2
+        label3  entry3
+        label4  entry4
+        label5  slider
 
-
+    -Hvis du sletter alle materialer untatt det nederste så skjer det noe rart med knappene som bytter rekkefølge på materialene i material_adjustment_panel
     -Zn i "cantilever profile" graf skal være "Ei"
-    -indent = høyde i nanometer. Hvis rectanglet er 500nm og indent er 500nm så skal rectanglet vises som et kvadrat
 
     -Finn en løsning på å gjøre "multi" view litt mer kompakt på venstre side
-
-    -Regn ut og sjekk nye ligninger fra Runar
     -Legg til to grafer i "multi" view
         -Top graf i multi view skal ha (0,0) nede i venstre hjørne (blå halvsirkel skal ikke være der)
-    -ZN blir regnet ut feil ifølge Runar, snakk om dette
+
+    -Regn ut og sjekk nye ligninger fra Runar
+    
 
     -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?
     -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert

@@ -7,11 +7,15 @@ import globals  #File containing global variables
 
 #This class handles the modification of the materials properties
 class Material_Adjustment_Panel:
-    def __init__(self, window):
+    def __init__(self, window, row_placement:int, column_placement:int):
         # print("CLASS MATERIAL_ADJUSTMENT_PANEL INIT()")
 
         #Window where everything is placed
         self.program_window = window
+
+        #Row/column placement in main program window
+        self.row_placement = row_placement
+        self.column_placement = column_placement
         
         self.material_adjustment_panel_frame = self.create_material_adjustment_panel()
 
@@ -31,8 +35,8 @@ class Material_Adjustment_Panel:
                 fg_color=settings.material_adjustment_panel_background_color
             )
             self.material_adjustment_panel_frame.grid(
-                row=0,
-                column=0,
+                row=self.row_placement,
+                column=self.column_placement,
                 padx=(settings.material_adjustment_panel_padding_left, settings.material_adjustment_panel_padding_right),
                 pady=(settings.material_adjustment_panel_padding_top, settings.material_adjustment_panel_padding_bottom),
                 sticky="nswe"
@@ -50,7 +54,7 @@ class Material_Adjustment_Panel:
 
         row_counter = 1
         #Create a different layout based on the "view"
-        match globals.option_menu:
+        match globals.current_view:
             case "Stacked" | "Realistic" | "Multi":
                 #If checkboxes has been made, disable it
                 for material in globals.materials:
@@ -784,6 +788,7 @@ class Material_Adjustment_Panel:
                         #Increment row_counter
                         row_counter+=1
 
+            
         return self.material_adjustment_panel_frame
 
 
@@ -818,7 +823,7 @@ class Material_Adjustment_Panel:
         # print("MATERIAL_ENTRY_UPDATED()")
     
         #Update different values in self.materials based on option menu value
-        match globals.option_menu:
+        match globals.current_view:
             case "Stacked" | "Realistic" | "Multi":
                 #Find material that corresponds to "entry"
                 for material in globals.materials:
@@ -887,7 +892,7 @@ class Material_Adjustment_Panel:
         ################################################################################################
             
         #Update different values in self.materials based on option value
-        match globals.option_menu:
+        match globals.current_view:
             case "Stacked"|"Realistic" | "Multi":
                 #Update the thickness value in self.materials
                 globals.materials[identifier]["Thickness"] = value

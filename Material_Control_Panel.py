@@ -11,11 +11,15 @@ import os
 
 
 class Material_Control_Panel:
-    def __init__(self, window):
+    def __init__(self, window, row_placement:int, column_placement:int):
         # print("CLASS MATERIAL_CONTROL_PANEL INIT()")
 
         #Window where everything is placed
         self.program_window = window
+
+        #Row/column placement in main program window
+        self.row_placement = row_placement
+        self.column_placement = column_placement
 
         self.material_control_panel_frame = self.create_material_control_panel()
 
@@ -32,8 +36,8 @@ class Material_Control_Panel:
                 fg_color=settings.material_control_panel_background_color
             )
             material_control_panel_frame.grid(
-                row=1,
-                column=0,
+                row=self.row_placement,
+                column=self.column_placement,
                 sticky="nsew",
                 padx=(settings.material_control_panel_padding_left, settings.material_control_panel_padding_right),
                 pady=(settings.material_control_panel_padding_top, settings.material_control_panel_padding_bottom)
@@ -1583,7 +1587,7 @@ class Material_Control_Panel:
             globals.app.load_materials_from_excel()
 
             #Stoney view is special and needs all materials to be "inactive" except the lowest layer material
-            if(globals.option_menu == "Stoney"):
+            if(globals.current_view == "Stoney"):
                 for material in globals.materials:
                     globals.materials[material]["Status"] = "inactive"
 
@@ -1723,7 +1727,7 @@ class Material_Control_Panel:
         canvas_screenshot = Image(f"{main_folder}/{sub_folder}/canvas_screenshot.png")
 
         #Set the width and height of image placed in excel file
-        match globals.option_menu:
+        match globals.current_view:
             case "Stacked" | "Realistic" | "Stepped" | "Multi":
                 canvas_screenshot.width = 750
                 canvas_screenshot.height = 350
