@@ -100,14 +100,6 @@
 # TO DO         
     -VIS RUNAR DETTE: "material_slider_updated()" Slider verdi skal gå fra 0 opp til summen av alle lag utenom layer1
     
-    -Når man har view i "multi" og så bytter til en annen view så skjer det noe rart med grid layout'en, den blir plutselig svart nederst
-    -Legg til i "new_panel":
-        label1  entry1
-        label2  entry2
-        label3  entry3
-        label4  entry4
-        label5  slider
-
     -Hvis du sletter alle materialer untatt det nederste så skjer det noe rart med knappene som bytter rekkefølge på materialene i material_adjustment_panel
     -Zn i "cantilever profile" graf skal være "Ei"
 

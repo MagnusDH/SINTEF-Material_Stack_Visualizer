@@ -35,19 +35,6 @@ class App:
         #Set correct row/column configuration and widget layout based on the "view"
         self.set_layout()
 
-
-        # #Create a panel that controls the properties of each material
-        # globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
-
-        # #Create canvas to draw materials on. This class also creates a control panel to control the layer_stack_canvas
-        # globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
-
-        # #Create a panel that controls the properties of each material
-        # globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
-
-        # #Create a panel that controls the actions of the layer_stack_canvas
-        # globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
-
     
     def load_materials_from_excel(self):
         """Reads the excel-file in the folder and populates the self.materials dictionary with info about each material"""
@@ -267,116 +254,6 @@ class App:
                 traceback.print_exc()
                 return
 
-    
-    def convert_decimal_string_to_float(self, string_number:str):
-        """
-        -Converts a string to float no matter if it is written with "," or "."\n 
-        -Returns the float is sucessfull, returns False if not sucessfull
-        """
-        # print("CINVERT_DECIMAL_STRING_TO_FLOAT()")
-        try:
-            new_float = float(string_number)
-            return new_float
-        
-        except:
-            if((isinstance(string_number, str)) and ("," in string_number)):
-                try:
-                    new_float = string_number.replace(",", ".")
-                    new_float = float(new_float)
-                    return new_float
-
-                except:
-                    return False
-            else:
-                return False
-
-
-    def is_valid_color(self, color:str):
-        """Returns True if given color string is a valid color. Return False if invalid"""
-        # print("IS_VALID_COLOR()")
-        #Check if color is accepted by tkinter
-        try:
-            self.program_window.winfo_rgb(color)
-            return True
-        
-        except:
-            #Check if color is valid hexadecimal value
-            if(type(color)==str and color.startswith('#') and len(color)==7):
-                return True
-            else:
-                return False
-
-
-    def sort_dictionary(self):
-        """
-        -Sorts the materials in the materials dictionary after their layer value\n
-        -Assigns new layer values based on the order of the materials in the dictionary. (First material in the dictionary is assigned as layer 1)
-        """
-        # print("SORT_DICTIONARY()")
-
-        #Sort the materials dictionary after the "layer" value
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
-
-        #create a layer counter variable starting at 1
-        layer_counter = 1
-        #Loop through the dictionary
-        for material in globals.materials:
-            #set material->layer value to be layer_counter
-            globals.materials[material]["Layer"] = layer_counter
-            #increment layer_counter
-            layer_counter += 1
-
-
-    def print_dictionary(self):
-        """Prints the globals.materials dictionary in its original order"""
-        #print("PRINT_DICTIONARY()")
-
-        for material in globals.materials:
-            print("Dictionary key:", material, "    |", type(material))
-            print("Name:", globals.materials[material]["Name"], "   |", type(globals.materials[material]["Name"]))
-            print("Layer:", globals.materials[material]["Layer"], "     |", type(globals.materials[material]["Layer"]))
-            print("Thickness:", globals.materials[material]["Thickness"], "     |", type(globals.materials[material]["Thickness"]))  
-            print("Unit:", globals.materials[material]["Unit"], "   |", type(globals.materials[material]["Unit"]))  
-            print("Indent [nm]:", globals.materials[material]["Indent [nm]"], "     |", type(globals.materials[material]["Indent [nm]"]))  
-            print("Color:", globals.materials[material]["Color"], "     |", type(globals.materials[material]["Color"]))  
-            print("Status:", globals.materials[material]["Status"], "   |", type(globals.materials[material]["Status"]))  
-            print("Modulus [GPa]:", globals.materials[material]["Modulus [GPa]"], "     |", type(globals.materials[material]["Modulus [GPa]"]))  
-            print("CTE [ppm/deg]:", globals.materials[material]["CTE [ppm/deg]"], "     |", type(globals.materials[material]["CTE [ppm/deg]"]))  
-            print("Density [kg/m3]:", globals.materials[material]["Density [kg/m3]"], "     |", type(globals.materials[material]["Density [kg/m3]"]))  
-            print("Stress_x [MPa]:", globals.materials[material]["Stress_x [MPa]"], "   |", type(globals.materials[material]["Stress_x [MPa]"]))  
-            print("Poisson:", globals.materials[material]["Poisson"], "     |", type(globals.materials[material]["Poisson"]))  
-            print("R0:", globals.materials[material]["R0"], "   |", type(globals.materials[material]["R0"]))  
-            print("R:", globals.materials[material]["R"], "     |", type(globals.materials[material]["R"]))  
-            
-            print("\n")
-
-
-    def program_window_resized(self, event): 
-        """Scales the layer_stack_canvas correctly based on the size of the program_window"""
-        # print("PROGRAM_WINDOW_RESIZED()")
-        
-        #Check if the program window is actually resized
-        if((self.program_window.winfo_width() != globals.current_program_window_width) or (self.program_window.winfo_height() != globals.current_program_window_height)):
-            # print("PROGRAM_WINDOW_RESIZED()")
-            self.program_window.update_idletasks()
-            
-            #Update the new sizes to globals
-            globals.current_program_window_height = self.program_window.winfo_height()
-            globals.current_program_window_width = self.program_window.winfo_width()
-
-            #Update the boundaries of the layer_stack_canvas
-            globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
-            globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
-            globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
-            globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
-            
-
-            globals.layer_stack_canvas.layer_stack_canvas_width =  globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-            globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
-
-            #Redraw the layer_stack_canvas
-            globals.layer_stack_canvas.draw_material_stack()
-
 
     def set_layout(self):
         """
@@ -390,20 +267,23 @@ class App:
         for widget in self.program_window.winfo_children():
             widget.grid_remove()
 
+
         #Reset the grid in main program window
         num_columns = self.program_window.grid_size()[0]
         num_rows = self.program_window.grid_size()[1]
         for i in range(num_columns):
-            self.program_window.columnconfigure(i, weight=0, minsize=0, uniform=None)
+            self.program_window.columnconfigure(i, weight=0, minsize=0, uniform="reset")
         for i in range(num_rows):
-            self.program_window.rowconfigure(i, weight=0, minsize=0, uniform=None)
+            self.program_window.rowconfigure(i, weight=0, minsize=0, uniform="reset")
 
         #Set different layouts based on the current_view
         match globals.current_view:
             case "Stacked" | "Realistic":
+                self.program_window.update()
                 #Change the layout of the program_window to only two columns
                 self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")
                 self.program_window.columnconfigure(1, weight=90, uniform="group1")
+
 
                 self.program_window.rowconfigure(0, weight=90, uniform="group1")    
                 self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
@@ -413,7 +293,7 @@ class App:
                     globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
                 else:
                     globals.material_adjustment_panel.create_material_adjustment_panel()
-                    globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
+                    globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0, sticky="nsew")
                 
                 #Set all material entry and slider values to "thickness" value, and mark all as "active"
                 for material in globals.materials:
@@ -426,20 +306,20 @@ class App:
                 if(globals.material_control_panel == None):
                     globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
                 else:
-                    globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0)
+                    globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0, sticky="nsew")
 
                 #Create "Layer_stack_canvas"
                 if(globals.layer_stack_canvas == None):
                     globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
                 else:
-                    globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1)
+                    globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1, sticky="nsew")
                 
 
                 #Create "canvas_control_panel"
                 if(globals.canvas_control_panel == None):
                     globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
                 else:
-                    globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
+                    globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1, sticky="nsew")
 
 
             case "Stepped":
@@ -627,6 +507,117 @@ class App:
         #Draw the material stack
         globals.layer_stack_canvas.draw_material_stack()
     
+    
+    def convert_decimal_string_to_float(self, string_number:str):
+        """
+        -Converts a string to float no matter if it is written with "," or "."\n 
+        -Returns the float is sucessfull, returns False if not sucessfull
+        """
+        # print("CINVERT_DECIMAL_STRING_TO_FLOAT()")
+        try:
+            new_float = float(string_number)
+            return new_float
+        
+        except:
+            if((isinstance(string_number, str)) and ("," in string_number)):
+                try:
+                    new_float = string_number.replace(",", ".")
+                    new_float = float(new_float)
+                    return new_float
+
+                except:
+                    return False
+            else:
+                return False
+
+
+    def is_valid_color(self, color:str):
+        """Returns True if given color string is a valid color. Return False if invalid"""
+        # print("IS_VALID_COLOR()")
+        #Check if color is accepted by tkinter
+        try:
+            self.program_window.winfo_rgb(color)
+            return True
+        
+        except:
+            #Check if color is valid hexadecimal value
+            if(type(color)==str and color.startswith('#') and len(color)==7):
+                return True
+            else:
+                return False
+
+
+    def sort_dictionary(self):
+        """
+        -Sorts the materials in the materials dictionary after their layer value\n
+        -Assigns new layer values based on the order of the materials in the dictionary. (First material in the dictionary is assigned as layer 1)
+        """
+        # print("SORT_DICTIONARY()")
+
+        #Sort the materials dictionary after the "layer" value
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+
+        #create a layer counter variable starting at 1
+        layer_counter = 1
+        #Loop through the dictionary
+        for material in globals.materials:
+            #set material->layer value to be layer_counter
+            globals.materials[material]["Layer"] = layer_counter
+            #increment layer_counter
+            layer_counter += 1
+
+
+    def print_dictionary(self):
+        """Prints the globals.materials dictionary in its original order"""
+        #print("PRINT_DICTIONARY()")
+
+        for material in globals.materials:
+            print("Dictionary key:", material, "    |", type(material))
+            print("Name:", globals.materials[material]["Name"], "   |", type(globals.materials[material]["Name"]))
+            print("Layer:", globals.materials[material]["Layer"], "     |", type(globals.materials[material]["Layer"]))
+            print("Thickness:", globals.materials[material]["Thickness"], "     |", type(globals.materials[material]["Thickness"]))  
+            print("Unit:", globals.materials[material]["Unit"], "   |", type(globals.materials[material]["Unit"]))  
+            print("Indent [nm]:", globals.materials[material]["Indent [nm]"], "     |", type(globals.materials[material]["Indent [nm]"]))  
+            print("Color:", globals.materials[material]["Color"], "     |", type(globals.materials[material]["Color"]))  
+            print("Status:", globals.materials[material]["Status"], "   |", type(globals.materials[material]["Status"]))  
+            print("Modulus [GPa]:", globals.materials[material]["Modulus [GPa]"], "     |", type(globals.materials[material]["Modulus [GPa]"]))  
+            print("CTE [ppm/deg]:", globals.materials[material]["CTE [ppm/deg]"], "     |", type(globals.materials[material]["CTE [ppm/deg]"]))  
+            print("Density [kg/m3]:", globals.materials[material]["Density [kg/m3]"], "     |", type(globals.materials[material]["Density [kg/m3]"]))  
+            print("Stress_x [MPa]:", globals.materials[material]["Stress_x [MPa]"], "   |", type(globals.materials[material]["Stress_x [MPa]"]))  
+            print("Poisson:", globals.materials[material]["Poisson"], "     |", type(globals.materials[material]["Poisson"]))  
+            print("R0:", globals.materials[material]["R0"], "   |", type(globals.materials[material]["R0"]))  
+            print("R:", globals.materials[material]["R"], "     |", type(globals.materials[material]["R"]))  
+            
+            print("\n")
+
+
+    def program_window_resized(self, event): 
+        """Scales the layer_stack_canvas correctly based on the size of the program_window"""
+        # print("PROGRAM_WINDOW_RESIZED()")
+        
+        #Check if the program window is actually resized
+        if((self.program_window.winfo_width() != globals.current_program_window_width) or (self.program_window.winfo_height() != globals.current_program_window_height)):
+            # print("PROGRAM_WINDOW_RESIZED()")
+            self.program_window.update_idletasks()
+            
+            #Update the new sizes to globals
+            globals.current_program_window_height = self.program_window.winfo_height()
+            globals.current_program_window_width = self.program_window.winfo_width()
+
+            #Update the boundaries of the layer_stack_canvas
+            globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
+            globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
+            globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
+            globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
+            
+
+            globals.layer_stack_canvas.layer_stack_canvas_width =  globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
+            globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
+
+            #Redraw the layer_stack_canvas
+            globals.layer_stack_canvas.draw_material_stack()
+
+
 
 if __name__ == "__main__":
     #Create the main program window
@@ -647,8 +638,8 @@ if __name__ == "__main__":
 
     #Create an instance of App and run it
     globals.app = App(program_window)
-    
-    # #Checks if the program window is being resized
+
+    #Checks if the program window is being resized
     globals.current_program_window_height = program_window.winfo_height()
     globals.current_program_window_width = program_window.winfo_width()
     program_window.bind("<Configure>", lambda event: globals.app.program_window_resized(event))

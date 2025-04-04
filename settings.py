@@ -93,6 +93,17 @@ new_panel_padding_bottom = 2
 new_panel_padding_left = 4 
 new_panel_padding_right = 2
 new_panel_background_color = material_adjustment_panel_background_color
+new_panel_text_color = "#B1E0FF"
+new_panel_entry_background_color = "#284154"
+new_panel_entry_border_color = "#B1E0FF"
+new_panel_entry_text_color = "#B1E0FF"
+
+new_panel_slider_range_min = 0
+new_panel_slider_range_max = 1000
+new_panel_slider_background_color = "black"
+new_panel_slider_button_color = "#B1E0FF"
+new_panel_slider_progress_color = "#B1E0FF"
+new_panel_slider_hover_color = "#85A8BF"
 
 
 #LAYER STACK CANVAS
