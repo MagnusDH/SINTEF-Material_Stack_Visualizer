@@ -170,6 +170,11 @@ stress_graph_x_axis_range_max = 100
 stress_graph_y_axis_range_min = -100
 stress_graph_y_axis_range_max = 100
 
+z_tip_is_graph_x_axis_range_min = 0
+z_tip_is_graph_x_axis_range_max = 100
+z_tip_is_graph_y_axis_range_min = 0
+z_tip_is_graph_y_axis_range_max = 100
+
 
 #GRAPH CONTROL PANEL
 graph_control_panel_background_color = material_adjustment_panel_background_color

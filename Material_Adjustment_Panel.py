@@ -1,5 +1,5 @@
 import tkinter
-from tkinter import StringVar, messagebox
+from tkinter import StringVar
 import customtkinter
 import settings #File containing settings
 import globals  #File containing global variables
@@ -235,67 +235,65 @@ class Material_Adjustment_Panel:
                             globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
 
 
-                        #Create buttons to move layer up or down
-                        if(len(globals.materials) > 1):
-                            #Create down_button
-                            if(globals.materials[material]["Move_down_button_id"] == None):
-                                move_down_button = customtkinter.CTkButton(
-                                    master=self.material_adjustment_panel_frame, 
-                                    text="⬇", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, 15),
-                                    fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
-                                    text_color=settings.material_adjustment_panel_button_text_color,
-                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
-                                )
-                                move_down_button.grid(
-                                    row=row_counter,
-                                    column=4,
-                                    sticky="",
-                                    padx=(0,0),
-                                    pady=(0,0)
-                                )
-                                globals.materials[material]["Move_down_button_id"] = move_down_button
-                            #Adjust existing move_down_button
-                            else:
-                                globals.materials[material]["Move_down_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down),
-                                    hover_color=globals.materials[material]["Color"]
-                                )
-                                globals.materials[material]["Move_down_button_id"].grid(
-                                    row=row_counter,
-                                    column=4
-                                )
+                        #Create move down_button
+                        if(globals.materials[material]["Move_down_button_id"] == None):
+                            move_down_button = customtkinter.CTkButton(
+                                master=self.material_adjustment_panel_frame, 
+                                text="⬇", #⬆ ⬇ 🔼 🔽
+                                font=(settings.text_font, 15),
+                                fg_color=settings.material_adjustment_panel_button_color,
+                                hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
+                                text_color=settings.material_adjustment_panel_button_text_color,
+                                command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
+                            )
+                            move_down_button.grid(
+                                row=row_counter,
+                                column=4,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Move_down_button_id"] = move_down_button
+                        #Adjust existing move_down_button
+                        else:
+                            globals.materials[material]["Move_down_button_id"].configure(
+                                command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down),
+                                hover_color=globals.materials[material]["Color"]
+                            )
+                            globals.materials[material]["Move_down_button_id"].grid(
+                                row=row_counter,
+                                column=4
+                            )
 
-                            #Create up_button
-                            if(globals.materials[material]["Move_up_button_id"] == None):
-                                move_up_button = customtkinter.CTkButton(
-                                    master=self.material_adjustment_panel_frame, 
-                                    text="⬆", #⬆ ⬇ 🔼 🔽
-                                    font=(settings.text_font, 15),
-                                    fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
-                                    text_color=settings.material_adjustment_panel_button_text_color,
-                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
-                                )
-                                move_up_button.grid(
-                                    row=row_counter,
-                                    column=5,
-                                    sticky="",
-                                    padx=(0,0),
-                                    pady=(0,0)
-                                )
-                                globals.materials[material]["Move_up_button_id"] = move_up_button
-                            #Adjust existing move_down_button
-                            else:
-                                globals.materials[material]["Move_up_button_id"].configure(
-                                    command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down),
-                                    hover_color=globals.materials[material]["Color"]
-                                )
-                                globals.materials[material]["Move_up_button_id"].grid(
-                                    row=row_counter,
-                                    column=5
-                                )
+                        #Create move up_button
+                        if(globals.materials[material]["Move_up_button_id"] == None):
+                            move_up_button = customtkinter.CTkButton(
+                                master=self.material_adjustment_panel_frame, 
+                                text="⬆", #⬆ ⬇ 🔼 🔽
+                                font=(settings.text_font, 15),
+                                fg_color=settings.material_adjustment_panel_button_color,
+                                hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
+                                text_color=settings.material_adjustment_panel_button_text_color,
+                                command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
+                            )
+                            move_up_button.grid(
+                                row=row_counter,
+                                column=5,
+                                sticky="",
+                                padx=(0,0),
+                                pady=(0,0)
+                            )
+                            globals.materials[material]["Move_up_button_id"] = move_up_button
+                        #Adjust existing move_down_button
+                        else:
+                            globals.materials[material]["Move_up_button_id"].configure(
+                                command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down),
+                                hover_color=globals.materials[material]["Color"]
+                            )
+                            globals.materials[material]["Move_up_button_id"].grid(
+                                row=row_counter,
+                                column=5
+                            )
 
                         #Increment row_counter
                         row_counter+=1

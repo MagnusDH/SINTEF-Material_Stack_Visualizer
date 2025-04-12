@@ -29,7 +29,7 @@ class App:
         if(os.path.isfile("Materials.xlsx")):
             self.load_materials_from_excel()
         
-        #??????????????????????????????????????????????????????????????
+        #Class for easy access to calculation of important equations
         globals.equations = Equations()
 
         #Set correct row/column configuration and widget layout based on the "view"
@@ -415,6 +415,8 @@ class App:
                 if(globals.graph == None):
                     globals.graph = Graph(self.program_window, 0, 2)
                 else:
+                    globals.graph.graph1.clear()
+                    globals.graph.graph2.clear()
                     globals.graph.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=1)
 
 

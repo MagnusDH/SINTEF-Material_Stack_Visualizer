@@ -97,17 +97,13 @@
     -Run the following command: "python -m PyInstaller --onefile program_name.py"
 
 
-# TO DO         
-    -VIS RUNAR DETTE: "material_slider_updated()" Slider verdi skal gå fra 0 opp til summen av alle lag utenom layer1
+# TO DO            
+    -Det skal være mikrometer langs x og y aksen i "z_tip_is" graf
     
-    -Hvis du sletter alle materialer untatt det nederste så skjer det noe rart med knappene som bytter rekkefølge på materialene i material_adjustment_panel
-    -Zn i "cantilever profile" graf skal være "Ei"
+    -put key "thickness" to "thickness [nm]"
 
-    -Finn en løsning på å gjøre "multi" view litt mer kompakt på venstre side
-    -Legg til to grafer i "multi" view
-        -Top graf i multi view skal ha (0,0) nede i venstre hjørne (blå halvsirkel skal ikke være der)
+    -tip_displacement_zero returnerer ett tall som skal vises i programmet under V-slider (label = "zero curvature thickness: value")
 
-    -Regn ut og sjekk nye ligninger fra Runar
     
 
     -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?
@@ -117,10 +113,15 @@
     -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
     -Fjerne eller forbedre "reset values" knappen??????? (hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes)
     -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
-
     -Make a button that gives the user the option to load an excel file
 
 # QUESTIONS:
+    -Spør om det er riktig at "W_entry" og "L_entry" ikke kan ha 0 verdier? dette fører til zero division errors    
+    -Trenger hjelp til "tip_displacement_zero" equation 
+    -Hvordan skal z_tip_is egentlig plottes i graf?
+    -VIS RUNAR DETTE: "material_slider_updated()" Slider verdi skal gå fra 0 opp til summen av alle lag utenom layer1
+    -Finner ikke en god løsning på å gjøre "multi" view litt mer kompakt på venstre side
+    -Hvordan skal W, L, Ri etc... ny entries fylles ut korrekt? skal de inneholde nanometer?
     -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
     
 # BUGS:

@@ -20,6 +20,7 @@ class New_Panel:
         self.new_panel_frame = self.create_new_panel()
     
 
+    #Add explanation of function
     def create_new_panel(self):
         """
         -??????????????????????????????? 
@@ -42,12 +43,11 @@ class New_Panel:
             )
 
             #Define the row&column layout of the new_panel
-            new_panel_frame.columnconfigure(0, weight=50, uniform="group1")
-            new_panel_frame.columnconfigure(1, weight=50, uniform="group1")
+            new_panel_frame.columnconfigure(0, weight=20, uniform="group1")
+            new_panel_frame.columnconfigure(1, weight=40, uniform="group1")
+            new_panel_frame.columnconfigure(2, weight=40, uniform="group1")
 
-            new_panel_frame.rowconfigure((0,1,2,3,), weight=20, uniform="group1")    
-            new_panel_frame.rowconfigure((4), weight=20, uniform="group1")
-        
+            new_panel_frame.rowconfigure((0,1,2,3,4,5), weight=1, uniform="group1")
 
             #Create "W μm" label
             W_label = customtkinter.CTkLabel(
@@ -65,9 +65,10 @@ class New_Panel:
             )
 
             #Create Entry
+            self.W_value = tkinter.StringVar(value=0)
             W_entry = customtkinter.CTkEntry(
                 master=new_panel_frame,
-                textvariable=tkinter.StringVar(value=0),
+                textvariable=self.W_value,
                 fg_color = settings.new_panel_entry_background_color,
                 border_color=settings.new_panel_entry_border_color,
                 border_width=0.4,
@@ -76,12 +77,12 @@ class New_Panel:
             )
             W_entry.grid(
                 row=0, 
-                column=1,
+                column=2,
                 sticky="",
                 padx=(0,0),
                 pady=(0,0)
             )
-            # W_entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
+            W_entry.bind("<Return>", lambda event, entry=W_entry: self.W_entry_updated(entry))
 
 
             #Create "L μm" label
@@ -100,9 +101,10 @@ class New_Panel:
             )
 
             #Create "L μm" Entry
+            self.L_value = tkinter.StringVar(value=0)
             L_entry = customtkinter.CTkEntry(
                 master=new_panel_frame,
-                textvariable=tkinter.StringVar(value=0),
+                textvariable=self.L_value,
                 fg_color = settings.new_panel_entry_background_color,
                 border_color=settings.new_panel_entry_border_color,
                 border_width=0.4,
@@ -111,12 +113,13 @@ class New_Panel:
             )
             L_entry.grid(
                 row=1, 
-                column=1,
+                column=2,
                 sticky="",
                 padx=(0,0),
                 pady=(0,0)
             )
-            # W_entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))#Create "W μm" label
+            L_entry.bind("<Return>", lambda event, entry=L_entry: self.L_entry_updated(entry))
+
             
             #Create "rᵢ μm" label
             ri_label = customtkinter.CTkLabel(
@@ -145,7 +148,7 @@ class New_Panel:
             )
             ri_entry.grid(
                 row=2, 
-                column=1,
+                column=2,
                 sticky="",
                 padx=(0,0),
                 pady=(0,0)
@@ -179,16 +182,31 @@ class New_Panel:
             )
             ro_entry.grid(
                 row=3, 
-                column=1,
+                column=2,
                 sticky="",
                 padx=(0,0),
                 pady=(0,0)
             )
             # ro_entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
 
+            #Create slider label
+            volt_label = customtkinter.CTkLabel(
+                master=new_panel_frame, 
+                text="Volt", 
+                fg_color=settings.new_panel_background_color,
+                text_color=settings.new_panel_text_color
+            )
+            volt_label.grid(
+                row=4, 
+                column=0, 
+                sticky="", 
+                padx=(0,0),
+                pady=(0,0)
+            )
+
             #Create Slider
-            self.V_value = tkinter.StringVar(value=0)
-            V_slider = customtkinter.CTkSlider(
+            self.volt_value = tkinter.StringVar(value=0)
+            volt_slider = customtkinter.CTkSlider(
                 master=new_panel_frame, 
                 from_=settings.new_panel_slider_range_min, 
                 to=settings.new_panel_slider_range_max, 
@@ -196,21 +214,21 @@ class New_Panel:
                 button_color=settings.new_panel_slider_button_color,
                 progress_color=settings.new_panel_slider_progress_color,
                 button_hover_color=settings.new_panel_slider_hover_color,
-                command=lambda value: self.V_slider_updated(value)
+                command=lambda value: self.volt_slider_updated(value)
             )
-            V_slider.grid(
+            volt_slider.grid(
                 row=4, 
-                column=0,
+                column=1,
                 sticky="",
                 padx=(0,0),
                 pady=(0,0)
             )
-            V_slider.set(helper_functions.convert_decimal_string_to_float(self.V_value.get()))
+            volt_slider.set(helper_functions.convert_decimal_string_to_float(self.volt_value.get()))
 
             #Create slider Entry
             V_entry = customtkinter.CTkEntry(
                 master=new_panel_frame,
-                textvariable=self.V_value,
+                textvariable=self.volt_value,
                 fg_color = settings.new_panel_entry_background_color,
                 border_color=settings.new_panel_entry_border_color,
                 border_width=0.4,
@@ -219,33 +237,78 @@ class New_Panel:
             )
             V_entry.grid(
                 row=4, 
-                column=1,
+                column=2,
                 sticky="",
                 padx=(0,0),
                 pady=(0,0)
             )
-            V_entry.bind("<Return>", lambda event, entry_id=V_entry, slider_id=V_slider: self.V_entry_updated(entry_id, slider_id))
+            V_entry.bind("<Return>", lambda event, entry_id=V_entry, slider_id=volt_slider: self.volt_entry_updated(entry_id, slider_id))
 
+
+            #curvature_thickness label
+            # globals.equations.tip_displacement_zero()
+            self.curvature_thickness_label = customtkinter.CTkLabel(
+                master=new_panel_frame, 
+                text=f"Zero curvature thickness: {self.volt_value.get()}", 
+                fg_color=settings.new_panel_background_color,
+                text_color=settings.new_panel_text_color
+            )
+            self.curvature_thickness_label.grid(
+                row=5, 
+                column=0, 
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,0),
+                columnspan=3
+            )
+            
 
         return new_panel_frame
         
     
-    def V_slider_updated(self, value):
+    def volt_slider_updated(self, value):
         """
-        Updates the value in the 'V_slider' so that it corresponds to the 'V_entry'
+        Updates the value in the 'volt_slider' so that it corresponds to the 'V_entry'
         """
-        # print("V_SLIDER UPDATED()")
+        # print("VOLT_SLIDER UPDATED()")
 
-        self.V_value.set(round(value, 1))
+        self.volt_value.set(round(value, 1))
+
+        self.curvature_thickness_label.configure(text=f"Zero curvature thickness: {self.volt_value.get()}")
 
 
-    def V_entry_updated(self, entry_id, slider_id):
+    def volt_entry_updated(self, entry_id, slider_id):
         """
-        Updates the value in the 'V_entry' so that it corresponds to the 'V_slider'
+        Updates the value in the 'V_entry' so that it corresponds to the 'volt_slider'
         """
-        # print("V_ENTRY_UPDATED()")
+        # print("VOLT_ENTRY_UPDATED()")
         
         #Find entered value
         entered_value = entry_id.get()
-        #Update the V_slider corresponding to entry
+        #Update the volt_slider corresponding to entry
         slider_id.set(helper_functions.convert_decimal_string_to_float(entered_value))
+
+        #Update curvature_thickness_label
+        self.curvature_thickness_label.configure(text=f"Zero curvature thickness: {self.volt_value.get()}")
+
+
+
+    #DOES NOT DO ANYTHING YET
+    def W_entry_updated(self, entry_id):
+        # print("W_ENTRY_UPDATED()")
+
+        #Find entered value
+        entered_value = entry_id.get()
+
+        EI = globals.equations.calculate_EI()
+    
+
+    def L_entry_updated(self, entry_id):
+        # print("L_ENTRY_UPDATED()")
+
+        #Find entered value
+        entered_value = entry_id.get()
+
+        z_tip_is = globals.equations.calculate_tip_placement()
+
+        globals.graph.draw_z_tip_is_graph()

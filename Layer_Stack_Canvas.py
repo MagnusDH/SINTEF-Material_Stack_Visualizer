@@ -1186,9 +1186,9 @@ class Layer_Stack_Canvas:
 
         #Write "Zn" text
         self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80,
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70,
             self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - Zn_pixels))/2,
-            text=f"Zn = {Zn}", 
+            text=f"Zn={Zn}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
             tags="text"
@@ -1196,7 +1196,7 @@ class Layer_Stack_Canvas:
 
 
         #Calculate Zp
-        Zp = round(globals.equations.calculate_mid_piezo(Zn), 1)
+        Zp = round(globals.equations.calculate_mid_piezo(), 1) + Zn
 
         #Convert Zp to pixels
         Zp_pixels = Zp / nm_per_pixel 
@@ -1225,8 +1225,8 @@ class Layer_Stack_Canvas:
 
         #Write "Zp" text
         self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 80, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
-            text=f"Zp = {round(Zp - Zn, 1)}", 
+            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
+            text=f"Zp={round(Zp - Zn, 1)}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
             tags="text"
