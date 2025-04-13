@@ -57,10 +57,7 @@ class Equations:
         """
         # print("CALCULATE_MID_PIEZO()")
 
-        #j = lag nummer 1 i en setting der lag starter på 0
-
-        piezo_thickness = 0
-        #populer en liste som går fra lag 1 til og med PZT laget
+        #Populate a list with thickness values from layer1 up until "PZT" material
         t = []
         for material in globals.materials:
             if(material.lower() == "pzt"):
@@ -68,13 +65,14 @@ class Equations:
 
             t.append(globals.materials[material]["Thickness"])
             
-
+        #Fetch thickness value for Piezo material
         piezo_thickness = globals.materials[material]["Thickness"]
 
+        #Calculate Zn
         Zn = self.calculate_Zn()
 
+        #Calculate Zp
         Zp = (piezo_thickness / 2) + sum(t) - Zn
-        # Zp = (piezo_thickness / 2) + sum(t)
 
         return Zp 
 
@@ -96,23 +94,23 @@ class Equations:
             t.append(globals.materials[material]["Thickness"] / 1e9)       #divided by 1 billion
             nu.append(globals.materials[material]["Poisson"])
 
-        #Fetch the 'w' value from new_panel
+        #Fetch the 'W_entry' value from new_panel
         W = helper_functions.convert_decimal_string_to_float(globals.new_panel.W_value.get())
         if(W == 0 or W == False):
             messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
             return None
 
-        #Convert to micrometers
+        #Convert W value to micrometers
         W = W / 1e6
 
-        # w = 160e-6  # width in meters
-
-        #Find Zn value
+        #Calculate Zn value
         Zn = self.calculate_Zn() / 1e9 #divided by 1 billion to get correct value
 
 
         EI = W * ((E[0] / (1 - nu[0]**2)) * (t[0]**3 / 12 + t[0] * (t[0]/2 - Zn)**2))
+        
         EI += W * sum([
+        
         E[i] / (1 - nu[i]**2) * (t[i]**3 / 12 + t[i] * (sum(t[:i]) + t[i]/2 - Zn)**2)
         for i in range(1, len(t))
         ])
@@ -120,10 +118,9 @@ class Equations:
         return EI
 
 
-    #NOT DONE
-    def calculate_M_is_cantilever(self):
+    def calculate_M_tot_cantilever(self):
         """
-        -Function to calculate cantilever stress bending moment (M_is)\n
+        -Function to calculate cantilever stress bending moment (M_tot)\n
         -Return value is 'newton meter'
         """
 
@@ -139,16 +136,14 @@ class Equations:
             sigma_i.append(globals.materials[material]["Stress_x [MPa]"] * 1e6)
 
 
-        #Fetch the 'w' value from new_panel
+        #Fetch the 'W_entry' value from new_panel
         W = helper_functions.convert_decimal_string_to_float(globals.new_panel.W_value.get())
         if(W == 0 or W == False):
             messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
             return None
 
-        #Convert to micrometers
+        #Convert W_value to micrometers
         W = W / 1e6
-
-        # w = 160e-6  # width in meters
 
         if(W == 0 or W == False):
             messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
@@ -157,12 +152,12 @@ class Equations:
         #Calculate Zn value
         Zn = self.calculate_Zn() / 1e9
 
+        #Calculate M_tot
         term1 = W * t[0] * sigma_i[0] * (t[0] / 2 - Zn)
         term2 = sum(W * t[i] * sigma_i[i] * (sum(t[:i]) + t[i] / 2 - Zn) for i in range(1, len(t)))
+        M_tot = term1 + term2 + self.calculate_M_p_cantilever()
 
-        M_is = term1 + term2
-
-        return M_is
+        return M_tot
 
 
     def calculate_curvature(self):
@@ -171,55 +166,100 @@ class Equations:
         -return value is in 1/meters
         """
 
-        M_is = self.calculate_M_is_cantilever()
-        if(M_is == None):
+        M_tot = self.calculate_M_tot_cantilever()
+        #If W_entry value is zero and M_tot function returns None, return
+        if(M_tot == None):
             return
 
         EI = self.calculate_EI()
+        #If W_entry value is zero and calculate_EI function returns None, return
         if(EI == None):
             return
 
-        curv_is = M_is / EI
+        curv_is = M_tot / EI
 
         return curv_is
 
     #NOT DONE
-    def calculate_tip_placement(self):
+    def calculate_tip_placement(self, L):
         """
-        -Tip displacement calculation\n
+        -Tip displacement calculation for a given "length/L" value\n
         -return value is in meters
         """
         curv_is = self.calculate_curvature()
 
-        #Fetch the 'L' value from new_panel
-        L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_value.get())
-        # L = 1000e-6  #length in meters
+        # #Fetch the 'L' value from new_panel
+        # L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_value.get())
+        # # L = 1000e-6  #length in meters
         
-        if(L == 0 or L == False):
-            messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
-            return None
+        # if(L == 0 or L == False):
+        #     messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
+        #     return None
 
-        #Convert to micrometers
+        #Convert L to micrometers
         L = L / 1e6
 
-        z_tip_is = 0.5 * curv_is * L**2
+        z_tip_tot = 0.5 * curv_is * L**2
 
-        return z_tip_is
+        return z_tip_tot * 1e6
 
 
-    def tip_displacement_zero():
+    #NOT DONE AND NOT IN USE 
+    def tip_displacement_zero(self):
         """???????????????"""
         print("TIP_DISPLACEMENT_ZERO()")
 
-        t1 = float(globals.materials["SIO2"]["Thickness"])
+        t = []
+        for material in globals.materials:
+            t.append(globals.materials[material]["Thickness"])
+
+        #CONVERT this to lower case!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        t1 = float(globals.materials["SiO2"]["Thickness"])
+
+        # t_temp = t.copy()
+        # t_temp[1] = t1[0]  #Extract scalar from array
+
+        #Fetch the 'L' value from new_panel
+        L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_entry.get())
         
-        t_temp = t.copy()
-        t_temp[1] = t1[0]  # Extract scalar from array
+        #Convert to micrometers
+        L = L / 1e6
 
-        zn = calculate_zn(E, t_temp, nu)
-        EI = calculate_EI(E, t_temp, nu, w, zn)
-        M_is = calculate_M_is_cantilever(w, t_temp, sigma, zn)
-        curv_is = M_is / EI
-        z_tip_is = 0.5 * curv_is * l**2
 
-        return z_tip_is
+        zn = self.calculate_Zn()
+        EI = self.calculate_EI()
+        M_tot = self.calculate_M_tot_cantilever()
+        curv_is = M_tot / EI
+        
+        z_tip_tot = 0.5 * curv_is * L**2
+
+        return z_tip_tot
+
+
+    def calculate_M_p_cantilever(self):
+        """
+        -Function to calculate cantilever piezoelectric moment (M_p)
+        """
+        # print("CALCULATE_M_P_CANTILEVER()")
+
+        #Calculate Zp value
+        Zp = self.calculate_mid_piezo() / 1e9
+
+        #Fetch the 'W_entry' value from new_panel
+        W = helper_functions.convert_decimal_string_to_float(globals.new_panel.W_value.get())
+        if(W == 0 or W == False):
+            messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
+            return None
+        #Convert to micrometers
+        W = W / 1e6
+
+        #Fetch the 'volt' value from new_panel
+        V_p = helper_functions.convert_decimal_string_to_float(globals.new_panel.volt_entry.get())
+
+        #Fetch the 'e_31_f' value from new_panel
+        e_31_f = helper_functions.convert_decimal_string_to_float(globals.new_panel.e_31_f_entry.get())
+
+        #Calculate M_p value
+        M_p = e_31_f * V_p * Zp * W
+
+        return M_p

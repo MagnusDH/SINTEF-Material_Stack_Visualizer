@@ -98,11 +98,11 @@
 
 
 # TO DO            
-    -Det skal være mikrometer langs x og y aksen i "z_tip_is" graf
-    
-    -put key "thickness" to "thickness [nm]"
+    -replace key "thickness" to "thickness [nm]"
 
     -tip_displacement_zero returnerer ett tall som skal vises i programmet under V-slider (label = "zero curvature thickness: value")
+
+    -export stack and graph in one button
 
     
 
@@ -116,13 +116,7 @@
     -Make a button that gives the user the option to load an excel file
 
 # QUESTIONS:
-    -Spør om det er riktig at "W_entry" og "L_entry" ikke kan ha 0 verdier? dette fører til zero division errors    
-    -Trenger hjelp til "tip_displacement_zero" equation 
-    -Hvordan skal z_tip_is egentlig plottes i graf?
-    -VIS RUNAR DETTE: "material_slider_updated()" Slider verdi skal gå fra 0 opp til summen av alle lag utenom layer1
-    -Finner ikke en god løsning på å gjøre "multi" view litt mer kompakt på venstre side
-    -Hvordan skal W, L, Ri etc... ny entries fylles ut korrekt? skal de inneholde nanometer?
-    -The svg exports of the stack (both full stack and layers) have different SVG sizes if the export was made when the program window was big or small. Is it necessary that they are the same size?
     
 # BUGS:
+    -Hvis en graf er tegnet og man bytter til "stoney view" så er den forrige grafen fremdeles tegnet
     -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 

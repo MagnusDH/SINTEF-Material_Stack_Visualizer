@@ -99,7 +99,7 @@ new_panel_entry_border_color = "#B1E0FF"
 new_panel_entry_text_color = "#B1E0FF"
 
 new_panel_slider_range_min = 0
-new_panel_slider_range_max = 1000
+new_panel_slider_range_max = 100
 new_panel_slider_background_color = "black"
 new_panel_slider_button_color = "#B1E0FF"
 new_panel_slider_progress_color = "#B1E0FF"

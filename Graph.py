@@ -8,6 +8,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #For creating gr
 import numpy
 import helper_functions
 
+from matplotlib.patches import FancyArrowPatch
+
+
 
 class Graph:
     def __init__(self, program_window, row_placement:int, column_placement:int):
@@ -48,26 +51,19 @@ class Graph:
                 pady=(settings.graph_padding_top, settings.graph_padding_bottom),
             )
 
-        
-        
-        #Adjust the margins around the plot
-        # self.graph_container.subplots_adjust(left=0.3, right, top, bottom)
-
         #Create subplots for graphs
-        # #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left)
+        #Explanation of digits: (1)Number of rows in the grid, (2) number of columns in the grid, (3)position of this subplot within the grid (counting starts from 1 in the top-left)
         self.graph1 = self.graph_container.add_subplot(211)  
         self.graph2 = self.graph_container.add_subplot(212)  
 
-        # self.graph_container.tight_layout()
+        #Adjust the margins around the plots
+        self.graph_container.subplots_adjust(
+            left=0.2,     # Move plots to the right (default ~0.125)
+            right=0.95,   # Leave space on the right
+            top=0.95,     # Leave space at the top
+            bottom=0.05    # Leave space at the bottom
+        )
 
-        # #Make each side of the graph equal, making the graph a square
-        # stoney_graph.set_aspect('equal')
-        
-        # #Set labels for the graph
-        # # self.graph.set_title("This is a simple graph")
-        # graph.set_xlabel("X [mm]", fontsize=10, labelpad=3)
-        # graph.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
-        
         #Set the display limits of the x and y axises 
         self.graph1.set_xlim([-100, 100])
         self.graph1.set_ylim([-100, 100])
@@ -87,9 +83,6 @@ class Graph:
         self.graph2.axhline(0, color="black", linewidth=1)
         self.graph2.axvline(0, color="black", linewidth=1)
 
-        #Create legends to display more info about each element in the graph
-        # stoney_graph.legend()
-        # stress_graph.legend()
 
         ########## THIS IS A WORK AROUND TO MAKE THE GRAPH RESIZE TO PROPERLY FIT THE WINDOW ##########
         self.program_window.update()
@@ -235,6 +228,83 @@ class Graph:
         # self.graph_translator.draw()
 
 
+    def draw_z_tip_is_graph(self):
+        """
+        -Draws the 'z_tip_is' graph
+        """
+        # print("DRAW_Z_TIP_IS_GRAPH()")
+
+        #Clear the graph
+        self.graph1.clear()
+
+        #Fetch the 'L' value from new_panel
+        L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_value.get())
+        
+        if(L == 0 or L == False):
+            messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
+            return None
+
+        #Set labels for the graph
+        self.graph1.set_title("'z_tip_is' graph")
+        self.graph1.set_xlabel("X [μm]", fontsize=10, labelpad=3)
+        self.graph1.set_ylabel("Tip displacement [μm]", fontsize=10, labelpad=8)
+        
+        #Set the display limits of the x and y axises 
+        self.graph1.set_xlim([settings.z_tip_is_graph_x_axis_range_min, L*1.15])
+        self.graph1.set_ylim([settings.z_tip_is_graph_y_axis_range_min, globals.equations.calculate_tip_placement(L)*1.05])
+
+        #Display the grid of the graph
+        self.graph1.grid(True)
+
+        # # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        self.graph1.axhline(0, color="black", linewidth=1)
+        self.graph1.axvline(0, color="black", linewidth=1)
+
+        #Create a list of X values ranging from 0 to L 
+        x_values = numpy.linspace(0, L, 100)
+        y_values = []
+
+        #Calculate y_values for each x_value in list
+        for x in x_values:
+            #Calculate y-value
+            y = globals.equations.calculate_tip_placement(x)
+            y_values.append(y)
+
+        #Plot X and Y values
+        self.graph1.plot(x_values, y_values, color="red")
+
+        #Get the highest x and y values
+        x_tip = x_values[-1]
+        y_tip = y_values[-1]
+
+        #Add arrow to show height of graph curve
+        height_arrow = FancyArrowPatch(
+            (x_tip, 0),             # start point (on x-axis)
+            (x_tip, y_tip),         # end point (at tip of curve)
+            arrowstyle='<->',       # arrowheads on both ends
+            color='blue',
+            linewidth=1.5,
+            mutation_scale=10       # size of the arrowheads
+        )
+
+        #Add the arrow to the graph
+        self.graph1.add_patch(height_arrow)
+
+        #Add text to show the height
+        self.graph1.text(
+            x_tip-150, y_tip,
+            f"Height:{round(y_tip,1)}",
+            fontsize=9,
+            color='blue',
+            va='center'
+        )
+
+
+        #Draw the canvas to display the updates
+        self.graph1.figure.canvas.draw()
+
+
+
     # """????????????????????????????????????????????????"""
     # def draw_stress_graph(self):
     #     print("DRAW_STRESS_GRAPH()")
@@ -288,53 +358,3 @@ class Graph:
 
     #     #Draw the created elements in the graph (check if this draws both of the graphs)
     #     # self.graph_translator.draw()
-
-
-    def draw_z_tip_is_graph(self):
-        print("DRAW_Z_TIP_IS_GRAPH()")
-
-        #Clear the graph
-        self.graph1.clear()
-
-        #Fetch the 'L' value from new_panel
-        L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_value.get())
-        
-        if(L == 0 or L == False):
-            messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
-            return None
-
-        #Set labels for the graph
-        self.graph1.set_title("z_tip_is graph")
-        self.graph1.set_xlabel("X [mm]", fontsize=10, labelpad=3)
-        self.graph1.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
-        
-        #Set the display limits of the x and y axises 
-        self.graph1.set_xlim([settings.z_tip_is_graph_x_axis_range_min, L])
-        self.graph1.set_ylim([settings.z_tip_is_graph_y_axis_range_min, L])
-
-        #Display the grid of the graph
-        self.graph1.grid(True)
-
-        # # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
-        self.graph1.axhline(0, color="black", linewidth=1)
-        self.graph1.axvline(0, color="black", linewidth=1)
-
-        #Convert L to micrometers
-        # L = L / 1e6
-
-        #Create a range of X values in a list 
-        x_values = numpy.linspace(0, L, 100)
-        y_values = []
-
-        z_tip_is = globals.equations.calculate_tip_placement()
-
-        for x in x_values:
-            #Calculate y-value
-            y = z_tip_is
-            y_values.append(y)
-
-        #Plot X and Y values
-        self.graph1.plot(x_values, y_values, color="red")
-
-        #Redraw the canvas to display the updates
-        self.graph1.figure.canvas.draw()

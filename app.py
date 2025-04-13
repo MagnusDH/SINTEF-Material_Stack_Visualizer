@@ -414,9 +414,8 @@ class App:
                 #Create "Graph"
                 if(globals.graph == None):
                     globals.graph = Graph(self.program_window, 0, 2)
+
                 else:
-                    globals.graph.graph1.clear()
-                    globals.graph.graph2.clear()
                     globals.graph.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=1)
 
 
@@ -486,8 +485,10 @@ class App:
                 if(globals.graph == None):
                     globals.graph = Graph(self.program_window, 0, 2)
                     globals.graph.graph_translator.get_tk_widget().grid(rowspan=2)
+                    globals.graph.draw_z_tip_is_graph()
                 else:
                     globals.graph.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
+                    globals.graph.draw_z_tip_is_graph()
 
 
                 #Create "graph_control_panel"

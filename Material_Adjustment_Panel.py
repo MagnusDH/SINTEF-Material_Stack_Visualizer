@@ -817,12 +817,15 @@ class Material_Adjustment_Panel:
             
     
     def material_entry_updated(self, entry):
-        """Updates the thickness value in globals.materials with the entered value and updates corresponding slider-widget"""
+        """
+        -Depending on the current view: different material values are changed and the stack and graphs are redrawn
+        """
+
         # print("MATERIAL_ENTRY_UPDATED()")
     
         #Update different values in self.materials based on option menu value
         match globals.current_view:
-            case "Stacked" | "Realistic" | "Multi":
+            case "Stacked" | "Realistic":
                 #Find material that corresponds to "entry"
                 for material in globals.materials:
                     if(globals.materials[material]["Entry_id"] == entry):
@@ -860,38 +863,52 @@ class Material_Adjustment_Panel:
                 
                 # #Redraw the graph
                 globals.graph.draw_stoney_graph()
-        
+
+            case "Multi":
+                #Find material that corresponds to "entry"
+                for material in globals.materials:
+                    if(globals.materials[material]["Entry_id"] == entry):
+                        #Find entered value
+                        entered_value = float(entry.get())
+                        #Update the thickness value in self.materials
+                        globals.materials[material]["Thickness"] = entered_value
+
+                        #Update the slider corresponding to the key
+                        globals.materials[material]["Slider_id"].set(entered_value)  
+
+                        #Re-draw the "z_tip_is" graph
+                        globals.graph.draw_z_tip_is_graph() 
+
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
 
 
     def material_slider_updated(self, value, identifier): 
-        """Updates the thickness value in self.materials with the slider value and updates corresponding entry-widget"""
+        """
+        -Depending on the current view: different material values are changed and the stack and graphs are redrawn
+        """
       
         # print("MATERIAL_SLIDER_UPDATED()")
 
         ################################################################################################
+        #Calculate slider range value
+        slider_max_value = 0
+        for material in globals.materials:
+            #Do not include the first layer
+            if(globals.materials[material]["Layer"] == 1):
+                continue
+            slider_max_value += globals.materials[material]["Thickness"]
 
-        # #Calculate slider range value
-        # slider_max_value = 0
-        # for material in globals.materials:
-        #     #Do not include the first layer
-        #     if(globals.materials[material]["Layer"] == 1):
-        #         continue
-        #     slider_max_value += globals.materials[material]["Thickness"]
+        for material in globals.materials:
+            globals.materials[material]["Slider_id"].configure(
+                to=slider_max_value)
 
-        # for material in globals.materials:
-        #     globals.materials[material]["Slider_id"].configure(
-        #         to=slider_max_value)
-
-        #     globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-
-
+            globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
         ################################################################################################
             
         #Update different values in self.materials based on option value
         match globals.current_view:
-            case "Stacked"|"Realistic" | "Multi":
+            case "Stacked"|"Realistic":
                 #Update the thickness value in self.materials
                 globals.materials[identifier]["Thickness"] = value
 
@@ -917,6 +934,17 @@ class Material_Adjustment_Panel:
 
                 #Redraw the graph
                 globals.graph.draw_stoney_graph()
+
+            case "Multi":
+                #Update the thickness value in self.materials
+                globals.materials[identifier]["Thickness"] = value
+
+                #Update the entry corresponding to key
+                globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
+                globals.materials[identifier]["Entry_id"].insert(0, value)
+                
+                #Re-draw the "z_tip_is" graph
+                globals.graph.draw_z_tip_is_graph() 
 
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
