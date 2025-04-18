@@ -7,9 +7,7 @@ from matplotlib.figure import Figure                            #For creating gr
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #For creating graphs
 import numpy
 import helper_functions
-
 from matplotlib.patches import FancyArrowPatch
-
 
 
 class Graph:
@@ -232,129 +230,98 @@ class Graph:
         """
         -Draws the 'z_tip_is' graph
         """
-        # print("DRAW_Z_TIP_IS_GRAPH()")
-
-        #Clear the graph
+        # Clear the graph
         self.graph1.clear()
-
-        #Fetch the 'L' value from new_panel
+    
+        # Fetch the 'L' value from new_panel
         L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_value.get())
         
         if(L == 0 or L == False):
             messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
             return None
-
-        #Set labels for the graph
-        self.graph1.set_title("'z_tip_is' graph")
+    
+        # Set labels for the graph
+        self.graph1.set_title("Cantilever bending")
         self.graph1.set_xlabel("X [μm]", fontsize=10, labelpad=3)
         self.graph1.set_ylabel("Tip displacement [μm]", fontsize=10, labelpad=8)
         
-        #Set the display limits of the x and y axises 
-        self.graph1.set_xlim([settings.z_tip_is_graph_x_axis_range_min, L*1.15])
-        self.graph1.set_ylim([settings.z_tip_is_graph_y_axis_range_min, globals.equations.calculate_tip_placement(L)*1.05])
-
-        #Display the grid of the graph
-        self.graph1.grid(True)
-
-        # # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
-        self.graph1.axhline(0, color="black", linewidth=1)
-        self.graph1.axvline(0, color="black", linewidth=1)
-
-        #Create a list of X values ranging from 0 to L 
+        # Set display limits of the x axis
+        self.graph1.set_xlim([settings.z_tip_is_graph_x_axis_range_min, L*1.05])
+        
+        # -- Calculate the x and y values first --
         x_values = numpy.linspace(0, L, 100)
         y_values = []
-
-        #Calculate y_values for each x_value in list
         for x in x_values:
-            #Calculate y-value
             y = globals.equations.calculate_tip_placement(x)
             y_values.append(y)
-
-        #Plot X and Y values
-        self.graph1.plot(x_values, y_values, color="red")
-
-        #Get the highest x and y values
+        
+        # Get the tip displacement (last y value)
+        y_tip = y_values[-1]
+        
+        # Adjust the y-axis limits based on the tip displacement:
+        if y_tip >= 0:
+            # For positive tip displacement, initial upper limit is 25
+            y_limit = 25
+            if y_tip > y_limit:
+                y_limit = 100  # increase to 50 if tip exceeds 25
+                while y_tip > y_limit:
+                    candidate = y_limit * 2
+                    if candidate > 100:
+                        y_limit = globals.equations.calculate_tip_placement(L) * 1.05
+                        break
+                    else:
+                        y_limit = candidate
+            # Use the settings value for the lower limit (often 0) 
+            self.graph1.set_ylim([settings.z_tip_is_graph_y_axis_range_min, y_limit])
+        else:
+            # For negative tip displacement, initial lower limit is -25
+            y_limit = -25
+            if y_tip < y_limit:
+                y_limit = -100  # decrease to -50 if tip is lower than -25
+                while y_tip < y_limit:
+                    candidate = y_limit * 2  # doubling a negative number doubles its magnitude
+                    if abs(candidate) > 100:
+                        y_limit = globals.equations.calculate_tip_placement(L) * 1.05
+                        break
+                    else:
+                        y_limit = candidate
+            # Set ylim so that the upper bound comes from settings (often 0)
+            self.graph1.set_ylim([y_limit, settings.z_tip_is_graph_y_axis_range_min])
+    
+        # Display the grid on the graph
+        self.graph1.grid(True)
+        
+        # Display the x and y axis lines in the grid
+        self.graph1.axhline(0, color="black", linewidth=1)
+        self.graph1.axvline(0, color="black", linewidth=1)
+    
+        # Plot the curve
+        self.graph1.plot(x_values, y_values, color="k")
+    
+        # Get the highest x and y values for the tip marker
         x_tip = x_values[-1]
         y_tip = y_values[-1]
-
-        #Add arrow to show height of graph curve
+    
+        # Create an arrow to show the height of the curve
         height_arrow = FancyArrowPatch(
-            (x_tip, 0),             # start point (on x-axis)
-            (x_tip, y_tip),         # end point (at tip of curve)
-            arrowstyle='<->',       # arrowheads on both ends
-            color='blue',
+            (x_tip, 0),       # start point (on x-axis)
+            (x_tip, y_tip),   # end point (at tip of curve)
+            arrowstyle='<->', # arrowheads on both ends
+            color='k',
             linewidth=1.5,
-            mutation_scale=10       # size of the arrowheads
+            mutation_scale=10  # size of the arrowheads
         )
-
-        #Add the arrow to the graph
         self.graph1.add_patch(height_arrow)
-
-        #Add text to show the height
+    
+        # Add text to show the height
         self.graph1.text(
-            x_tip-150, y_tip,
-            f"Height:{round(y_tip,1)}",
+            0.95*x_tip, (0 + y_tip) / 2,
+            f"{round(y_tip,1)}",
             fontsize=9,
-            color='blue',
-            va='center'
+            color='k',
+            va='center',
+            bbox=dict(facecolor='white', edgecolor='k', boxstyle='round,pad=0.5')
         )
-
-
-        #Draw the canvas to display the updates
+    
+        # Draw the canvas to display the updates
         self.graph1.figure.canvas.draw()
-
-
-
-    # """????????????????????????????????????????????????"""
-    # def draw_stress_graph(self):
-    #     print("DRAW_STRESS_GRAPH()")
-
-    #     #Clear the graph
-    #     self.stress_graph.clear()
-
-    #     #Set labels for the graph
-    #     # self.stress_graph.set_title("This is a simple graph")
-    #     # self.stress_graph.set_xlabel("X [mm]", fontsize=10, labelpad=3)
-    #     # self.stress_graph.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
-        
-    #     # #Set the display limits of the x and y axises 
-    #     self.stress_graph.set_xlim([settings.stress_graph_x_axis_range_min, settings.stress_graph_x_axis_range_max])
-    #     self.stress_graph.set_ylim([settings.stress_graph_y_axis_range_min, settings.stress_graph_y_axis_range_max])
-
-    #     # #Display the grid of the graph
-    #     self.stress_graph.grid(True)
-
-    #     # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
-    #     self.stress_graph.axhline(0, color="black", linewidth=1)
-    #     self.stress_graph.axvline(0, color="black", linewidth=1)
-
-    #     #Fetch some values?
-
-        
-    #     #Display some text?
-    #     # self.stress_graph.text(
-    #     #     0.0, 1.15,                              # X and Y Coordinates of the text (relative to axes in percentages)
-    #     #     f"Some example text",                         # Text
-    #     #     color="blue",
-    #     #     transform=self.stress_graph.transAxes,            # Transform to make the coordinates relative to the axes
-    #     #     fontsize=10,                            # Set the font size
-    #     #     verticalalignment='top',                # Align text to the top
-    #     #     bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
-    #     # )
-
-    #     #Create some x_values values? 
-    #     # x_values = numpy.linspace(-min(100, 100), min(100, 100), 100)
-
-    #     # #Create some y values?
-    #     # y0 = 50 - numpy.sqrt(50**2 - x_values**2)
-    #     # y1 = 60 - numpy.sqrt(60**2 - x_values**2)
-
-    #     # #Plot some values? 
-    #     # self.stress_graph.plot(x_values, y0, color="red")
-    #     # self.stress_graph.plot(x_values, y1, color="blue")
-
-    #     # #Redraw the canvas to display the updates (check if this draws only this graph)
-    #     # self.stress_graph.figure.canvas.draw()
-
-    #     #Draw the created elements in the graph (check if this draws both of the graphs)
-    #     # self.graph_translator.draw()

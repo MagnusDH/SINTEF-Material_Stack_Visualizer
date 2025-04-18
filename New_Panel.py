@@ -7,7 +7,7 @@ import helper_functions
 
 class New_Panel:
     def __init__(self, window, row_placement:int, column_placement:int):
-        # print("CLASS NEW_PANEL INIT()")
+        print("CLASS NEW_PANEL INIT()")
 
         #Window where everything is placed
         self.program_window = window
@@ -111,6 +111,7 @@ class New_Panel:
                 text_color=settings.new_panel_entry_text_color,
                 justify="center"
             )
+            print("L_entry created")
             self.L_entry.grid(
                 row=1, 
                 column=2,
@@ -281,10 +282,10 @@ class New_Panel:
 
 
             #curvature_thickness label
-            # globals.equations.tip_displacement_zero()
+            self.t_zero = 0 #tkinter.StringVar(value=globals.equations.find_t_solution())
             self.curvature_thickness_label = customtkinter.CTkLabel(
                 master=new_panel_frame, 
-                text=f"Zero curvature thickness: {0}", 
+                text=f"Stress-neutral SiO2-thickness: {self.t_zero}", 
                 fg_color=settings.new_panel_background_color,
                 text_color=settings.new_panel_text_color
             )

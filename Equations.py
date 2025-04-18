@@ -1,11 +1,13 @@
 import globals
 from tkinter import messagebox
 import helper_functions
+from scipy.optimize import fsolve
+
 
 #This class handles all equations
 class Equations:
-    # def __init__(self):
-        # print("CLASS EQUATIONS INIT()")
+    def __init__(self):
+        print("CLASS EQUATIONS INIT()")
 
 
     def calculate_Zn(self):
@@ -118,7 +120,7 @@ class Equations:
         return EI
 
 
-    def calculate_M_tot_cantilever(self):
+    def calculate_M_is_cantilever(self):
         """
         -Function to calculate cantilever stress bending moment (M_tot)\n
         -Return value is 'newton meter'
@@ -155,10 +157,17 @@ class Equations:
         #Calculate M_tot
         term1 = W * t[0] * sigma_i[0] * (t[0] / 2 - Zn)
         term2 = sum(W * t[i] * sigma_i[i] * (sum(t[:i]) + t[i] / 2 - Zn) for i in range(1, len(t)))
-        M_tot = term1 + term2 + self.calculate_M_p_cantilever()
+        M_is = term1 + term2
+
+        return M_is
+
+
+    def calculate_M_tot_cantilever(self):
+        
+        M_tot = self.calculate_M_is_cantilever() + self.calculate_M_p_cantilever()
 
         return M_tot
-
+    
 
     def calculate_curvature(self):
         """
@@ -180,7 +189,7 @@ class Equations:
 
         return curv_is
 
-    #NOT DONE
+
     def calculate_tip_placement(self, L):
         """
         -Tip displacement calculation for a given "length/L" value\n
@@ -188,52 +197,12 @@ class Equations:
         """
         curv_is = self.calculate_curvature()
 
-        # #Fetch the 'L' value from new_panel
-        # L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_value.get())
-        # # L = 1000e-6  #length in meters
-        
-        # if(L == 0 or L == False):
-        #     messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
-        #     return None
-
         #Convert L to micrometers
         L = L / 1e6
 
         z_tip_tot = 0.5 * curv_is * L**2
 
         return z_tip_tot * 1e6
-
-
-    #NOT DONE AND NOT IN USE 
-    def tip_displacement_zero(self):
-        """???????????????"""
-        print("TIP_DISPLACEMENT_ZERO()")
-
-        t = []
-        for material in globals.materials:
-            t.append(globals.materials[material]["Thickness"])
-
-        #CONVERT this to lower case!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        t1 = float(globals.materials["SiO2"]["Thickness"])
-
-        # t_temp = t.copy()
-        # t_temp[1] = t1[0]  #Extract scalar from array
-
-        #Fetch the 'L' value from new_panel
-        L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_entry.get())
-        
-        #Convert to micrometers
-        L = L / 1e6
-
-
-        zn = self.calculate_Zn()
-        EI = self.calculate_EI()
-        M_tot = self.calculate_M_tot_cantilever()
-        curv_is = M_tot / EI
-        
-        z_tip_tot = 0.5 * curv_is * L**2
-
-        return z_tip_tot
 
 
     def calculate_M_p_cantilever(self):
@@ -263,3 +232,49 @@ class Equations:
         M_p = e_31_f * V_p * Zp * W
 
         return M_p
+
+
+    #?????????? this is new from Runar
+    def neutralize_global_stress(self, t_guess):
+        """
+        Objective function for fsolve: sets the second-layer thickness to t_guess[0],
+        computes the resulting tip displacement, then restores the original thickness.
+        Returns the tip displacement in the same units that calculate_tip_placement uses.
+        """
+        # Identify the second layer key (assumes ordering in globals.materials)
+        layer_keys = list(globals.materials.keys())
+        second_key = layer_keys[1]
+
+        # Backup original thickness and set the trial value
+        original_thickness = globals.materials[second_key]["Thickness"]
+        globals.materials[second_key]["Thickness"] = t_guess[0]
+
+        # Fetch L and compute tip displacement
+        L_val = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_entry.get())
+
+        # calculate_tip_placement expects L in μm and returns z_tip in μm
+        z_tip = self.calculate_tip_placement(L_val)
+
+        # Restore original thickness
+        globals.materials[second_key]["Thickness"] = original_thickness
+        return z_tip
+    
+
+    #??? from Runar
+    def find_t_solution(self):
+        """
+        Solve for and return the thickness of the second layer that makes the
+        stress-induced tip displacement zero.
+        """
+
+        print("FIND_T_SOLUTION()")
+        # Identify second layer current thickness
+        t_guess = float(globals.materials["SiO2"]["Thickness"])  #Extract scalar from array
+
+        # Use fsolve to find the root of neutralize_global_stress
+        t_sol = fsolve(self.neutralize_global_stress, [t_guess])[0]
+        # print(f'Neutralizing thickness is: {t_sol} nm')
+        
+        return t_sol
+
+

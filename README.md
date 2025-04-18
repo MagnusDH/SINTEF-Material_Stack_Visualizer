@@ -98,6 +98,8 @@
 
 
 # TO DO            
+    -Equations and New_Panel has circular dependencies when it comes to the L_entry. fix this
+
     -replace key "thickness" to "thickness [nm]"
 
     -tip_displacement_zero returnerer ett tall som skal vises i programmet under V-slider (label = "zero curvature thickness: value")
