@@ -106,6 +106,8 @@
 
     -export stack and graph in one button
 
+    -Når materialer blir flyttet opp eller ned blir ikke grafene oppdatert direkte
+
     
 
     -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?

@@ -18,7 +18,7 @@ class New_Panel:
 
         #Create new_panel
         self.new_panel_frame = self.create_new_panel()
-    
+
 
     #Add explanation of function
     def create_new_panel(self):
@@ -111,7 +111,6 @@ class New_Panel:
                 text_color=settings.new_panel_entry_text_color,
                 justify="center"
             )
-            print("L_entry created")
             self.L_entry.grid(
                 row=1, 
                 column=2,
@@ -282,10 +281,10 @@ class New_Panel:
 
 
             #curvature_thickness label
-            self.t_zero = 0 #tkinter.StringVar(value=globals.equations.find_t_solution())
+            self.t_zero = tkinter.StringVar(value=0) #globals.equations.find_t_solution())
             self.curvature_thickness_label = customtkinter.CTkLabel(
                 master=new_panel_frame, 
-                text=f"Stress-neutral SiO2-thickness: {self.t_zero}", 
+                text=f"Stress-neutral SiO2-thickness: {self.t_zero.get()}", 
                 fg_color=settings.new_panel_background_color,
                 text_color=settings.new_panel_text_color
             )
@@ -298,7 +297,6 @@ class New_Panel:
                 columnspan=3
             )
             
-
         return new_panel_frame
         
     
@@ -315,9 +313,6 @@ class New_Panel:
 
         #Update z_tip graph
         globals.graph.draw_z_tip_is_graph()
-
-
-
 
 
     def volt_entry_updated(self, entry_id, slider_id):

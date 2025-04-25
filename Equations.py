@@ -249,14 +249,15 @@ class Equations:
         original_thickness = globals.materials[second_key]["Thickness"]
         globals.materials[second_key]["Thickness"] = t_guess[0]
 
-        # Fetch L and compute tip displacement
+        #Fetch L and compute tip displacement
         L_val = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_entry.get())
 
-        # calculate_tip_placement expects L in μm and returns z_tip in μm
+        #calculate_tip_placement expects L in μm and returns z_tip in μm
         z_tip = self.calculate_tip_placement(L_val)
 
         # Restore original thickness
         globals.materials[second_key]["Thickness"] = original_thickness
+        
         return z_tip
     
 
