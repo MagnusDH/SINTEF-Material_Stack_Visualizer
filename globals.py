@@ -12,7 +12,7 @@ material_control_panel = None
 new_panel = None
 layer_stack_canvas = None
 canvas_control_panel = None
-graph = None
+graph_panel = None
 graph_control_panel = None
 equations = None
 

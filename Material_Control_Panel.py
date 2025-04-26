@@ -1586,14 +1586,6 @@ class Material_Control_Panel:
             #Reload the values from the excel file in to the dictionary
             globals.app.load_materials_from_excel()
 
-            #Stoney view is special and needs all materials to be "inactive" except the lowest layer material
-            if(globals.current_view == "Stoney"):
-                for material in globals.materials:
-                    globals.materials[material]["Status"] = "inactive"
-
-                    if(globals.materials[material]["Layer"] == 1):
-                        globals.materials[material]["Status"] = "active"
-
             #Redraw the material stack
             globals.layer_stack_canvas.draw_material_stack()
 
@@ -1731,9 +1723,7 @@ class Material_Control_Panel:
             case "Stacked" | "Realistic" | "Stepped" | "Multi":
                 canvas_screenshot.width = 750
                 canvas_screenshot.height = 350
-            case "Stoney":
-                canvas_screenshot.width = 350
-                canvas_screenshot.height = 350
+            
 
         #Add the image to the excel file in a specific cell
         sheet.add_image(canvas_screenshot, "N1")

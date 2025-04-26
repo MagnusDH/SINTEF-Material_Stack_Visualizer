@@ -100,6 +100,10 @@
 # TO DO            
     -Equations and New_Panel has circular dependencies when it comes to the L_entry. fix this
 
+    -Lag en funksjon som oppdaterer alle nødvendige widgets. for exempel draw_material_stack, draw_graphs, 
+
+    -I "delete_material()", "move_material()" vil ikke grafer bli oppdatert når et materiale blir slettet
+
     -replace key "thickness" to "thickness [nm]"
 
     -tip_displacement_zero returnerer ett tall som skal vises i programmet under V-slider (label = "zero curvature thickness: value")
@@ -120,7 +124,11 @@
     -Make a button that gives the user the option to load an excel file
 
 # QUESTIONS:
+    -Spør om "headline" til new_panel
+    -Spør om navn på "new_panel" widget
+    -Spør om hvordan equations parameters bør lages
+    -Vis Runar hvordan du har lagt til "W" verdien i "equations"
+    -Hvordan skal Stoney graph lages? Skal han ha checkboxer? Skal en checkbox være huket av ved default?
     
 # BUGS:
-    -Hvis en graf er tegnet og man bytter til "stoney view" så er den forrige grafen fremdeles tegnet
     -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 

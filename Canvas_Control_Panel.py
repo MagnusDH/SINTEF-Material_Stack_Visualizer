@@ -4,7 +4,7 @@ import customtkinter
 import settings
 import globals
 import os
-from Graph import Graph
+from Graph_Panel import Graph_Panel
 from Graph_Control_Panel import Graph_Control_Panel
 
 
@@ -130,7 +130,7 @@ class Canvas_Control_Panel:
         #Switch layout option menu
         self.option_menu = customtkinter.CTkOptionMenu(
             master=canvas_control_panel_frame, 
-            values=["Stacked", "Realistic", "Stepped", "Stoney", "Multi"],
+            values=["Stacked", "Realistic", "Stepped", "Multi"],
             font=(settings.text_font, settings.canvas_control_panel_text_size),
             bg_color=settings.canvas_control_panel_background_color,
             fg_color=settings.canvas_control_panel_dropdown_color,
@@ -176,158 +176,13 @@ class Canvas_Control_Panel:
         #Redraw material stack
         globals.layer_stack_canvas.draw_material_stack()
 
+
     #???????????????????????????????????????????
     def switch_layout(self, *event):
         """?????????????????????????"""
         globals.current_view = self.option_menu.get()
         
         globals.app.set_layout()
-        # """
-        # -Changes the Label explaining what is being modified by sliders and entries in the Material_Adjustment_Panel\n
-        # -Changes the values for sliders and entries\n
-        # -Changes the layout of the program window for each 'view' mode\n
-        # """
-        # # print("SWITCH_LAYOUT()")
-
-        # Switch the option in globals.current_view
-        # globals.current_view = self.option_menu.get()
-
-        # #Remove the graph if it exists
-        # if hasattr(globals.graph, 'graph_translator'):
-        #     globals.graph.graph_translator.get_tk_widget().destroy()
-        #     del globals.graph.graph_translator
-
-        # #Delete the graph_control_panel if it exists
-        # if(hasattr(globals.graph_control_panel, 'graph_control_panel_frame')):
-        #     globals.graph_control_panel.graph_control_panel_frame.destroy()   #Destroy the widget
-        #     del globals.graph_control_panel.graph_control_panel_frame         #Delete the reference in memory
-
-        # #Create a new material_adjustment_panel with a different layout based on the option menu
-        # globals.material_adjustment_panel.create_material_adjustment_panel()
-        
-        #Switch UI layout based on option value
-        # match self.option_menu.get():
-        #     case "Stacked" | "Realistic":
-        #         #Change the layout of the program_window to only two columns
-        #         self.program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
-        #         self.program_window.columnconfigure(1, weight=9, uniform="group1")  
-        #         self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
-
-        #         #Set all material entry and slider values to "thickness" value, and mark all as "active"
-        #         for material in globals.materials:
-        #             globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-        #             globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-        #             globals.materials[material]["Status"] = "active"
-
-
-        #         #Update the sizes for layer_stack_canvas      
-        #         self.program_window.update()
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
-        #         globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
-        #         globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-
-        #         #Draw material stack                
-        #         globals.layer_stack_canvas.draw_material_stack()
-
-
-        #     case "Stepped":
-        #         #Change the layout of the program_window to only two columns
-        #         self.program_window.columnconfigure(0, weight=1, minsize=500, uniform="group1")  #set this column to a specific size that won't change
-        #         self.program_window.columnconfigure(1, weight=9, uniform="group1")  
-        #         self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
-
-
-        #         #Set all material entry and slider values to "indent" value, and mark all as "active"
-        #         for material in globals.materials:
-        #             globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
-        #             globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
-        #             globals.materials[material]["Status"] = "active"
-
-        #         #Update the sizes for layer_stack_canvas         
-        #         self.program_window.update()
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
-        #         globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
-        #         globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-
-        #         #Draw the material stack
-        #         globals.layer_stack_canvas.draw_material_stack()
-
-
-        #     case "Stoney":
-        #         #Change the layout of the program_window to make space for Graph
-        #         self.program_window.columnconfigure(0, minsize=450, weight=0, uniform=None)
-        #         self.program_window.columnconfigure(1, weight=1, uniform="group2")
-        #         self.program_window.columnconfigure(2, weight=1, uniform="group2")
-
-        #         #Set all material entry and slider values to "thickness" value
-        #         #Set all materials->Status to "inactive" (except the lowest layer material)
-        #         for material in globals.materials:
-        #             globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-        #             globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-        #             globals.materials[material]["Status"] = "inactive"
-        #             globals.materials[material]["Checkbox_id"].deselect()
-
-        #             if(globals.materials[material]["Layer"] == 1):
-        #                 globals.materials[material]["Status"] = "active"
-        #                 globals.materials[material]["Checkbox_id"].select()
-
-
-        #         #Update the sizes for layer_stack_canvas      
-        #         self.program_window.update()
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
-        #         globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
-        #         globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-                
-        #         #Redraw material stack
-        #         globals.layer_stack_canvas.draw_material_stack()
-
-        #         #Create Graph
-        #         globals.graph = Graph(self.program_window, 0, 2)
-
-        #         #Create panel that controls the actions of the graph
-        #         globals.graph_control_panel = Graph_Control_Panel(self.program_window, 1, 2)
-
-
-        #     case "Multi":
-        #         #TODO
-        #             #Make sure to erase all widgets in a row or column you want to erase
-                
-                
-        #         #Change the layout of the program_window to three rows
-        #         self.program_window.rowconfigure(0, weight=90, uniform="group1")    
-        #         self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")   #set this row to a specific size that won't change    
-                
-        #         self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")  #set this column to a specific size that won't change
-        #         self.program_window.columnconfigure(1, weight=90, uniform="group1")
-        #         self.program_window.grid_columnconfigure(2, weight=0, uniform=None)
-
-        #         #Set all material entry and slider values to "thickness" value, and mark all as "active"
-        #         for material in globals.materials:
-        #             globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-        #             globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-        #             globals.materials[material]["Status"] = "active"
-
-
-        #         #Update the sizes for layer_stack_canvas      
-        #         self.program_window.update()
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x0 = 0
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y0 = globals.layer_stack_canvas.layer_stack_canvas.winfo_height() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_width() - 1
-        #         globals.layer_stack_canvas.visible_canvas_bbox_y1 = 0
-        #         globals.layer_stack_canvas.layer_stack_canvas_height = globals.layer_stack_canvas.visible_canvas_bbox_y0 - globals.layer_stack_canvas.visible_canvas_bbox_y1
-        #         globals.layer_stack_canvas.layer_stack_canvas_width = globals.layer_stack_canvas.visible_canvas_bbox_x1 - globals.layer_stack_canvas.visible_canvas_bbox_x0
-
-        #         #Draw material stack                
-        #         globals.layer_stack_canvas.draw_material_stack()
 
 
     def choose_stack_export(self, *event):
@@ -489,7 +344,7 @@ class Canvas_Control_Panel:
                     if(globals.materials[material]["Line_id"] != None):
                         #Line must be drawn from the right side of stack to left side of text
                         match globals.current_view:
-                            case "Stacked" | "Realistic" | "Stoney" | "Multi":
+                            case "Stacked" | "Realistic" | "Multi":
                                 line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
                                 #Construct an SVG <line> element for arrows
                                 bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])

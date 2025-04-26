@@ -10,7 +10,7 @@ import helper_functions
 from matplotlib.patches import FancyArrowPatch
 
 
-class Graph:
+class Graph_Panel:
     def __init__(self, program_window, row_placement:int, column_placement:int):
         # print("CLASS: GRAPH_INIT()")
         
@@ -45,8 +45,8 @@ class Graph:
                 row=self.row_placement,
                 column=self.column_placement,
                 sticky="nsew",
-                padx=(settings.graph_padding_left, settings.graph_padding_right),
-                pady=(settings.graph_padding_top, settings.graph_padding_bottom),
+                padx=(settings.graph_panel_padding_left, settings.graph_panel_padding_right),
+                pady=(settings.graph_panel_padding_top, settings.graph_panel_padding_bottom),
             )
 
         #Create subplots for graphs
@@ -95,135 +95,133 @@ class Graph:
     def draw_stoney_graph(self):
         """Draws the stoney graph with materials that are "active" in the materials dictionary"""
         
-        # print("DRAW_STONEY_GRAPH()")
+        print("DRAW_STONEY_GRAPH()")
 
         #Clear the graph
-        self.graph1.clear()
+        self.graph2.clear()
 
         #Set labels for the graph
-        # self.graph.set_title("This is a simple graph")
-        self.graph1.set_xlabel("X [mm]", fontsize=10, labelpad=3)
-        self.graph1.set_ylabel("Height [μm]", fontsize=10, labelpad=-5)
+        self.graph2.set_title("Stoney")
+        self.graph2.set_xlabel("X [mm]", fontsize=10, labelpad=3)
+        self.graph2.set_ylabel("Height [μm]", fontsize=10, labelpad=8)
+
         
-        # #Set the display limits of the x and y axises 
-        self.graph1.set_xlim([settings.stoney_graph_x_axis_range_min, settings.stoney_graph_x_axis_range_max])
-        self.graph1.set_ylim([settings.stoney_graph_y_axis_range_min, settings.stoney_graph_y_axis_range_max])
+        #Set the display limits of the x and y axises 
+        self.graph2.set_xlim([settings.stoney_graph_x_axis_range_min, settings.stoney_graph_x_axis_range_max])
+        self.graph2.set_ylim([settings.stoney_graph_y_axis_range_min, settings.stoney_graph_y_axis_range_max])
 
-        # #Display the grid of the graph
-        self.graph1.grid(True)
+        #Display the grid of the graph
+        self.graph2.grid(True)
 
-        # #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
-        self.graph1.axhline(0, color="black", linewidth=1)
-        self.graph1.axvline(0, color="black", linewidth=1)
+        #Display the x and y axis lines in the grid (the first argument is the value on the x and y grid)
+        self.graph2.axhline(0, color="black", linewidth=1)
+        self.graph2.axvline(0, color="black", linewidth=1)
 
-        #Fetch the correct materials by checking which are "active"
-        material_counter = 0
-        chosen_material = None
-        lowest_material = None
-        for material in globals.materials:
-            if(globals.materials[material]["Layer"] == 1):
-                lowest_material = material
-                continue
+        # #Fetch the correct materials by checking which are "active"
+        # material_counter = 0
+        # chosen_material = None
+        # lowest_material = None
+        # for material in globals.materials:
+        #     if(globals.materials[material]["Layer"] == 1):
+        #         lowest_material = material
+        #         continue
 
-            if(globals.materials[material]["Status"] == "active"):
-                chosen_material = material
-                material_counter += 1
+        #     if(globals.materials[material]["Status"] == "active"):
+        #         chosen_material = material
+        #         material_counter += 1
     
         
-        #Raise error if there are more than two selected materials/filaments
-        if(material_counter > 1):
-            print("ERROR: MORE THAN TWO FILAMENTS SELECTED!!!!!!!!!")
-            return
+        # #Raise error if there are more than two selected materials/filaments
+        # if(material_counter > 1):
+        #     print("ERROR: MORE THAN TWO FILAMENTS SELECTED!!!!!!!!!")
+        #     return
         
-        if(chosen_material == None):
-            messagebox.showerror("No filament selected", f"Please select a filament")
-            return
+        # if(chosen_material == None):
+        #     messagebox.showerror("No filament selected", f"Please select a filament")
+        #     return
 
 
-        #Fetch necessary values
-        #Es = modulus for the substrate (multiplied by 1billion)
-        Es = globals.materials[lowest_material]["Modulus [GPa]"] * 1000000000
-        #Vs = poisson til substratet
-        Vs = globals.materials[lowest_material]["Poisson"]
-        #Ts = thickness for the substrate in nanometers (value divided by 1billion)
-        Ts = globals.materials[lowest_material]["Thickness"] / 1000000000
-        #Tf = thickness for material/filament in nanometers (value divided by 1billion)
-        Tf = globals.materials[chosen_material]["Thickness"] / 1000000000
-        #R0 = R0 til filamentet
-        R0 = globals.materials[chosen_material]["R0"]
-        #R = R til materialet/filament
-        R = globals.materials[chosen_material]["R"]
+        # #Fetch necessary values
+        # #Es = modulus for the substrate (multiplied by 1billion)
+        # Es = globals.materials[lowest_material]["Modulus [GPa]"] * 1000000000
+        # #Vs = poisson til substratet
+        # Vs = globals.materials[lowest_material]["Poisson"]
+        # #Ts = thickness for the substrate in nanometers (value divided by 1billion)
+        # Ts = globals.materials[lowest_material]["Thickness"] / 1000000000
+        # #Tf = thickness for material/filament in nanometers (value divided by 1billion)
+        # Tf = globals.materials[chosen_material]["Thickness"] / 1000000000
+        # #R0 = R0 til filamentet
+        # R0 = globals.materials[chosen_material]["R0"]
+        # #R = R til materialet/filament
+        # R = globals.materials[chosen_material]["R"]
 
 
-        #Check for division by zero errors
-        if(Tf) == 0:
-            messagebox.showerror("Division by zero Error", f"The 'thickness' of '{chosen_material}' can not be zero")
-            return
-        if(R == 0):
-            messagebox.showerror("Division by zero Error", f"The 'R' value for '{chosen_material}' can not be zero")
-            return
-        if(R0 == 0):
-            messagebox.showerror("Division by zero Error", f"The 'R0' value for '{chosen_material}' can not be zero")
-            return
-        if(1-Vs) == 0:
-            messagebox.showerror("Division by zero Error", f"The 'poisson' value for '{lowest_material}' can not be 1.\nCalculation (1 - Vs) resulted in zero")
-            return
+        # #Check for division by zero errors
+        # if(Tf) == 0:
+        #     messagebox.showerror("Division by zero Error", f"The 'thickness' of '{chosen_material}' can not be zero")
+        #     return
+        # if(R == 0):
+        #     messagebox.showerror("Division by zero Error", f"The 'R' value for '{chosen_material}' can not be zero")
+        #     return
+        # if(R0 == 0):
+        #     messagebox.showerror("Division by zero Error", f"The 'R0' value for '{chosen_material}' can not be zero")
+        #     return
+        # if(1-Vs) == 0:
+        #     messagebox.showerror("Division by zero Error", f"The 'poisson' value for '{lowest_material}' can not be 1.\nCalculation (1 - Vs) resulted in zero")
+        #     return
         
-        #Calculate the sigma_R value
-        sigma_R = ( (Es* (Ts**2)) / (6*(1-Vs)*Tf)) * ( (1/R) - (1/R0) )
-        #Convert to correct value
-        sigma_R = sigma_R/1000000
-        #Limit value to 2 decimals
-        sigma_R = round(sigma_R, 2)
+        # #Calculate the sigma_R value
+        # sigma_R = ( (Es* (Ts**2)) / (6*(1-Vs)*Tf)) * ( (1/R) - (1/R0) )
+        # #Convert to correct value
+        # sigma_R = sigma_R/1000000
+        # #Limit value to 2 decimals
+        # sigma_R = round(sigma_R, 2)
 
-        #Display the R0 value in the graph
-        self.graph1.text(
-            -0.0, 1.15,                              # X and Y Coordinates of the text (relative to axes in percentages)
-            f"R0 = {R0}",                         # Text
-            color="blue",
-            transform=self.graph1.transAxes,            # Transform to make the coordinates relative to the axes
-            fontsize=10,                            # Set the font size
-            verticalalignment='top',                # Align text to the top
-            bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
-        )
+        # #Display the R0 value in the graph
+        # self.graph2.text(
+        #     -0.0, 1.15,                              # X and Y Coordinates of the text (relative to axes in percentages)
+        #     f"R0 = {R0}",                         # Text
+        #     color="blue",
+        #     transform=self.graph1.transAxes,            # Transform to make the coordinates relative to the axes
+        #     fontsize=10,                            # Set the font size
+        #     verticalalignment='top',                # Align text to the top
+        #     bbox=dict(facecolor='white', alpha=0.5) # Add a background box for readability
+        # )
 
         #Display the R value in the graph
-        self.graph1.text(
-            0.3, 1.15,
-            f"R = {R}",                     
-            color="red",
-            transform=self.graph1.transAxes,
-            fontsize=10,
-            verticalalignment='top',
-            bbox=dict(facecolor='white', alpha=0.5)
-        )
+        # self.graph2.text(
+        #     0.3, 1.15,
+        #     f"R = {R}",                     
+        #     color="red",
+        #     transform=self.graph1.transAxes,
+        #     fontsize=10,
+        #     verticalalignment='top',
+        #     bbox=dict(facecolor='white', alpha=0.5)
+        # )
 
-        self.graph1.text(
-            0.6, 1.15,
-            f"σR = {sigma_R}MPa",
-            transform=self.graph1.transAxes,
-            fontsize=10,
-            verticalalignment='top',
-            bbox=dict(facecolor='white', alpha=0.5)
-        )
+        # self.graph2.text(
+        #     0.6, 1.15,
+        #     f"σR = {sigma_R}MPa",
+        #     transform=self.graph1.transAxes,
+        #     fontsize=10,
+        #     verticalalignment='top',
+        #     bbox=dict(facecolor='white', alpha=0.5)
+        # )
 
 
-        #Create a  range of X values 
-        x_values = numpy.linspace(-min(R, R0), min(R, R0), 100)
+        # #Create a  range of X values 
+        # x_values = numpy.linspace(-min(R, R0), min(R, R0), 100)
 
-        #Create values to plot in the graph
-        y0 = R0 - numpy.sqrt(R0**2 - x_values**2)
-        y1 = R - numpy.sqrt(R**2 - x_values**2)
+        # #Create values to plot in the graph
+        # y0 = R0 - numpy.sqrt(R0**2 - x_values**2)
+        # y1 = R - numpy.sqrt(R**2 - x_values**2)
 
-        #Plot y1 and y0 values
-        self.graph1.plot(x_values, y0, color="red")
-        self.graph1.plot(x_values, y1, color="blue")
+        # #Plot y1 and y0 values
+        # self.graph2.plot(x_values, y0, color="red")
+        # self.graph2.plot(x_values, y1, color="blue")
 
-        # # Redraw the canvas to display the updates (check if this draws only this graph)
-        self.graph1.figure.canvas.draw()
-
-        #Draw the created elements in the graph (check if this draws both of the graphs)
-        # self.graph_translator.draw()
+        #Redraw the canvas to display the updates (check if this draws only this graph)
+        self.graph2.figure.canvas.draw()
 
 
     def draw_z_tip_is_graph(self):
@@ -240,7 +238,7 @@ class Graph:
             messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
             return None
     
-        # Set labels for the graph
+        #Set labels for the graph
         self.graph1.set_title("Cantilever bending")
         self.graph1.set_xlabel("X [μm]", fontsize=10, labelpad=3)
         self.graph1.set_ylabel("Tip displacement [μm]", fontsize=10, labelpad=8)

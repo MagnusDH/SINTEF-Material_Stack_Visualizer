@@ -12,7 +12,7 @@ from Layer_Stack_Canvas import Layer_Stack_Canvas
 from Material_Control_Panel import Material_Control_Panel
 from New_Panel import New_Panel
 from Canvas_Control_Panel import Canvas_Control_Panel
-from Graph import Graph
+from Graph_Panel import Graph_Panel
 from Graph_Control_Panel import Graph_Control_Panel
 from Equations import Equations
 import traceback
@@ -364,68 +364,6 @@ class App:
                     globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
    
 
-            case "Stoney":
-                self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")  #set this column to a specific size that won't change
-                self.program_window.columnconfigure(1, weight=45, uniform="group1")  
-                self.program_window.columnconfigure(2, weight=45, uniform="group1")  
-
-                self.program_window.rowconfigure(0, weight=90, uniform="group1")    
-                self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
-
-                #Create "Material_adjustment_panel"
-                if(globals.material_control_panel == None):
-                    globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
-                else:
-                    globals.material_adjustment_panel.create_material_adjustment_panel()
-                    globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
-
-                #Set all material entry and slider values to "thickness" value, and mark all as "inactive" expect the lowest layer
-                for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-                    globals.materials[material]["Status"] = "inactive"
-                    globals.materials[material]["Checkbox_id"].deselect()
-
-                    if(globals.materials[material]["Layer"] == 1):
-                        globals.materials[material]["Status"] = "active"
-                        globals.materials[material]["Checkbox_id"].select()
-
-                #Create "Material_control_panel"
-                if(globals.material_control_panel == None):
-                    globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
-                else:
-                    globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0)
-
-
-                #Create "Layer_stack_canvas"
-                if(globals.layer_stack_canvas == None):
-                    globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
-                else:
-                    globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1)
-
-
-                #Create "canvas_control_panel"
-                if(globals.canvas_control_panel == None):
-                    globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
-                else:
-                    globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
-
-
-                #Create "Graph"
-                if(globals.graph == None):
-                    globals.graph = Graph(self.program_window, 0, 2)
-
-                else:
-                    globals.graph.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=1)
-
-
-                #Create "graph_control_panel"
-                if(globals.graph_control_panel == None):
-                    globals.graph_control_panel = Graph_Control_Panel(self.program_window, 1, 2)
-                else:
-                    globals.graph_control_panel.graph_control_panel_frame.grid(row=1, column=2)
-
-
             case "Multi":
                 self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")
                 self.program_window.columnconfigure(1, weight=45, uniform="group1")  
@@ -482,13 +420,16 @@ class App:
 
 
                 #Create "Graph"
-                if(globals.graph == None):
-                    globals.graph = Graph(self.program_window, 0, 2)
-                    globals.graph.graph_translator.get_tk_widget().grid(rowspan=2)
-                    globals.graph.draw_z_tip_is_graph()
+                if(globals.graph_panel == None):
+                    globals.graph_panel = Graph_Panel(self.program_window, 0, 2)
+                    globals.graph_panel.graph_translator.get_tk_widget().grid(rowspan=2)
+                    globals.graph_panel.draw_z_tip_is_graph()
+                    globals.graph_panel.draw_stoney_graph()
+
                 else:
-                    globals.graph.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
-                    globals.graph.draw_z_tip_is_graph()
+                    globals.graph_panel.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
+                    globals.graph_panel.draw_z_tip_is_graph()
+                    globals.graph_panel.draw_stoney_graph()
 
 
                 #Create "graph_control_panel"
@@ -627,8 +568,8 @@ if __name__ == "__main__":
     program_window = tkinter.Tk()
     
     #Set the dimensions of the program window
-    # program_window.state("zoomed")
-    program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
+    program_window.state("zoomed")
+    # program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
     
     #Set the program window title
     program_window.title(settings.program_window_title)

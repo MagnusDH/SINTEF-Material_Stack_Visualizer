@@ -13,9 +13,11 @@ material_adjustment_panel_padding_top = 4
 material_adjustment_panel_padding_bottom = 2
 material_adjustment_panel_padding_right = 2
 material_adjustment_panel_padding_left = 4
-material_adjustment_panel_text_color = "#B1E0FF"
 
+material_adjustment_panel_text_color = "#B1E0FF"
 material_adjustment_panel_label_size = 15
+material_adjustment_panel_label_weight = "bold"
+
 
 material_adjustment_panel_entry_background_color = "#284154"
 material_adjustment_panel_entry_border_color = "#B1E0FF"
@@ -50,7 +52,6 @@ material_control_panel_padding_left = 4
 material_control_panel_button_color = "#B1E0FF"#"#0080ca"
 material_control_panel_button_hover_color = "#85A8BF"#"#009ffb"
 material_control_panel_button_text_color = "black" 
-# material_control_panel_text_color = 
 material_control_panel_text_size = 12
 
 
@@ -93,7 +94,13 @@ new_panel_padding_bottom = 2
 new_panel_padding_left = 4 
 new_panel_padding_right = 2
 new_panel_background_color = material_adjustment_panel_background_color
+
 new_panel_text_color = "#B1E0FF"
+new_panel_headline_size = 15
+new_panel_headline_font = "Arial"
+new_panel_headline_weight = "bold"
+
+
 new_panel_entry_background_color = "#284154"
 new_panel_entry_border_color = "#B1E0FF"
 new_panel_entry_text_color = "#B1E0FF"
@@ -117,7 +124,7 @@ layer_stack_canvas_text_color = "black"
 layer_stack_canvas_text_size = 10
 layer_stack_canvas_rectangle_outline_color = "black"
 #STACKED
-layer_stack_canvas_stacked_offset_right_side = 230             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STACKED/REALISTIC/STONEY VIEW
+layer_stack_canvas_stacked_offset_right_side = 230             #HOW MUCH SPACE IS GIVEN TO TEXT ON THE RIGHT SIDE OF THE CANVAS IN STACKED/REALISTIC VIEW
 layer_stack_canvas_stacked_offset_left_side = 0
 #REALISTIC
 layer_stack_canvas_realistic_offset_left_side = 0
@@ -153,12 +160,12 @@ canvas_control_panel_dropdown_hover_color = "#85A8BF"
 canvas_control_panel_text_size = 12
 
 
-#GRAPHS
+#GRAPH_PANEL
 graph_resolution = 75                  #resolution (100 = 100% original size)
-graph_padding_top = 4
-graph_padding_bottom = 2
-graph_padding_left = 2
-graph_padding_right = 4
+graph_panel_padding_top = 4
+graph_panel_padding_bottom = 2
+graph_panel_padding_left = 2
+graph_panel_padding_right = 4
 
 stoney_graph_x_axis_range_min = -100
 stoney_graph_x_axis_range_max = 100

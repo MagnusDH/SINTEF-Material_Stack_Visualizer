@@ -43,7 +43,7 @@ class Graph_Control_Panel:
 
         #Create a toolbar for the graph
         toolbar = NavigationToolbar2Tk(
-            globals.graph.graph_translator,
+            globals.graph_panel.graph_translator,
             graph_control_panel_frame,
         )
         toolbar.pack(
@@ -100,4 +100,4 @@ class Graph_Control_Panel:
         filename = "graph.svg"
 
         #Save the graph as svg file
-        globals.graph.graph_container.savefig(f"{main_folder}/{sub_folder}/{filename}")
+        globals.graph_panel.graph_container.savefig(f"{main_folder}/{sub_folder}/{filename}")

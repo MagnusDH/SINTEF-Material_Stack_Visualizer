@@ -49,40 +49,22 @@ class New_Panel:
 
             new_panel_frame.rowconfigure((0,1,2,3,4,5,6), weight=1, uniform="group1")
 
-            #Create "W μm" label
-            W_label = customtkinter.CTkLabel(
+            #Headline
+            headline = customtkinter.CTkLabel(
                 master=new_panel_frame, 
-                text="W [μm]", 
+                text="SOME HEADLINE??", 
                 fg_color=settings.new_panel_background_color,
-                text_color=settings.new_panel_text_color
+                text_color=settings.new_panel_text_color,
+                font=(settings.new_panel_headline_font, settings.new_panel_headline_size, settings.new_panel_headline_weight) 
             )
-            W_label.grid(
+            headline.grid(
                 row=0, 
-                column=0, 
+                column=0,
+                columnspan=3, 
                 sticky="", 
                 padx=(0,0),
                 pady=(0,0)
             )
-
-            #Create Entry
-            self.W_value = tkinter.StringVar(value=160)
-            W_entry = customtkinter.CTkEntry(
-                master=new_panel_frame,
-                textvariable=self.W_value,
-                fg_color = settings.new_panel_entry_background_color,
-                border_color=settings.new_panel_entry_border_color,
-                border_width=0.4,
-                text_color=settings.new_panel_entry_text_color,
-                justify="center"
-            )
-            W_entry.grid(
-                row=0, 
-                column=2,
-                sticky="",
-                padx=(0,0),
-                pady=(0,0)
-            )
-            W_entry.bind("<Return>", lambda event, entry=W_entry: self.W_entry_updated(entry))
 
 
             #Create "L μm" label
@@ -139,7 +121,7 @@ class New_Panel:
             #Create ri Entry
             ri_entry = customtkinter.CTkEntry(
                 master=new_panel_frame,
-                textvariable=tkinter.StringVar(value=0),
+                textvariable=tkinter.StringVar(value="not in use"),
                 fg_color = settings.new_panel_entry_background_color,
                 border_color=settings.new_panel_entry_border_color,
                 border_width=0.4,
@@ -173,7 +155,7 @@ class New_Panel:
             #Create Entry
             ro_entry = customtkinter.CTkEntry(
                 master=new_panel_frame,
-                textvariable=tkinter.StringVar(value=0),
+                textvariable=tkinter.StringVar(value="not in use"),
                 fg_color = settings.new_panel_entry_background_color,
                 border_color=settings.new_panel_entry_border_color,
                 border_width=0.4,
@@ -221,7 +203,7 @@ class New_Panel:
                 padx=(0,0),
                 pady=(0,0)
             )
-            self.e_31_f_entry.bind("<Return>", lambda event: globals.graph.draw_z_tip_is_graph())
+            self.e_31_f_entry.bind("<Return>", lambda event: globals.graph_panel.draw_z_tip_is_graph())
 
 
             #Create slider label
@@ -280,15 +262,15 @@ class New_Panel:
             self.volt_entry.bind("<Return>", lambda event, entry_id=self.volt_entry, slider_id=volt_slider: self.volt_entry_updated(entry_id, slider_id))
 
 
-            #curvature_thickness label
+            #Stress_neutral label
             self.t_zero = tkinter.StringVar(value=0) #globals.equations.find_t_solution())
-            self.curvature_thickness_label = customtkinter.CTkLabel(
+            self.Stress_neutral_label = customtkinter.CTkLabel(
                 master=new_panel_frame, 
                 text=f"Stress-neutral SiO2-thickness: {self.t_zero.get()}", 
                 fg_color=settings.new_panel_background_color,
                 text_color=settings.new_panel_text_color
             )
-            self.curvature_thickness_label.grid(
+            self.Stress_neutral_label.grid(
                 row=6, 
                 column=0, 
                 sticky="w", 
@@ -297,6 +279,79 @@ class New_Panel:
                 columnspan=3
             )
             
+
+            #Piezoelectric_bending_moment label
+            self.piezo_bending = tkinter.StringVar(value=0)
+            self.piezo_bending_label = customtkinter.CTkLabel(
+                master=new_panel_frame, 
+                text=f"Piezoelectric bending moment: {self.piezo_bending.get()}", 
+                fg_color=settings.new_panel_background_color,
+                text_color=settings.new_panel_text_color
+            )
+            self.piezo_bending_label.grid(
+                row=7, 
+                column=0, 
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,0),
+                columnspan=3
+            )
+            
+
+            #Blocking_force_cantilever_tip label
+            self.blocking_force = tkinter.StringVar(value=0)
+            self.blocking_force_cantilever_label = customtkinter.CTkLabel(
+                master=new_panel_frame, 
+                text=f"Blocking force cantilever tip: {self.blocking_force.get()}", 
+                fg_color=settings.new_panel_background_color,
+                text_color=settings.new_panel_text_color
+            )
+            self.blocking_force_cantilever_label.grid(
+                row=8, 
+                column=0, 
+                columnspan=3,
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,0),
+            )
+
+
+            #Initial_curvature label
+            self.initial_curvature = tkinter.StringVar(value=0)
+            self.initial_curvature_label = customtkinter.CTkLabel(
+                master=new_panel_frame, 
+                text=f"Initial curvature: {self.initial_curvature.get()}", 
+                fg_color=settings.new_panel_background_color,
+                text_color=settings.new_panel_text_color
+            )
+            self.initial_curvature_label.grid(
+                row=9, 
+                column=0, 
+                columnspan=3,
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,0),
+            )
+            
+
+            #Final_curvature label
+            self.final_curvature = tkinter.StringVar(value=0)
+            self.final_curvature_label = customtkinter.CTkLabel(
+                master=new_panel_frame, 
+                text=f"Final curvature: {self.final_curvature.get()}", 
+                fg_color=settings.new_panel_background_color,
+                text_color=settings.new_panel_text_color
+            )
+            self.final_curvature_label.grid(
+                row=10, 
+                column=0, 
+                columnspan=3,
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,0),
+            )
+
+
         return new_panel_frame
         
     
@@ -312,7 +367,10 @@ class New_Panel:
         # self.curvature_thickness_label.configure(text=f"Zero curvature thickness: {self.volt_value.get()}")
 
         #Update z_tip graph
-        globals.graph.draw_z_tip_is_graph()
+        globals.graph_panel.draw_z_tip_is_graph()
+
+        #Re-draw the "stoney" graph
+        globals.graph_panel.draw_stoney_graph()
 
 
     def volt_entry_updated(self, entry_id, slider_id):
@@ -328,21 +386,11 @@ class New_Panel:
         slider_id.set(helper_functions.convert_decimal_string_to_float(entered_value))
 
         #Update z_tip graph
-        globals.graph.draw_z_tip_is_graph()
+        globals.graph_panel.draw_z_tip_is_graph()
 
-
-    def W_entry_updated(self, entry_id):
-        """
-        -Re-draws the z_tip graph
-        """
-        # print("W_ENTRY_UPDATED()")
-
-        #Find entered value
-        # entered_value = entry_id.get()
-
-        #Update z_tip graph
-        globals.graph.draw_z_tip_is_graph()
-    
+        #Re-draw the "stoney" graph
+        globals.graph_panel.draw_stoney_graph()
+  
 
     def L_entry_updated(self, entry_id):
         """
@@ -353,4 +401,7 @@ class New_Panel:
         #Find entered value
         # entered_value = entry_id.get()
 
-        globals.graph.draw_z_tip_is_graph()
+        globals.graph_panel.draw_z_tip_is_graph()
+
+        #Re-draw the "stoney" graph
+        globals.graph_panel.draw_stoney_graph()

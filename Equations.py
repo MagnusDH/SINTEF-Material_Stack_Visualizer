@@ -6,15 +6,20 @@ from scipy.optimize import fsolve
 
 #This class handles all equations
 class Equations:
-    def __init__(self):
-        print("CLASS EQUATIONS INIT()")
+    # def __init__(self):
+        # print("CLASS EQUATIONS INIT()")
 
 
-    def calculate_Zn(self):
+    def calculate_Zn(self):#E:list, t:list, nu:list):
         """
-        -Calculates the neutral axis value for the materials in the stack\n
-        -Returns the 'Zn' value
-        -Return value is nanometer
+        -Calculates the neutral axis value for the given materials\n
+        -Returns the 'Zn' value in nanometers\n
+
+        PARAMETERS:        
+        E = list of "Modulus [GPa]" values\n
+        t = list of "Thickness" values in nanometers\n
+        nu = list of "Poisson" values\n
+
         """
         # print("CALCULATE_ZN()")
         #Create a list of all the necessary variables
@@ -52,6 +57,7 @@ class Equations:
         return Zn
     
 
+    #NOT DONE
     def calculate_mid_piezo(self):
         """
         -Calculates mid-plane location for the nth layer (z_mid_n)\n 
@@ -79,6 +85,7 @@ class Equations:
         return Zp 
 
 
+    #NOT DONE
     def calculate_EI(self):
         """
         -Function to calculate flexural rigidity (EI)
@@ -96,18 +103,12 @@ class Equations:
             t.append(globals.materials[material]["Thickness"] / 1e9)       #divided by 1 billion
             nu.append(globals.materials[material]["Poisson"])
 
-        #Fetch the 'W_entry' value from new_panel
-        W = helper_functions.convert_decimal_string_to_float(globals.new_panel.W_value.get())
-        if(W == 0 or W == False):
-            messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
-            return None
-
         #Convert W value to micrometers
+        W = 160
         W = W / 1e6
 
         #Calculate Zn value
         Zn = self.calculate_Zn() / 1e9 #divided by 1 billion to get correct value
-
 
         EI = W * ((E[0] / (1 - nu[0]**2)) * (t[0]**3 / 12 + t[0] * (t[0]/2 - Zn)**2))
         
@@ -120,6 +121,7 @@ class Equations:
         return EI
 
 
+    #NOT DONE
     def calculate_M_is_cantilever(self):
         """
         -Function to calculate cantilever stress bending moment (M_tot)\n
@@ -138,18 +140,9 @@ class Equations:
             sigma_i.append(globals.materials[material]["Stress_x [MPa]"] * 1e6)
 
 
-        #Fetch the 'W_entry' value from new_panel
-        W = helper_functions.convert_decimal_string_to_float(globals.new_panel.W_value.get())
-        if(W == 0 or W == False):
-            messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
-            return None
-
-        #Convert W_value to micrometers
+        #Convert W value to micrometers
+        W = 160
         W = W / 1e6
-
-        if(W == 0 or W == False):
-            messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
-            return None
 
         #Calculate Zn value
         Zn = self.calculate_Zn() / 1e9
@@ -162,6 +155,7 @@ class Equations:
         return M_is
 
 
+    #NOT DONE
     def calculate_M_tot_cantilever(self):
         
         M_tot = self.calculate_M_is_cantilever() + self.calculate_M_p_cantilever()
@@ -169,6 +163,7 @@ class Equations:
         return M_tot
     
 
+    #NOT DONE
     def calculate_curvature(self):
         """
         -Curvature calculation\n
@@ -190,6 +185,7 @@ class Equations:
         return curv_is
 
 
+    #NOT DONE
     def calculate_tip_placement(self, L):
         """
         -Tip displacement calculation for a given "length/L" value\n
@@ -205,21 +201,24 @@ class Equations:
         return z_tip_tot * 1e6
 
 
-    def calculate_M_p_cantilever(self):
+    #NOT DONE
+    def calculate_M_p_cantilever(self):#, Zp:float, W:float, V_p:float, e_31_f:float):
         """
         -Function to calculate cantilever piezoelectric moment (M_p)
+        
+        -Parameters:\n
+        Zp unit ???
+        W unit ???
+        V_p unit ???
+        e_31_f unit ???
         """
         # print("CALCULATE_M_P_CANTILEVER()")
 
         #Calculate Zp value
         Zp = self.calculate_mid_piezo() / 1e9
 
-        #Fetch the 'W_entry' value from new_panel
-        W = helper_functions.convert_decimal_string_to_float(globals.new_panel.W_value.get())
-        if(W == 0 or W == False):
-            messagebox.showerror("ERROR", "'W [μm]' entry can not be zero or empty")
-            return None
-        #Convert to micrometers
+        #Convert W value to micrometers
+        W = 160
         W = W / 1e6
 
         #Fetch the 'volt' value from new_panel
@@ -234,7 +233,7 @@ class Equations:
         return M_p
 
 
-    #?????????? this is new from Runar
+    #NOT DONE
     def neutralize_global_stress(self, t_guess):
         """
         Objective function for fsolve: sets the second-layer thickness to t_guess[0],
@@ -261,14 +260,14 @@ class Equations:
         return z_tip
     
 
-    #??? from Runar
+    #NOT DONE
     def find_t_solution(self):
         """
         Solve for and return the thickness of the second layer that makes the
         stress-induced tip displacement zero.
         """
+        # print("FIND_T_SOLUTION()")
 
-        print("FIND_T_SOLUTION()")
         # Identify second layer current thickness
         t_guess = float(globals.materials["SiO2"]["Thickness"])  #Extract scalar from array
 
