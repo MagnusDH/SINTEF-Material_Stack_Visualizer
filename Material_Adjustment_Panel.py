@@ -120,7 +120,7 @@ class Material_Adjustment_Panel:
                                 font=(settings.text_font, 10, "bold"),
                                 fg_color=settings.material_adjustment_panel_delete_button_color,
                                 hover_color=settings.material_adjustment_panel_delete_button_hover_color, 
-                                text_color="black",#settings.material_control_panel_text_color,
+                                text_color="black",
                                 command=lambda identifier=material: self.delete_material(identifier)
                             )
                             delete_material_button.grid(
@@ -146,9 +146,9 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Label_name_id"] == None):
                             label = customtkinter.CTkLabel(
                                 master=self.material_adjustment_panel_frame, 
-                                text=material, 
+                                textvariable=globals.materials[material]["Name"], 
                                 fg_color=settings.material_adjustment_panel_background_color,
-                                text_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_text_color
+                                text_color=globals.materials[material]["Color"].get()
                             )
                             label.grid(
                                 row=row_counter, 
@@ -162,8 +162,8 @@ class Material_Adjustment_Panel:
                         #Adjust existing material name label
                         else:
                             globals.materials[material]["Label_name_id"].configure(
-                                text=globals.materials[material]["Name"],
-                                text_color=globals.materials[material]["Color"]
+                                textvariable=globals.materials[material]["Name"],
+                                text_color=globals.materials[material]["Color"].get()
                             )
                             globals.materials[material]["Label_name_id"].grid(
                                 row=row_counter,
@@ -174,7 +174,7 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Entry_id"] == None):
                             entry = customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
-                                textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
+                                textvariable=globals.materials[material]["Thickness [nm]"],
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
                                 border_color=settings.material_adjustment_panel_entry_border_color,
                                 border_width=0.4,
@@ -188,12 +188,12 @@ class Material_Adjustment_Panel:
                                 padx=(0,0),
                                 pady=(0,0)
                             )
-                            entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
+                            # entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
                             globals.materials[material]["Entry_id"] = entry
                         #Adjust existing Entry
                         else:
                             globals.materials[material]["Entry_id"].configure(
-                                textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
+                                textvariable=globals.materials[material]["Thickness [nm]"]
                             )
                             globals.materials[material]["Entry_id"].grid(
                                 row=row_counter,
@@ -207,11 +207,13 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame, 
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
+                                variable=globals.materials[material]["Thickness [nm]"],
+                                number_of_steps=1000,
                                 fg_color=settings.material_adjustment_panel_slider_background_color,
                                 button_color=settings.material_adjustment_panel_slider_button_color,
-                                progress_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_slider_progress_color,
+                                progress_color=globals.materials[material]["Color"].get(),#settings.material_adjustment_panel_slider_progress_color,
                                 button_hover_color=settings.material_adjustment_panel_slider_hover_color,
-                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                                # command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
                             )
                             slider.grid(
                                 row=row_counter, 
@@ -221,19 +223,20 @@ class Material_Adjustment_Panel:
                                 pady=(0,0)
                             )
                             globals.materials[material]["Slider_id"] = slider 
-                            slider.set(globals.materials[material]["Thickness"])
+                            # slider.set(globals.materials[material]["Thickness [nm]"].get())
                         #Adjust existing slider
                         else:
                             globals.materials[material]["Slider_id"].configure(
-                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier),
-                                progress_color=globals.materials[material]["Color"]
+                                variable=globals.materials[material]["Thickness [nm]"],
+                                progress_color=globals.materials[material]["Color"].get()
+                                # command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier),
                             )
 
                             globals.materials[material]["Slider_id"].grid(
                                 row=row_counter,
                                 column=3
                             )
-                            globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+                            # globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness [nm]"])
 
 
                         #Create move down_button
@@ -243,7 +246,7 @@ class Material_Adjustment_Panel:
                                 text="⬇", #⬆ ⬇ 🔼 🔽
                                 font=(settings.text_font, 15),
                                 fg_color=settings.material_adjustment_panel_button_color,
-                                hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
+                                hover_color=globals.materials[material]["Color"].get(), 
                                 text_color=settings.material_adjustment_panel_button_text_color,
                                 command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                             )
@@ -259,7 +262,7 @@ class Material_Adjustment_Panel:
                         else:
                             globals.materials[material]["Move_down_button_id"].configure(
                                 command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down),
-                                hover_color=globals.materials[material]["Color"]
+                                hover_color=globals.materials[material]["Color"].get()
                             )
                             globals.materials[material]["Move_down_button_id"].grid(
                                 row=row_counter,
@@ -273,7 +276,7 @@ class Material_Adjustment_Panel:
                                 text="⬆", #⬆ ⬇ 🔼 🔽
                                 font=(settings.text_font, 15),
                                 fg_color=settings.material_adjustment_panel_button_color,
-                                hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
+                                hover_color=globals.materials[material]["Color"].get(), 
                                 text_color=settings.material_adjustment_panel_button_text_color,
                                 command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                             )
@@ -289,7 +292,7 @@ class Material_Adjustment_Panel:
                         else:
                             globals.materials[material]["Move_up_button_id"].configure(
                                 command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down),
-                                hover_color=globals.materials[material]["Color"]
+                                hover_color=globals.materials[material]["Color"].get()
                             )
                             globals.materials[material]["Move_up_button_id"].grid(
                                 row=row_counter,
@@ -361,7 +364,7 @@ class Material_Adjustment_Panel:
                                 font=(settings.text_font, 10, "bold"),
                                 fg_color=settings.material_adjustment_panel_delete_button_color,
                                 hover_color=settings.material_adjustment_panel_delete_button_hover_color, 
-                                text_color="black",#settings.material_control_panel_text_color,
+                                text_color="black",
                                 command=lambda identifier=material: self.delete_material(identifier)
                             )
                             delete_material_button.grid(
@@ -386,9 +389,9 @@ class Material_Adjustment_Panel:
                         if(globals.materials[material]["Label_name_id"] == None):
                             label = customtkinter.CTkLabel(
                                 master=self.material_adjustment_panel_frame, 
-                                text=material, 
+                                textvariable=globals.materials[material]["Name"], 
                                 fg_color=settings.material_adjustment_panel_background_color,
-                                text_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_text_color
+                                text_color=globals.materials[material]["Color"].get(),
                             )
                             label.grid(
                                 row=row_counter, 
@@ -402,8 +405,8 @@ class Material_Adjustment_Panel:
                         #Adjust existing material name label
                         else:
                             globals.materials[material]["Label_name_id"].configure(
-                                text=globals.materials[material]["Name"],
-                                text_color=globals.materials[material]["Color"]
+                                textvariable=globals.materials[material]["Name"],
+                                text_color=globals.materials[material]["Color"].get()
                             )
                             globals.materials[material]["Label_name_id"].grid(
                                 row=row_counter,
@@ -412,9 +415,9 @@ class Material_Adjustment_Panel:
 
                         #Create Entry
                         if(globals.materials[material]["Entry_id"] == None):
-                            entry = customtkinter.CTkEntry(
+                            entry=customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
-                                textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])),
+                                textvariable=globals.materials[material]["Indent [nm]"],
                                 fg_color = settings.material_adjustment_panel_entry_background_color,
                                 border_color=settings.material_adjustment_panel_entry_border_color,
                                 border_width=0.4,
@@ -428,12 +431,12 @@ class Material_Adjustment_Panel:
                                 padx=(0,0),
                                 pady=(0,0)
                             )
-                            entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
+                            # entry.bind("<Return>", lambda event, e=entry: self.material_entry_updated(e))
                             globals.materials[material]["Entry_id"] = entry
                         #Adjust existing Entry
                         else:
                             globals.materials[material]["Entry_id"].configure(
-                                textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"]))
+                                textvariable=globals.materials[material]["Indent [nm]"]
                             )
                             globals.materials[material]["Entry_id"].grid(
                                 row=row_counter,
@@ -447,11 +450,13 @@ class Material_Adjustment_Panel:
                                 master=self.material_adjustment_panel_frame, 
                                 from_=settings.material_adjustment_panel_slider_range_min, 
                                 to=settings.material_adjustment_panel_slider_range_max,
+                                variable=globals.materials[material]["Indent [nm]"],
+                                number_of_steps=1000,
                                 fg_color=settings.material_adjustment_panel_slider_background_color,
                                 button_color=settings.material_adjustment_panel_slider_button_color,
-                                progress_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_slider_progress_color,
+                                progress_color=globals.materials[material]["Color"].get(),
                                 button_hover_color=settings.material_adjustment_panel_slider_hover_color,
-                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
+                                # command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier)
                             )
                             slider.grid(
                                 row=row_counter, 
@@ -461,18 +466,19 @@ class Material_Adjustment_Panel:
                                 pady=(0,0)
                             )
                             globals.materials[material]["Slider_id"] = slider 
-                            slider.set(globals.materials[material]["Indent [nm]"])
+                            # slider.set(globals.materials[material]["Indent [nm]"])
                         #Adjust existing slider
                         else:
                             globals.materials[material]["Slider_id"].configure(
-                                command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier),
-                                progress_color=globals.materials[material]["Color"]
+                                # command=lambda value, identifier=material:self.material_slider_updated(round(value), identifier),
+                                variable=globals.materials[material]["Indent [nm]"],
+                                progress_color=globals.materials[material]["Color"].get()
                             )
                             globals.materials[material]["Slider_id"].grid(
                                 row=row_counter,
                                 column=3
                             )
-                            globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
+                            # globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
 
                         
                         #Create buttons to move layer up or down
@@ -484,7 +490,7 @@ class Material_Adjustment_Panel:
                                     text="⬇", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"].get(),
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down)
                                 )
@@ -500,7 +506,7 @@ class Material_Adjustment_Panel:
                             else:
                                 globals.materials[material]["Move_down_button_id"].configure(
                                     command=lambda chosen_material=material, up_or_down="down": self.move_material(chosen_material, up_or_down),
-                                    hover_color=globals.materials[material]["Color"]
+                                    hover_color=globals.materials[material]["Color"].get()
                                 )
                                 globals.materials[material]["Move_down_button_id"].grid(
                                     row=row_counter,
@@ -514,7 +520,7 @@ class Material_Adjustment_Panel:
                                     text="⬆", #⬆ ⬇ 🔼 🔽
                                     font=(settings.text_font, 15),
                                     fg_color=settings.material_adjustment_panel_button_color,
-                                    hover_color=globals.materials[material]["Color"],#settings.material_adjustment_panel_button_hover_color, 
+                                    hover_color=globals.materials[material]["Color"].get(), 
                                     text_color=settings.material_adjustment_panel_button_text_color,
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down)
                                 )
@@ -530,7 +536,7 @@ class Material_Adjustment_Panel:
                             else:
                                 globals.materials[material]["Move_up_button_id"].configure(
                                     command=lambda chosen_material=material, up_or_down="up": self.move_material(chosen_material, up_or_down),
-                                    hover_color=globals.materials[material]["Color"]
+                                    hover_color=globals.materials[material]["Color"].get()
                                 )
                                 globals.materials[material]["Move_up_button_id"].grid(
                                     row=row_counter,
@@ -544,123 +550,122 @@ class Material_Adjustment_Panel:
         return self.material_adjustment_panel_frame
           
     
-    def material_entry_updated(self, entry):
-        """
-        -Depending on the current view: different material values are changed and the stack and graphs are redrawn
-        """
+    # def material_entry_updated(self, entry):
+    #     """
+    #     -Depending on the current view: different material values are changed and the stack and graphs are redrawn
+    #     """
 
-        # print("MATERIAL_ENTRY_UPDATED()")
-    
+    #     print("MATERIAL_ENTRY_UPDATED()")
+
         #Update different values in self.materials based on option menu value
-        match globals.current_view:
-            case "Stacked" | "Realistic":
-                #Find material that corresponds to "entry"
-                for material in globals.materials:
-                    if(globals.materials[material]["Entry_id"] == entry):
-                        #Find entered value
-                        entered_value = helper_functions.convert_decimal_string_to_float(entry.get())
-                        #Update the thickness value in self.materials
-                        globals.materials[material]["Thickness"] = entered_value
+        # match globals.current_view:
+        #     case "Stacked" | "Realistic":
+        #         #Find material that corresponds to "entry"
+        #         for material in globals.materials:
+        #             if(globals.materials[material]["Entry_id"] == entry):
+                        # #Find entered value
+                        # entered_value = helper_functions.convert_decimal_string_to_float(entry.get())
+                        # #Update the thickness value in self.materials
+                        # globals.materials[material]["Thickness [nm]"] = entered_value
 
                         #Update the slider corresponding to the key
-                        globals.materials[material]["Slider_id"].set(entered_value)
+                        # globals.materials[material]["Slider_id"].set(entered_value)
 
-            case "Stepped":
-                #Find material that corresponds to "entry"
-                for material in globals.materials:
-                    if(globals.materials[material]["Entry_id"] == entry):
-                        #Find entered value
-                        entered_value = helper_functions.convert_decimal_string_to_float(entry.get())
+            # case "Stepped":
+            #     #Find material that corresponds to "entry"
+            #     for material in globals.materials:
+            #         if(globals.materials[material]["Entry_id"] == entry):
+            #             #Find entered value
+            #             entered_value = helper_functions.convert_decimal_string_to_float(entry.get())
 
-                        #Update the thickness value in self.materials
-                        globals.materials[material]["Indent [nm]"] = entered_value
+            #             #Update the thickness value in self.materials
+            #             globals.materials[material]["Indent [nm]"] = entered_value
 
-                        #Update the slider corresponding to the key
-                        globals.materials[material]["Slider_id"].set(entered_value)
+            #             #Update the slider corresponding to the key
+            #             globals.materials[material]["Slider_id"].set(entered_value)
 
 
-            case "Multi":
-                #Find material that corresponds to "entry"
-                for material in globals.materials:
-                    if(globals.materials[material]["Entry_id"] == entry):
-                        #Find entered value
-                        entered_value = helper_functions.convert_decimal_string_to_float(entry.get())
+            # case "Multi":
+            #     #Find material that corresponds to "entry"
+            #     for material in globals.materials:
+            #         if(globals.materials[material]["Entry_id"] == entry):
+            #             #Find entered value
+            #             entered_value = helper_functions.convert_decimal_string_to_float(entry.get())
 
-                        #Update the thickness value in self.materials
-                        globals.materials[material]["Thickness"] = entered_value
+            #             #Update the thickness value in self.materials
+            #             globals.materials[material]["Thickness [nm]"] = entered_value
 
-                        #Update the slider corresponding to the key
-                        globals.materials[material]["Slider_id"].set(entered_value)  
+            #             #Update the slider corresponding to the key
+            #             globals.materials[material]["Slider_id"].set(entered_value)  
 
-                        #Re-draw the "z_tip_is" graph
-                        globals.graph_panel.draw_z_tip_is_graph() 
+            #             #Re-draw the "z_tip_is" graph
+            #             globals.graph_canvas.draw_z_tip_is_graph() 
 
-                        #Re-draw the "stoney" graph
-                        globals.graph_panel.draw_stoney_graph()
+            #             #Re-draw the "stoney" graph
+            #             globals.graph_canvas.draw_stoney_graph()
 
 
         #Redraw material stack
-        globals.layer_stack_canvas.draw_material_stack()
+        # globals.layer_stack_canvas.draw_material_stack()
 
 
-    def material_slider_updated(self, value, identifier): 
-        """
-        -Depending on the current view: different material values are changed and the stack and graphs are redrawn
-        """
+    # def material_slider_updated(self, value, identifier): 
+    #     """
+    #     -Depending on the current view: different material values are changed and the stack and graphs are redrawn
+    #     """
       
-        # print("MATERIAL_SLIDER_UPDATED()")
+    #     print("MATERIAL_SLIDER_UPDATED()")
 
         ################################################################################################
         #Calculate slider range value
-        slider_max_value = 0
-        for material in globals.materials:
-            #Do not include the first layer
-            if(globals.materials[material]["Layer"] == 1):
-                continue
-            slider_max_value += globals.materials[material]["Thickness"]
+        # slider_max_value = 0
+        # for material in globals.materials:
+        #     #Do not include the first layer
+        #     if(globals.materials[material]["Layer"].get() == 1):
+        #         continue
+        #     slider_max_value += globals.materials[material]["Thickness [nm]"]
 
-        for material in globals.materials:
-            globals.materials[material]["Slider_id"].configure(
-                to=slider_max_value)
+        # for material in globals.materials:
+        #     globals.materials[material]["Slider_id"].configure(
+        #         to=slider_max_value)
 
-            globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
+        #     globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness [nm]"])
         ################################################################################################
             
         #Update different values in self.materials based on option value
-        match globals.current_view:
-            case "Stacked"|"Realistic":
-                #Update the thickness value in self.materials
-                globals.materials[identifier]["Thickness"] = value
+        # match globals.current_view:
+        #     case "Stacked"|"Realistic":
+        #         #Update the thickness value in self.materials
+        #         globals.materials[identifier]["Thickness [nm]"] = value
 
-                #Update the entry corresponding to key
-                globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
-                globals.materials[identifier]["Entry_id"].insert(0, value)
+        #         #Update the entry corresponding to key
+        #         globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
+        #         globals.materials[identifier]["Entry_id"].insert(0, value)
             
-            case "Stepped":
-                #Update the "indent" value in self.materials
-                globals.materials[identifier]["Indent [nm]"] = value
+        #     case "Stepped":
+        #         #Update the "indent" value in self.materials
+        #         globals.materials[identifier]["Indent [nm]"] = value
 
-                #Update the entry corresponding to key
-                globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
-                globals.materials[identifier]["Entry_id"].insert(0, value)
+        #         #Update the entry corresponding to key
+        #         globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
+        #         globals.materials[identifier]["Entry_id"].insert(0, value)
             
-            
-            case "Multi":
-                #Update the thickness value in self.materials
-                globals.materials[identifier]["Thickness"] = value
+        #     case "Multi":
+        #         #Update the thickness value in self.materials
+        #         globals.materials[identifier]["Thickness [nm]"] = value
 
-                #Update the entry corresponding to key
-                globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
-                globals.materials[identifier]["Entry_id"].insert(0, value)
+        #         #Update the entry corresponding to key
+        #         globals.materials[identifier]["Entry_id"].delete(0, tkinter.END)
+        #         globals.materials[identifier]["Entry_id"].insert(0, value)
                 
-                #Re-draw the "z_tip_is" graph
-                globals.graph_panel.draw_z_tip_is_graph() 
+        #         #Re-draw the "z_tip_is" graph
+        #         globals.graph_canvas.draw_z_tip_is_graph() 
 
-                #Re-draw the "stoney" graph
-                globals.graph_panel.draw_stoney_graph()
+        #         #Re-draw the "stoney" graph
+        #         globals.graph_canvas.draw_stoney_graph()
 
-        #Redraw material stack
-        globals.layer_stack_canvas.draw_material_stack()
+        # #Redraw material stack
+        # globals.layer_stack_canvas.draw_material_stack()
 
 
     def delete_material(self, material):
@@ -715,8 +720,13 @@ class Material_Adjustment_Panel:
         #Update the material_adjustment_panel
         self.create_material_adjustment_panel()
 
-        #Re-draw the material stack
+        #Redraw the material stack
         globals.layer_stack_canvas.draw_material_stack()
+
+        #If graphs has been created, redraw them
+        if(globals.graph_canvas != None):
+            globals.graph_canvas.draw_z_tip_is_graph()
+            globals.graph_canvas.draw_stoney_graph()
         
 
     def move_material(self, chosen_material, up_or_down):
@@ -732,10 +742,10 @@ class Material_Adjustment_Panel:
         above_material = None
         below_material = None
         for material in globals.materials:
-            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] - 1):
+            if(globals.materials[material]["Layer"].get() == globals.materials[chosen_material]["Layer"].get() - 1):
                 below_material = material
 
-            if(globals.materials[material]["Layer"] == globals.materials[chosen_material]["Layer"] + 1):
+            if(globals.materials[material]["Layer"].get() == globals.materials[chosen_material]["Layer"].get() + 1):
                 above_material = material
 
         
@@ -754,10 +764,15 @@ class Material_Adjustment_Panel:
                 globals.materials[above_material]["Layer"] = tmp_layer
 
         #Sort the keys in globals.materials after the "layer" value of each material
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
 
         #Adjust the widgets in material_adjustment_panel_frame
         self.create_material_adjustment_panel()
 
         #Redraw the material stack
         globals.layer_stack_canvas.draw_material_stack()
+
+        #If graphs has been created, redraw them
+        if(globals.graph_canvas != None):
+            globals.graph_canvas.draw_z_tip_is_graph()
+            globals.graph_canvas.draw_stoney_graph()

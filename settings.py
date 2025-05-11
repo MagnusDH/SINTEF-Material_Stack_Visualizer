@@ -89,28 +89,28 @@ modify_material_window_entry_text_color = "#B1E0FF"
 modify_material_window_text_size = 12
 
 #NEW PANEL
-new_panel_padding_top = 2 
-new_panel_padding_bottom = 2 
-new_panel_padding_left = 4 
-new_panel_padding_right = 2
-new_panel_background_color = material_adjustment_panel_background_color
+parameters_panel_padding_top = 2 
+parameters_panel_padding_bottom = 2 
+parameters_panel_padding_left = 4 
+parameters_panel_padding_right = 2
+parameters_panel_background_color = material_adjustment_panel_background_color
 
-new_panel_text_color = "#B1E0FF"
-new_panel_headline_size = 15
-new_panel_headline_font = "Arial"
-new_panel_headline_weight = "bold"
+parameters_panel_text_color = "#B1E0FF"
+parameters_panel_headline_size = 15
+parameters_panel_headline_font = "Arial"
+parameters_panel_headline_weight = "bold"
 
 
-new_panel_entry_background_color = "#284154"
-new_panel_entry_border_color = "#B1E0FF"
-new_panel_entry_text_color = "#B1E0FF"
+parameters_panel_entry_background_color = "#284154"
+parameters_panel_entry_border_color = "#B1E0FF"
+parameters_panel_entry_text_color = "#B1E0FF"
 
-new_panel_slider_range_min = 0
-new_panel_slider_range_max = 100
-new_panel_slider_background_color = "black"
-new_panel_slider_button_color = "#B1E0FF"
-new_panel_slider_progress_color = "#B1E0FF"
-new_panel_slider_hover_color = "#85A8BF"
+parameters_panel_slider_range_min = 0
+parameters_panel_slider_range_max = 100
+parameters_panel_slider_background_color = "black"
+parameters_panel_slider_button_color = "#B1E0FF"
+parameters_panel_slider_progress_color = "#B1E0FF"
+parameters_panel_slider_hover_color = "#85A8BF"
 
 
 #LAYER STACK CANVAS
@@ -160,12 +160,12 @@ canvas_control_panel_dropdown_hover_color = "#85A8BF"
 canvas_control_panel_text_size = 12
 
 
-#GRAPH_PANEL
+#GRAPH_Canvas
 graph_resolution = 75                  #resolution (100 = 100% original size)
-graph_panel_padding_top = 4
-graph_panel_padding_bottom = 2
-graph_panel_padding_left = 2
-graph_panel_padding_right = 4
+graph_canvas_padding_top = 4
+graph_canvas_padding_bottom = 2
+graph_canvas_padding_left = 2
+graph_canvas_padding_right = 4
 
 stoney_graph_x_axis_range_min = -100
 stoney_graph_x_axis_range_max = 100
@@ -194,4 +194,4 @@ graph_control_panel_button_hover_color = "#85A8BF"
 graph_control_panel_button_text_color = "black"
 
 #SVG
-svg_text_size = 14
+svg_text_size = 20

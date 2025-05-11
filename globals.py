@@ -9,10 +9,10 @@ current_view = "Multi"
 app = None
 material_adjustment_panel = None
 material_control_panel = None
-new_panel = None
+parameters_panel = None
 layer_stack_canvas = None
 canvas_control_panel = None
-graph_panel = None
+graph_canvas = None
 graph_control_panel = None
 equations = None
 

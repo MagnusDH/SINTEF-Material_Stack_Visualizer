@@ -4,8 +4,6 @@ import customtkinter
 import settings
 import globals
 import os
-from Graph_Panel import Graph_Panel
-from Graph_Control_Panel import Graph_Control_Panel
 
 
 #This class handles the buttons that perform actions on the canvas
@@ -264,10 +262,6 @@ class Canvas_Control_Panel:
         """Exports every layer of the stack with text and arrows as SVG-file"""     
         # print("EXPORT_LAYERS_AS_SVG()")
 
-        #TODO
-            #line from text bbox to small rectangle is not exported to svg
-
-
         #Create folders and filenames
         main_folder = "exports"
         #Create the folder if it doesn't exist
@@ -285,13 +279,14 @@ class Canvas_Control_Panel:
         previously_created_elements = []
 
         #Iterate through all the materials
-        # for material in dict(reversed(globals.materials.items())):
         for material in globals.materials:
             #Only create svg element if there is a rectangle
             if(globals.materials[material]["Rectangle_id"] != None):
 
                 #Create a name for the SVG file for the current layer
-                filename = f"{layer_counter}_layer_{globals.current_view}.svg"
+                # filename = f"{layer_counter}materials_{material}_{globals.current_view}.svg"
+                filename = f"{layer_counter}materials_{list(globals.materials)[0]}-{material}.svg"
+                
 
                 #Create the file path by joining the folder path and the filename
                 file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")

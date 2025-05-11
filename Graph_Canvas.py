@@ -10,7 +10,7 @@ import helper_functions
 from matplotlib.patches import FancyArrowPatch
 
 
-class Graph_Panel:
+class Graph_Canvas:
     def __init__(self, program_window, row_placement:int, column_placement:int):
         # print("CLASS: GRAPH_INIT()")
         
@@ -45,8 +45,8 @@ class Graph_Panel:
                 row=self.row_placement,
                 column=self.column_placement,
                 sticky="nsew",
-                padx=(settings.graph_panel_padding_left, settings.graph_panel_padding_right),
-                pady=(settings.graph_panel_padding_top, settings.graph_panel_padding_bottom),
+                padx=(settings.graph_canvas_padding_left, settings.graph_canvas_padding_right),
+                pady=(settings.graph_canvas_padding_top, settings.graph_canvas_padding_bottom),
             )
 
         #Create subplots for graphs
@@ -92,13 +92,28 @@ class Graph_Panel:
         return self.graph_translator
 
 
-    def draw_stoney_graph(self):
-        """Draws the stoney graph with materials that are "active" in the materials dictionary"""
-        
-        print("DRAW_STONEY_GRAPH()")
+    def draw_graphs(self):
+        """Draws graphs based on the current view"""
+        # print("DRAW_GRAPHS()")
 
-        #Clear the graph
+        #Clear all existing graphs
+        self.graph1.clear()
         self.graph2.clear()
+
+                
+        #Draw stack based on value in option menu
+        match globals.current_view:
+            case "Multi":
+                self.draw_z_tip_is_graph()
+                self.draw_stoney_graph()
+
+
+    def draw_stoney_graph(self):
+        """
+        Draws the stoney graph with materials that are "active" in the materials dictionary
+        """
+        
+        # print("DRAW_STONEY_GRAPH()")
 
         #Set labels for the graph
         self.graph2.set_title("Stoney")
@@ -147,9 +162,9 @@ class Graph_Panel:
         # #Vs = poisson til substratet
         # Vs = globals.materials[lowest_material]["Poisson"]
         # #Ts = thickness for the substrate in nanometers (value divided by 1billion)
-        # Ts = globals.materials[lowest_material]["Thickness"] / 1000000000
+        # Ts = globals.materials[lowest_material]["Thickness [nm]"] / 1000000000
         # #Tf = thickness for material/filament in nanometers (value divided by 1billion)
-        # Tf = globals.materials[chosen_material]["Thickness"] / 1000000000
+        # Tf = globals.materials[chosen_material]["Thickness [nm]"] / 1000000000
         # #R0 = R0 til filamentet
         # R0 = globals.materials[chosen_material]["R0"]
         # #R = R til materialet/filament
@@ -228,31 +243,59 @@ class Graph_Panel:
         """
         -Draws the 'z_tip_is' graph
         """
-        # Clear the graph
-        self.graph1.clear()
-    
-        # Fetch the 'L' value from new_panel
-        L = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_value.get())
         
-        if(L == 0 or L == False):
-            messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
-            return None
-    
         #Set labels for the graph
         self.graph1.set_title("Cantilever bending")
         self.graph1.set_xlabel("X [μm]", fontsize=10, labelpad=3)
         self.graph1.set_ylabel("Tip displacement [μm]", fontsize=10, labelpad=8)
+
+        #Fetch L value
+        L = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.L_value.get())
+        if(L == 0 or L == False):
+            messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
+            return None
         
-        # Set display limits of the x axis
+        #Set display limits of the x axis
         self.graph1.set_xlim([settings.z_tip_is_graph_x_axis_range_min, L*1.05])
         
-        # -- Calculate the x and y values first --
+        #########################################################################
+        #Fetch necessary values
+        E = []
+        t = []
+        nu = []
+        sigma_i = []
+        for material in globals.materials:
+            E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
+            t.append(float(globals.materials[material]["Thickness [nm]"].get()) / 1e9)
+            nu.append(globals.materials[material]["Poisson"].get())
+            sigma_i.append(float(globals.materials[material]["Stress_x [MPa]"].get()) * 1e6)
+
+        W = 160 / 1e6 #In micrometers
+        piezo_thickness = float(globals.materials["PZT"]["Thickness [nm]"].get()) / 1e9
+        Zn = globals.equations.calculate_Zn(E, t, nu)
+        Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+        V_p = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.volt_entry.get())
+        e_31_f = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.e_31_f_entry.get())
+        M_p = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
+        M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W)
+        M_tot = globals.equations.calculate_M_tot_cantilever(M_is, M_p)
+        EI = globals.equations.calculate_EI(E, t, nu, W, Zn)
+        curv_is = globals.equations.calculate_curvature(M_tot, EI)
+        ##########################################################################
+
+        L = L/1e6
+        
+        #Calculate x and y values
         x_values = numpy.linspace(0, L, 100)
         y_values = []
         for x in x_values:
-            y = globals.equations.calculate_tip_placement(x)
+            y = globals.equations.calculate_tip_placement(curv_is, x)
             y_values.append(y)
         
+
+
+
+        ############ RUNAR START ####################################
         # Get the tip displacement (last y value)
         y_tip = y_values[-1]
         
@@ -265,7 +308,7 @@ class Graph_Panel:
                 while y_tip > y_limit:
                     candidate = y_limit * 2
                     if candidate > 100:
-                        y_limit = globals.equations.calculate_tip_placement(L) * 1.05
+                        y_limit = globals.equations.calculate_tip_placement(curv_is, L) * 1.05
                         break
                     else:
                         y_limit = candidate
@@ -279,14 +322,17 @@ class Graph_Panel:
                 while y_tip < y_limit:
                     candidate = y_limit * 2  # doubling a negative number doubles its magnitude
                     if abs(candidate) > 100:
-                        y_limit = globals.equations.calculate_tip_placement(L) * 1.05
+                        y_limit = globals.equations.calculate_tip_placement(curv_is, L) * 1.05
                         break
                     else:
                         y_limit = candidate
             # Set ylim so that the upper bound comes from settings (often 0)
             self.graph1.set_ylim([y_limit, settings.z_tip_is_graph_y_axis_range_min])
     
-        # Display the grid on the graph
+        ##################RUNAR SLUTT######################
+
+
+        #Display the grid on the graph
         self.graph1.grid(True)
         
         # Display the x and y axis lines in the grid
@@ -294,10 +340,10 @@ class Graph_Panel:
         self.graph1.axvline(0, color="black", linewidth=1)
     
         # Plot the curve
-        self.graph1.plot(x_values, y_values, color="k")
+        self.graph1.plot(x_values*1e6, y_values, color="k")
     
         # Get the highest x and y values for the tip marker
-        x_tip = x_values[-1]
+        x_tip = x_values[-1] * 1e6
         y_tip = y_values[-1]
     
         # Create an arrow to show the height of the curve
@@ -320,6 +366,9 @@ class Graph_Panel:
             va='center',
             bbox=dict(facecolor='white', edgecolor='k', boxstyle='round,pad=0.5')
         )
-    
+
+        # L = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.L_entry.get()) / 1e6
+        # globals.equations.find_t_solution(L, curv_is)
+        
         # Draw the canvas to display the updates
         self.graph1.figure.canvas.draw()

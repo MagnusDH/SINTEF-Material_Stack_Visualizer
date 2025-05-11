@@ -1,7 +1,7 @@
 def convert_decimal_string_to_float(string_number):
         """
         -Converts a string to float no matter if it is written with "," or "."\n 
-        -Returns the float is sucessfull, returns False if not sucessfull
+        -Returns the float if sucessfull, returns False if not sucessfull
         """
         # print("CINVERT_DECIMAL_STRING_TO_FLOAT()")
         try:

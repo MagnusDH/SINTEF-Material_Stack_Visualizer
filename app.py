@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import messagebox, StringVar
+import tkinter.dialog
 import customtkinter
 import pyautogui  # For better user interface visual effects
 import os
@@ -10,12 +11,13 @@ import settings
 from Material_Adjustment_Panel import Material_Adjustment_Panel
 from Layer_Stack_Canvas import Layer_Stack_Canvas
 from Material_Control_Panel import Material_Control_Panel
-from New_Panel import New_Panel
+from Parameters_Panel import Parameters_Panel
 from Canvas_Control_Panel import Canvas_Control_Panel
-from Graph_Panel import Graph_Panel
+from Graph_Canvas import Graph_Canvas
 from Graph_Control_Panel import Graph_Control_Panel
 from Equations import Equations
 import traceback
+import helper_functions
 
 #Main application class
 class App:
@@ -62,168 +64,270 @@ class App:
                     #Increment "i" to go to the next row
                     i+=1
 
-                    #If some cells are left empty, has an invalid value or headline does not exist -> apply default value
                     #MATERIAL NAME CHECK
+                    #If there is a headline called "material"                    
                     if("material" in row.index):
+                        #If the value in the cell is empty or just spaces
                         if((pandas.isna(row["material"])) or str(row["material"]).isspace()):
-                            row["material"] = "No name"
+                            row["material"] = tkinter.StringVar(value="No name")
+                        #There is a value in the cell
+                        else:
+                            row["material"] = tkinter.StringVar(value=row["material"])
+                    #If headline does not exist -> apply default value
                     else:
-                        row["material"] = "No name"
+                        row["material"] = tkinter.StringVar(value="No name")
 
 
                     #THICKNESS CHECK
-                    if("thickness" in row.index):
-                        if(pandas.isna(row["thickness"])):
-                            row["thickness"] = 0
-                        thickness_conversion = self.convert_decimal_string_to_float(row["thickness"]) 
-                        if((thickness_conversion != False) and (thickness_conversion >= 0)):
-                            row["thickness"] = thickness_conversion
+                    #If there is a headline called "thickness [nm]"
+                    if("thickness [nm]" in row.index):
+                        #If there is no value in the cell -> apply default value
+                        if(pandas.isna(row["thickness [nm]"])):
+                            row["thickness [nm]"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["thickness"] = 0
+                            thickness_conversion = helper_functions.convert_decimal_string_to_float(row["thickness [nm]"])
+                            #If the value is invalid 
+                            if((thickness_conversion == False) or (thickness_conversion < 0)):
+                                row["thickness [nm]"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["thickness [nm]"] = tkinter.DoubleVar(value=thickness_conversion)
+                    #If excel headline does not exist -> apply default value
                     else:
-                        row["thickness"] = 0
+                        row["thickness [nm]"] = tkinter.DoubleVar(value=0)
 
 
                     #UNIT CHECK
+                    #If there is a headline called "unit"
                     if("unit" in row.index):
+                        #If cell is empty or just spaces
                         if((pandas.isna(row["unit"])) or (row["unit"].isspace())):
-                            row["unit"] = "No value"
+                            row["unit"] = tkinter.StringVar(value="No value")
+                        #There is a valid value in cell
+                        else:
+                            row["unit"] = tkinter.StringVar(value=row["unit"])
+                    #There is no headline called "unit" -> apply default value
                     else:
-                        row["unit"] = "No value"
+                        row["unit"] = tkinter.StringVar(value="No value")
 
 
                     #INDENT CHECK
+                    #If there is a headline called "indent [nm]"
                     if("indent [nm]" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["indent [nm]"])):
-                            row["indent [nm]"] = 0
-                        indent_conversion = self.convert_decimal_string_to_float(row["indent [nm]"]) 
-                        if((indent_conversion != False) and (indent_conversion >= 0)):
-                            row["indent [nm]"] = indent_conversion
+                            row["indent [nm]"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["indent [nm]"] = 0
+                            indent_conversion = helper_functions.convert_decimal_string_to_float(row["indent [nm]"]) 
+                            #If value in cell is not valid
+                            if((indent_conversion == False) or (indent_conversion < 0)):
+                                row["indent [nm]"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["indent [nm]"] = tkinter.DoubleVar(value=indent_conversion)
+                    #There excel headline does not exist -> apply default value
                     else:
-                        row["indent [nm]"] = 0
-                    
-
+                        row["indent [nm]"] = tkinter.DoubleVar(value=0)
+                  
 
                     #COLOR CHECK
+                    #If there is a headline called "color"
                     if("color" in row.index):
+                        #If there is no valid value in the cell 
                         if((pandas.isna(row["color"])) or (self.is_valid_color(row["color"]) == False)):
-                            row["color"] = "white"
+                            row["color"] = tkinter.StringVar(value="white")
+                        #There is a valid value in the cell
+                        else:
+                            row["color"] = tkinter.StringVar(value=row["color"])
+                    #If there is no excel headline
                     else:
-                        row["color"] = "white"
+                        row["color"] = tkinter.StringVar(value="white")
 
 
                     #MODULUS CHECK
+                    #If there is a headline called "modulus [gpa]"
                     if("modulus [gpa]" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["modulus [gpa]"])):
-                            row["modulus [gpa]"] = 0
-                        modulus_conversion = self.convert_decimal_string_to_float(row["modulus [gpa]"]) 
-                        if(modulus_conversion != False):
-                            row["modulus [gpa]"] = abs(modulus_conversion)
+                            row["modulus [gpa]"] = tkinter.DoubleVar(value=0)
+                        #If there is a value in the cell
                         else:
-                            row["modulus [gpa]"] = 0  
+                            modulus_conversion = helper_functions.convert_decimal_string_to_float(row["modulus [gpa]"]) 
+                            #If the value is invalid
+                            if(modulus_conversion == False):
+                                row["modulus [gpa]"] = tkinter.DoubleVar(value=0)
+                            #If the value is valid
+                            else:
+                                row["modulus [gpa]"] = tkinter.DoubleVar(value=abs(modulus_conversion))
+                    #If there is no headline -> apply default value
                     else:
-                        row["modulus [gpa]"] = 0    
-
+                        row["modulus [gpa]"] = tkinter.DoubleVar(value=0)  
 
 
                     #CTE CHECK
+                    #If there is a headline called "cte [ppm/deg]"
                     if("cte [ppm/deg]" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["cte [ppm/deg]"])):
-                            row["cte [ppm/deg]"] = 0
-                        cte_conversion = self.convert_decimal_string_to_float(row["cte [ppm/deg]"]) 
-                        if(cte_conversion != False):
-                            row["cte [ppm/deg]"] = abs(cte_conversion)
+                            row["cte [ppm/deg]"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["cte [ppm/deg]"] = 0 
+                            cte_conversion = helper_functions.convert_decimal_string_to_float(row["cte [ppm/deg]"])
+                            #If the value is invalid 
+                            if(cte_conversion == False):
+                                row["cte [ppm/deg]"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["cte [ppm/deg]"] = tkinter.DoubleVar(value=abs(cte_conversion))
+                    #If excel headline does not exist -> apply default value
                     else:
-                        row["cte [ppm/deg]"] = 0 
-
-
-
+                        row["cte [ppm/deg]"] = tkinter.DoubleVar(value=0)
+                    
+                    
                     #DENSITY CHECK
+                    #If there is a headline called "density [kg/m3]"
                     if("density [kg/m3]" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["density [kg/m3]"])):
-                            row["density [kg/m3]"] = 0
-                        density_conversion = self.convert_decimal_string_to_float(row["density [kg/m3]"]) 
-                        if(density_conversion != False):
-                            row["density [kg/m3]"] = abs(density_conversion)
+                            row["density [kg/m3]"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["density [kg/m3]"] = 0 
+                            density_conversion = helper_functions.convert_decimal_string_to_float(row["density [kg/m3]"])
+                            #If the value is invalid 
+                            if(density_conversion == False):
+                                row["density [kg/m3]"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["density [kg/m3]"] = tkinter.DoubleVar(value=abs(density_conversion))
+                    #If excel headline does not exist -> apply default value
                     else:
-                        row["density [kg/m3]"] = 0 
-
+                        row["density [kg/m3]"] = tkinter.DoubleVar(value=0)
 
 
                     #STRESS CHECK
+                    #If there is a headline called "stress_x [mpa]"
                     if("stress_x [mpa]" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["stress_x [mpa]"])):
-                            row["stress_x [mpa]"] = 0
-                        stress_conversion = self.convert_decimal_string_to_float(row["stress_x [mpa]"]) 
-                        if(stress_conversion != False):
-                            row["stress_x [mpa]"] = stress_conversion
+                            row["stress_x [mpa]"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["stress_x [mpa]"] = 0 
+                            stress_conversion = helper_functions.convert_decimal_string_to_float(row["stress_x [mpa]"])
+                            #If the value is invalid 
+                            if(stress_conversion == False):
+                                row["stress_x [mpa]"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["stress_x [mpa]"] = tkinter.DoubleVar(value=stress_conversion)
+                    #If excel headline does not exist -> apply default value
                     else:
-                        row["stress_x [mpa]"] = 0 
+                        row["stress_x [mpa]"] = tkinter.DoubleVar(value=0)
 
 
                     #POISSON CHECK
+                    #If there is a headline called "poisson"
                     if("poisson" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["poisson"])):
-                            row["poisson"] = 0
-                        poisson_conversion = self.convert_decimal_string_to_float(row["poisson"]) 
-                        if(poisson_conversion != False):
-                            row["poisson"] = abs(poisson_conversion)
+                            row["poisson"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["poisson"] = 0
+                            poisson_conversion = helper_functions.convert_decimal_string_to_float(row["poisson"])
+                            #If the value is invalid 
+                            if(poisson_conversion == False):
+                                row["poisson"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["poisson"] = tkinter.DoubleVar(value=poisson_conversion)
+                    #If excel headline does not exist -> apply default value
                     else:
-                        row["poisson"] = 0
+                        row["poisson"] = tkinter.DoubleVar(value=0)
 
 
                     #R0 CHECK
+                    #If there is a headline called "r0"
                     if("r0" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["r0"])):
-                            row["r0"] = 0
-                        R0_conversion = self.convert_decimal_string_to_float(row["r0"]) 
-                        if(R0_conversion != False):
-                            row["r0"] = R0_conversion
+                            row["r0"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["r0"] = 0
+                            R0_conversion = helper_functions.convert_decimal_string_to_float(row["r0"])
+                            #If the value is invalid 
+                            if(R0_conversion == False):
+                                row["r0"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["r0"] = tkinter.DoubleVar(value=R0_conversion)
+                    #If excel headline does not exist -> apply default value
                     else:
-                        row["r0"] = 0
+                        row["r0"] = tkinter.DoubleVar(value=0)
 
 
                     #R CHECK
+                    #If there is a headline called "r"
                     if("r" in row.index):
+                        #If there is no value in the cell -> apply default value
                         if(pandas.isna(row["r"])):
-                            row["r"] = 0
-                        R_conversion = self.convert_decimal_string_to_float(row["r"]) 
-                        if(R_conversion != False):
-                            row["r"] = R_conversion
+                            row["r"] = tkinter.DoubleVar(value=0)
+                        #There is a value in the cell
                         else:
-                            row["r"] = 0 
+                            R_conversion = helper_functions.convert_decimal_string_to_float(row["r"])
+                            #If the value is invalid 
+                            if(R_conversion == False):
+                                row["r"] = tkinter.DoubleVar(value=0)
+                            #The value in the cell is valid
+                            else:
+                                row["r"] = tkinter.DoubleVar(value=R_conversion)
+                    #If excel headline does not exist -> apply default value
                     else:
-                        row["r"] = 0 
+                        row["r"] = tkinter.DoubleVar(value=0)
+
+                    
+                    #LAYER
+                    row["layer"] = tkinter.IntVar(value=int(layer))
+
+                    #STATUS
+                    row["status"] = tkinter.StringVar(value="active")
+
+
+                    
+                    #ADD TRACES TO ALL VARIABLES
+                    # Trace changes to trigger canvas redraw
+                    row["material"].trace_add("write", lambda *args, identifier="Name": self.variable_updated(identifier))
+                    row["layer"].trace_add("write", lambda *args, identifier="Layer": self.variable_updated(identifier))
+                    row["thickness [nm]"].trace_add("write", lambda *args, identifier="Thickness [nm]": self.variable_updated(identifier))
+                    row["unit"].trace_add("write", lambda *args, identifier="Unit": self.variable_updated(identifier))
+                    row["indent [nm]"].trace_add("write", lambda *args, identifier="Indent [nm]": self.variable_updated(identifier))
+                    row["color"].trace_add("write", lambda *args, identifier="Color": self.variable_updated(identifier))
+                    row["status"].trace_add("write", lambda *args, identifier="Status": self.variable_updated(identifier))
+                    row["modulus [gpa]"].trace_add("write", lambda *args, identifier="Modulus [GPa]": self.variable_updated(identifier))
+                    row["cte [ppm/deg]"].trace_add("write", lambda *args, identifier="CTE [ppm/deg]": self.variable_updated(identifier))
+                    row["density [kg/m3]"].trace_add("write", lambda *args, identifier="Density [kg/m3]": self.variable_updated(identifier))
+                    row["stress_x [mpa]"].trace_add("write", lambda *args, identifier="Stress_x [MPa]": self.variable_updated(identifier))
+                    row["poisson"].trace_add("write", lambda *args, identifier="Poisson": self.variable_updated(identifier))
+                    row["r0"].trace_add("write", lambda *args, identifier="R0": self.variable_updated(identifier))
+                    row["r"].trace_add("write", lambda *args, identifier="R": self.variable_updated(identifier))
 
                     
                     #Create an "info" dictionary to contain all info from excel-file
                     info = {
-                        "Name": str(row["material"]),
-                        "Layer": int(layer),
-                        "Thickness": float(row["thickness"]),
+                        "Name": row["material"],
+                        "Layer": row["layer"],
+                        "Thickness [nm]": row["thickness [nm]"],
                         "Unit": row["unit"],
-                        "Indent [nm]": float(row["indent [nm]"]),
+                        "Indent [nm]": row["indent [nm]"],
                         "Color": row["color"],
-                        "Status": "active",
-                        "Modulus [GPa]": float(row["modulus [gpa]"]),
-                        "CTE [ppm/deg]": float(row["cte [ppm/deg]"]),
-                        "Density [kg/m3]": float(row["density [kg/m3]"]),
-                        "Stress_x [MPa]": float(row["stress_x [mpa]"]),
-                        "Poisson": float(row["poisson"]),
-                        "R0": float(row["r0"]),
-                        "R": float(row["r"]),
+                        "Status": row["status"],
+                        "Modulus [GPa]": row["modulus [gpa]"],
+                        "CTE [ppm/deg]": row["cte [ppm/deg]"],
+                        "Density [kg/m3]": row["density [kg/m3]"],
+                        "Stress_x [MPa]": row["stress_x [mpa]"],
+                        "Poisson": row["poisson"],
+                        "R0": row["r0"],
+                        "R": row["r"],
                         "Label_name_id": None,
                         "Delete_material_button_id": None,
                         "Move_down_button_id": None,
@@ -242,7 +346,7 @@ class App:
                     }
 
                     #Put "info" dictionary into self.materials dictionary
-                    globals.materials[str(row["material"])] = info
+                    globals.materials[row["material"].get()] = info
 
                     layer -= 1
                 
@@ -253,6 +357,118 @@ class App:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")
                 traceback.print_exc()
                 return
+    
+    #NOT DONE
+    def variable_updated(self, identifier:str, *args):
+        """
+        Add some explanation\n
+
+        PARAMETERS:
+            identifier: name of updated variable
+        """
+        # print("VARIABLE_UPDATED()")
+
+        match identifier:
+            case "Name":
+                pass
+
+            case "Thickness [nm]":
+                globals.layer_stack_canvas.draw_material_stack()
+                globals.graph_canvas.draw_graphs()
+                #Update equation labels in parameters panel
+                #update "Blocking force"
+
+
+            case "Layer":
+                print("Layer variable is updated")
+                #Redraw stack
+                #Redraw graph
+                #Update equation labels
+            
+            case "Indent [nm]":
+                print("Indent variable is updated")
+
+            case "Unit":
+                print("Unit variable is updated")
+                
+            case "Color":
+                print("Color variable is updated")
+                
+            case "Status":                             
+                print("Status variable is updated")
+            
+            case "Modulus [GPa]":
+                print("Modulus variable is updated")
+                
+            case "CTE [ppm/deg]":
+                print("CTE variable is updated")
+                
+            case "Density [kg/m3]":
+                print("Density variable is updated")
+                
+            case "Stress_x [MPa]":
+                print("Stress_x variable is updated")
+                
+            case "Poisson":
+                print("Poisson variable is updated")
+            
+            case "R0":
+                print("R0 variable is updated")
+            
+            case "R":
+                print("R variable is updated")
+            
+            case "piezo_material_name":
+                print("piezo_material_name variable is updated")
+                #update "Blocking force"
+
+
+            case "L_value":
+                print("L_value variable is updated")
+                #update "Blocking force"
+
+
+            case "e_31_f_value":
+                print("e_31_f_value variable is updated")
+                #Update graphs
+                #update "Blocking force"
+
+            
+            case "volt_value":
+                print("volt_value variable is updated")
+                #update "Blocking force"
+
+
+            case "stress_neutral_SiO2_thickness_value":
+                print("stress_neutral_SiO2_thickness_value updated")
+
+
+            case "piezoelectric_bending_moment_value":
+                print("piezoelectric_bending_moment_value updated")
+
+
+            case "blocking_force_cantilever_value":
+                print("blocking_force_cantilever_value variable is updated")
+            
+
+            case "initial_curvature_value":
+                print("initial_curvature_value updated")
+
+
+            case "final_curvature_value":
+                print("final_curvature_value updated")
+                
+
+
+        #When a material is deleted:
+            #Redraw stack
+            #Redraw graph
+            #Update equation labels
+
+        #When a material is modified:
+            #Redraw stack
+            #Redraw graph
+            #Update equation labels
 
 
     def set_layout(self):
@@ -295,13 +511,13 @@ class App:
                     globals.material_adjustment_panel.create_material_adjustment_panel()
                     globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0, sticky="nsew")
                 
-                #Set all material entry and slider values to "thickness" value, and mark all as "active"
+                #Set all material entry and slider values to "Thickness [nm]" value, and mark all as "active"
                 for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-                    globals.materials[material]["Status"] = "active"
+                    globals.materials[material]["Slider_id"].configure(variable=globals.materials[material]["Thickness [nm]"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=globals.materials[material]["Thickness [nm]"])
+                    globals.materials[material]["Status"].set(value="active")
 
-
+                
                 #Create "Material_control_panel"
                 if(globals.material_control_panel == None):
                     globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
@@ -340,9 +556,9 @@ class App:
 
                 #Set all material entry and slider values to "indent" value, and mark all as "active"
                 for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Indent [nm]"])
-                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])))
-                    globals.materials[material]["Status"] = "active"
+                    globals.materials[material]["Slider_id"].configure(variable=globals.materials[material]["Indent [nm]"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=globals.materials[material]["Indent [nm]"])
+                    globals.materials[material]["Status"].set(value="active")
 
 
                 #Create "Material_control_panel"
@@ -382,18 +598,18 @@ class App:
                     globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
 
 
-                #Set all material entry and slider values to "thickness" value, and mark all as "active"
+                #Set all material entry and slider values to "Thickness [nm]" value, and mark all as "active"
                 for material in globals.materials:
-                    globals.materials[material]["Slider_id"].set(globals.materials[material]["Thickness"])
-                    globals.materials[material]["Entry_id"].configure(textvariable=StringVar(value=str(globals.materials[material]["Thickness"])))
-                    globals.materials[material]["Status"] = "active"
+                    globals.materials[material]["Slider_id"].configure(variable=globals.materials[material]["Thickness [nm]"])
+                    globals.materials[material]["Entry_id"].configure(textvariable=globals.materials[material]["Thickness [nm]"])
+                    globals.materials[material]["Status"].set(value="active")
 
 
-                #Create "NEW_PANEL"
-                if(globals.new_panel == None):
-                    globals.new_panel = New_Panel(self.program_window, 1, 0)
+                #Create "Parameters_Panel"
+                if(globals.parameters_panel == None):
+                    globals.parameters_panel = Parameters_Panel(self.program_window, 1, 0)
                 else:
-                    globals.new_panel.new_panel_frame.grid(row=1, column=0)
+                    globals.parameters_panel.parameters_panel_frame.grid(row=1, column=0)
 
 
                 #Create "Material_control_panel"
@@ -420,16 +636,16 @@ class App:
 
 
                 #Create "Graph"
-                if(globals.graph_panel == None):
-                    globals.graph_panel = Graph_Panel(self.program_window, 0, 2)
-                    globals.graph_panel.graph_translator.get_tk_widget().grid(rowspan=2)
-                    globals.graph_panel.draw_z_tip_is_graph()
-                    globals.graph_panel.draw_stoney_graph()
+                if(globals.graph_canvas == None):
+                    globals.graph_canvas = Graph_Canvas(self.program_window, 0, 2)
+                    globals.graph_canvas.graph_translator.get_tk_widget().grid(rowspan=2)
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
 
                 else:
-                    globals.graph_panel.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
-                    globals.graph_panel.draw_z_tip_is_graph()
-                    globals.graph_panel.draw_stoney_graph()
+                    globals.graph_canvas.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
 
 
                 #Create "graph_control_panel"
@@ -452,29 +668,6 @@ class App:
         globals.layer_stack_canvas.draw_material_stack()
     
     
-    def convert_decimal_string_to_float(self, string_number:str):
-        """
-        -Converts a string to float no matter if it is written with "," or "."\n 
-        -Returns the float is sucessfull, returns False if not sucessfull
-        """
-        # print("CINVERT_DECIMAL_STRING_TO_FLOAT()")
-        try:
-            new_float = float(string_number)
-            return new_float
-        
-        except:
-            if((isinstance(string_number, str)) and ("," in string_number)):
-                try:
-                    new_float = string_number.replace(",", ".")
-                    new_float = float(new_float)
-                    return new_float
-
-                except:
-                    return False
-            else:
-                return False
-
-
     def is_valid_color(self, color:str):
         """Returns True if given color string is a valid color. Return False if invalid"""
         # print("IS_VALID_COLOR()")
@@ -499,14 +692,14 @@ class App:
         # print("SORT_DICTIONARY()")
 
         #Sort the materials dictionary after the "layer" value
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
 
         #create a layer counter variable starting at 1
         layer_counter = 1
         #Loop through the dictionary
         for material in globals.materials:
             #set material->layer value to be layer_counter
-            globals.materials[material]["Layer"] = layer_counter
+            globals.materials[material]["Layer"] = tkinter.IntVar(value=layer_counter)
             #increment layer_counter
             layer_counter += 1
 
@@ -516,21 +709,21 @@ class App:
         #print("PRINT_DICTIONARY()")
 
         for material in globals.materials:
-            print("Dictionary key:", material, "    |", type(material))
-            print("Name:", globals.materials[material]["Name"], "   |", type(globals.materials[material]["Name"]))
-            print("Layer:", globals.materials[material]["Layer"], "     |", type(globals.materials[material]["Layer"]))
-            print("Thickness:", globals.materials[material]["Thickness"], "     |", type(globals.materials[material]["Thickness"]))  
-            print("Unit:", globals.materials[material]["Unit"], "   |", type(globals.materials[material]["Unit"]))  
-            print("Indent [nm]:", globals.materials[material]["Indent [nm]"], "     |", type(globals.materials[material]["Indent [nm]"]))  
-            print("Color:", globals.materials[material]["Color"], "     |", type(globals.materials[material]["Color"]))  
-            print("Status:", globals.materials[material]["Status"], "   |", type(globals.materials[material]["Status"]))  
-            print("Modulus [GPa]:", globals.materials[material]["Modulus [GPa]"], "     |", type(globals.materials[material]["Modulus [GPa]"]))  
-            print("CTE [ppm/deg]:", globals.materials[material]["CTE [ppm/deg]"], "     |", type(globals.materials[material]["CTE [ppm/deg]"]))  
-            print("Density [kg/m3]:", globals.materials[material]["Density [kg/m3]"], "     |", type(globals.materials[material]["Density [kg/m3]"]))  
-            print("Stress_x [MPa]:", globals.materials[material]["Stress_x [MPa]"], "   |", type(globals.materials[material]["Stress_x [MPa]"]))  
-            print("Poisson:", globals.materials[material]["Poisson"], "     |", type(globals.materials[material]["Poisson"]))  
-            print("R0:", globals.materials[material]["R0"], "   |", type(globals.materials[material]["R0"]))  
-            print("R:", globals.materials[material]["R"], "     |", type(globals.materials[material]["R"]))  
+            print("Dictionary key:", material, "    |   ", type(material))
+            print("Name:", globals.materials[material]["Name"].get(), "     |   ", type(globals.materials[material]["Name"]))
+            print("Layer:", globals.materials[material]["Layer"].get(), "   |   ", type(globals.materials[material]["Layer"]))
+            print("Thickness [nm]:", globals.materials[material]["Thickness [nm]"].get(), "  |  ", type(globals.materials[material]["Thickness [nm]"]))  
+            print("Unit:", globals.materials[material]["Unit"].get(), "     |   ", type(globals.materials[material]["Unit"]))  
+            print("Indent [nm]:", globals.materials[material]["Indent [nm]"].get(), "   |   ", type(globals.materials[material]["Indent [nm]"]))  
+            print("Color:", globals.materials[material]["Color"].get(), "   |   ", type(globals.materials[material]["Color"]))  
+            print("Status:", globals.materials[material]["Status"].get(), "     |   ", type(globals.materials[material]["Status"]))  
+            print("Modulus [GPa]:", globals.materials[material]["Modulus [GPa]"].get(), "   |   ", type(globals.materials[material]["Modulus [GPa]"]))  
+            print("CTE [ppm/deg]:", globals.materials[material]["CTE [ppm/deg]"].get(), "   |   ", type(globals.materials[material]["CTE [ppm/deg]"]))  
+            print("Density [kg/m3]:", globals.materials[material]["Density [kg/m3]"].get(), "   |   ", type(globals.materials[material]["Density [kg/m3]"]))  
+            print("Stress_x [MPa]:", globals.materials[material]["Stress_x [MPa]"].get(), "     |   ", type(globals.materials[material]["Stress_x [MPa]"]))  
+            print("Poisson:", globals.materials[material]["Poisson"].get(), "   |   ", type(globals.materials[material]["Poisson"]))  
+            print("R0:", globals.materials[material]["R0"].get(), "     |   ", type(globals.materials[material]["R0"]))  
+            print("R:", globals.materials[material]["R"].get(), "   |   ", type(globals.materials[material]["R"]))  
             
             print("\n")
 
@@ -568,8 +761,8 @@ if __name__ == "__main__":
     program_window = tkinter.Tk()
     
     #Set the dimensions of the program window
-    program_window.state("zoomed")
-    # program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
+    # program_window.state("zoomed")
+    program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
     
     #Set the program window title
     program_window.title(settings.program_window_title)

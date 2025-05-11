@@ -8,6 +8,7 @@ from openpyxl.styles import PatternFill, Border, Side, Font, Alignment
 from PIL import ImageGrab
 from openpyxl.drawing.image import Image
 import os
+import helper_functions
 
 
 class Material_Control_Panel:
@@ -58,7 +59,7 @@ class Material_Control_Panel:
             text="Add material", #"+" 
             fg_color=settings.material_control_panel_button_color,
             hover_color=settings.material_control_panel_button_hover_color,
-            text_color=settings.material_control_panel_button_text_color,#settings.material_control_panel_text_color,
+            text_color=settings.material_control_panel_button_text_color,
             font=(settings.text_font, settings.material_control_panel_text_size),
             command=self.add_material
         )
@@ -91,7 +92,7 @@ class Material_Control_Panel:
         #Reset values button
         reset_values_button = customtkinter.CTkButton(
             master=material_control_panel_frame,
-            text="Reset values",
+            text="Reset materials",
             font=(settings.text_font, settings.material_control_panel_text_size),
             fg_color= settings.material_control_panel_button_color, 
             hover_color=settings.material_control_panel_button_hover_color, 
@@ -208,37 +209,6 @@ class Material_Control_Panel:
             padx=(5,0),
             pady=(0,0)
         )
-
-        # #Unit
-        # self.material_unit_label = customtkinter.CTkLabel(
-        #     master=self.add_material_window, 
-        #     text="Measurement unit", 
-        #     text_color=settings.add_material_window_text_color,
-        #     fg_color=settings.add_material_window_background_color,
-        # )
-        
-        # self.material_unit_label.grid(
-        #     row=2, 
-        #     column=0, 
-        #     sticky="", 
-        #     padx=(0,0),
-        #     pady=(0,0)
-        # )
-
-        # self.material_unit_entry = customtkinter.CTkEntry(
-        #     master=self.add_material_window,
-        #     fg_color = "white",
-        #     text_color="black",
-        #     width=70,
-        #     justify="center"
-        # )
-        # self.material_unit_entry.grid(
-        #     row=2, 
-        #     column=1,
-        #     sticky="e",
-        #     padx=(0,0),
-        #     pady=(0,0)
-        # )
 
         #Indent
         self.material_indent_label = customtkinter.CTkLabel(
@@ -592,9 +562,14 @@ class Material_Control_Panel:
             return
 
 
-        #If "thickness" value is entered, check if it is integer
+        #If "Thickness [nm]" value is entered, check if it is valid
         if(self.material_thickness_entry.get() != ""):
             thickness_value = globals.app.convert_decimal_string_to_float(self.material_thickness_entry.get())
+            #If thickness is negative
+            if(thickness_value < 0):
+                messagebox.showerror("ERROR", "'Thickness' value can not be negative", parent=self.add_material_window)
+                return
+            #If thickness is not integer or float
             if(isinstance(thickness_value, bool) and thickness_value == False):
                 messagebox.showerror("ERROR", "'Thickness' value has to be an integer or decimal number", parent=self.add_material_window)
                 return
@@ -682,6 +657,8 @@ class Material_Control_Panel:
 
         #All inputs have been validated, add it to dictionary
         self.add_material_to_dictionary()
+
+        #Destroy window
         self.add_material_window.destroy()
         
         #Update material_adjustment_panel
@@ -723,75 +700,109 @@ class Material_Control_Panel:
         """Adds values from entries to 'materials' dictionary"""
         # print("ADD_MATERIAL_TO_DICTIONARY")
 
-        #If some entries in "add_material_window" are not set, the values is automaticly set to zero
+        #If some entries in "add_material_window" are not set, the values is automaticly set to default value
+        #NAME
+        if(not self.material_name_entry.get()):
+            material_name = tkinter.StringVar(value="No name")
+        else:
+            material_name = tkinter.StringVar(value=self.material_name_entry.get())
+
+        #LAYER
+        layer_value = tkinter.IntVar(value=len(globals.materials)+1)
+
         #THICKNESS
         if(not self.material_thickness_entry.get()):
-            material_thickness = 0
+            material_thickness = tkinter.DoubleVar(value=0)
         else:
-            material_thickness = globals.app.convert_decimal_string_to_float(self.material_thickness_entry.get())
+            material_thickness = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.material_thickness_entry.get()))
+
+        #UNIT
+        unit_value = tkinter.StringVar(value="nm")
 
         #INDENT
         if(not self.material_indent_entry.get()):
-            material_indent = 0
+            material_indent = tkinter.DoubleVar(value=0)
         else:
-            material_indent = globals.app.convert_decimal_string_to_float(self.material_indent_entry.get())
+            material_indent = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.material_indent_entry.get()))
+        
+        #COLOR
+        if(not self.material_color_entry.get()):
+            material_color = tkinter.StringVar(value="white")
+        else:
+            material_color = tkinter.StringVar(value=self.material_color_entry.get())
+
+        #STATUS
+        status_value = tkinter.StringVar(value="active")
 
         #Modulus [GPa] VALUE
         if( not self.Modulus_value_entry.get()):
-            Modulus_value = 0
+            Modulus_value = tkinter.DoubleVar(value=0)
         else:
-            Modulus_value = globals.app.convert_decimal_string_to_float(self.Modulus_value_entry.get())
+            Modulus_value = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.Modulus_value_entry.get()))
 
         #CTE [ppm/deg] VALUE
         if(not self.CTE_value_entry.get()):
-            CTE_value = 0
+            CTE_value = tkinter.DoubleVar(value=0)
         else:
-            CTE_value = globals.app.convert_decimal_string_to_float(self.CTE_value_entry.get())
+            CTE_value = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.CTE_value_entry.get()))
 
         #Density [kg/m3] VALUE
         if(self.Density_value_entry.get() == ""):
-            Density_value = 0
+            Density_value = tkinter.DoubleVar(value=0)
         else:
-            Density_value = globals.app.convert_decimal_string_to_float(self.Density_value_entry.get())
+            Density_value = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.Density_value_entry.get()))
         
         #Stress_x [MPa] VALUE
         if(self.Stress_value_entry.get() == ""):
-            Stress_value = 0
+            Stress_value = tkinter.DoubleVar(value=0)
         else:
-            Stress_value = globals.app.convert_decimal_string_to_float(self.Stress_value_entry.get())
+            Stress_value = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.Stress_value_entry.get()))
         
         #POISSON VALUE
         if(self.Poisson_value_entry.get() == ""):
-            Poisson_value = 0
+            Poisson_value = tkinter.DoubleVar(value=0)
         else:
-            Poisson_value = globals.app.convert_decimal_string_to_float(self.Poisson_value_entry.get())
+            Poisson_value = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.Poisson_value_entry.get()))
 
         #R0 VALUE
         if(self.R0_value_entry.get() == ""):
-            R0_value = 0
+            R0_value = tkinter.DoubleVar(value=0)
         else:
-            R0_value = globals.app.convert_decimal_string_to_float(self.R0_value_entry.get())
+            R0_value = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.R0_value_entry.get()))
 
         #R VALUE
         if(self.R_value_entry.get() == ""):
-            R_value = 0
+            R_value = tkinter.DoubleVar(value=0)
         else:
-            R_value = globals.app.convert_decimal_string_to_float(self.R_value_entry.get())
+            R_value = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.R_value_entry.get()))
 
 
-        #Loop through all materials and increment "layer" with 1, assuring that the new material is placed on top of the stack
-        # for material in globals.materials:
-            # globals.materials[material]["Layer"] += 1
+        #ADD TRACES TO ALL VARIABLES
+        material_name.trace_add("write", lambda *args, identifier="Name": globals.app.variable_updated(identifier))
+        layer_value.trace_add("write", lambda *args, identifier="Layer": globals.app.variable_updated(identifier))
+        material_thickness.trace_add("write", lambda *args, identifier="Thickness [nm]": globals.app.variable_updated(identifier))
+        unit_value.trace_add("write", lambda *args, identifier="Unit": globals.app.variable_updated(identifier))
+        material_indent.trace_add("write", lambda *args, identifier="Indent [nm]": globals.app.variable_updated(identifier))
+        material_color.trace_add("write", lambda *args, identifier="Color": globals.app.variable_updated(identifier))
+        status_value.trace_add("write", lambda *args, identifier="Status": globals.app.variable_updated(identifier))
+        Modulus_value.trace_add("write", lambda *args, identifier="Modulus [GPa]": globals.app.variable_updated(identifier))
+        CTE_value.trace_add("write", lambda *args, identifier="CTE [ppm/deg]": globals.app.variable_updated(identifier))
+        Density_value.trace_add("write", lambda *args, identifier="Density [kg/m3]": globals.app.variable_updated(identifier))
+        Stress_value.trace_add("write", lambda *args, identifier="Stress_x [MPa]": globals.app.variable_updated(identifier))
+        Poisson_value.trace_add("write", lambda *args, identifier="Poisson": globals.app.variable_updated(identifier))
+        R0_value.trace_add("write", lambda *args, identifier="R0": globals.app.variable_updated(identifier))
+        R_value.trace_add("write", lambda *args, identifier="R": globals.app.variable_updated(identifier))
+        
 
         #Add values to dictionary
         info = {
-            "Name": str(self.material_name_entry.get()),
-            "Layer": len(globals.materials)+1,
-            "Thickness": material_thickness,
-            "Unit": "nm",
+            "Name": material_name,
+            "Layer": layer_value,
+            "Thickness [nm]": material_thickness,
+            "Unit": unit_value,
             "Indent [nm]": material_indent,
-            "Color": str(self.material_color_entry.get()),
-            "Status": "active",
+            "Color": material_color,
+            "Status": status_value,
             "Modulus [GPa]": Modulus_value,
             "CTE [ppm/deg]": CTE_value,
             "Density [kg/m3]": Density_value,
@@ -819,8 +830,8 @@ class Material_Control_Panel:
         #Put "info" dictionary into self.materials dictionary
         globals.materials[str(self.material_name_entry.get())] = info
 
-        #Sort the materials dictionary after the "layer" value
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+        #Sort the materials dictionary
+        globals.app.sort_dictionary()
 
 
     def modify_material(self):
@@ -884,7 +895,7 @@ class Material_Control_Panel:
         name_label.grid(
             row=0,
             column=0,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -892,7 +903,7 @@ class Material_Control_Panel:
         #Thickness  
         thickness_label = customtkinter.CTkLabel(
             master=scrollable_frame,
-            text="Thickness",
+            text="Thickness [nm]",
             font=(settings.modify_material_window_text_font, settings.modify_material_window_text_size, "bold"),
             text_color = settings.modify_material_window_text_color,
             fg_color=settings.modify_material_window_scrollable_frame_background_color
@@ -900,7 +911,7 @@ class Material_Control_Panel:
         thickness_label.grid(
             row=0,
             column=1,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -916,7 +927,7 @@ class Material_Control_Panel:
         unit_label.grid(
             row=0,
             column=2,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -932,7 +943,7 @@ class Material_Control_Panel:
         indent_label.grid(
             row=0,
             column=3,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -948,7 +959,7 @@ class Material_Control_Panel:
         color_label.grid(
             row=0,
             column=4,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -964,7 +975,7 @@ class Material_Control_Panel:
         modulus_label.grid(
             row=0,
             column=5,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -980,7 +991,7 @@ class Material_Control_Panel:
         CTE_label.grid(
             row=0,
             column=6,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -996,7 +1007,7 @@ class Material_Control_Panel:
         density_label.grid(
             row=0,
             column=7,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -1012,7 +1023,7 @@ class Material_Control_Panel:
         stress_label.grid(
             row=0,
             column=8,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -1028,7 +1039,7 @@ class Material_Control_Panel:
         poisson_label.grid(
             row=0,
             column=9,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -1044,7 +1055,7 @@ class Material_Control_Panel:
         R0_label.grid(
             row=0,
             column=10,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -1060,7 +1071,7 @@ class Material_Control_Panel:
         R_label.grid(
             row=0,
             column=11,
-            sticky="",
+            sticky="nsew",
             padx=(0,0),
             pady=(0,0)
         )
@@ -1076,11 +1087,11 @@ class Material_Control_Panel:
             #MATERIAL NAME
             material_name_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Name"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Name"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             material_name_entry.grid(
@@ -1096,11 +1107,11 @@ class Material_Control_Panel:
             #THICKNESS
             thickness_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Thickness"])),
-                fg_color = settings.modify_material_window_entry_background_color,
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Thickness [nm]"].get()),
+                fg_color=settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             thickness_entry.grid(
@@ -1116,11 +1127,11 @@ class Material_Control_Panel:
             #UNIT
             unit_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Unit"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Unit"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             unit_entry.grid(
@@ -1136,11 +1147,11 @@ class Material_Control_Panel:
             #INDENT [NM]
             indent_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Indent [nm]"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Indent [nm]"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             indent_entry.grid(
@@ -1156,11 +1167,11 @@ class Material_Control_Panel:
             #COLOR
             color_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Color"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Color"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             color_entry.grid(
@@ -1176,11 +1187,11 @@ class Material_Control_Panel:
             #MODULUS [GPa]
             modulus_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Modulus [GPa]"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Modulus [GPa]"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             modulus_entry.grid(
@@ -1196,11 +1207,11 @@ class Material_Control_Panel:
             #CTE [ppm/deg]
             CTE_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["CTE [ppm/deg]"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["CTE [ppm/deg]"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             CTE_entry.grid(
@@ -1216,11 +1227,11 @@ class Material_Control_Panel:
             #DENSITY [kg/m3]
             density_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Density [kg/m3]"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Density [kg/m3]"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             density_entry.grid(
@@ -1236,11 +1247,11 @@ class Material_Control_Panel:
             #STRESS_X [MPa]
             stress_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Stress_x [MPa]"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Stress_x [MPa]"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             stress_entry.grid(
@@ -1255,11 +1266,11 @@ class Material_Control_Panel:
             #POISSON
             poisson_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["Poisson"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["Poisson"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             poisson_entry.grid(
@@ -1275,11 +1286,11 @@ class Material_Control_Panel:
             #R0
             R0_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["R0"])),
+                textvariable=tkinter.StringVar(value=globals.materials[material]["R0"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             R0_entry.grid(
@@ -1295,11 +1306,11 @@ class Material_Control_Panel:
             #R
             R_entry = customtkinter.CTkEntry(
                 master=scrollable_frame,
-                textvariable=StringVar(value=str(globals.materials[material]["R"])),
+                textvariable=StringVar(value=globals.materials[material]["R"].get()),
                 fg_color = settings.modify_material_window_entry_background_color,
                 border_color=settings.modify_material_window_entry_border_color,
                 border_width=0.4,
-                text_color=globals.materials[material]["Color"],#settings.modify_material_window_entry_text_color,
+                text_color=globals.materials[material]["Color"].get(),
                 justify="center"
             )
             R_entry.grid(
@@ -1384,140 +1395,167 @@ class Material_Control_Panel:
 
 
     def validate_modify_material_inputs(self):
-        """Goes through all entries in self.entry_dictionary and validates all entries"""
+        """
+        Goes through all entries in self.entry_dictionary and validates them
+        """
         # print("VALIDATE_MODIFY_MATERIAL_INPUTS()")
+        
         for material in self.entry_dictionary:
             #NAME
-            try:
-                material_name = str(self.entry_dictionary[material]["Name_entry"].get())
-                if(material_name == ""):
-                    messagebox.showerror("ERROR", f"'Material' for '{material}' can not be empty", parent=self.modify_material_window)
-                    self.modify_material_window.lift()
-                    return
-
-            except ValueError:
-                print("'Material' must be of type 'string'")
+            if(self.entry_dictionary[material]["Name_entry"].get() == ""):
+                messagebox.showerror("ERROR", f"'Material' for '{material}' can not be empty", parent=self.modify_material_window)
+                self.modify_material_window.lift()
                 return
-            
-            
+
 
             #THICKNESS
             if(self.entry_dictionary[material]["Thickness_entry"].get() != ""):
-                thickness_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Thickness_entry"].get()) 
+                thickness_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Thickness_entry"].get()) 
                 if(isinstance(thickness_value, bool) and thickness_value == False):            
                     messagebox.showerror("ERROR", f"'Thickness' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
                 if(thickness_value < 0):
                     messagebox.showerror("ERROR", f"'Thickness' value for '{material}' can not be a negative number", parent=self.modify_material_window)
                     return
+            #If thickness box is empty
+            else:
+                messagebox.showerror("ERROR", f"'Thickness' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
         
             #UNIT
-            try:
-                unit = str(self.entry_dictionary[material]["Unit_entry"].get())
-                if(unit == ""):
-                    messagebox.showerror("ERROR", f"'Unit' value for '{material}' can not be empty", parent=self.modify_material_window)
-                    self.modify_material_window.lift()
-                    return
+            #If unit box is empty
+            if(self.entry_dictionary[material]["Unit_entry"].get() == ""):
+                messagebox.showerror("ERROR", f"'Unit' value for '{material}' can not be empty", parent=self.modify_material_window)
+                self.modify_material_window.lift()
+                return
 
-            except ValueError:
-                messagebox.showerror("ERROR", f"'Unit' value for '{material_name}' must be of type 'string'", parent=self.modify_material_window)
-                return 
-        
+
             #INDENT [NM]
             if(self.entry_dictionary[material]["Indent_entry"].get() != ""):
-                indent_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Indent_entry"].get()) 
+                indent_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Indent_entry"].get()) 
                 if(isinstance(indent_value, bool) and indent_value == False):            
                     messagebox.showerror("ERROR", f"'Indent[nm]' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
                 if(indent_value < 0):
                     messagebox.showerror("ERROR", f"'Indent' value for '{material}' can not be a negative number", parent=self.modify_material_window)
                     return
-        
+            #If Indent box is empty
+            else:
+                messagebox.showerror("ERROR", f"'Indent' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
+            
+
             #COLOR
-            #Check if input color is valid
-            if(self.is_valid_color(self.entry_dictionary[material]["Color_entry"].get()) == False):
-                messagebox.showerror("ERROR", f"Given 'Color' for '{material}' is not valid.\nValue must be valid string or hex-value ('#123456)", parent=self.modify_material_window)
+            #If entry is empty
+            if(self.entry_dictionary[material]["Color_entry"].get() == ""):
+                messagebox.showerror("ERROR", f"'Color' for '{material}' can not be empty", parent=self.modify_material_window)
                 self.modify_material_window.lift()
                 return
-            try:
-                color = str(self.entry_dictionary[material]["Color_entry"].get())
-                if(color == ""):
-                    messagebox.showerror("ERROR", f"'Color' for '{material}' can not be empty", parent=self.modify_material_window)
+            #If entry is not empty
+            else:
+                #Check if input color is valid
+                if(self.is_valid_color(self.entry_dictionary[material]["Color_entry"].get()) == False):
+                    messagebox.showerror("ERROR", f"Given 'Color' for '{material}' is not valid.\nValue must be valid string or hex-value ('#123456)", parent=self.modify_material_window)
                     self.modify_material_window.lift()
                     return
-
-            except ValueError:
-                print(f"'Color' value for '{material_name}' must be of type 'string'")
-                return
 
 
             #MODULUS [GPa]
             if(self.entry_dictionary[material]["Modulus_entry"].get() != ""):
-                modulus_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Modulus_entry"].get()) 
+                modulus_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Modulus_entry"].get()) 
                 if(isinstance(modulus_value, bool) and modulus_value == False):            
                     messagebox.showerror("ERROR", f"'Modulus[GPa]' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
                 if(modulus_value < 0):
                     messagebox.showerror("ERROR", f"'Modulus[GPa]' value for '{material}' can not be a negative number", parent=self.modify_material_window)
                     return
+            #If modulus entry is empty
+            else:
+                messagebox.showerror("ERROR", f"'Modulus[GPa]' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
 
             
 
             #CTE [ppm/deg]
             if(self.entry_dictionary[material]["CTE_entry"].get() != ""):
-                cte_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["CTE_entry"].get()) 
+                cte_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["CTE_entry"].get()) 
                 if(isinstance(cte_value, bool) and cte_value == False):            
                     messagebox.showerror("ERROR", f"'CTE [ppm/deg]' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
                 if(cte_value < 0):
                     messagebox.showerror("ERROR", f"'CTE [ppm/deg]' value for '{material}' can not be a negative number", parent=self.modify_material_window)
                     return
+            #If CTE entry is empty
+            else:
+                messagebox.showerror("ERROR", f"'CTE [ppm/deg]' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
 
             
             #DENSITY [kg/m3]
             if(self.entry_dictionary[material]["Density_entry"].get() != ""):
-                density_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Density_entry"].get()) 
+                density_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Density_entry"].get()) 
                 if(isinstance(density_value, bool) and density_value == False):            
                     messagebox.showerror("ERROR", f"'Density [kg/m3]' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
                 if(density_value < 0):
                     messagebox.showerror("ERROR", f"'Density [kg/m3]' value for '{material}' can not be a negative number", parent=self.modify_material_window)
                     return
+            #If CTE entry is empty
+            else:
+                messagebox.showerror("ERROR", f"'Density [kg/m3]' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
 
 
             #STRESS_X [MPa]
             if(self.entry_dictionary[material]["Stress_entry"].get() != ""):
-                stress_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Stress_entry"].get()) 
+                stress_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Stress_entry"].get()) 
                 if(isinstance(stress_value, bool) and stress_value == False):            
                     messagebox.showerror("ERROR", f"'Stress [MPa]' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
+            #If STRESS_X entry is empty
+            else:
+                messagebox.showerror("ERROR", f"'Stress [MPa]' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
 
         
             #POISSON
             if(self.entry_dictionary[material]["Poisson_entry"].get() != ""):
-                poisson_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Poisson_entry"].get()) 
+                poisson_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Poisson_entry"].get()) 
                 if(isinstance(poisson_value, bool) and poisson_value == False):            
                     messagebox.showerror("ERROR", f"'Poisson' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
                 if(poisson_value < 0):
                     messagebox.showerror("ERROR", f"'Poisson' value for '{material}' can not be a negative number", parent=self.modify_material_window)
                     return
+            #If poisson entry is empty
+            else:
+                messagebox.showerror("ERROR", f"'Poisson' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
 
 
             #R0
             if(self.entry_dictionary[material]["R0_entry"].get() != ""):
-                R0_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["R0_entry"].get()) 
+                R0_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R0_entry"].get()) 
                 if(isinstance(R0_value, bool) and R0_value == False):            
                     messagebox.showerror("ERROR", f"'R0' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
+            #If R0 entry is empty
+            else:
+                messagebox.showerror("ERROR", f"'R0' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
+
 
 
             #R
             if(self.entry_dictionary[material]["R_entry"].get() != ""):
-                R_value = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["R_entry"].get()) 
+                R_value = helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R_entry"].get()) 
                 if(isinstance(R_value, bool) and R_value == False):            
                     messagebox.showerror("ERROR", f"'R' value for '{material}' has to be an integer or decimal", parent=self.modify_material_window)
                     return
+            #If R entry is empty
+            else:
+                messagebox.showerror("ERROR", f"'R' value for '{material}' can not be empty", parent=self.modify_material_window)
+                return
 
 
         self.confirm_material_changes()
@@ -1536,31 +1574,46 @@ class Material_Control_Panel:
             globals.materials[new_key] = globals.materials.pop(material)   
 
             #Replace values in dictionary 
-            globals.materials[new_key]["Name"] = self.entry_dictionary[material]["Name_entry"].get()
-            globals.materials[new_key]["Thickness"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Thickness_entry"].get())  
-            globals.materials[new_key]["Unit"] = self.entry_dictionary[material]["Unit_entry"].get()  
-            globals.materials[new_key]["Indent [nm]"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Indent_entry"].get()) 
-            globals.materials[new_key]["Color"] = self.entry_dictionary[material]["Color_entry"].get()  
-            globals.materials[new_key]["Modulus [GPa]"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Modulus_entry"].get())  
-            globals.materials[new_key]["CTE [ppm/deg]"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["CTE_entry"].get())
-            globals.materials[new_key]["Density [kg/m3]"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Density_entry"].get())
-            globals.materials[new_key]["Stress_x [MPa]"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Stress_entry"].get())
-            globals.materials[new_key]["Poisson"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["Poisson_entry"].get())
-            globals.materials[new_key]["R0"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["R0_entry"].get())
-            globals.materials[new_key]["R"] = globals.app.convert_decimal_string_to_float(self.entry_dictionary[material]["R_entry"].get())
+            # globals.materials[new_key]["Name"] = tkinter.StringVar(value=self.entry_dictionary[material]["Name_entry"].get())
+            # globals.materials[new_key]["Thickness [nm]"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Thickness_entry"].get()))  
+            # globals.materials[new_key]["Unit"] = tkinter.StringVar(value=self.entry_dictionary[material]["Unit_entry"].get())  
+            # globals.materials[new_key]["Indent [nm]"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Indent_entry"].get())) 
+            # globals.materials[new_key]["Color"] = tkinter.StringVar(value=self.entry_dictionary[material]["Color_entry"].get())  
+            # globals.materials[new_key]["Modulus [GPa]"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Modulus_entry"].get()))  
+            # globals.materials[new_key]["CTE [ppm/deg]"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["CTE_entry"].get()))
+            # globals.materials[new_key]["Density [kg/m3]"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Density_entry"].get()))
+            # globals.materials[new_key]["Stress_x [MPa]"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Stress_entry"].get()))
+            # globals.materials[new_key]["Poisson"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Poisson_entry"].get()))
+            # globals.materials[new_key]["R0"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R0_entry"].get()))
+            # globals.materials[new_key]["R"] = tkinter.DoubleVar(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R_entry"].get()))
+
+
+            globals.materials[new_key]["Name"].set(self.entry_dictionary[material]["Name_entry"].get())
+            globals.materials[new_key]["Thickness [nm]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Thickness_entry"].get()))  
+            globals.materials[new_key]["Unit"].set(self.entry_dictionary[material]["Unit_entry"].get())  
+            globals.materials[new_key]["Indent [nm]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Indent_entry"].get())) 
+            globals.materials[new_key]["Color"].set(self.entry_dictionary[material]["Color_entry"].get())  
+            globals.materials[new_key]["Modulus [GPa]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Modulus_entry"].get()))  
+            globals.materials[new_key]["CTE [ppm/deg]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["CTE_entry"].get()))
+            globals.materials[new_key]["Density [kg/m3]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Density_entry"].get()))
+            globals.materials[new_key]["Stress_x [MPa]"].set(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Stress_entry"].get()))
+            globals.materials[new_key]["Poisson"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Poisson_entry"].get()))
+            globals.materials[new_key]["R0"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R0_entry"].get()))
+            globals.materials[new_key]["R"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R_entry"].get()))
 
 
         #Sort materials dictionary
         globals.app.sort_dictionary()
 
+        #Destroy modify_material_window
+        self.modify_material_window.destroy()
+
         #Re-create the material_adjustment_panel
-        globals.material_adjustment_panel.create_material_adjustment_panel() 
+        globals.material_adjustment_panel.create_material_adjustment_panel()
 
         #Redraw the material stack
         globals.layer_stack_canvas.draw_material_stack()
 
-        #Destroy modify_material_window
-        self.modify_material_window.destroy()
 
 
     def reset_values(self):
@@ -1588,6 +1641,11 @@ class Material_Control_Panel:
 
             #Redraw the material stack
             globals.layer_stack_canvas.draw_material_stack()
+
+            #If graphs has been created, redraw them
+            if(globals.graph_canvas != None):
+                globals.graph_canvas.draw_z_tip_is_graph()
+                globals.graph_canvas.draw_stoney_graph()
 
             #Recreate the material_adjustment_panel
             globals.material_adjustment_panel.create_material_adjustment_panel()
@@ -1625,7 +1683,7 @@ class Material_Control_Panel:
 
         #Create header cells
         sheet["A1"] = "Material"          # Add a new header in column A row 1
-        sheet["B1"] = "Thickness"
+        sheet["B1"] = "Thickness [nm]"
         sheet["C1"] = "Unit"
         sheet["D1"] = "Indent [nm]"
         sheet["E1"] = "Color"
@@ -1685,19 +1743,18 @@ class Material_Control_Panel:
         row_counter = 2
 
         for material in dict(reversed(globals.materials.items())):
-            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["Name"])
-            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness"])
-            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"])
-            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["Indent [nm]"])
-            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["Color"])
-            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["Modulus [GPa]"])
-            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["CTE [ppm/deg]"])
-            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"])
-            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"])
-            sheet.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"])
-            sheet.cell(row=row_counter, column=11, value=globals.materials[material]["R0"])
-            sheet.cell(row=row_counter, column=12, value=globals.materials[material]["R"])
-
+            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["Name"].get())
+            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness [nm]"].get())
+            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"].get())
+            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["Indent [nm]"].get())
+            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["Color"].get())
+            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["Modulus [GPa]"].get())
+            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["CTE [ppm/deg]"].get())
+            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"].get())
+            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"].get())
+            sheet.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"].get())
+            sheet.cell(row=row_counter, column=11, value=globals.materials[material]["R0"].get())
+            sheet.cell(row=row_counter, column=12, value=globals.materials[material]["R"].get())
 
             #increment row_counter
             row_counter += 1
@@ -1721,7 +1778,7 @@ class Material_Control_Panel:
         #Set the width and height of image placed in excel file
         match globals.current_view:
             case "Stacked" | "Realistic" | "Stepped" | "Multi":
-                canvas_screenshot.width = 750
+                canvas_screenshot.width = 350
                 canvas_screenshot.height = 350
             
 

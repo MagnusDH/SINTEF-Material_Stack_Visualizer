@@ -102,7 +102,7 @@ class Layer_Stack_Canvas:
 
 
     def draw_material_stack(self, *event):
-        """Draws the material stack based on the value in the option box"""
+        """Draws the material stack based on the current view"""
         # print("DRAW MATERIAL STACK()")
 
         #Clear all existing elements on canvas and in dictionary
@@ -118,7 +118,7 @@ class Layer_Stack_Canvas:
             globals.materials[material]["Indent_arrow_pointer_id"] = None
 
         #Sort the materials dictionary after the "layer" value
-        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"]))
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
                 
         #Draw stack based on value in option menu
         match globals.current_view:
@@ -157,10 +157,10 @@ class Layer_Stack_Canvas:
         #Find the total height of all materials combined
         sum_of_all_materials = 0
         for material in globals.materials:
-            if(globals.materials[material]["Layer"] == 1):
+            if(globals.materials[material]["Layer"].get() == 1):
                 continue    #Skip lowest layer
             
-            rectangle_height = float(globals.materials[material]["Thickness"])
+            rectangle_height = globals.materials[material]["Thickness [nm]"].get()
             sum_of_all_materials += rectangle_height
         
         #Materials (except the lowest layer material) will be drawn on 9/10 of the canvas
@@ -174,14 +174,14 @@ class Layer_Stack_Canvas:
         
         #Draw rectangles on canvas
         for material in globals.materials:
-            #Create material rectangle only if "thickness" is > zero
-            if(float(globals.materials[material]["Thickness"]) > 0):
+            #Create material rectangle only if "Thickness [nm]" is > zero
+            if(globals.materials[material]["Thickness [nm]"].get() > 0):
 
                 #Lowest material will be drawn on the bottom 1/10 of the canvas
-                if(globals.materials[material]["Layer"] == 1 ):  
+                if(globals.materials[material]["Layer"].get() == 1 ):  
                     created_rectangle = self.layer_stack_canvas.create_rectangle(
                         self.visible_canvas_bbox_x0, self.visible_canvas_bbox_y0, rectangle_x1, rectangle_y0, 
-                        fill=globals.materials[material]["Color"], 
+                        fill=globals.materials[material]["Color"].get(), 
                         outline=settings.layer_stack_canvas_rectangle_outline_color,
                         tags="material_rectangle"
                     )
@@ -192,7 +192,7 @@ class Layer_Stack_Canvas:
                 #Material is not the lowest in the stack
                 else:
                     #find how many percent the current rectangle's height is of the total sum of materials
-                    rectangle_height = float(globals.materials[material]["Thickness"])
+                    rectangle_height = globals.materials[material]["Thickness [nm]"].get()
                     rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
                     #Convert rectangle percentage to pixels
                     rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
@@ -201,7 +201,7 @@ class Layer_Stack_Canvas:
                     rectangle_y1 = rectangle_y0 - rectangle_height_pixels
                     created_rectangle = self.layer_stack_canvas.create_rectangle(
                         rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                        fill=globals.materials[material]["Color"],
+                        fill=globals.materials[material]["Color"].get(),
                         outline=settings.layer_stack_canvas_rectangle_outline_color, 
                         tags="material_rectangle"
                     )
@@ -228,7 +228,7 @@ class Layer_Stack_Canvas:
         #Find the total height of all materials combined
         sum_of_all_materials = 0
         for material in globals.materials:
-            rectangle_height = float(globals.materials[material]["Thickness"])
+            rectangle_height = globals.materials[material]["Thickness [nm]"].get()
             sum_of_all_materials += rectangle_height
         
         #Prepare first rectangle coordinates based on view
@@ -258,10 +258,10 @@ class Layer_Stack_Canvas:
         #Draw rectangles on canvas
         for material in globals.materials:
         
-            #Create material rectangle only if "thickness" is > zero
-            if(float(globals.materials[material]["Thickness"]) > 0):
+            #Create material rectangle only if "Thickness [nm]" is > zero
+            if(globals.materials[material]["Thickness [nm]"].get() > 0):
                 #find how many percent the current rectangle's height is of the total sum of materials
-                rectangle_height = float(globals.materials[material]["Thickness"])
+                rectangle_height = globals.materials[material]["Thickness [nm]"].get()
                 rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
                 #Convert rectangle percentage to pixels
                 rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
@@ -270,7 +270,7 @@ class Layer_Stack_Canvas:
                 rectangle_y1 = rectangle_y0 - rectangle_height_pixels
                 created_rectangle = self.layer_stack_canvas.create_rectangle(
                     rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                    fill=globals.materials[material]["Color"],
+                    fill=globals.materials[material]["Color"].get(),
                     outline=settings.layer_stack_canvas_rectangle_outline_color, 
                     tags="material_rectangle"
                 )
@@ -301,12 +301,12 @@ class Layer_Stack_Canvas:
         sum_of_all_materials = 0
         biggest_material = 0
         for material in globals.materials:
-            if(globals.materials[material]["Layer"] == 1):
+            if(globals.materials[material]["Layer"].get() == 1):
                 continue    #Skip lowest material
 
-            sum_of_all_materials += float(globals.materials[material]["Thickness"])
-            if(biggest_material < float(globals.materials[material]["Thickness"])):
-                biggest_material = float(globals.materials[material]["Thickness"])
+            sum_of_all_materials += globals.materials[material]["Thickness [nm]"].get()
+            if(biggest_material < globals.materials[material]["Thickness [nm]"].get()):
+                biggest_material = globals.materials[material]["Thickness [nm]"].get()
         
         #Find how many nanometers 1 pixel should represent
         nanometers_per_pixel = sum_of_all_materials/round(self.layer_stack_canvas_height * 0.9)
@@ -323,14 +323,14 @@ class Layer_Stack_Canvas:
 
         #Draw rectangles on canvas
         for material in globals.materials:
-            #Create material rectangle only if "thickness" is > zero
-            if(float(globals.materials[material]["Thickness"]) > 0):
+            #Create material rectangle only if "Thickness [nm]" is > zero
+            if(globals.materials[material]["Thickness [nm]"].get() > 0):
 
                 #Draw lowest layer material on the bottom 1/10 of the canvas
-                if(globals.materials[material]["Layer"] == 1):
+                if(globals.materials[material]["Layer"].get() == 1):
                     
                     #Find how many pixels is needed to represent the indent of the current material
-                    indent_width_pixels = float(globals.materials[material]["Indent [nm]"])/nanometers_per_pixel
+                    indent_width_pixels = globals.materials[material]["Indent [nm]"].get()/nanometers_per_pixel
 
                     #Set the width of the rectangle
                     rectangle_x1 = rectangle_x1 - indent_width_pixels
@@ -340,7 +340,7 @@ class Layer_Stack_Canvas:
                         #Create rectangle
                         created_rectangle = self.layer_stack_canvas.create_rectangle(
                             rectangle_x0, self.visible_canvas_bbox_y0, rectangle_x1, rectangle_y0,
-                            fill=globals.materials[material]["Color"],
+                            fill=globals.materials[material]["Color"].get(),
                             outline=settings.layer_stack_canvas_rectangle_outline_color, 
                             tags="material_rectangle"
                         )
@@ -351,13 +351,13 @@ class Layer_Stack_Canvas:
                 #Material is not the lowest in the stack
                 else:
                     #Find how many pixels is needed to represent the height of the current material
-                    rectangle_height_pixels = float(globals.materials[material]["Thickness"])/nanometers_per_pixel
+                    rectangle_height_pixels = globals.materials[material]["Thickness [nm]"].get()/nanometers_per_pixel
                     
                     #Set the y1 coordinate of the rectangle
                     rectangle_y1 = rectangle_y0 - rectangle_height_pixels
 
                     #Find how many pixels is needed to represent the indent of the current material
-                    indent_width_pixels = float(globals.materials[material]["Indent [nm]"])/nanometers_per_pixel
+                    indent_width_pixels = globals.materials[material]["Indent [nm]"].get()/nanometers_per_pixel
 
                     #Set the indent width for the current rectangle
                     rectangle_x1 =  rectangle_x1 - indent_width_pixels
@@ -366,7 +366,7 @@ class Layer_Stack_Canvas:
                     if(rectangle_x1 >= original_rectangle_x0):
                         created_rectangle = self.layer_stack_canvas.create_rectangle(
                             rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                            fill=globals.materials[material]["Color"], 
+                            fill=globals.materials[material]["Color"].get(), 
                             outline=settings.layer_stack_canvas_rectangle_outline_color,
                             tags="material_rectangle"
                         )
@@ -393,7 +393,7 @@ class Layer_Stack_Canvas:
         #Check how many materials are marked as "active"
         num_active_materials = 0
         for material in globals.materials:
-            if(globals.materials[material]["Status"] == "active"):
+            if(globals.materials[material]["Status"].get() == "active"):
                 num_active_materials += 1
 
         #If the are no active materials to draw, then end the function
@@ -403,11 +403,11 @@ class Layer_Stack_Canvas:
         #Find the total height of all materials combined
         sum_of_all_materials = 0
         for material in globals.materials:
-            if(globals.materials[material]["Status"] == "active"):
-                if(globals.materials[material]["Layer"] == 1):
+            if(globals.materials[material]["Status"].get() == "active"):
+                if(globals.materials[material]["Layer"].get() == 1):
                     continue    #Skip lowest material
                 
-                rectangle_height = float(globals.materials[material]["Thickness"])
+                rectangle_height = globals.materials[material]["Thickness [nm]"].get()
                 sum_of_all_materials += rectangle_height
             
         #Materials (except the lowest layer material) will be drawn on 9/10 of the canvas
@@ -420,17 +420,16 @@ class Layer_Stack_Canvas:
         rectangle_y1 = None #Calculated later
             
         #Draw rectangles on canvas
-        # for material in globals.materials:
         for material in globals.materials:
-            if(globals.materials[material]["Status"] == "active"):
-                #Create material rectangle only if "thickness" is > zero
-                if(float(globals.materials[material]["Thickness"]) > 0):
+            if(globals.materials[material]["Status"].get() == "active"):
+                #Create material rectangle only if "Thickness [nm]" is > zero
+                if(globals.materials[material]["Thickness [nm]"].get() > 0):
 
                     #Lowest layer material will be drawn on the bottom 1/10 of the canvas
-                    if(globals.materials[material]["Layer"] == 1):  
+                    if(globals.materials[material]["Layer"].get() == 1):  
                         created_rectangle = self.layer_stack_canvas.create_rectangle(
                             rectangle_x0, self.visible_canvas_bbox_y0, rectangle_x1, rectangle_y0, 
-                            fill=globals.materials[material]["Color"], 
+                            fill=globals.materials[material]["Color"].get(), 
                             outline=settings.layer_stack_canvas_rectangle_outline_color,
                             tags="material_rectangle"
                         )
@@ -441,7 +440,7 @@ class Layer_Stack_Canvas:
                     #Material is not the lowest layer
                     else:
                         #find how many percent the current rectangle's height is of the total sum of materials
-                        rectangle_height = float(globals.materials[material]["Thickness"])
+                        rectangle_height = globals.materials[material]["Thickness [nm]"].get()
                         rectangle_percentage = (rectangle_height/sum_of_all_materials)*100
                         #Convert rectangle percentage to pixels
                         rectangle_height_pixels = (rectangle_percentage/100)*canvas_height
@@ -450,7 +449,7 @@ class Layer_Stack_Canvas:
                         rectangle_y1 = rectangle_y0 - rectangle_height_pixels
                         created_rectangle = self.layer_stack_canvas.create_rectangle(
                             rectangle_x0, rectangle_y0, rectangle_x1, rectangle_y1, 
-                            fill=globals.materials[material]["Color"],
+                            fill=globals.materials[material]["Color"].get(),
                             outline=settings.layer_stack_canvas_rectangle_outline_color, 
                             tags="material_rectangle"
                         )
@@ -496,7 +495,7 @@ class Layer_Stack_Canvas:
                         if(text_height < rectangle_height):
                             created_text = self.layer_stack_canvas.create_text(
                                 rectangle_middle_x, rectangle_middle_y, 
-                                text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
+                                text=f"{material} - {globals.materials[material]['Thickness [nm]'].get()} {globals.materials[material]['Unit'].get()}", 
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
                                 anchor="center", 
@@ -510,7 +509,7 @@ class Layer_Stack_Canvas:
                         else:
                             created_text = self.layer_stack_canvas.create_text(
                                 self.visible_canvas_bbox_x1, rectangle_middle_y, 
-                                text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
+                                text=f"{material} - {globals.materials[material]['Thickness [nm]'].get()} {globals.materials[material]['Unit'].get()}", 
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
                                 tags="text"
@@ -558,7 +557,7 @@ class Layer_Stack_Canvas:
                         if(text_height < rectangle_height):
                             created_text = self.layer_stack_canvas.create_text(
                                 rectangle_middle_x, rectangle_middle_y, 
-                                text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
+                                text=f"{material} - {globals.materials[material]['Thickness [nm]'].get()} {globals.materials[material]['Unit'].get()}", 
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
                                 anchor="center", 
@@ -572,7 +571,7 @@ class Layer_Stack_Canvas:
                         else:
                             created_text = self.layer_stack_canvas.create_text(
                                 self.visible_canvas_bbox_x0, rectangle_middle_y, 
-                                text=f"{material} - {globals.materials[material]['Thickness']} {globals.materials[material]['Unit']}", 
+                                text=f"{material} - {globals.materials[material]['Thickness [nm]'].get()} {globals.materials[material]['Unit'].get()}", 
                                 fill=settings.layer_stack_canvas_text_color, 
                                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
                                 tags="text"
@@ -873,7 +872,7 @@ class Layer_Stack_Canvas:
                 #if there is a previous material
                 if(previous_material != None):
                     #Only create indent text if material->indent value is bigger than zero
-                    if(float(globals.materials[material]["Indent [nm]"]) > 0):
+                    if(globals.materials[material]["Indent [nm]"].get() > 0):
                         current_material_rect_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])
                         current_rectangle_x0 = current_material_rect_coordinates[0]
                         current_rectangle_y0 = current_material_rect_coordinates[3]
@@ -897,7 +896,7 @@ class Layer_Stack_Canvas:
                         #Create a text on the side of the current material->rectangle with indent number
                         indent_text = self.layer_stack_canvas.create_text(
                             (self.visible_canvas_bbox_x1), (current_rectangle_y0 - 10),
-                            text=f"{float(globals.materials[material]['Indent [nm]'])} {globals.materials[material]['Unit']}",
+                            text=f"{globals.materials[material]['Indent [nm]'].get()} {globals.materials[material]['Unit'].get()}",
                             fill=settings.text_color, 
                             font=(settings.text_font, settings.text_size),
                             tags="text"
@@ -1129,7 +1128,7 @@ class Layer_Stack_Canvas:
         #Find the total height of all materials combined
         total_height_of_materials = 0
         for material in globals.materials:
-            total_height_of_materials += float(globals.materials[material]["Thickness"])
+            total_height_of_materials += globals.materials[material]["Thickness [nm]"].get()
         
         #Create text to explain the total height of the stack in "nm"
         self.layer_stack_canvas.create_text(
@@ -1144,8 +1143,22 @@ class Layer_Stack_Canvas:
         #Find nanometers needed to represent 1 pixel
         nm_per_pixel = total_height_of_materials/self.layer_stack_canvas_height
 
+        #Create lists of modulus, thickness and poisson values
+        E = []
+        t = []
+        nu = []
+
+        for material in globals.materials:
+            E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
+            t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+            nu.append(globals.materials[material]["Poisson"].get())
+
         #Calculate Zn
-        Zn = round(globals.equations.calculate_Zn(), 1)
+        # Zn = round(globals.equations.calculate_Zn(E, t, nu), 1)
+        Zn = globals.equations.calculate_Zn(E, t, nu)
+
+        #Convert Zn to nanometers
+        Zn = Zn * 1e9
 
         #Convert Zn to pixels
         Zn_pixels = Zn / nm_per_pixel
@@ -1184,15 +1197,30 @@ class Layer_Stack_Canvas:
         self.layer_stack_canvas.create_text(
             self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70,
             self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - Zn_pixels))/2,
-            text=f"Zn={Zn}", 
+            text=f"Zn={round(Zn,1)}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
             tags="text"
         )
 
 
+        #Populate a list with thickness values from layer1 up until "PZT" material
+        t_piezo_list = []
+        for material in globals.materials:
+            if(material == globals.parameters_panel.piezo_material_entry.get()):
+                break
+
+            #Convert thickness to nanometers and append it to list 
+            t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+            
+        #Fetch thickness value for Piezo material
+        piezo_thickness = globals.materials[globals.parameters_panel.piezo_material_entry.get()]["Thickness [nm]"].get() / 1e9
+
         #Calculate Zp
-        Zp = round(globals.equations.calculate_mid_piezo(), 1) + Zn
+        Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/ 1e9
+
+        #Convert Zn to nanometers
+        Zp = Zp * 1e9
 
         #Convert Zp to pixels
         Zp_pixels = Zp / nm_per_pixel 
@@ -1222,7 +1250,7 @@ class Layer_Stack_Canvas:
         #Write "Zp" text
         self.layer_stack_canvas.create_text(
             self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
-            text=f"Zp={round(Zp - Zn, 1)}", 
+            text=f"Zp={round(Zp-Zn, 1)}", 
             fill="black", 
             font=(settings.text_font, settings.layer_stack_canvas_text_size), 
             tags="text"

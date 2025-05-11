@@ -10,26 +10,18 @@ class Equations:
         # print("CLASS EQUATIONS INIT()")
 
 
-    def calculate_Zn(self):#E:list, t:list, nu:list):
+    def calculate_Zn(self, E:list, t:list, nu:list):
         """
-        -Calculates the neutral axis value for the given materials\n
-        -Returns the 'Zn' value in nanometers\n
+        Calculates the neutral axis value for the given materials\n
 
-        PARAMETERS:        
-        E = list of "Modulus [GPa]" values\n
-        t = list of "Thickness" values in nanometers\n
-        nu = list of "Poisson" values\n
+        PARAMETERS:\n     
+            E: list of "Modulus" values in unit: Pascal
+            t: list of "Thickness" values in unit: meters
+            nu: list of "Poisson" values in unit: "no special unit"
 
+        Returns "Zn" in unit: meters
         """
-        # print("CALCULATE_ZN()")
-        #Create a list of all the necessary variables
-        E = []
-        t = []
-        nu = []
-        for material in globals.materials:
-            E.append(globals.materials[material]["Modulus [GPa]"])
-            t.append(globals.materials[material]["Thickness"])
-            nu.append(globals.materials[material]["Poisson"])
+        #print("CALCULATE_ZN()")
 
         #Check for "zero division errors"
         for i in range(len(nu)):
@@ -57,27 +49,18 @@ class Equations:
         return Zn
     
 
-    #NOT DONE
-    def calculate_mid_piezo(self):
+    def calculate_mid_piezo(self, t:list, Zn:float, piezo_thickness:float):
         """
-        -Calculates mid-plane location for the nth layer (z_mid_n)\n 
-        -Return value is Zp in nanometers
+        Calculates mid-plane location for the nth layer (z_mid_n)\n
+
+        PARAMETERS:\n
+            t: list of "thickness" values in "meters" for materials from layer1 up til chosen piezo material.
+            Zn: value in "meters"
+            piezo_thickness: "thickness" of chosen piezo material in "meters"
+
+        Returns "Zp" in unit: meters
         """
         # print("CALCULATE_MID_PIEZO()")
-
-        #Populate a list with thickness values from layer1 up until "PZT" material
-        t = []
-        for material in globals.materials:
-            if(material.lower() == "pzt"):
-                break
-
-            t.append(globals.materials[material]["Thickness"])
-            
-        #Fetch thickness value for Piezo material
-        piezo_thickness = globals.materials[material]["Thickness"]
-
-        #Calculate Zn
-        Zn = self.calculate_Zn()
 
         #Calculate Zp
         Zp = (piezo_thickness / 2) + sum(t) - Zn
@@ -85,30 +68,20 @@ class Equations:
         return Zp 
 
 
-    #NOT DONE
-    def calculate_EI(self):
+    def calculate_EI(self, E:list, t:list, nu:list, W:float, Zn:float):
         """
-        -Function to calculate flexural rigidity (EI)
-        -Scaled to SI-units 
-        -Return value is 'newton meter**2'
+        Function to calculate flexural rigidity (EI) scaled to SI-units\n
+
+        PARAMETERS:\n
+            E: list of "Modulus" values in unit: pascal
+            t: list of "Thickness" values in unit: meters
+            nu: list of "Poisson" values in unit: "no special unit"
+            W: value in unit: meters
+            Zn: value in unit: meters
+
+        Returns "EI" in unit: newton meter**2
         """
         # print("CALCULATE_EI()")
-
-        #Create lists of all the necessary variables
-        E = []
-        t = []
-        nu = []
-        for material in globals.materials:
-            E.append(globals.materials[material]["Modulus [GPa]"] * 1e9)    #multiplied with 1 billion
-            t.append(globals.materials[material]["Thickness"] / 1e9)       #divided by 1 billion
-            nu.append(globals.materials[material]["Poisson"])
-
-        #Convert W value to micrometers
-        W = 160
-        W = W / 1e6
-
-        #Calculate Zn value
-        Zn = self.calculate_Zn() / 1e9 #divided by 1 billion to get correct value
 
         EI = W * ((E[0] / (1 - nu[0]**2)) * (t[0]**3 / 12 + t[0] * (t[0]/2 - Zn)**2))
         
@@ -121,31 +94,17 @@ class Equations:
         return EI
 
 
-    #NOT DONE
-    def calculate_M_is_cantilever(self):
+    def calculate_M_is_cantilever(self, Zn:float, sigma_i:list, t:list, W:float):
         """
-        -Function to calculate cantilever stress bending moment (M_tot)\n
-        -Return value is 'newton meter'
+        Function to calculate cantilever stress bending moment (M_tot)\n
+
+        PARAMETERS:\n
+            sigma_i: list of "Stress_x" values in unit: pascal
+            W: value in unit: meters
+            Zn: value in unit: meters
+
+        Returns M_is value in unit: newton meters
         """
-
-        #Create lists of all the necessary variables
-        E = []
-        t = []
-        nu = []
-        sigma_i = []
-        for material in globals.materials:
-            E.append(globals.materials[material]["Modulus [GPa]"] * 1e9)
-            t.append(globals.materials[material]["Thickness"] / 1e9)
-            nu.append(globals.materials[material]["Poisson"])
-            sigma_i.append(globals.materials[material]["Stress_x [MPa]"] * 1e6)
-
-
-        #Convert W value to micrometers
-        W = 160
-        W = W / 1e6
-
-        #Calculate Zn value
-        Zn = self.calculate_Zn() / 1e9
 
         #Calculate M_tot
         term1 = W * t[0] * sigma_i[0] * (t[0] / 2 - Zn)
@@ -155,77 +114,65 @@ class Equations:
         return M_is
 
 
-    #NOT DONE
-    def calculate_M_tot_cantilever(self):
+    def calculate_M_tot_cantilever(self, M_is:float, M_p:float):
+        """
+        PARAMETERS:\n
+            M_is: value in unit: newton meters
+            M_p: value in unit: newton meters
+
+        Returns M_tot value in unit: newton meters
+        """
         
-        M_tot = self.calculate_M_is_cantilever() + self.calculate_M_p_cantilever()
+        M_tot = M_is + M_p
 
         return M_tot
     
 
-    #NOT DONE
-    def calculate_curvature(self):
+    def calculate_curvature(self, M_tot:float, EI:float):
         """
-        -Curvature calculation\n
-        -return value is in 1/meters
+        Function to calculate Curvature\n
+
+        PARAMETERS:\n
+            M_tot: value in unit: newton meters
+            EI: value in unit: newton meter**2
+
+        Return curv_is in unit: 1/meters
         """
-
-        M_tot = self.calculate_M_tot_cantilever()
-        #If W_entry value is zero and M_tot function returns None, return
-        if(M_tot == None):
-            return
-
-        EI = self.calculate_EI()
-        #If W_entry value is zero and calculate_EI function returns None, return
-        if(EI == None):
-            return
 
         curv_is = M_tot / EI
 
         return curv_is
 
 
-    #NOT DONE
-    def calculate_tip_placement(self, L):
+    def calculate_tip_placement(self, curv_is:float, L:float):
         """
-        -Tip displacement calculation for a given "length/L" value\n
-        -return value is in meters
-        """
-        curv_is = self.calculate_curvature()
+        Calculates tip displacement for a given "length/L" value\n
 
-        #Convert L to micrometers
-        L = L / 1e6
+        PARAMETERS:
+            curv_is: value in unit: 1/meters
+            L: value in unit: micrometers
+
+        Return z_tip_tot in unit: micrometers
+        """
 
         z_tip_tot = 0.5 * curv_is * L**2
 
         return z_tip_tot * 1e6
 
 
-    #NOT DONE
-    def calculate_M_p_cantilever(self):#, Zp:float, W:float, V_p:float, e_31_f:float):
+    def calculate_M_p_cantilever(self, Zp:float, W:float, V_p:float, e_31_f:float):
         """
-        -Function to calculate cantilever piezoelectric moment (M_p)
-        
-        -Parameters:\n
-        Zp unit ???
-        W unit ???
-        V_p unit ???
-        e_31_f unit ???
+        Calculates cantilever piezoelectric moment (M_p)
+
+        PARAMETERS:\n
+            Zp: value in unit: meters
+            W: value in unit: meters
+            V_p: value in unit: volt
+            e_31_f: value in unit: c/m2
+
+        Returns "M_p" in unit: newton meters
         """
         # print("CALCULATE_M_P_CANTILEVER()")
-
-        #Calculate Zp value
-        Zp = self.calculate_mid_piezo() / 1e9
-
-        #Convert W value to micrometers
-        W = 160
-        W = W / 1e6
-
-        #Fetch the 'volt' value from new_panel
-        V_p = helper_functions.convert_decimal_string_to_float(globals.new_panel.volt_entry.get())
-
-        #Fetch the 'e_31_f' value from new_panel
-        e_31_f = helper_functions.convert_decimal_string_to_float(globals.new_panel.e_31_f_entry.get())
 
         #Calculate M_p value
         M_p = e_31_f * V_p * Zp * W
@@ -233,48 +180,115 @@ class Equations:
         return M_p
 
 
-    #NOT DONE
-    def neutralize_global_stress(self, t_guess):
+    #HVA ER RETUR VERDI???
+    def neutralize_global_stress(self, t:list, L:float, curv_is:float):
         """
         Objective function for fsolve: sets the second-layer thickness to t_guess[0],
         computes the resulting tip displacement, then restores the original thickness.
-        Returns the tip displacement in the same units that calculate_tip_placement uses.
+        Returns the tip displacement in the same units that calculate_tip_placement uses\n
+
+        PARAMETERS:\n
+            t: list of thickness values in unit: meters
+            L: value in unit: meters
+
+        Returns z_tip in unit: meters??
         """
         # Identify the second layer key (assumes ordering in globals.materials)
         layer_keys = list(globals.materials.keys())
         second_key = layer_keys[1]
 
         # Backup original thickness and set the trial value
-        original_thickness = globals.materials[second_key]["Thickness"]
-        globals.materials[second_key]["Thickness"] = t_guess[0]
-
-        #Fetch L and compute tip displacement
-        L_val = helper_functions.convert_decimal_string_to_float(globals.new_panel.L_entry.get())
+        original_thickness = globals.materials[second_key]["Thickness [nm]"]
+        globals.materials[second_key]["Thickness [nm]"] = t
 
         #calculate_tip_placement expects L in μm and returns z_tip in μm
-        z_tip = self.calculate_tip_placement(L_val)
+        z_tip = self.calculate_tip_placement(curv_is, L)
 
         # Restore original thickness
-        globals.materials[second_key]["Thickness"] = original_thickness
-        
+        globals.materials[second_key]["Thickness [nm]"] = original_thickness
+
+        print("t_guess:", t)
+        print("L:", L)
+
         return z_tip
     
 
-    #NOT DONE
-    def find_t_solution(self):
+    def find_t_solution(self, L:float, curv_is:float):
         """
         Solve for and return the thickness of the second layer that makes the
-        stress-induced tip displacement zero.
+        stress-induced tip displacement zero.\n
+
+        Returns the neutralizing thickness in unit: nanometer
         """
-        # print("FIND_T_SOLUTION()")
+        print("FIND_T_SOLUTION()")
+
+        print(L, curv_is)
 
         # Identify second layer current thickness
-        t_guess = float(globals.materials["SiO2"]["Thickness"])  #Extract scalar from array
+        t_guess = float(globals.materials["SiO2"]["Thickness [nm]"]) / 1e9  #Extract scalar from array
+
+        t = []
+        for material in globals.materials:
+            t.append(float(globals.materials[material]["Thickness [nm]"]) / 1e9)
 
         # Use fsolve to find the root of neutralize_global_stress
-        t_sol = fsolve(self.neutralize_global_stress, [t_guess])[0]
-        # print(f'Neutralizing thickness is: {t_sol} nm')
-        
+        t_sol = fsolve(self.neutralize_global_stress(t, L, curv_is), [t_guess])[0]
+
         return t_sol
+
+
+    def calculate_blocking_force(self, E:list, t:list, V:float, e_31_f:float, h_PZT:float, h_Si:float, w:float, L:float):
+        '''
+        Blocking force calculations
+        '''
+        #Piezo & substrate compliances
+        S11_PZT = 13.8e-12      # [m²/N]  from Jaffe/Tyholdt
+        S12_PZT = -4.07e-12     # [m²/N]
+        S11_Si  = 1.0 / E[0]    # [m²/N], isotropic Si approximation
+
+        # 9) Effective d31 for thin film (m/V)
+        
+        d31 = e_31_f * (S11_PZT + S12_PZT)
+
+        # 10) Layer thicknesses for blocking force formula
+        h_PZT = t[3]            # PZT layer thickness [m]
+        h_Si  = t[0]            # substrate layer thickness [m]
+        num = -3 * d31 * h_Si * (h_PZT + h_Si) * w
+        den =  4 * (S11_PZT * h_Si + S11_Si * h_PZT) * L
+
+        return (num/den) * V
+
+
+
+
+
+
+
+
+
+
+
+
+    # def neutralize_global_stress(t1):
+    #     t_temp = t.copy()
+    #     t_temp[1] = t1[0]  # Extract scalar from array
+    #     zn = calculate_zn(E, t_temp, nu)
+    #     EI = calculate_EI(E, t_temp, nu, w, zn)
+    #     M_is = calculate_M_is_cantilever(w, t_temp, sigma, zn)
+    #     curv_is = M_is / EI
+    #     z_tip_is = 0.5 * curv_is * l**2
+    #     return z_tip_is
+    
+
+    # def find_t1_solution():
+    #     """
+    #     Solve for and return the thickness t[1] that makes the 
+    #     stress‐induced tip displacement zero.
+    #     """
+    #     # use the current global t[1] as the initial guess
+    #     t_initial_guess = t[1]
+    #     # fsolve expects an array‐like initial guess
+    #     t1_sol = fsolve(neutralize_global_stress, [t_initial_guess])[0]
+    #     return t1_sol
 
 
