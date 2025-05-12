@@ -1644,8 +1644,7 @@ class Material_Control_Panel:
 
             #If graphs has been created, redraw them
             if(globals.graph_canvas != None):
-                globals.graph_canvas.draw_z_tip_is_graph()
-                globals.graph_canvas.draw_stoney_graph()
+                globals.graph_canvas.draw_graphs()
 
             #Recreate the material_adjustment_panel
             globals.material_adjustment_panel.create_material_adjustment_panel()

@@ -118,9 +118,6 @@
 
 
 # TO DO
-    -i piezoelectric_bending_moment_label skal verdien "M_p" legges inn
-    -i stress_neutral_SiO2_thickness_label skal verdien fra globals.equations.find_t_solution() legges inn
-
     -Modify_materials() er full av bugs
 
     -Find a smart way to render parameters_panel equation labels

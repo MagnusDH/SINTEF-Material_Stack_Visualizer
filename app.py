@@ -1,5 +1,5 @@
 import tkinter
-from tkinter import messagebox, StringVar
+from tkinter import messagebox
 import tkinter.dialog
 import customtkinter
 import pyautogui  # For better user interface visual effects
@@ -296,20 +296,20 @@ class App:
                     
                     #ADD TRACES TO ALL VARIABLES
                     # Trace changes to trigger canvas redraw
-                    row["material"].trace_add("write", lambda *args, identifier="Name": self.variable_updated(identifier))
-                    row["layer"].trace_add("write", lambda *args, identifier="Layer": self.variable_updated(identifier))
-                    row["thickness [nm]"].trace_add("write", lambda *args, identifier="Thickness [nm]": self.variable_updated(identifier))
-                    row["unit"].trace_add("write", lambda *args, identifier="Unit": self.variable_updated(identifier))
-                    row["indent [nm]"].trace_add("write", lambda *args, identifier="Indent [nm]": self.variable_updated(identifier))
-                    row["color"].trace_add("write", lambda *args, identifier="Color": self.variable_updated(identifier))
-                    row["status"].trace_add("write", lambda *args, identifier="Status": self.variable_updated(identifier))
-                    row["modulus [gpa]"].trace_add("write", lambda *args, identifier="Modulus [GPa]": self.variable_updated(identifier))
-                    row["cte [ppm/deg]"].trace_add("write", lambda *args, identifier="CTE [ppm/deg]": self.variable_updated(identifier))
-                    row["density [kg/m3]"].trace_add("write", lambda *args, identifier="Density [kg/m3]": self.variable_updated(identifier))
-                    row["stress_x [mpa]"].trace_add("write", lambda *args, identifier="Stress_x [MPa]": self.variable_updated(identifier))
-                    row["poisson"].trace_add("write", lambda *args, identifier="Poisson": self.variable_updated(identifier))
-                    row["r0"].trace_add("write", lambda *args, identifier="R0": self.variable_updated(identifier))
-                    row["r"].trace_add("write", lambda *args, identifier="R": self.variable_updated(identifier))
+                    row["material"].trace_add("write", lambda *args, identifier="Name": self.update_widgets(identifier))
+                    row["layer"].trace_add("write", lambda *args, identifier="Layer": self.update_widgets(identifier))
+                    row["thickness [nm]"].trace_add("write", lambda *args, identifier="Thickness [nm]": self.update_widgets(identifier))
+                    row["unit"].trace_add("write", lambda *args, identifier="Unit": self.update_widgets(identifier))
+                    row["indent [nm]"].trace_add("write", lambda *args, identifier="Indent [nm]": self.update_widgets(identifier))
+                    row["color"].trace_add("write", lambda *args, identifier="Color": self.update_widgets(identifier))
+                    row["status"].trace_add("write", lambda *args, identifier="Status": self.update_widgets(identifier))
+                    row["modulus [gpa]"].trace_add("write", lambda *args, identifier="Modulus [GPa]": self.update_widgets(identifier))
+                    row["cte [ppm/deg]"].trace_add("write", lambda *args, identifier="CTE [ppm/deg]": self.update_widgets(identifier))
+                    row["density [kg/m3]"].trace_add("write", lambda *args, identifier="Density [kg/m3]": self.update_widgets(identifier))
+                    row["stress_x [mpa]"].trace_add("write", lambda *args, identifier="Stress_x [MPa]": self.update_widgets(identifier))
+                    row["poisson"].trace_add("write", lambda *args, identifier="Poisson": self.update_widgets(identifier))
+                    row["r0"].trace_add("write", lambda *args, identifier="R0": self.update_widgets(identifier))
+                    row["r"].trace_add("write", lambda *args, identifier="R": self.update_widgets(identifier))
 
                     
                     #Create an "info" dictionary to contain all info from excel-file
@@ -358,26 +358,27 @@ class App:
                 traceback.print_exc()
                 return
     
-    #NOT DONE
-    def variable_updated(self, identifier:str, *args):
+
+    def update_widgets(self, identifier:str, *args):
         """
-        Add some explanation\n
+        Updates widgets based on which tkinter.variable name is provided to the function\n
 
         PARAMETERS:
             identifier: name of updated variable
         """
-        # print("VARIABLE_UPDATED()")
+        # print("UPDATE_WIDGETS()")
 
         match identifier:
             case "Name":
-                pass
+                print("name variable updated")
 
             case "Thickness [nm]":
+                print("Thickness value updated")
                 globals.layer_stack_canvas.draw_material_stack()
                 globals.graph_canvas.draw_graphs()
+
                 #Update equation labels in parameters panel
                 #update "Blocking force"
-
 
             case "Layer":
                 print("Layer variable is updated")
@@ -420,44 +421,47 @@ class App:
             
             case "piezo_material_name":
                 print("piezo_material_name variable is updated")
+                globals.layer_stack_canvas.draw_material_stack()
+                globals.graph_canvas.draw_graphs()
+                
                 #update "Blocking force"
-
 
             case "L_value":
                 print("L_value variable is updated")
+                globals.graph_canvas.draw_graphs()
                 #update "Blocking force"
-
 
             case "e_31_f_value":
                 print("e_31_f_value variable is updated")
+                globals.graph_canvas.draw_graphs()
+
                 #Update graphs
                 #update "Blocking force"
-
             
             case "volt_value":
                 print("volt_value variable is updated")
-                #update "Blocking force"
+                globals.graph_canvas.draw_graphs()
 
+                #update "Blocking force"
 
             case "stress_neutral_SiO2_thickness_value":
                 print("stress_neutral_SiO2_thickness_value updated")
 
-
             case "piezoelectric_bending_moment_value":
                 print("piezoelectric_bending_moment_value updated")
 
-
-            case "blocking_force_cantilever_value":
+            case "blocking_force_cantilever":
                 print("blocking_force_cantilever_value variable is updated")
             
-
             case "initial_curvature_value":
                 print("initial_curvature_value updated")
 
-
             case "final_curvature_value":
                 print("final_curvature_value updated")
-                
+
+            case _:
+                print("There is not a match-case for this variable:", identifier)
+
 
 
         #When a material is deleted:
@@ -475,7 +479,7 @@ class App:
         """
         -Sets the correct column and row configuration for the main program window based on the "view"\n
         -Creates the widgets in the main program window for the specific "view"
-        -Adjusts sliders, entries, checkboxes etc... for the sepcific view
+        -Adjusts sliders, entries, labels etc... for the sepcific view
         """
         # print("SET_LAYOUT()")
 
@@ -504,39 +508,38 @@ class App:
                 self.program_window.rowconfigure(0, weight=90, uniform="group1")    
                 self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
 
-                #Create "Material_adjustment_panel"
+                #MATERIAL_ADJUSTMENT_PANEL
                 if(globals.material_adjustment_panel == None):
                     globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
                 else:
                     globals.material_adjustment_panel.create_material_adjustment_panel()
                     globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0, sticky="nsew")
                 
-                #Set all material entry and slider values to "Thickness [nm]" value, and mark all as "active"
+                #Set all material entry and slider values to "Thickness [nm]" value
                 for material in globals.materials:
                     globals.materials[material]["Slider_id"].configure(variable=globals.materials[material]["Thickness [nm]"])
                     globals.materials[material]["Entry_id"].configure(textvariable=globals.materials[material]["Thickness [nm]"])
-                    globals.materials[material]["Status"].set(value="active")
 
                 
-                #Create "Material_control_panel"
+                #MATERIAL_CONTROL_PANEL
                 if(globals.material_control_panel == None):
                     globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
                 else:
                     globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0, sticky="nsew")
 
-                #Create "Layer_stack_canvas"
+
+                #LAYER_STACK_CANVAS
                 if(globals.layer_stack_canvas == None):
                     globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
                 else:
                     globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1, sticky="nsew")
                 
 
-                #Create "canvas_control_panel"
+                #CANVAS_CONTROL_PANEL
                 if(globals.canvas_control_panel == None):
                     globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
                 else:
                     globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1, sticky="nsew")
-
 
             case "Stepped":
                 #Change the layout of the program_window to only two columns
@@ -547,39 +550,39 @@ class App:
                 self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
 
                 
-                #Create "Material_adjustment_panel"
+                #Material_adjustment_panel
                 if(globals.material_adjustment_panel == None):
                     globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
                 else:
                     globals.material_adjustment_panel.create_material_adjustment_panel()
                     globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
 
-                #Set all material entry and slider values to "indent" value, and mark all as "active"
+                #Set all material entry and slider values to "indent" value
                 for material in globals.materials:
                     globals.materials[material]["Slider_id"].configure(variable=globals.materials[material]["Indent [nm]"])
                     globals.materials[material]["Entry_id"].configure(textvariable=globals.materials[material]["Indent [nm]"])
-                    globals.materials[material]["Status"].set(value="active")
 
 
-                #Create "Material_control_panel"
+                #MATERIAL_CONTROL_PANEL
                 if(globals.material_control_panel == None):
                     globals.material_control_panel = Material_Control_Panel(self.program_window, 1, 0)
                 else:
                     globals.material_control_panel.material_control_panel_frame.grid(row=1,column=0)
 
-                #Create "Layer_stack_canvas"
+
+                #LAYER_STACK_CANVAS
                 if(globals.layer_stack_canvas == None):
                     globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
                 else:
                     globals.layer_stack_canvas.layer_stack_canvas.grid(row=0, column=1, rowspan=1)
-                    
-                #Create "canvas_control_panel"
+
+
+                #CANVAS_CONTROL_PANEL
                 if(globals.canvas_control_panel == None):
                     globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 1, 1)
                 else:
                     globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
    
-
             case "Multi":
                 self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")
                 self.program_window.columnconfigure(1, weight=45, uniform="group1")  
@@ -590,36 +593,35 @@ class App:
                 self.program_window.rowconfigure(2, weight=10, minsize=100, uniform="group1")
 
 
-                #Create "Material_adjustment_panel"
+                #MATERIAL_ADJUSTMENT_PANEL
                 if(globals.material_adjustment_panel == None):
                     globals.material_adjustment_panel = Material_Adjustment_Panel(self.program_window, 0, 0)
                 else:
                     globals.material_adjustment_panel.create_material_adjustment_panel()
                     globals.material_adjustment_panel.material_adjustment_panel_frame.grid(row=0, column=0)
 
-
-                #Set all material entry and slider values to "Thickness [nm]" value, and mark all as "active"
+                
+                #Set all material entry and slider values to "Thickness [nm]" value
                 for material in globals.materials:
                     globals.materials[material]["Slider_id"].configure(variable=globals.materials[material]["Thickness [nm]"])
                     globals.materials[material]["Entry_id"].configure(textvariable=globals.materials[material]["Thickness [nm]"])
-                    globals.materials[material]["Status"].set(value="active")
 
 
-                #Create "Parameters_Panel"
+                #PARAMETERS_PANEL
                 if(globals.parameters_panel == None):
                     globals.parameters_panel = Parameters_Panel(self.program_window, 1, 0)
                 else:
                     globals.parameters_panel.parameters_panel_frame.grid(row=1, column=0)
 
 
-                #Create "Material_control_panel"
+                #MATERIAL_CONTROL_PANEL
                 if(globals.material_control_panel == None):
                     globals.material_control_panel = Material_Control_Panel(self.program_window, 2, 0)
                 else:
                     globals.material_control_panel.material_control_panel_frame.grid(row=2,column=0)
 
 
-                #Create "Layer_stack_canvas"
+                #LAYER_STACK_CANVAS
                 if(globals.layer_stack_canvas == None):
                     globals.layer_stack_canvas = Layer_Stack_Canvas(self.program_window, 0, 1)
                     globals.layer_stack_canvas.layer_stack_canvas.grid(rowspan=2)
@@ -628,27 +630,24 @@ class App:
                     globals.layer_stack_canvas.layer_stack_canvas.grid(rowspan=2)
 
 
-                #Create "canvas_control_panel"
+                #CANVAS_CONTROL_PANEL
                 if(globals.canvas_control_panel == None):
                     globals.canvas_control_panel = Canvas_Control_Panel(self.program_window, 2, 1)
                 else:
                     globals.canvas_control_panel.canvas_control_panel_frame.grid(row=2, column=1)
 
 
-                #Create "Graph"
+                #GRAPH_CANVAS
                 if(globals.graph_canvas == None):
                     globals.graph_canvas = Graph_Canvas(self.program_window, 0, 2)
                     globals.graph_canvas.graph_translator.get_tk_widget().grid(rowspan=2)
-                    globals.graph_canvas.draw_z_tip_is_graph()
-                    globals.graph_canvas.draw_stoney_graph()
-
+                    globals.graph_canvas.draw_graphs()
                 else:
                     globals.graph_canvas.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
-                    globals.graph_canvas.draw_z_tip_is_graph()
-                    globals.graph_canvas.draw_stoney_graph()
+                    globals.graph_canvas.draw_graphs()
 
 
-                #Create "graph_control_panel"
+                #GRAPH_CONTROL_PANEL
                 if(globals.graph_control_panel == None):
                     globals.graph_control_panel = Graph_Control_Panel(self.program_window, 2, 2)
                 else:
@@ -772,6 +771,9 @@ if __name__ == "__main__":
         
     #Create keyboard shortcuts for the main window
     program_window.bind("<Escape>", lambda event: program_window.destroy())
+    
+    #Initialize global variables
+    globals.initialize_globals(program_window)
 
     #Create an instance of App and run it
     globals.app = App(program_window)

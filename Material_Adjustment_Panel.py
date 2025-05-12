@@ -725,8 +725,7 @@ class Material_Adjustment_Panel:
 
         #If graphs has been created, redraw them
         if(globals.graph_canvas != None):
-            globals.graph_canvas.draw_z_tip_is_graph()
-            globals.graph_canvas.draw_stoney_graph()
+            globals.graph_canvas.draw_graphs()
         
 
     def move_material(self, chosen_material, up_or_down):
@@ -774,5 +773,4 @@ class Material_Adjustment_Panel:
 
         #If graphs has been created, redraw them
         if(globals.graph_canvas != None):
-            globals.graph_canvas.draw_z_tip_is_graph()
-            globals.graph_canvas.draw_stoney_graph()
+            globals.graph_canvas.draw_graphs()

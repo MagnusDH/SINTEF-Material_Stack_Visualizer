@@ -243,6 +243,8 @@ class Graph_Canvas:
         """
         -Draws the 'z_tip_is' graph
         """
+
+        # print("DRAW_Z_TIP_IS_GRAPH()")
         
         #Set labels for the graph
         self.graph1.set_title("Cantilever bending")
@@ -250,7 +252,7 @@ class Graph_Canvas:
         self.graph1.set_ylabel("Tip displacement [μm]", fontsize=10, labelpad=8)
 
         #Fetch L value
-        L = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.L_value.get())
+        L = globals.L_value.get()
         if(L == 0 or L == False):
             messagebox.showerror("ERROR", "'L [μm]' entry can not be zero or empty")
             return None
@@ -270,21 +272,23 @@ class Graph_Canvas:
             nu.append(globals.materials[material]["Poisson"].get())
             sigma_i.append(float(globals.materials[material]["Stress_x [MPa]"].get()) * 1e6)
 
+
         W = 160 / 1e6 #In micrometers
         piezo_thickness = float(globals.materials["PZT"]["Thickness [nm]"].get()) / 1e9
         Zn = globals.equations.calculate_Zn(E, t, nu)
         Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
-        V_p = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.volt_entry.get())
-        e_31_f = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.e_31_f_entry.get())
+        V_p = globals.volt_value.get()
+        e_31_f = globals.e_31_f_value.get()
         M_p = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
         M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W)
         M_tot = globals.equations.calculate_M_tot_cantilever(M_is, M_p)
         EI = globals.equations.calculate_EI(E, t, nu, W, Zn)
         curv_is = globals.equations.calculate_curvature(M_tot, EI)
+        
         ##########################################################################
 
         L = L/1e6
-        
+
         #Calculate x and y values
         x_values = numpy.linspace(0, L, 100)
         y_values = []
@@ -292,8 +296,6 @@ class Graph_Canvas:
             y = globals.equations.calculate_tip_placement(curv_is, x)
             y_values.append(y)
         
-
-
 
         ############ RUNAR START ####################################
         # Get the tip displacement (last y value)
@@ -367,8 +369,5 @@ class Graph_Canvas:
             bbox=dict(facecolor='white', edgecolor='k', boxstyle='round,pad=0.5')
         )
 
-        # L = helper_functions.convert_decimal_string_to_float(globals.parameters_panel.L_entry.get()) / 1e6
-        # globals.equations.find_t_solution(L, curv_is)
-        
-        # Draw the canvas to display the updates
+        #Draw the canvas to display the updates
         self.graph1.figure.canvas.draw()

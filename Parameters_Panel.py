@@ -68,8 +68,8 @@ class Parameters_Panel:
 
 
             #PIEZO_MATERIAL_NAME VARIABLE
-            self.piezo_material_name = tkinter.StringVar(value="PZT")
-            self.piezo_material_name.trace_add("write", lambda *args, identifier="piezo_material_name": globals.app.variable_updated(identifier))
+            # self.piezo_material_name = tkinter.StringVar(value="PZT")
+            # self.piezo_material_name.trace_add("write", lambda *args, identifier="piezo_material_name": globals.app.update_widgets(identifier))
 
 
             #PIEZO_MATERIAL LABEL
@@ -92,7 +92,7 @@ class Parameters_Panel:
             #PIEZO_MATERIAL entry
             self.piezo_material_entry = customtkinter.CTkEntry(
                 master=parameters_panel_frame,
-                textvariable=self.piezo_material_name,
+                textvariable=globals.piezo_material_name,
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
                 border_width=0.4,
@@ -107,11 +107,6 @@ class Parameters_Panel:
                 pady=(0,0)
             )
             self.piezo_material_entry.bind("<Return>", lambda event, entry=self.piezo_material_entry: self.piezo_material_entry_updated(entry))
-
-
-            #"L [μm]" VARIABLE
-            self.L_value = tkinter.DoubleVar(value=1000)
-            self.L_value.trace_add("write", lambda *args, identifier="L_value": globals.app.variable_updated(identifier))
 
 
             #Create "L μm" label
@@ -133,7 +128,7 @@ class Parameters_Panel:
             #"L [μm]" Entry
             self.L_entry = customtkinter.CTkEntry(
                 master=parameters_panel_frame,
-                textvariable=self.L_value,
+                textvariable=globals.L_value,
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
                 border_width=0.4,
@@ -219,11 +214,6 @@ class Parameters_Panel:
             )
 
             
-            #E_31_F VARIABLE
-            self.e_31_f_value = tkinter.DoubleVar(value=18) 
-            self.e_31_f_value.trace_add("write", lambda *args, identifier="e_31_f_value": globals.app.variable_updated(identifier))
-
-
             #E_31_F LABEL
             self.e_31_f_label = customtkinter.CTkLabel(
                 master=parameters_panel_frame, 
@@ -243,7 +233,7 @@ class Parameters_Panel:
             #e_31_f entry
             self.e_31_f_entry = customtkinter.CTkEntry(
                 master=parameters_panel_frame,
-                textvariable=self.e_31_f_value,
+                textvariable=globals.e_31_f_value,
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
                 border_width=0.4,
@@ -276,12 +266,11 @@ class Parameters_Panel:
 
 
             #VOLT SLIDER
-            self.volt_value = tkinter.DoubleVar(value=0)
             self.volt_slider = customtkinter.CTkSlider(
                 master=parameters_panel_frame, 
                 from_=settings.parameters_panel_slider_range_min, 
                 to=settings.parameters_panel_slider_range_max, 
-                variable=self.volt_value,
+                variable=globals.volt_value,
                 number_of_steps=100,
                 fg_color=settings.parameters_panel_slider_background_color,
                 button_color=settings.parameters_panel_slider_button_color,
@@ -295,13 +284,12 @@ class Parameters_Panel:
                 padx=(0,0),
                 pady=(0,0)
             )
-            self.volt_value.trace_add("write", lambda *args, identifier="volt_value": globals.app.variable_updated(identifier))
-
+            
 
             #VOLT ENTRY
             self.volt_entry = customtkinter.CTkEntry(
                 master=parameters_panel_frame,
-                textvariable=self.volt_value,
+                textvariable=globals.volt_value,
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
                 border_width=0.4,
@@ -316,11 +304,6 @@ class Parameters_Panel:
                 pady=(0,0)
             )
 
-
-            #STRESS_NEUTRAL_SIO2_THICKNESS VARIABLE
-            self.stress_neutral_SiO2_thickness_value = tkinter.DoubleVar(value=0)
-            self.stress_neutral_SiO2_thickness_value.trace_add("write", lambda *args, identifier="stress_neutral_SiO2_thickness_value": globals.app.variable_updated(identifier))
-            
 
             #STRESS_NEUTRAL_SIO2_THICKNESS LABEL
             self.stress_neutral_SiO2_thickness_label1 = customtkinter.CTkLabel(
@@ -338,8 +321,8 @@ class Parameters_Panel:
                 columnspan=3
             )
             self.stress_neutral_SiO2_thickness_label2 = customtkinter.CTkLabel(
-                master=parameters_panel_frame, 
-                textvariable=self.stress_neutral_SiO2_thickness_value,
+                master=parameters_panel_frame,
+                textvariable=globals.t_sol,
                 fg_color=settings.parameters_panel_background_color,
                 text_color=settings.parameters_panel_text_color
             )
@@ -351,11 +334,6 @@ class Parameters_Panel:
                 pady=(0,0),
                 columnspan=3
             )
-            
-
-            #PIEZOELECTRIC_BENDING_MOMENT VARIABLE
-            self.piezoelectric_bending_moment_value = tkinter.DoubleVar(value=0)
-            self.piezoelectric_bending_moment_value.trace_add("write", lambda *args, identifier="piezoelectric_bending_moment_value": globals.app.variable_updated(identifier))
             
 
             #PIEZOELECTRIC_BENDING_MOMENT LABEL
@@ -375,7 +353,7 @@ class Parameters_Panel:
             )
             self.piezoelectric_bending_moment_label2 = customtkinter.CTkLabel(
                 master=parameters_panel_frame, 
-                textvariable=self.piezoelectric_bending_moment_value,
+                textvariable=globals.M_p,
                 fg_color=settings.parameters_panel_background_color,
                 text_color=settings.parameters_panel_text_color
             )
@@ -387,11 +365,6 @@ class Parameters_Panel:
                 pady=(0,0),
                 columnspan=3
             )
-            
-
-            #BLOCKING_FORCE_CANTILEVER VARIABLE
-            self.blocking_force_cantilever_value = tkinter.DoubleVar(value=0)
-            self.blocking_force_cantilever_value.trace_add("write", lambda *args, identifier="blocking_force_cantilever_value": globals.app.variable_updated(identifier))
             
 
             #BLOCKING_FORCE_CANTILEVER LABEL
@@ -411,7 +384,7 @@ class Parameters_Panel:
             )
             self.blocking_force_cantilever_label2 = customtkinter.CTkLabel(
                 master=parameters_panel_frame, 
-                textvariable=self.blocking_force_cantilever_value, 
+                textvariable=globals.blocking_force_cantilever, 
                 fg_color=settings.parameters_panel_background_color,
                 text_color=settings.parameters_panel_text_color
             )
@@ -424,11 +397,6 @@ class Parameters_Panel:
                 pady=(0,0),
             )
 
-
-            #INITIAL_CURVATURE VARIABLE
-            self.initial_curvature_value = tkinter.DoubleVar(value=0)
-            self.initial_curvature_value.trace_add("write", lambda *args, identifier="initial_curvature_value": globals.app.variable_updated(identifier))
-            
 
             #INITIAL_CURVATURE LABEL
             self.initial_curvature_label1 = customtkinter.CTkLabel(
@@ -447,7 +415,7 @@ class Parameters_Panel:
             )
             self.initial_curvature_label2 = customtkinter.CTkLabel(
                 master=parameters_panel_frame, 
-                textvariable=self.initial_curvature_value, 
+                text="Add tkinter variable", 
                 fg_color=settings.parameters_panel_background_color,
                 text_color=settings.parameters_panel_text_color
             )
@@ -460,10 +428,6 @@ class Parameters_Panel:
                 pady=(0,0),
             )
 
-
-            #FINAL_CURVATURE VARIABLE
-            self.final_curvature_value = tkinter.DoubleVar(value=0)
-            self.final_curvature_value.trace_add("write", lambda *args, identifier="final_curvature_value": globals.app.variable_updated(identifier))            
 
             #FINAL_CURVATURE LABEL
             self.final_curvature_label1 = customtkinter.CTkLabel(
@@ -482,7 +446,7 @@ class Parameters_Panel:
             )
             self.final_curvature_label2 = customtkinter.CTkLabel(
                 master=parameters_panel_frame, 
-                textvariable=self.final_curvature_value, 
+                text="Add tkinter variable", 
                 fg_color=settings.parameters_panel_background_color,
                 text_color=settings.parameters_panel_text_color
             )
@@ -504,10 +468,11 @@ class Parameters_Panel:
 
         if(entry_id.get() not in globals.materials):
             messagebox.showerror("Name error", f"Material '{entry_id.get()}' not found.\nMake sure it is spelled correctly")
+            return
 
         #Redraw Layer stack
         globals.layer_stack_canvas.draw_material_stack()
 
         #Redraw graphs
-        globals.graph_canvas.draw_z_tip_is_graph()
+        globals.graph_canvas.draw_graphs()
 

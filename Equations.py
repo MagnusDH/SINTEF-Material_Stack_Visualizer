@@ -1,4 +1,5 @@
 import globals
+import tkinter
 from tkinter import messagebox
 import helper_functions
 from scipy.optimize import fsolve
@@ -8,7 +9,7 @@ from scipy.optimize import fsolve
 class Equations:
     # def __init__(self):
         # print("CLASS EQUATIONS INIT()")
-
+            
 
     def calculate_Zn(self, E:list, t:list, nu:list):
         """
@@ -157,7 +158,10 @@ class Equations:
 
         z_tip_tot = 0.5 * curv_is * L**2
 
-        return z_tip_tot * 1e6
+        #Convert to micrometers
+        z_tip_tot = z_tip_tot * 1e6
+
+        return z_tip_tot
 
 
     def calculate_M_p_cantilever(self, Zp:float, W:float, V_p:float, e_31_f:float):
@@ -220,9 +224,9 @@ class Equations:
 
         Returns the neutralizing thickness in unit: nanometer
         """
-        print("FIND_T_SOLUTION()")
+        # print("FIND_T_SOLUTION()")
 
-        print(L, curv_is)
+        # print(L, curv_is)
 
         # Identify second layer current thickness
         t_guess = float(globals.materials["SiO2"]["Thickness [nm]"]) / 1e9  #Extract scalar from array
@@ -237,6 +241,7 @@ class Equations:
         return t_sol
 
 
+    #ADD EXPLANATION OF FUNCTION
     def calculate_blocking_force(self, E:list, t:list, V:float, e_31_f:float, h_PZT:float, h_Si:float, w:float, L:float):
         '''
         Blocking force calculations
@@ -256,7 +261,9 @@ class Equations:
         num = -3 * d31 * h_Si * (h_PZT + h_Si) * w
         den =  4 * (S11_PZT * h_Si + S11_Si * h_PZT) * L
 
-        return (num/den) * V
+        blocking_force = (num/den) * V
+
+        return blocking_force
 
 
 
