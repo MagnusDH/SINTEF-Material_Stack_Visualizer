@@ -103,7 +103,7 @@ class Layer_Stack_Canvas:
 
     def draw_material_stack(self, *event):
         """Draws the material stack based on the current view"""
-        # print("DRAW MATERIAL STACK()")
+        print("DRAW MATERIAL STACK()")
 
         #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
@@ -121,7 +121,7 @@ class Layer_Stack_Canvas:
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
                 
         #Draw stack based on value in option menu
-        match globals.current_view:
+        match globals.current_view.get():
             case "Stacked":
                 self.draw_material_stack_stacked()
                 self.write_text_on_stack()
@@ -232,7 +232,7 @@ class Layer_Stack_Canvas:
             sum_of_all_materials += rectangle_height
         
         #Prepare first rectangle coordinates based on view
-        match globals.current_view:
+        match globals.current_view.get():
             case "Realistic":
                 rectangle_x0 = self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_realistic_offset_left_side
                 rectangle_y0 = self.visible_canvas_bbox_y0
@@ -475,7 +475,7 @@ class Layer_Stack_Canvas:
         text_height = text_font.metrics()['linespace']
 
         #CREATION OF TEXT, TEXT_BBOX AND LINES
-        match globals.current_view:
+        match globals.current_view.get():
             case "Stacked" | "Realistic" | "Multi":
 
                 #Loop through every material:
@@ -603,7 +603,7 @@ class Layer_Stack_Canvas:
                             
 
         #ADJUSTMENT OF TEXT: LEFT AND RIGHT            
-        match globals.current_view:
+        match globals.current_view.get():
             #Text overlaps with canvas right side
             case "Stacked" | "Realistic" | "Multi":
                 #Loop through all materials
@@ -700,7 +700,7 @@ class Layer_Stack_Canvas:
                     #Get coordinates of matching rectangle
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
-                    match globals.current_view:
+                    match globals.current_view.get():
                         case "Stacked" | "Realistic" | "Multi":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
@@ -743,7 +743,7 @@ class Layer_Stack_Canvas:
                         rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                         
                         #Move the pointer line based on stack view
-                        match globals.current_view:
+                        match globals.current_view.get():
                             case "Stacked" | "Realistic" | "Multi":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                             case "Stepped":
@@ -783,7 +783,7 @@ class Layer_Stack_Canvas:
                     #Get coordinates of matching rectangle
                     rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                     #Move the pointer line based on stack view
-                    match globals.current_view:
+                    match globals.current_view.get():
                         case "Stacked" | "Realistic" | "Multi":
                             self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                         case "Stepped":
@@ -825,7 +825,7 @@ class Layer_Stack_Canvas:
                         rectangle_middle_y = (self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1] + self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[3]) / 2
                         
                         #Move the pointer line based on stack view
-                        match globals.current_view:
+                        match globals.current_view.get():
                             case "Stacked" | "Realistic" | "Multi":
                                 self.layer_stack_canvas.coords(globals.materials[material]["Line_id"], current_text_bbox_x0, current_text_bbox_middle_y, self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[2], rectangle_middle_y)
                             case "Stepped":
@@ -1099,8 +1099,6 @@ class Layer_Stack_Canvas:
                         #if current_indent_text_bbox bottom overlaps with previous indent_text_bbox top
 
 
-
-
                 #Set previous_material to current material
                 previous_material = material
 
@@ -1113,145 +1111,170 @@ class Layer_Stack_Canvas:
         """
         # print("DRAW_ZN_AND_ZP()")
 
-        #Create line from bottom of stack to top of stack (total height line)
-        self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y0), 
-            (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y1), 
-            arrow=tkinter.BOTH, 
-            arrowshape=(10,10,5),
-            width=3,
-            fill="black",
-            tags="arrow_line_both"
-        ) 
+        try:
+            #Check for errors
+            if(len(globals.materials) == 0):
+                raise ValueError("No materials")
 
-        
-        #Find the total height of all materials combined
-        total_height_of_materials = 0
-        for material in globals.materials:
-            total_height_of_materials += globals.materials[material]["Thickness [nm]"].get()
-        
-        #Create text to explain the total height of the stack in "nm"
-        self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y1 + 30,
-            text=f"Total height:\n{total_height_of_materials} nm", 
-            fill=settings.layer_stack_canvas_text_color, 
-            font=(settings.text_font, settings.layer_stack_canvas_text_size),
-            tags="text" 
-        )
+            if(globals.piezo_material_name.get() == ""):
+                raise ValueError("No Piezo material selected")
 
+            #Create line from bottom of stack to top of stack (total height line)
+            self.layer_stack_canvas.create_line(
+                (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y0), 
+                (self.visible_canvas_bbox_x0 + 10, self.visible_canvas_bbox_y1), 
+                arrow=tkinter.BOTH, 
+                arrowshape=(10,10,5),
+                width=3,
+                fill="black",
+                tags="arrow_line_both"
+            ) 
 
-        #Find nanometers needed to represent 1 pixel
-        nm_per_pixel = total_height_of_materials/self.layer_stack_canvas_height
-
-        #Create lists of modulus, thickness and poisson values
-        E = []
-        t = []
-        nu = []
-
-        for material in globals.materials:
-            E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
-            t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
-            nu.append(globals.materials[material]["Poisson"].get())
-
-        #Calculate Zn
-        # Zn = round(globals.equations.calculate_Zn(E, t, nu), 1)
-        Zn = globals.equations.calculate_Zn(E, t, nu)
-
-        #Convert Zn to nanometers
-        Zn = Zn * 1e9
-
-        #Convert Zn to pixels
-        Zn_pixels = Zn / nm_per_pixel
-
-        #Draw the neutral axis line on the canvas
-        self.layer_stack_canvas.create_line(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels,
-            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zn_pixels, 
-            fill="orange",
-            width=4,
-            dash=1,
-            tags="dotted_line"
-        )
-
-        #Draw line from bottom of stack up to neutral axis
-        self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0),
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels), 
-            arrow=tkinter.BOTH, 
-            arrowshape=(10,10,5),
-            fill="black",
-            width = 3,
-            tags="arrow_line_both"
-        ) 
-
-        #Write "neutral axis" text
-        self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zn_pixels,
-            text=f"Neutral axis", 
-            fill="black", 
-            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-            tags="text"
-        )
-
-        #Write "Zn" text
-        self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70,
-            self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - Zn_pixels))/2,
-            text=f"Zn={round(Zn,1)}", 
-            fill="black", 
-            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-            tags="text"
-        )
-
-
-        #Populate a list with thickness values from layer1 up until "PZT" material
-        t_piezo_list = []
-        for material in globals.materials:
-            if(material == globals.parameters_panel.piezo_material_entry.get()):
-                break
-
-            #Convert thickness to nanometers and append it to list 
-            t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
             
-        #Fetch thickness value for Piezo material
-        piezo_thickness = globals.materials[globals.parameters_panel.piezo_material_entry.get()]["Thickness [nm]"].get() / 1e9
-
-        #Calculate Zp
-        Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/ 1e9
-
-        #Convert Zn to nanometers
-        Zp = Zp * 1e9
-
-        #Convert Zp to pixels
-        Zp_pixels = Zp / nm_per_pixel 
-
-        #Draw the Zp line on the canvas
-        self.layer_stack_canvas.create_line(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels,
-            self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zp_pixels, 
-            fill="blue",
-            width=4,
-            dash=1,
-            tags="dotted_line"
-        )
-
-        #Draw line from Zn to Zp
-        self.layer_stack_canvas.create_line(
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels),
-            (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels), 
-            arrow=tkinter.BOTH, 
-            arrowshape=(10,10,5),
-            fill="black",
-            width = 3,
-            tags="arrow_line_both"
-        )
+            #Find the total height of all materials combined
+            total_height_of_materials = 0
+            for material in globals.materials:
+                total_height_of_materials += globals.materials[material]["Thickness [nm]"].get()
+            
+            #Create text to explain the total height of the stack in "nm"
+            self.layer_stack_canvas.create_text(
+                self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y1 + 30,
+                text=f"Total height:\n{total_height_of_materials} nm", 
+                fill=settings.layer_stack_canvas_text_color, 
+                font=(settings.text_font, settings.layer_stack_canvas_text_size),
+                tags="text" 
+            )
 
 
-        #Write "Zp" text
-        self.layer_stack_canvas.create_text(
-            self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
-            text=f"Zp={round(Zp-Zn, 1)}", 
-            fill="black", 
-            font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-            tags="text"
-        )
+            #Find nanometers needed to represent 1 pixel
+            nm_per_pixel = total_height_of_materials/self.layer_stack_canvas_height
+
+            #Create lists of modulus, thickness and poisson values
+            E = []
+            t = []
+            nu = []
+
+            for material in globals.materials:
+                E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
+                t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                nu.append(globals.materials[material]["Poisson"].get())
+
+            #Calculate Zn
+            # Zn = round(globals.equations.calculate_Zn(E, t, nu), 1)
+            Zn = globals.equations.calculate_Zn(E, t, nu)
+            if(isinstance(Zn, Exception)):
+                raise ValueError(f"Zn could not be calculated.\nerror:'{Zn}'")
+
+            #Convert Zn to nanometers
+            Zn = Zn * 1e9
+
+            #Convert Zn to pixels
+            Zn_pixels = Zn / nm_per_pixel
+
+            #Draw the neutral axis line on the canvas
+            self.layer_stack_canvas.create_line(
+                self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels,
+                self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zn_pixels, 
+                fill="orange",
+                width=4,
+                dash=1,
+                tags="dotted_line"
+            )
+
+            #Draw line from bottom of stack up to neutral axis
+            self.layer_stack_canvas.create_line(
+                (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0),
+                (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels), 
+                arrow=tkinter.BOTH, 
+                arrowshape=(10,10,5),
+                fill="black",
+                width = 3,
+                tags="arrow_line_both"
+            ) 
+
+            #Write "neutral axis" text
+            self.layer_stack_canvas.create_text(
+                self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zn_pixels,
+                text=f"Neutral axis", 
+                fill="black", 
+                font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+                tags="text"
+            )
+
+            #Write "Zn" text
+            self.layer_stack_canvas.create_text(
+                self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70,
+                self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - (self.visible_canvas_bbox_y0 - Zn_pixels))/2,
+                text=f"Zn={round(Zn,1)}", 
+                fill="black", 
+                font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+                tags="text"
+            )
+
+
+            #Populate a list with thickness values from layer1 up until "PZT" material
+            t_piezo_list = []
+            for material in globals.materials:
+                # if(material == globals.parameters_panel.piezo_material_entry.get()):
+                if(material == globals.piezo_material_name.get()):
+                    break
+
+                #Convert thickness to nanometers and append it to list 
+                t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                
+            #Fetch thickness value for Piezo material
+            # piezo_thickness = globals.materials[globals.parameters_panel.piezo_material_entry.get()]["Thickness [nm]"].get() / 1e9
+            piezo_thickness = globals.materials[globals.piezo_material_name.get()]["Thickness [nm]"].get() / 1e9
+
+
+            #Calculate Zp
+            Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/ 1e9
+            if(isinstance(Zp, Exception)):
+                raise ValueError(f"Zp could not be calculated.\nerror:'{Zp}'")
+
+
+            #Convert Zn to nanometers
+            Zp = Zp * 1e9
+
+            #Convert Zp to pixels
+            Zp_pixels = Zp / nm_per_pixel 
+
+            #Draw the Zp line on the canvas
+            self.layer_stack_canvas.create_line(
+                self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels,
+                self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zp_pixels, 
+                fill="blue",
+                width=4,
+                dash=1,
+                tags="dotted_line"
+            )
+
+            #Draw line from Zn to Zp
+            self.layer_stack_canvas.create_line(
+                (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels),
+                (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels), 
+                arrow=tkinter.BOTH, 
+                arrowshape=(10,10,5),
+                fill="black",
+                width = 3,
+                tags="arrow_line_both"
+            )
+
+
+            #Write "Zp" text
+            self.layer_stack_canvas.create_text(
+                self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
+                text=f"Zp={round(Zp-Zn, 1)}", 
+                fill="black", 
+                font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+                tags="text"
+            )
+
+        except Exception as error:
+            self.layer_stack_canvas.create_text(
+                self.visible_canvas_bbox_x1/2, self.visible_canvas_bbox_y0/2,
+                text=f"Could not draw Zn, neutral axis and Zp\n{error}", 
+                fill="red", 
+                font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+            )
+            return

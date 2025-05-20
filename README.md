@@ -110,22 +110,12 @@
     -V_p is a value in "volt" and needs no conversion
     -e_31_f is a value in "c/m2" and needs no conversion
 
-
-
-# HOW TO CREATE AN EXECUTABLE FILE:
-    -Navigate to the folder containing the python program
-    -Run the following command: "python -m PyInstaller --onefile program_name.py"
-
-
 # TO DO
+    -Gå gjennom "update_widgets()" og sørg for at alt blir oppdatert. Viktig å sjekke hva som skjer når materialer blir modifisert, lagt til, slettet eller flyttet. Også viktig at comboboxes i parameters_panel blir oppdatert riktig i alle tilfeller 
+
     -Modify_materials() er full av bugs
-
-    -Find a smart way to render parameters_panel equation labels
-
     -Fiks størrelse på svg exports
-    
     -export stack and graph in one button   
-
     -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?
     -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert
     -Check the width of a materials->name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas

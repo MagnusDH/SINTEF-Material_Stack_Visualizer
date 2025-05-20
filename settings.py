@@ -100,10 +100,18 @@ parameters_panel_headline_size = 15
 parameters_panel_headline_font = "Arial"
 parameters_panel_headline_weight = "bold"
 
-
 parameters_panel_entry_background_color = "#284154"
 parameters_panel_entry_border_color = "#B1E0FF"
 parameters_panel_entry_text_color = "#B1E0FF"
+
+parameters_panel_combobox_background_color = "#284154"
+parameters_panel_combobox_border_color = "#B1E0FF"
+parameters_panel_combobox_text_color = "#B1E0FF"
+parameters_panel_combobox_button_color = "#85A8BF"
+parameters_panel_combobox_button_hover_color = "#6d8b9e"
+parameters_panel_combobox_dropdown_fg_color = "#284154"
+parameters_panel_combobox_dropdown_hover_color= "#1a2b38"
+parameters_panel_combobox_dropdown_text_color = "#B1E0FF"
 
 parameters_panel_slider_range_min = 0
 parameters_panel_slider_range_max = 100
@@ -160,7 +168,7 @@ canvas_control_panel_dropdown_hover_color = "#85A8BF"
 canvas_control_panel_text_size = 12
 
 
-#GRAPH_Canvas
+#GRAPH_CANVAS
 graph_resolution = 75                  #resolution (100 = 100% original size)
 graph_canvas_padding_top = 4
 graph_canvas_padding_bottom = 2

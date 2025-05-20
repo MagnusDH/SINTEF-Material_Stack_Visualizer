@@ -55,7 +55,7 @@ class Material_Adjustment_Panel:
 
         row_counter = 1
         #Create a different layout based on the "view"
-        match globals.current_view:
+        match globals.current_view.get():
             case "Stacked" | "Realistic" | "Multi":
                 #If checkboxes has been made, disable it
                 for material in globals.materials:
@@ -558,7 +558,7 @@ class Material_Adjustment_Panel:
     #     print("MATERIAL_ENTRY_UPDATED()")
 
         #Update different values in self.materials based on option menu value
-        # match globals.current_view:
+        # match globals.current_view.get():
         #     case "Stacked" | "Realistic":
         #         #Find material that corresponds to "entry"
         #         for material in globals.materials:
@@ -633,7 +633,7 @@ class Material_Adjustment_Panel:
         ################################################################################################
             
         #Update different values in self.materials based on option value
-        # match globals.current_view:
+        # match globals.current_view.get():
         #     case "Stacked"|"Realistic":
         #         #Update the thickness value in self.materials
         #         globals.materials[identifier]["Thickness [nm]"] = value
@@ -725,7 +725,8 @@ class Material_Adjustment_Panel:
 
         #If graphs has been created, redraw them
         if(globals.graph_canvas != None):
-            globals.graph_canvas.draw_graphs()
+            globals.graph_canvas.draw_z_tip_is_graph()
+            globals.graph_canvas.draw_stoney_graph()
         
 
     def move_material(self, chosen_material, up_or_down):
@@ -765,12 +766,4 @@ class Material_Adjustment_Panel:
         #Sort the keys in globals.materials after the "layer" value of each material
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
 
-        #Adjust the widgets in material_adjustment_panel_frame
-        self.create_material_adjustment_panel()
-
-        #Redraw the material stack
-        globals.layer_stack_canvas.draw_material_stack()
-
-        #If graphs has been created, redraw them
-        if(globals.graph_canvas != None):
-            globals.graph_canvas.draw_graphs()
+        globals.app.update_widgets("material_moved")

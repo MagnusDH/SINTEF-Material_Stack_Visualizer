@@ -19,6 +19,8 @@ from Equations import Equations
 import traceback
 import helper_functions
 
+
+
 #Main application class
 class App:
     def __init__(self, program_window):
@@ -31,12 +33,15 @@ class App:
         if(os.path.isfile("Materials.xlsx")):
             self.load_materials_from_excel()
         
+        #Initialize global variables
+        globals.initialize_globals(self.program_window)
+
         #Class for easy access to calculation of important equations
         globals.equations = Equations()
 
         #Set correct row/column configuration and widget layout based on the "view"
         self.set_layout()
-
+    
     
     def load_materials_from_excel(self):
         """Reads the excel-file in the folder and populates the self.materials dictionary with info about each material"""
@@ -296,20 +301,20 @@ class App:
                     
                     #ADD TRACES TO ALL VARIABLES
                     # Trace changes to trigger canvas redraw
-                    row["material"].trace_add("write", lambda *args, identifier="Name": self.update_widgets(identifier))
-                    row["layer"].trace_add("write", lambda *args, identifier="Layer": self.update_widgets(identifier))
-                    row["thickness [nm]"].trace_add("write", lambda *args, identifier="Thickness [nm]": self.update_widgets(identifier))
-                    row["unit"].trace_add("write", lambda *args, identifier="Unit": self.update_widgets(identifier))
-                    row["indent [nm]"].trace_add("write", lambda *args, identifier="Indent [nm]": self.update_widgets(identifier))
-                    row["color"].trace_add("write", lambda *args, identifier="Color": self.update_widgets(identifier))
-                    row["status"].trace_add("write", lambda *args, identifier="Status": self.update_widgets(identifier))
-                    row["modulus [gpa]"].trace_add("write", lambda *args, identifier="Modulus [GPa]": self.update_widgets(identifier))
-                    row["cte [ppm/deg]"].trace_add("write", lambda *args, identifier="CTE [ppm/deg]": self.update_widgets(identifier))
-                    row["density [kg/m3]"].trace_add("write", lambda *args, identifier="Density [kg/m3]": self.update_widgets(identifier))
-                    row["stress_x [mpa]"].trace_add("write", lambda *args, identifier="Stress_x [MPa]": self.update_widgets(identifier))
-                    row["poisson"].trace_add("write", lambda *args, identifier="Poisson": self.update_widgets(identifier))
-                    row["r0"].trace_add("write", lambda *args, identifier="R0": self.update_widgets(identifier))
-                    row["r"].trace_add("write", lambda *args, identifier="R": self.update_widgets(identifier))
+                    row["material"].trace_add("write", lambda *args, identifier="material_name_updated": self.update_widgets(identifier))
+                    # row["layer"].trace_add("write", lambda *args, identifier="material_layer_updated": self.update_widgets(identifier))
+                    row["thickness [nm]"].trace_add("write", lambda *args, identifier="material_thickness_updated": self.update_widgets(identifier))
+                    # row["unit"].trace_add("write", lambda *args, identifier="material_unit_updated": self.update_widgets(identifier))
+                    row["indent [nm]"].trace_add("write", lambda *args, identifier="material_indent_updated": self.update_widgets(identifier))
+                    row["color"].trace_add("write", lambda *args, identifier="material_color_updated": self.update_widgets(identifier))
+                    row["status"].trace_add("write", lambda *args, identifier="material_status_updated": self.update_widgets(identifier))
+                    row["modulus [gpa]"].trace_add("write", lambda *args, identifier="material_modulus_updated": self.update_widgets(identifier))
+                    row["cte [ppm/deg]"].trace_add("write", lambda *args, identifier="material_cte_updated": self.update_widgets(identifier))
+                    row["density [kg/m3]"].trace_add("write", lambda *args, identifier="material_density_updated": self.update_widgets(identifier))
+                    row["stress_x [mpa]"].trace_add("write", lambda *args, identifier="material_stress_x_updated": self.update_widgets(identifier))
+                    row["poisson"].trace_add("write", lambda *args, identifier="material_poisson_updated": self.update_widgets(identifier))
+                    row["r0"].trace_add("write", lambda *args, identifier="material_R0_updated": self.update_widgets(identifier))
+                    row["r"].trace_add("write", lambda *args, identifier="material_R_updated": self.update_widgets(identifier))
 
                     
                     #Create an "info" dictionary to contain all info from excel-file
@@ -361,118 +366,225 @@ class App:
 
     def update_widgets(self, identifier:str, *args):
         """
-        Updates widgets based on which tkinter.variable name is provided to the function\n
+        Updates widgets based on which identifier word is provided to the function\n
 
         PARAMETERS:
-            identifier: name of updated variable
+            identifier: name of updated variable or performed action
         """
-        # print("UPDATE_WIDGETS()")
+        print("UPDATE_WIDGETS()")
 
         match identifier:
-            case "Name":
+            case "all":
+                print("all updated")
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+                
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+                
+            case "current_view_updated":
+                print("current view_updated")
+                self.set_layout()
+            
+            case "material_added":
+                print("Material_added")
+
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+                
+                #Update labels
+
+            case "material_deleted":
+                print("Material_deleted")
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+                
+                #Update labels
+
+            case "material_modified":
+                print("Material_modified")
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+
+                #Update labels
+
+            case "material_moved":
+                print("material_moved")
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+
+            case "material_name_updated":
                 print("name variable updated")
 
-            case "Thickness [nm]":
+            case "material_thickness_updated":
                 print("Thickness value updated")
-                globals.layer_stack_canvas.draw_material_stack()
-                globals.graph_canvas.draw_graphs()
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
 
                 #Update equation labels in parameters panel
                 #update "Blocking force"
 
-            case "Layer":
+            case "material_layer_updated":
                 print("Layer variable is updated")
-                #Redraw stack
-                #Redraw graph
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+                
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+
                 #Update equation labels
             
-            case "Indent [nm]":
+            case "material_indent_updated":
                 print("Indent variable is updated")
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
 
-            case "Unit":
+            case "material_unit_updated":
                 print("Unit variable is updated")
                 
-            case "Color":
+            case "material_color_updated":
                 print("Color variable is updated")
                 
-            case "Status":                             
+            case "material_status_updated":                             
                 print("Status variable is updated")
             
-            case "Modulus [GPa]":
+            case "material_modulus_updated":
                 print("Modulus variable is updated")
                 
-            case "CTE [ppm/deg]":
-                print("CTE variable is updated")
+            case "material_cte_updated":
+                print("CTE [ppm/deg] variable is updated")
                 
-            case "Density [kg/m3]":
-                print("Density variable is updated")
+            case "material_density_updated":
+                print("Density [kg/m3] variable is updated")
                 
-            case "Stress_x [MPa]":
-                print("Stress_x variable is updated")
+            case "material_stress_x_updated":
+                print("Stress_x_[MPa] variable is updated")
                 
-            case "Poisson":
+            case "material_poisson_updated":
                 print("Poisson variable is updated")
             
-            case "R0":
+            case "material_R0_updated":
                 print("R0 variable is updated")
             
-            case "R":
+            case "material_R_updated":
                 print("R variable is updated")
             
-            case "piezo_material_name":
-                print("piezo_material_name variable is updated")
-                globals.layer_stack_canvas.draw_material_stack()
-                globals.graph_canvas.draw_graphs()
-                
+            case "piezo_material_updated":
+                print("piezo_material variable is updated")
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
+
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+
                 #update "Blocking force"
 
-            case "L_value":
+            case "L_value_updated":
                 print("L_value variable is updated")
-                globals.graph_canvas.draw_graphs()
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+
                 #update "Blocking force"
 
-            case "e_31_f_value":
+            case "e_31_f_value_updated":
                 print("e_31_f_value variable is updated")
-                globals.graph_canvas.draw_graphs()
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
 
-                #Update graphs
                 #update "Blocking force"
             
-            case "volt_value":
+            case "volt_value_updated":
                 print("volt_value variable is updated")
-                globals.graph_canvas.draw_graphs()
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+
 
                 #update "Blocking force"
 
-            case "stress_neutral_SiO2_thickness_value":
+            case "stress_neutral_SiO2_thickness_value_updated":
                 print("stress_neutral_SiO2_thickness_value updated")
 
-            case "piezoelectric_bending_moment_value":
+            case "piezoelectric_bending_moment_value_updated":
                 print("piezoelectric_bending_moment_value updated")
 
-            case "blocking_force_cantilever":
+            case "blocking_force_cantilever_updated":
                 print("blocking_force_cantilever_value variable is updated")
             
-            case "initial_curvature_value":
+            case "initial_curvature_value_updated":
                 print("initial_curvature_value updated")
 
-            case "final_curvature_value":
+            case "final_curvature_value_updated":
                 print("final_curvature_value updated")
+            
+            case "stoney_layer1_updated":
+                print("stoney_layer1 updated")
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_stoney_graph()
+            
+            case "stoney_layer2_updated":
+                print("stoney_layer2 updated")
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_stoney_graph()
+
 
             case _:
                 print("There is not a match-case for this variable:", identifier)
-
-
-
-        #When a material is deleted:
-            #Redraw stack
-            #Redraw graph
-            #Update equation labels
-
-        #When a material is modified:
-            #Redraw stack
-            #Redraw graph
-            #Update equation labels
 
 
     def set_layout(self):
@@ -497,7 +609,7 @@ class App:
             self.program_window.rowconfigure(i, weight=0, minsize=0, uniform="reset")
 
         #Set different layouts based on the current_view
-        match globals.current_view:
+        match globals.current_view.get():
             case "Stacked" | "Realistic":
                 self.program_window.update()
                 #Change the layout of the program_window to only two columns
@@ -641,10 +753,13 @@ class App:
                 if(globals.graph_canvas == None):
                     globals.graph_canvas = Graph_Canvas(self.program_window, 0, 2)
                     globals.graph_canvas.graph_translator.get_tk_widget().grid(rowspan=2)
-                    globals.graph_canvas.draw_graphs()
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
+
                 else:
                     globals.graph_canvas.graph_translator.get_tk_widget().grid(row=0, column=2, rowspan=2)
-                    globals.graph_canvas.draw_graphs()
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
 
 
                 #GRAPH_CONTROL_PANEL
@@ -668,8 +783,12 @@ class App:
     
     
     def is_valid_color(self, color:str):
-        """Returns True if given color string is a valid color. Return False if invalid"""
+        """
+        Returns True if given color string is a valid color\n
+        Returns False otherwise
+        """
         # print("IS_VALID_COLOR()")
+        
         #Check if color is accepted by tkinter
         try:
             self.program_window.winfo_rgb(color)
@@ -698,7 +817,7 @@ class App:
         #Loop through the dictionary
         for material in globals.materials:
             #set material->layer value to be layer_counter
-            globals.materials[material]["Layer"] = tkinter.IntVar(value=layer_counter)
+            globals.materials[material]["Layer"].set(layer_counter)
             #increment layer_counter
             layer_counter += 1
 
@@ -772,9 +891,6 @@ if __name__ == "__main__":
     #Create keyboard shortcuts for the main window
     program_window.bind("<Escape>", lambda event: program_window.destroy())
     
-    #Initialize global variables
-    globals.initialize_globals(program_window)
-
     #Create an instance of App and run it
     globals.app = App(program_window)
 
@@ -782,6 +898,12 @@ if __name__ == "__main__":
     globals.current_program_window_height = program_window.winfo_height()
     globals.current_program_window_width = program_window.winfo_width()
     program_window.bind("<Configure>", lambda event: globals.app.program_window_resized(event))
+
+    #Start the main loop of the program
+    program_window.mainloop()
+
+
+
 
     #CODE TO CHANGE TITLE BAR COLOR
     # import ctypes
@@ -794,127 +916,3 @@ if __name__ == "__main__":
     #     ctypes.byref(ctypes.c_int(color_bgr)), 4
     # )
     #END TITLE BAR CODE#
-
-
-    #Start the main loop of the program
-    program_window.mainloop()
-
-
-
-
-
-
-###################COMMENTED CODE FOR CREATING A SCROLLABLE MAIN_FRAME#####################
-
-#Create background_canvas and main_frame where every widgets is placed
-# self.main_frame, self.background_canvas = self.create_scrollable_frame(self.program_window)
-
-# """
-# -Creates a scrollable frame on the window given in the class
-# -(To be able to do this a "canvas" is made and a "frame" is placed on top of the canvas. 
-# -(Then scrollbars are placed in the main window which controls scrolling on the canvas)
-# """
-# def create_scrollable_frame(self, window):
-    #     #print("CREATE_SCROLLABLE_FRAME()")
-    #     #Create a background canvas (Scrollbars can only be used with a canvas)
-    #     background_canvas = customtkinter.CTkCanvas(
-    #         master=window,
-    #         height=window.winfo_height()-settings.scrollbar_width-5,
-    #         width=window.winfo_width()-settings.scrollbar_width-5,
-    #         bg=settings.background_canvas_background_color,
-    #         highlightthickness=0
-    #     )
-    #     background_canvas.grid(
-    #         row=0, 
-    #         column=0, 
-    #         sticky="nsew",
-    #     )
-
-    #     #Prevent the background_canvas to automaticly resize itself to the size of the children widgets inside it
-    #     background_canvas.grid_propagate(False)
-
-    #     #Create a frame inside the canvas to hold all the widgets
-    #     main_frame = customtkinter.CTkFrame(
-    #         master=background_canvas, 
-    #         width=max(settings.main_frame_minimum_width*0.8, window.winfo_width()*0.8 - settings.scrollbar_width),     #Has to be 80% to get correct size for some reason
-    #         height=max(settings.main_frame_minimum_height*0.8, window.winfo_height()*0.8 - settings.scrollbar_width),   #Has to be 80% to get correct size for some reason
-    #         fg_color=settings.main_frame_background_color,
-    #     )
-    #     main_frame.grid(
-    #         row=0,
-    #         column=0
-    #     )
-
-    #     #Prevent the main_frame window to downsize itself to fit widgets placed inside
-    #     main_frame.grid_propagate(False)
-
-    #     #Add main_frame to a window in the background_canvas to enable scrolling
-    #     background_canvas.create_window(
-    #         (0, 0), 
-    #         window=main_frame, 
-    #         anchor="nw"
-    #     )
-
-    #     ####### UNNECESSARY STUFF? ##########
-
-    #     #Configure the main_frame to expand with the background_canvas
-    #     # main_frame.bind("<Configure>", self.on_frame_configure(background_canvas))
-
-    #     # background_canvas.configure(scrollregion=background_canvas.bbox("all"))
-
-    #     # background_canvas.configure(
-    #     #     scrollregion=(0, 0, max(500, background_canvas.winfo_width()), max(500, background_canvas.winfo_height()))
-    #     # )
-    #     ####################################
-
-        
-
-    #     #Add scrollbars to the background_canvas
-    #     canvas_vertical_scrollbar = customtkinter.CTkScrollbar(
-    #         master=window,
-    #         orientation="vertical",
-    #         width=settings.scrollbar_width,
-    #         border_spacing=settings.scrollbar_border_spacing,
-    #         fg_color=settings.scrollbar_background_color,
-    #         command=background_canvas.yview
-    #     )
-    #     canvas_vertical_scrollbar.grid(
-    #         row=0, 
-    #         column=1,
-    #         sticky="ns",
-    #     )
-
-    #     canvas_horizontal_scrollbar = customtkinter.CTkScrollbar(
-    #         master=window,
-    #         orientation="horizontal", 
-    #         width=settings.scrollbar_width,
-    #         border_spacing=settings.scrollbar_border_spacing,
-    #         fg_color=settings.scrollbar_background_color,
-    #         command=background_canvas.xview
-    #     )
-    #     canvas_horizontal_scrollbar.grid(
-    #         row=1, 
-    #         column=0, 
-    #         sticky="ew"
-    #     )
-
-    #     #Set the scrollregion for the scrollbars (x0,y0 to x1,y1) and activate the scrollbars
-    #     background_canvas.configure(
-    #         scrollregion=(0, 0, settings.main_frame_minimum_width, settings.main_frame_minimum_height),
-    #         yscrollcommand=canvas_vertical_scrollbar.set, 
-    #         xscrollcommand=canvas_horizontal_scrollbar.set
-    #     )
-
-    #     return main_frame, background_canvas
-
-
-
-#
-# """Dynamically adjusts the scrollable area of the background_canvas
-# Ensures that the scrollbars correctly reflect the size of the content inside the canvas
-# """
-# def on_frame_configure(self, canvas, event=None):
-    #     #Update the scroll region of the canvas to encompass the entire frame
-    #     canvas.configure(scrollregion=canvas.bbox("all"))
-
-###################END COMMENTED CODE FOR CREATING A SCROLLABLE MAIN_FRAME#####################

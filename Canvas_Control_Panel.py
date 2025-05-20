@@ -129,6 +129,7 @@ class Canvas_Control_Panel:
         self.option_menu = customtkinter.CTkOptionMenu(
             master=canvas_control_panel_frame, 
             values=["Stacked", "Realistic", "Stepped", "Multi"],
+            variable=globals.current_view,
             font=(settings.text_font, settings.canvas_control_panel_text_size),
             bg_color=settings.canvas_control_panel_background_color,
             fg_color=settings.canvas_control_panel_dropdown_color,
@@ -138,7 +139,7 @@ class Canvas_Control_Panel:
             dropdown_text_color=settings.canvas_control_panel_dropdown_text_color,
             dropdown_fg_color=settings.canvas_control_panel_dropdown_background_color,
             dropdown_hover_color=settings.canvas_control_panel_dropdown_hover_color,
-            command=self.switch_layout
+            # command=self.switch_layout
         )
         self.option_menu.grid(
             row=1, 
@@ -148,7 +149,6 @@ class Canvas_Control_Panel:
             pady=(5,5)
         )
 
-        self.option_menu.set(globals.current_view)
 
         return canvas_control_panel_frame
 
@@ -176,11 +176,11 @@ class Canvas_Control_Panel:
 
 
     #???????????????????????????????????????????
-    def switch_layout(self, *event):
-        """?????????????????????????"""
-        globals.current_view = self.option_menu.get()
+    # def switch_layout(self, *event):
+    #     """?????????????????????????"""
+    #     globals.current_view.set(self.option_menu.get())
         
-        globals.app.set_layout()
+    #     globals.app.set_layout()
 
 
     def choose_stack_export(self, *event):
@@ -207,7 +207,7 @@ class Canvas_Control_Panel:
         all_items = globals.layer_stack_canvas.layer_stack_canvas.find_all()
 
         #Return if there are no items on canvas
-        if(len(all_items) == 0):
+        if(len(all_items)-1 == 0):
             return
 
         #Create folders and filenames
@@ -216,12 +216,12 @@ class Canvas_Control_Panel:
             os.makedirs(main_folder)
 
         #Create sub_folder if it does not already exist
-        sub_folder = globals.current_view
+        sub_folder = globals.current_view.get()
         if not os.path.exists(f"{main_folder}/{sub_folder}"):
             os.makedirs(f"{main_folder}/{sub_folder}")
         
         #Create path for file to be saved in
-        filename = f"Material_Stack_{globals.current_view}.svg"
+        filename = f"Material_Stack_{globals.current_view.get()}.svg"
         file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
 
         #Open the file for writing
@@ -262,6 +262,12 @@ class Canvas_Control_Panel:
         """Exports every layer of the stack with text and arrows as SVG-file"""     
         # print("EXPORT_LAYERS_AS_SVG()")
 
+        all_items = globals.layer_stack_canvas.layer_stack_canvas.find_all()
+
+        #Return if there are no items on canvas
+        if(len(all_items)-1 == 0):
+            return
+
         #Create folders and filenames
         main_folder = "exports"
         #Create the folder if it doesn't exist
@@ -269,7 +275,7 @@ class Canvas_Control_Panel:
             os.makedirs(main_folder)
 
         #Create sub_folder if it does not already exist
-        sub_folder = globals.current_view
+        sub_folder = globals.current_view.get()
         if not os.path.exists(f"{main_folder}/{sub_folder}"):
             os.makedirs(f"{main_folder}/{sub_folder}")
         
@@ -284,7 +290,7 @@ class Canvas_Control_Panel:
             if(globals.materials[material]["Rectangle_id"] != None):
 
                 #Create a name for the SVG file for the current layer
-                # filename = f"{layer_counter}materials_{material}_{globals.current_view}.svg"
+                # filename = f"{layer_counter}materials_{material}_{globals.current_view.get()}.svg"
                 filename = f"{layer_counter}materials_{list(globals.materials)[0]}-{material}.svg"
                 
 
@@ -338,7 +344,7 @@ class Canvas_Control_Panel:
                     #Create SVG-element for arrow line pointing from box to rectangle
                     if(globals.materials[material]["Line_id"] != None):
                         #Line must be drawn from the right side of stack to left side of text
-                        match globals.current_view:
+                        match globals.current_view.get():
                             case "Stacked" | "Realistic" | "Multi":
                                 line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Line_id"])
                                 #Construct an SVG <line> element for arrows
@@ -460,7 +466,7 @@ class Canvas_Control_Panel:
         all_items = globals.layer_stack_canvas.layer_stack_canvas.find_all()
 
         #Return if there are no items on canvas
-        if(len(all_items) == 0):
+        if(len(all_items)-1 == 0):
             return
 
         #Create folders and filenames
@@ -469,12 +475,12 @@ class Canvas_Control_Panel:
             os.makedirs(main_folder)
 
         #Create sub_folder if it does not already exist
-        sub_folder = globals.current_view
+        sub_folder = globals.current_view.get()
         if not os.path.exists(f"{main_folder}/{sub_folder}"):
             os.makedirs(f"{main_folder}/{sub_folder}")
         
         #Create path for file to be saved in
-        filename = f"Full_Stack_{globals.current_view}.svg"
+        filename = f"Full_Stack_{globals.current_view.get()}.svg"
         file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
 
         #Open the file for writing

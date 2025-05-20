@@ -3,9 +3,6 @@ import tkinter
 #The main dictionary where ALL materials and info about each material is stored
 materials = {}
 
-#The start view for the program
-current_view = "Multi"
-
 #Reference to all classes
 app = None
 material_adjustment_panel = None
@@ -26,22 +23,30 @@ def initialize_globals(root_window):
     Creates variables that are used globaly in the program
     """
     # print("INITIALIZE_GLOBALS()")
-    
+
+    global current_view
+    current_view = tkinter.StringVar(value="Multi")
+    current_view.trace_add("write", lambda *args, identifier="current_view_updated": app.update_widgets(identifier))
+
     global piezo_material_name
-    piezo_material_name = tkinter.StringVar(value="PZT")
-    piezo_material_name.trace_add("write", lambda *args, identifier="piezo_material_name": app.update_widgets(identifier))
+    piezo_material_name = tkinter.StringVar(value="")
+    piezo_material_name.trace_add("write", lambda *args, identifier="piezo_material_updated": app.update_widgets(identifier))
+
+    if(materials and len(materials) >= 1):
+        key_list = list(materials)
+        piezo_material_name.set(key_list[0])
 
     global L_value
     L_value = tkinter.DoubleVar(value=1000)
-    L_value.trace_add("write", lambda *args, identifier="L_value": app.update_widgets(identifier))
+    L_value.trace_add("write", lambda *args, identifier="L_value_updated": app.update_widgets(identifier))
     
     global e_31_f_value
     e_31_f_value = tkinter.DoubleVar(value=18)
-    e_31_f_value.trace_add("write", lambda *args, identifier="e_31_f_value": app.update_widgets(identifier))
+    e_31_f_value.trace_add("write", lambda *args, identifier="e_31_f_value_updated": app.update_widgets(identifier))
 
     global volt_value
     volt_value = tkinter.DoubleVar(value=0)
-    volt_value.trace_add("write", lambda *args, identifier="volt_value": app.update_widgets(identifier))
+    volt_value.trace_add("write", lambda *args, identifier="volt_value_updated": app.update_widgets(identifier))
 
     # global stress_neutral_SiO2_thickness_value
     # stress_neutral_SiO2_thickness_value = tkinter.DoubleVar(value=0)
@@ -53,7 +58,7 @@ def initialize_globals(root_window):
     
     global blocking_force_cantilever
     blocking_force_cantilever = tkinter.DoubleVar(value=0)
-    blocking_force_cantilever.trace_add("write", lambda *args, identifier="blocking_force_cantilever": app.update_widgets(identifier))
+    blocking_force_cantilever.trace_add("write", lambda *args, identifier="blocking_force_cantilever_updated": app.update_widgets(identifier))
     
     # global initial_curvature_value
     # initial_curvature_value = tkinter.DoubleVar(value=0)
@@ -102,3 +107,18 @@ def initialize_globals(root_window):
     global t_sol
     t_sol = tkinter.DoubleVar(value=0)
     t_sol.trace_add("write", lambda *args, identifier="t_sol": app.update_widgets(identifier))
+
+    global stoney_layer1
+    global stoney_layer2
+    stoney_layer1 = tkinter.StringVar(value="")
+    stoney_layer2 = tkinter.StringVar(value="")
+
+    stoney_layer1.trace_add("write", lambda *args, identifier="stoney_layer1_updated": app.update_widgets(identifier))
+    stoney_layer2.trace_add("write", lambda *args, identifier="stoney_layer2_updated": app.update_widgets(identifier))
+
+    #IF globals.materials is not empty
+    if(materials and len(materials) >= 2):
+        key_list = list(materials)
+        stoney_layer1.set(key_list[0])
+        stoney_layer2.set(key_list[1])
+
