@@ -111,7 +111,7 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Gå gjennom "update_widgets()" og sørg for at alt blir oppdatert. Viktig å sjekke hva som skjer når materialer blir modifisert, lagt til, slettet eller flyttet. Også viktig at comboboxes i parameters_panel blir oppdatert riktig i alle tilfeller 
+    -Slett "status" funksjon på materialer
 
     -Modify_materials() er full av bugs
     -Fiks størrelse på svg exports
@@ -127,6 +127,9 @@
 
 # QUESTIONS:
     -Ta bort "unit" i excel ark? det gir ikke mening å ha lengre
+    -I parameters_panel hvor equations blir oppdatert: finn en løsning for hvordan finne "SiO2_thickness" på en sikker måte
+    -I parameters_panel hvor equations blir oppdatert: hva er riktig (round) verdi for M_p?
+    -hvordan si ifra at "piezo_material" ikke er valgt når stress_neutral_SiO2_thickness blir regnet ut? I parameters_panel
 
     
 # BUGS:

@@ -371,7 +371,7 @@ class App:
         PARAMETERS:
             identifier: name of updated variable or performed action
         """
-        print("UPDATE_WIDGETS()")
+        # print("UPDATE_WIDGETS()")
 
         match identifier:
             case "all":
@@ -394,7 +394,7 @@ class App:
                 self.set_layout()
             
             case "material_added":
-                print("Material_added")
+                print("material_added")
 
                 if(globals.material_adjustment_panel != None):
                     globals.material_adjustment_panel.create_material_adjustment_panel()
@@ -408,16 +408,16 @@ class App:
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_z_tip_is_graph()
                     globals.graph_canvas.draw_stoney_graph()
-                
-                #Update labels
-
+            
             case "material_deleted":
-                print("Material_deleted")
+                # print("material_deleted")
                 if(globals.material_adjustment_panel != None):
                     globals.material_adjustment_panel.create_material_adjustment_panel()
 
                 if(globals.parameters_panel != None):
                     globals.parameters_panel.create_parameters_panel()
+
+                    #REMOVE THE CURRENT VALUE
 
                 if(globals.layer_stack_canvas != None):
                     globals.layer_stack_canvas.draw_material_stack()
@@ -426,8 +426,6 @@ class App:
                     globals.graph_canvas.draw_z_tip_is_graph()
                     globals.graph_canvas.draw_stoney_graph()
                 
-                #Update labels
-
             case "material_modified":
                 print("Material_modified")
                 if(globals.material_adjustment_panel != None):
@@ -442,8 +440,6 @@ class App:
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_z_tip_is_graph()
                     globals.graph_canvas.draw_stoney_graph()
-
-                #Update labels
 
             case "material_moved":
                 print("material_moved")
@@ -462,9 +458,18 @@ class App:
 
             case "material_name_updated":
                 print("name variable updated")
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
 
             case "material_thickness_updated":
                 print("Thickness value updated")
+
                 if(globals.layer_stack_canvas != None):
                     globals.layer_stack_canvas.draw_material_stack()
 
@@ -472,11 +477,14 @@ class App:
                     globals.graph_canvas.draw_z_tip_is_graph()
                     globals.graph_canvas.draw_stoney_graph()
 
-                #Update equation labels in parameters panel
-                #update "Blocking force"
-
             case "material_layer_updated":
                 print("Layer variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.material_adjustment_panel != None):
+                    globals.material_adjustment_panel.create_material_adjustment_panel()
+                
                 if(globals.layer_stack_canvas != None):
                     globals.layer_stack_canvas.draw_material_stack()
 
@@ -484,8 +492,6 @@ class App:
                     globals.graph_canvas.draw_z_tip_is_graph()
                     globals.graph_canvas.draw_stoney_graph()
                 
-                if(globals.material_adjustment_panel != None):
-                    globals.material_adjustment_panel.create_material_adjustment_panel()
 
                 #Update equation labels
             
@@ -496,36 +502,86 @@ class App:
 
             case "material_unit_updated":
                 print("Unit variable is updated")
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
                 
             case "material_color_updated":
                 print("Color variable is updated")
+                if(globals.layer_stack_canvas != None):
+                    globals.layer_stack_canvas.draw_material_stack()
                 
             case "material_status_updated":                             
                 print("Status variable is updated")
             
             case "material_modulus_updated":
                 print("Modulus variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
                 
             case "material_cte_updated":
                 print("CTE [ppm/deg] variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
                 
             case "material_density_updated":
                 print("Density [kg/m3] variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
                 
             case "material_stress_x_updated":
                 print("Stress_x_[MPa] variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
                 
             case "material_poisson_updated":
                 print("Poisson variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
             
             case "material_R0_updated":
                 print("R0 variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
             
             case "material_R_updated":
                 print("R variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
+                if(globals.graph_canvas != None):
+                    globals.graph_canvas.draw_z_tip_is_graph()
+                    globals.graph_canvas.draw_stoney_graph()
             
             case "piezo_material_updated":
                 print("piezo_material variable is updated")
+                #To update equation labels
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
                 if(globals.layer_stack_canvas != None):
                     globals.layer_stack_canvas.draw_material_stack()
 
@@ -533,44 +589,54 @@ class App:
                     globals.graph_canvas.draw_z_tip_is_graph()
                     globals.graph_canvas.draw_stoney_graph()
 
-                #update "Blocking force"
-
             case "L_value_updated":
                 print("L_value variable is updated")
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_z_tip_is_graph()
-
-                #update "Blocking force"
+                
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
 
             case "e_31_f_value_updated":
                 print("e_31_f_value variable is updated")
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_z_tip_is_graph()
 
-                #update "Blocking force"
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
             
             case "volt_value_updated":
                 print("volt_value variable is updated")
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_z_tip_is_graph()
 
-
-                #update "Blocking force"
-
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+                
             case "stress_neutral_SiO2_thickness_value_updated":
                 print("stress_neutral_SiO2_thickness_value updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
 
             case "piezoelectric_bending_moment_value_updated":
                 print("piezoelectric_bending_moment_value updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
 
             case "blocking_force_cantilever_updated":
                 print("blocking_force_cantilever_value variable is updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
             
             case "initial_curvature_value_updated":
                 print("initial_curvature_value updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
 
             case "final_curvature_value_updated":
                 print("final_curvature_value updated")
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
             
             case "stoney_layer1_updated":
                 print("stoney_layer1 updated")
@@ -582,9 +648,19 @@ class App:
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_stoney_graph()
 
+            # case "t_sol":
+                # print("t_sol updated")
+                # if(globals.parameters_panel != None):
+                #     globals.parameters_panel.create_parameters_panel()
+
+            # case "M_p":
+                # print("M_p updated")
+                # if(globals.parameters_panel != None):
+                #     globals.parameters_panel.create_parameters_panel()
 
             case _:
-                print("There is not a match-case for this variable:", identifier)
+                # print("There is not a match-case for this variable:", identifier)
+                pass
 
 
     def set_layout(self):

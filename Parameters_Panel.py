@@ -110,6 +110,8 @@ class Parameters_Panel:
                 pady=(0,0),
             )
         else:
+            if(self.piezo_material_combobox.get() not in globals.materials.keys()):
+                self.piezo_material_combobox.set("")
             self.piezo_material_combobox.configure(
                 values=list(reversed((globals.materials.keys())))
             )
@@ -404,7 +406,8 @@ class Parameters_Panel:
             )
             self.blocking_force_cantilever_label2 = customtkinter.CTkLabel(
                 master=self.parameters_panel_frame, 
-                textvariable=globals.blocking_force_cantilever, 
+                # textvariable=globals.blocking_force_cantilever, 
+                text="Equation needs to be fixed",
                 fg_color=settings.parameters_panel_background_color,
                 text_color=settings.parameters_panel_text_color
             )
@@ -558,6 +561,9 @@ class Parameters_Panel:
                 pady=(0,0),
             )
         else:
+            if(self.stoney_layer1_combobox.get() not in globals.materials.keys()):
+                self.stoney_layer1_combobox.set("")
+
             self.stoney_layer1_combobox.configure(
                 values=list(reversed((globals.materials.keys())))
             )
@@ -587,10 +593,76 @@ class Parameters_Panel:
                 pady=(0,0),
             )
         else:
+            if(self.stoney_layer2_combobox.get() not in globals.materials.keys()):
+                self.stoney_layer2_combobox.set("")
             self.stoney_layer2_combobox.configure(
                 values=list(reversed((globals.materials.keys())))
             )
 
 
+        #Update the values in the equation labels
+        self.update_equation_labels()
+
+
         return self.parameters_panel_frame
-  
+
+
+    def update_equation_labels(self):
+        """
+        """
+
+        # print("UPDATE_EQUATION_LABELS()")
+
+        try: 
+            t = []
+            # sigma_i = []
+            E = []
+            nu = []
+            
+            for material in globals.materials:
+                t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                #sigma_i.append(globals.materials[material]["Stress_x [MPa]"].get() * 1e6)
+                E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
+                nu.append(globals.materials[material]["Poisson"].get())
+
+            # L = globals.L_value.get() 
+
+            Zn = globals.equations.calculate_Zn(E, t, nu)
+
+            W = 160 / 1e6
+
+            # M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W)
+            
+            piezo_thickness = globals.materials[globals.piezo_material_name.get()]["Thickness [nm]"].get() / 1e9
+
+            Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+
+            V_p = globals.volt_value.get()
+
+            e_31_f = globals.e_31_f_value.get()
+
+            # M_p = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
+
+            # M_tot = globals.equations.calculate_M_tot_cantilever(M_is, M_p)
+
+            # EI = globals.equations.calculate_EI(E, t, nu, W, Zn)
+
+            # curv_is = globals.equations.calculate_curvature(M_tot, EI)
+
+            # SiO2_thickness = globals.materials["SiO2"]["Thickness [nm]"].get() / 1e9
+
+            # t_sol = globals.equations.find_t_solution(t, L, curv_is, SiO2_thickness)
+            # if(isinstance(t_sol, Exception)):
+            #     raise ValueError(f"Could not calculate t_sol.\nerror:'{t_sol}'")
+            # else: 
+            #     globals.t_sol.set(t_sol)
+
+            M_p = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
+            if(isinstance(M_p, Exception)):
+                raise ValueError(f"Could not calculate M_p.\nerror:'{M_p}'")
+            else: 
+                globals.M_p.set(M_p)
+                print("M_p:", M_p)
+        
+        except Exception as error:
+            print("Could not update labels in parameters panel\n", error)

@@ -32,10 +32,6 @@ def initialize_globals(root_window):
     piezo_material_name = tkinter.StringVar(value="")
     piezo_material_name.trace_add("write", lambda *args, identifier="piezo_material_updated": app.update_widgets(identifier))
 
-    if(materials and len(materials) >= 1):
-        key_list = list(materials)
-        piezo_material_name.set(key_list[0])
-
     global L_value
     L_value = tkinter.DoubleVar(value=1000)
     L_value.trace_add("write", lambda *args, identifier="L_value_updated": app.update_widgets(identifier))
@@ -112,13 +108,5 @@ def initialize_globals(root_window):
     global stoney_layer2
     stoney_layer1 = tkinter.StringVar(value="")
     stoney_layer2 = tkinter.StringVar(value="")
-
     stoney_layer1.trace_add("write", lambda *args, identifier="stoney_layer1_updated": app.update_widgets(identifier))
     stoney_layer2.trace_add("write", lambda *args, identifier="stoney_layer2_updated": app.update_widgets(identifier))
-
-    #IF globals.materials is not empty
-    if(materials and len(materials) >= 2):
-        key_list = list(materials)
-        stoney_layer1.set(key_list[0])
-        stoney_layer2.set(key_list[1])
-

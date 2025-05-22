@@ -103,7 +103,7 @@ class Layer_Stack_Canvas:
 
     def draw_material_stack(self, *event):
         """Draws the material stack based on the current view"""
-        print("DRAW MATERIAL STACK()")
+        # print("DRAW MATERIAL STACK()")
 
         #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")

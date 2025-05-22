@@ -717,16 +717,7 @@ class Material_Adjustment_Panel:
         #Sort the materials{} dictionary
         globals.app.sort_dictionary()
         
-        #Update the material_adjustment_panel
-        self.create_material_adjustment_panel()
-
-        #Redraw the material stack
-        globals.layer_stack_canvas.draw_material_stack()
-
-        #If graphs has been created, redraw them
-        if(globals.graph_canvas != None):
-            globals.graph_canvas.draw_z_tip_is_graph()
-            globals.graph_canvas.draw_stoney_graph()
+        globals.app.update_widgets("material_deleted")
         
 
     def move_material(self, chosen_material, up_or_down):
