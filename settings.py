@@ -175,9 +175,9 @@ graph_canvas_padding_bottom = 2
 graph_canvas_padding_left = 2
 graph_canvas_padding_right = 4
 
-stoney_graph_x_axis_range_min = -100
-stoney_graph_x_axis_range_max = 100
-stoney_graph_y_axis_range_min = -10
+stoney_graph_x_axis_range_min = -25
+stoney_graph_x_axis_range_max = 25
+stoney_graph_y_axis_range_min = 0
 stoney_graph_y_axis_range_max = 50
 
 stress_graph_x_axis_range_min = -100

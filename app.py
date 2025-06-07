@@ -294,11 +294,6 @@ class App:
                     #LAYER
                     row["layer"] = tkinter.IntVar(value=int(layer))
 
-                    #STATUS
-                    row["status"] = tkinter.StringVar(value="active")
-
-
-                    
                     #ADD TRACES TO ALL VARIABLES
                     # Trace changes to trigger canvas redraw
                     row["material"].trace_add("write", lambda *args, identifier="material_name_updated": self.update_widgets(identifier))
@@ -307,7 +302,6 @@ class App:
                     # row["unit"].trace_add("write", lambda *args, identifier="material_unit_updated": self.update_widgets(identifier))
                     row["indent [nm]"].trace_add("write", lambda *args, identifier="material_indent_updated": self.update_widgets(identifier))
                     row["color"].trace_add("write", lambda *args, identifier="material_color_updated": self.update_widgets(identifier))
-                    row["status"].trace_add("write", lambda *args, identifier="material_status_updated": self.update_widgets(identifier))
                     row["modulus [gpa]"].trace_add("write", lambda *args, identifier="material_modulus_updated": self.update_widgets(identifier))
                     row["cte [ppm/deg]"].trace_add("write", lambda *args, identifier="material_cte_updated": self.update_widgets(identifier))
                     row["density [kg/m3]"].trace_add("write", lambda *args, identifier="material_density_updated": self.update_widgets(identifier))
@@ -325,7 +319,6 @@ class App:
                         "Unit": row["unit"],
                         "Indent [nm]": row["indent [nm]"],
                         "Color": row["color"],
-                        "Status": row["status"],
                         "Modulus [GPa]": row["modulus [gpa]"],
                         "CTE [ppm/deg]": row["cte [ppm/deg]"],
                         "Density [kg/m3]": row["density [kg/m3]"],
@@ -510,9 +503,6 @@ class App:
                 if(globals.layer_stack_canvas != None):
                     globals.layer_stack_canvas.draw_material_stack()
                 
-            case "material_status_updated":                             
-                print("Status variable is updated")
-            
             case "material_modulus_updated":
                 print("Modulus variable is updated")
                 if(globals.parameters_panel != None):
@@ -772,12 +762,12 @@ class App:
                     globals.canvas_control_panel.canvas_control_panel_frame.grid(row=1, column=1)
    
             case "Multi":
-                self.program_window.columnconfigure(0, weight=10, minsize=500, uniform="group1")
-                self.program_window.columnconfigure(1, weight=45, uniform="group1")  
-                self.program_window.columnconfigure(2, weight=45, uniform="group1")  
+                self.program_window.columnconfigure(0, weight=33, minsize=500, uniform="group1")
+                self.program_window.columnconfigure(1, weight=34, uniform="group1")  
+                self.program_window.columnconfigure(2, weight=33, uniform="group1")  
 
-                self.program_window.rowconfigure(0, weight=45, uniform="group1")    
-                self.program_window.rowconfigure(1, weight=45, uniform="group1")
+                self.program_window.rowconfigure(0, weight=30, uniform="group1")    
+                self.program_window.rowconfigure(1, weight=60, uniform="group1")
                 self.program_window.rowconfigure(2, weight=10, minsize=100, uniform="group1")
 
 
@@ -910,7 +900,6 @@ class App:
             print("Unit:", globals.materials[material]["Unit"].get(), "     |   ", type(globals.materials[material]["Unit"]))  
             print("Indent [nm]:", globals.materials[material]["Indent [nm]"].get(), "   |   ", type(globals.materials[material]["Indent [nm]"]))  
             print("Color:", globals.materials[material]["Color"].get(), "   |   ", type(globals.materials[material]["Color"]))  
-            print("Status:", globals.materials[material]["Status"].get(), "     |   ", type(globals.materials[material]["Status"]))  
             print("Modulus [GPa]:", globals.materials[material]["Modulus [GPa]"].get(), "   |   ", type(globals.materials[material]["Modulus [GPa]"]))  
             print("CTE [ppm/deg]:", globals.materials[material]["CTE [ppm/deg]"].get(), "   |   ", type(globals.materials[material]["CTE [ppm/deg]"]))  
             print("Density [kg/m3]:", globals.materials[material]["Density [kg/m3]"].get(), "   |   ", type(globals.materials[material]["Density [kg/m3]"]))  

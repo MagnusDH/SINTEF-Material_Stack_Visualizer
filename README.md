@@ -111,7 +111,8 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Slett "status" funksjon på materialer
+    -I parameters_panel hvor equations blir oppdatert: finn en løsning for aa velge "SiO2_thickness" og oppdater dette i "equations" hvor "SiO2_thickness" blir brukt 
+    -legge til en funksjon for å legge til flere piezo materialer
 
     -Modify_materials() er full av bugs
     -Fiks størrelse på svg exports
@@ -126,10 +127,7 @@
     -ikke vis error box, men heller rød markør rundt feil
 
 # QUESTIONS:
-    -Ta bort "unit" i excel ark? det gir ikke mening å ha lengre
-    -I parameters_panel hvor equations blir oppdatert: finn en løsning for hvordan finne "SiO2_thickness" på en sikker måte
-    -I parameters_panel hvor equations blir oppdatert: hva er riktig (round) verdi for M_p?
-    -hvordan si ifra at "piezo_material" ikke er valgt når stress_neutral_SiO2_thickness blir regnet ut? I parameters_panel
+    
 
     
 # BUGS:

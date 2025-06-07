@@ -128,10 +128,10 @@ class Graph_Canvas:
             if(len(globals.materials) == 0):
                 raise ValueError("No materials")
 
-            if(globals.stoney_layer1.get()==""):
+            if(globals.stoney_substrate.get()==""):
                 raise ValueError("No substrate selected")
             
-            if(globals.stoney_layer2.get()==""):
+            if(globals.stoney_filament.get()==""):
                 raise ValueError("No filament selected")
 
         
@@ -139,11 +139,6 @@ class Graph_Canvas:
             self.graph2.set_title("Stoney")
             self.graph2.set_xlabel("X [mm]", fontsize=10, labelpad=3)
             self.graph2.set_ylabel("Height [μm]", fontsize=10, labelpad=8)
-
-            
-            #Set the display limits of the x and y axises 
-            self.graph2.set_xlim([settings.stoney_graph_x_axis_range_min, settings.stoney_graph_x_axis_range_max])
-            self.graph2.set_ylim([settings.stoney_graph_y_axis_range_min, settings.stoney_graph_y_axis_range_max])
 
             #Display the grid of the graph
             self.graph2.grid(True)
@@ -154,32 +149,32 @@ class Graph_Canvas:
 
             #Fetch necessary values
             #Modulus value for substrate in pascals
-            Es = globals.materials[globals.stoney_layer1.get()]["Modulus [GPa]"].get() * 1000000000
+            Es = globals.materials[globals.stoney_substrate.get()]["Modulus [GPa]"].get() * 1000000000
             #Poisson value for substrate
-            Vs = globals.materials[globals.stoney_layer1.get()]["Poisson"].get()
+            Vs = globals.materials[globals.stoney_substrate.get()]["Poisson"].get()
             #Thickness for substrate in meters
-            Ts = globals.materials[globals.stoney_layer1.get()]["Thickness [nm]"].get() / 1000000000
+            Ts = globals.materials[globals.stoney_substrate.get()]["Thickness [nm]"].get() / 1000000000
             
             #Thickness for filament in meters
-            Tf = globals.materials[globals.stoney_layer2.get()]["Thickness [nm]"].get() / 1000000000
+            Tf = globals.materials[globals.stoney_filament.get()]["Thickness [nm]"].get() / 1000000000
             #R0 value for filament
-            R0 = globals.materials[globals.stoney_layer2.get()]["R0"].get()
+            R0 = globals.materials[globals.stoney_filament.get()]["R0"].get()
             #R value for filament
-            R = globals.materials[globals.stoney_layer2.get()]["R"].get()
+            R = globals.materials[globals.stoney_filament.get()]["R"].get()
 
 
             #Check for division by zero errors
             if(Tf) == 0:
-                raise ValueError(f"The 'thickness' of '{globals.stoney_layer2.get()}' can not be zero")
+                raise ValueError(f"The 'thickness' of '{globals.stoney_filament.get()}' can not be zero")
 
             if(R == 0):
-                raise ValueError(f"The 'R' value for '{globals.stoney_layer2.get()}' can not be zero")
+                raise ValueError(f"The 'R' value for '{globals.stoney_filament.get()}' can not be zero")
 
             if(R0 == 0):
-                raise ValueError(f"The 'R0' value for '{globals.stoney_layer2.get()}' can not be zero")
+                raise ValueError(f"The 'R0' value for '{globals.stoney_filament.get()}' can not be zero")
             
             if(1-Vs) == 0:
-                raise ValueError(f"The 'poisson' value for '{globals.stoney_layer1.get()}' can not be 1")
+                raise ValueError(f"The 'poisson' value for '{globals.stoney_substrate.get()}' can not be 1")
             
             #Calculate the sigma_R value
             sigma_R = ( (Es* (Ts**2)) / (6*(1-Vs)*Tf)) * ( (1/R) - (1/R0) )
@@ -223,8 +218,14 @@ class Graph_Canvas:
             x_values = numpy.linspace(-min(R, R0), min(R, R0), 100)
 
             #Create values to plot in the graph
-            y0 = R0 - numpy.sqrt(R0**2 - x_values**2)
-            y1 = R - numpy.sqrt(R**2 - x_values**2)
+            y0 = self.stoney(R0, x_values)
+            y1 = self.stoney(R, x_values)
+            
+            #Set the display limits of the x and y axises 
+            self.graph2.set_xlim([settings.stoney_graph_x_axis_range_min, settings.stoney_graph_x_axis_range_max])
+            # self.graph2.set_ylim([0, max(self.stoney(R0,settings.stoney_graph_y_axis_range_min), self.stoney(R,settings.stoney_graph_y_axis_range_max))])
+            self.graph2.set_ylim([0, max(self.stoney(R0,25), self.stoney(R,25))])
+
 
             #Plot y1 and y0 values
             self.graph2.plot(x_values, y0, color="red")
@@ -250,6 +251,9 @@ class Graph_Canvas:
 
             #Draw the canvas to display the updates
             self.graph2.figure.canvas.draw()
+
+    def stoney(self, R0, x):
+        return R0 - numpy.sqrt(R0**2 - x**2)
 
 
     def draw_z_tip_is_graph(self):

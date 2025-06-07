@@ -728,9 +728,6 @@ class Material_Control_Panel:
         else:
             material_color = tkinter.StringVar(value=self.material_color_entry.get())
 
-        #STATUS
-        status_value = tkinter.StringVar(value="active")
-
         #Modulus [GPa] VALUE
         if( not self.Modulus_value_entry.get()):
             Modulus_value = tkinter.DoubleVar(value=0)
@@ -781,7 +778,6 @@ class Material_Control_Panel:
         # unit_value.trace_add("write", lambda *args, identifier="material_unit_updated": globals.app.update_widgets(identifier))
         material_indent.trace_add("write", lambda *args, identifier="material_indent_updated": globals.app.update_widgets(identifier))
         material_color.trace_add("write", lambda *args, identifier="material_color_updated": globals.app.update_widgets(identifier))
-        status_value.trace_add("write", lambda *args, identifier="material_status_updated": globals.app.update_widgets(identifier))
         Modulus_value.trace_add("write", lambda *args, identifier="material_modulus_updated": globals.app.update_widgets(identifier))
         CTE_value.trace_add("write", lambda *args, identifier="material_cte_updated": globals.app.update_widgets(identifier))
         Density_value.trace_add("write", lambda *args, identifier="material_density_updated": globals.app.update_widgets(identifier))
@@ -799,7 +795,6 @@ class Material_Control_Panel:
             "Unit": unit_value,
             "Indent [nm]": material_indent,
             "Color": material_color,
-            "Status": status_value,
             "Modulus [GPa]": Modulus_value,
             "CTE [ppm/deg]": CTE_value,
             "Density [kg/m3]": Density_value,
@@ -1691,7 +1686,8 @@ class Material_Control_Panel:
 
             #If graphs has been created, redraw them
             if(globals.graph_canvas != None):
-                globals.graph_canvas.draw_graphs()
+                globals.graph_canvas.draw_stoney_graph()
+                globals.graph_canvas.draw_z_tip_is_graph()
 
             #Recreate the material_adjustment_panel
             globals.material_adjustment_panel.create_material_adjustment_panel()

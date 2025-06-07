@@ -104,9 +104,9 @@ def initialize_globals(root_window):
     t_sol = tkinter.DoubleVar(value=0)
     t_sol.trace_add("write", lambda *args, identifier="t_sol": app.update_widgets(identifier))
 
-    global stoney_layer1
-    global stoney_layer2
-    stoney_layer1 = tkinter.StringVar(value="")
-    stoney_layer2 = tkinter.StringVar(value="")
-    stoney_layer1.trace_add("write", lambda *args, identifier="stoney_layer1_updated": app.update_widgets(identifier))
-    stoney_layer2.trace_add("write", lambda *args, identifier="stoney_layer2_updated": app.update_widgets(identifier))
+    global stoney_substrate
+    global stoney_filament
+    stoney_substrate = tkinter.StringVar(value="")
+    stoney_filament = tkinter.StringVar(value="")
+    stoney_substrate.trace_add("write", lambda *args, identifier="stoney_layer1_updated": app.update_widgets(identifier))
+    stoney_filament.trace_add("write", lambda *args, identifier="stoney_layer2_updated": app.update_widgets(identifier))
