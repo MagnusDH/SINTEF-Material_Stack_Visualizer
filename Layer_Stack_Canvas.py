@@ -1055,7 +1055,7 @@ class Layer_Stack_Canvas:
             
             #Create text to explain the total height of the stack in "nm"
             self.layer_stack_canvas.create_text(
-                self.visible_canvas_bbox_x0 + 90, self.visible_canvas_bbox_y1 + 30,
+                self.visible_canvas_bbox_x0 + 95, self.visible_canvas_bbox_y1 + 30,
                 text=f"Total height:\n{total_height_of_materials} nm", 
                 fill=settings.layer_stack_canvas_text_color, 
                 font=(settings.text_font, settings.layer_stack_canvas_text_size),
@@ -1190,7 +1190,7 @@ class Layer_Stack_Canvas:
         except Exception as error:
             self.layer_stack_canvas.create_text(
                 self.visible_canvas_bbox_x1/2, self.visible_canvas_bbox_y0/2,
-                text=f"Could not draw Zn, neutral axis and Zp\n{error}", 
+                text=f"Could not draw Zn, neutral axis and Zp\nERROR: '{error}'", 
                 fill="red", 
                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
             )

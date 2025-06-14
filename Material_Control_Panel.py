@@ -3,10 +3,10 @@ from tkinter import colorchooser, messagebox, StringVar
 import customtkinter
 import settings #File containing settings
 import globals  #File containing global variables
-from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Border, Side, Font, Alignment
-from PIL import ImageGrab
-from openpyxl.drawing.image import Image
+# from openpyxl import Workbook
+# from openpyxl.styles import PatternFill, Border, Side, Font, Alignment
+# from PIL import ImageGrab
+# from openpyxl.drawing.image import Image
 import os
 import helper_functions
 
@@ -107,23 +107,6 @@ class Material_Control_Panel:
             pady=(5,5)
         )           
 
-        #Create button to export materials{} and stack to a excel file
-        export_as_excel_button = customtkinter.CTkButton(
-            master=material_control_panel_frame, 
-            text="Export values to excel", 
-            font=(settings.text_font, settings.material_control_panel_text_size),
-            fg_color=settings.material_control_panel_button_color,
-            hover_color=settings.material_control_panel_button_hover_color,
-            text_color=settings.material_control_panel_button_text_color,
-            command=self.export_to_excel
-        )
-        export_as_excel_button.grid(
-            row=1,
-            column=1,
-            sticky="nsew",
-            padx=(5,5),
-            pady=(5,5)
-        )
 
         return material_control_panel_frame
     
@@ -1694,138 +1677,3 @@ class Material_Control_Panel:
 
         else:
             messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")
-
-
-    def export_to_excel(self):
-        """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
-        # print("EXPORT_TO_EXCEL()")
-
-        #Create an filename and a workbook to contain data
-        filename = "exported_materials.xlsx"
-
-        #Create main folder if it does not already exist
-        main_folder = "exports"
-        if not os.path.exists(main_folder):
-            os.makedirs(main_folder)
-
-        #Create sub_folder if it does not already exist
-        sub_folder = "excel"
-        if not os.path.exists(f"{main_folder}/{sub_folder}"):
-            os.makedirs(f"{main_folder}/{sub_folder}")
-        
-
-        #Create path for file to be saved in
-        file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
-
-        workbook = Workbook()
-
-        # Optionally, rename the default sheet
-        sheet = workbook.active
-        # sheet.title = ""
-
-        #Create header cells
-        sheet["A1"] = "Material"          # Add a new header in column A row 1
-        sheet["B1"] = "Thickness [nm]"
-        sheet["C1"] = "Unit"
-        sheet["D1"] = "Indent [nm]"
-        sheet["E1"] = "Color"
-        sheet["F1"] = "Modulus [GPa]"
-        sheet["G1"] = "CTE [ppm/deg]"
-        sheet["H1"] = "Density [kg/m3]"
-        sheet["I1"] = "Stress_x [MPa]"
-        sheet["J1"] = "Poisson"
-        sheet["K1"] = "R0"
-        sheet["L1"] = "R"
-
-
-        #Define a fill_color for cells
-        fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
-
-        #Loop through the desired range of columns and rows to apply the fill_color and set a bold font
-        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=12):  # Adjust row/column range as needed
-            for cell in row:
-                cell.font = Font(bold=True)
-                cell.fill = fill_color
-
-
-        #Define a border style (thin lines for grid)
-        thin_border = Border(
-            left=Side(style="thin"),
-            right=Side(style="thin"),
-            top=Side(style="thin"),
-            bottom=Side(style="thin")
-        )
-
-        #Apply the border to a range of cells and center the text in each cell
-        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=12):  # Adjust range as needed
-            for cell in row:
-                cell.border = thin_border
-                cell.alignment = Alignment(horizontal="center", vertical="center")
-
-        #Set the height and width values of cells in the excel file
-        sheet.column_dimensions['A'].width = 13  #Width of column A
-        sheet.column_dimensions['B'].width = 10  
-        sheet.column_dimensions['C'].width = 6  
-        sheet.column_dimensions['D'].width = 13  
-        sheet.column_dimensions['E'].width = 10  
-        sheet.column_dimensions['F'].width = 15  
-        sheet.column_dimensions['G'].width = 15  
-        sheet.column_dimensions['H'].width = 15
-        sheet.column_dimensions['I'].width = 15  
-        sheet.column_dimensions['J'].width = 10
-        sheet.column_dimensions['K'].width = 10
-        sheet.column_dimensions['L'].width = 10
-
-
-        # Set row height
-        # sheet.row_dimensions[1].height = 20  # Height of row 1 set to 30
-
-
-        #Loop through materials{} and place values in excel file
-        row_counter = 2
-
-        for material in dict(reversed(globals.materials.items())):
-            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["Name"].get())
-            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness [nm]"].get())
-            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"].get())
-            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["Indent [nm]"].get())
-            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["Color"].get())
-            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["Modulus [GPa]"].get())
-            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["CTE [ppm/deg]"].get())
-            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"].get())
-            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"].get())
-            sheet.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"].get())
-            sheet.cell(row=row_counter, column=11, value=globals.materials[material]["R0"].get())
-            sheet.cell(row=row_counter, column=12, value=globals.materials[material]["R"].get())
-
-            #increment row_counter
-            row_counter += 1
-
-
-        #Find coordinates of canvas on the screen
-        canvas_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_rootx()
-        canvas_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_rooty()
-        canvas_x2 = canvas_x1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_width()
-        canvas_y2 = canvas_y1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_height()
-
-        bbox = (canvas_x1, canvas_y1, canvas_x2, canvas_y2)
-
-        #Take a screenshot of the screen where canvas is
-        screenshot = ImageGrab.grab(bbox=bbox)
-        screenshot.save(f"{main_folder}/{sub_folder}/canvas_screenshot.png", "PNG")
-
-        #Load the image with openpyxl
-        canvas_screenshot = Image(f"{main_folder}/{sub_folder}/canvas_screenshot.png")
-
-        #Set the width and height of image placed in excel file
-        match globals.current_view.get():
-            case "Stacked" | "Realistic" | "Stepped" | "Multi":
-                canvas_screenshot.width = 350
-                canvas_screenshot.height = 350
-            
-
-        #Add the image to the excel file in a specific cell
-        sheet.add_image(canvas_screenshot, "N1")
-
-        #Save the workbook as excel file
-        workbook.save(f"{main_folder}/{sub_folder}/{filename}")

@@ -41,14 +41,22 @@ class Graph_Control_Panel:
                 sticky="nsew"
             )
 
+        
+            #Define the row&column layout of the graph_control_panel_frame
+            graph_control_panel_frame.columnconfigure(0, weight=100, uniform="group1")
+            graph_control_panel_frame.rowconfigure(0, weight=100, uniform="group1")   
+
         #Create a toolbar for the graph
         toolbar = NavigationToolbar2Tk(
             globals.graph_canvas.graph_translator,
             graph_control_panel_frame,
         )
-        toolbar.pack(
-            padx=(3,3),
-            pady=(1,1),
+        toolbar.grid(
+            row=0,
+            column=0,
+            sticky="nsew",
+            padx=(0,0),
+            pady=(0,0),
         )
         toolbar.config(
             background=settings.graph_control_panel_background_color,
@@ -59,45 +67,4 @@ class Graph_Control_Panel:
                 background=settings.graph_control_panel_button_color, 
             )
 
-
-        #Export graph button
-        export_graph_button = customtkinter.CTkButton(
-            master=graph_control_panel_frame,
-            text="Export graph",
-            fg_color= settings.graph_control_panel_button_color, 
-            hover_color=settings.graph_control_panel_button_hover_color, 
-            text_color=settings.graph_control_panel_button_text_color,
-            command=self.export_graph
-        )
-        export_graph_button.pack(
-            padx=(0,0),
-            pady=(5,0)
-        )
-
         return graph_control_panel_frame
-
-
-    def export_graph(self):
-        """Exports the graph as svg file"""
-        
-        #print("EXPORT_GRAPH()")
-
-        #CREATE FOLDER HIERARCHY
-        main_folder = "exports"
-
-        #Create folder if it does not exist
-        if not os.path.exists(main_folder):
-            os.makedirs(main_folder)
-
-        #Create sub_folder
-        sub_folder = "graph"
-
-        #Create sub_folder if it does not exist
-        if not os.path.exists(f"{main_folder}/{sub_folder}"):
-            os.makedirs(f"{main_folder}/{sub_folder}")
-        
-        #Create name for the file
-        filename = "graph.svg"
-
-        #Save the graph as svg file
-        globals.graph_canvas.graph_container.savefig(f"{main_folder}/{sub_folder}/{filename}")

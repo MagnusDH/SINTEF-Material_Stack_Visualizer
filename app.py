@@ -466,6 +466,9 @@ class App:
                 if(globals.layer_stack_canvas != None):
                     globals.layer_stack_canvas.draw_material_stack()
 
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_z_tip_is_graph()
                     globals.graph_canvas.draw_stoney_graph()

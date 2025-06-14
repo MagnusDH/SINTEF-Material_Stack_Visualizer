@@ -241,7 +241,7 @@ class Graph_Canvas:
             #Add error text
             self.graph2.text(
                 0.5, 0.5,
-                f"Could not draw Stoney graph\n\n{error}",
+                f"Could not draw Stoney graph\n\nERROR: '{error}'",
                 fontsize=9,
                 color="red",
                 transform=self.graph2.transAxes,
@@ -434,7 +434,7 @@ class Graph_Canvas:
             #Add error text
             self.graph1.text(
                 0.5, 0.5,
-                f"Could not draw curvature graph\n\n{error}",
+                f"Could not draw curvature graph\n\nERROR: '{error}'",
                 fontsize=9,
                 color="red",
                 transform=self.graph1.transAxes,

@@ -4,6 +4,10 @@ import customtkinter
 import settings
 import globals
 import os
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill, Border, Side, Font, Alignment
+from PIL import ImageGrab
+from openpyxl.drawing.image import Image
 
 
 #This class handles the buttons that perform actions on the canvas
@@ -70,7 +74,7 @@ class Canvas_Control_Panel:
         #Export option menu
         self.export_option_menu = customtkinter.CTkOptionMenu(
             master=canvas_control_panel_frame, 
-            values=["Full stack", "Material rectangles", "Layers"],
+            values=["Stack with text (SVG)", "Stack without text (SVG)", "Individual layers (SVG)", "Graphs (SVG)", "Material properties + screenshot (EXCEL)", "All"],
             font=(settings.text_font, settings.canvas_control_panel_text_size),
             bg_color=settings.canvas_control_panel_background_color,
             fg_color=settings.canvas_control_panel_dropdown_color,
@@ -175,14 +179,6 @@ class Canvas_Control_Panel:
         globals.layer_stack_canvas.draw_material_stack()
 
 
-    #???????????????????????????????????????????
-    # def switch_layout(self, *event):
-    #     """?????????????????????????"""
-    #     globals.current_view.set(self.option_menu.get())
-        
-    #     globals.app.set_layout()
-
-
     def choose_stack_export(self, *event):
         """Calls different export functions based on the 'export_option_menu' value"""
        
@@ -190,14 +186,27 @@ class Canvas_Control_Panel:
 
         #Call functions based on export_option_menu value
         match self.export_option_menu.get():
-            case "Full stack":
+            case "Stack with text (SVG)":
                 self.export_full_stack_as_svg()
 
-            case "Material rectangles":
+            case "Stack without text (SVG)":
                 self.export_material_stack_as_svg()
 
-            case "Layers":
+            case "Individual layers (SVG)":
                 self.export_layers_as_svg()
+
+            case "Graphs (SVG)":
+                self.export_graphs()
+
+            case "Material properties + screenshot (EXCEL)":
+                self.export_to_excel()
+
+            case "All":
+                self.export_full_stack_as_svg()
+                self.export_material_stack_as_svg()
+                self.export_layers_as_svg()
+                self.export_graphs()
+                self.export_to_excel()
 
 
     def export_material_stack_as_svg(self):
@@ -221,7 +230,7 @@ class Canvas_Control_Panel:
             os.makedirs(f"{main_folder}/{sub_folder}")
         
         #Create path for file to be saved in
-        filename = f"Material_Stack_{globals.current_view.get()}.svg"
+        filename = f"{globals.current_view.get()}_stack_without_text.svg"
         file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
 
         #Open the file for writing
@@ -480,7 +489,7 @@ class Canvas_Control_Panel:
             os.makedirs(f"{main_folder}/{sub_folder}")
         
         #Create path for file to be saved in
-        filename = f"Full_Stack_{globals.current_view.get()}.svg"
+        filename = f"{globals.current_view.get()}_stack_with_text.svg"
         file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
 
         #Open the file for writing
@@ -489,8 +498,10 @@ class Canvas_Control_Panel:
             f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
 
             #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.program_window.winfo_width(), self.program_window.winfo_height()))
- 
+            # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.program_window.winfo_width(), self.program_window.winfo_height()))
+            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.layer_stack_canvas.layer_stack_canvas.winfo_width(), globals.layer_stack_canvas.layer_stack_canvas.winfo_height()))
+
+            
 
             #Iterate through all the items
             for item in all_items:
@@ -587,3 +598,164 @@ class Canvas_Control_Panel:
 
         #Close the svg file
         f.close()
+
+
+    def export_graphs(self):
+        """Exports the graph as svg file"""
+        
+        #print("EXPORT_GRAPHS()")
+
+        #CREATE FOLDER HIERARCHY
+        main_folder = "exports"
+
+        #Create folder if it does not exist
+        if not os.path.exists(main_folder):
+            os.makedirs(main_folder)
+
+        #Create sub_folder
+        sub_folder = "graphs"
+
+        #Create sub_folder if it does not exist
+        if not os.path.exists(f"{main_folder}/{sub_folder}"):
+            os.makedirs(f"{main_folder}/{sub_folder}")
+        
+        #Create name for the file
+        filename = "graphs.svg"
+
+        #Save the graph as svg file
+        globals.graph_canvas.graph_container.savefig(f"{main_folder}/{sub_folder}/{filename}")
+
+
+    def export_to_excel(self):
+        """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
+        # print("EXPORT_TO_EXCEL()")
+
+        #Create an filename and a workbook to contain data
+        filename = "exported_materials.xlsx"
+
+        #Create main folder if it does not already exist
+        main_folder = "exports"
+        if not os.path.exists(main_folder):
+            os.makedirs(main_folder)
+
+        #Create sub_folder if it does not already exist
+        sub_folder = "excel"
+        if not os.path.exists(f"{main_folder}/{sub_folder}"):
+            os.makedirs(f"{main_folder}/{sub_folder}")
+        
+
+        #Create path for file to be saved in
+        file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
+
+        workbook = Workbook()
+
+        # Optionally, rename the default sheet
+        sheet = workbook.active
+        # sheet.title = ""
+
+        #Create header cells
+        sheet["A1"] = "Material"          # Add a new header in column A row 1
+        sheet["B1"] = "Thickness [nm]"
+        sheet["C1"] = "Unit"
+        sheet["D1"] = "Indent [nm]"
+        sheet["E1"] = "Color"
+        sheet["F1"] = "Modulus [GPa]"
+        sheet["G1"] = "CTE [ppm/deg]"
+        sheet["H1"] = "Density [kg/m3]"
+        sheet["I1"] = "Stress_x [MPa]"
+        sheet["J1"] = "Poisson"
+        sheet["K1"] = "R0"
+        sheet["L1"] = "R"
+
+
+        #Define a fill_color for cells
+        fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
+
+        #Loop through the desired range of columns and rows to apply the fill_color and set a bold font
+        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=12):  # Adjust row/column range as needed
+            for cell in row:
+                cell.font = Font(bold=True)
+                cell.fill = fill_color
+
+
+        #Define a border style (thin lines for grid)
+        thin_border = Border(
+            left=Side(style="thin"),
+            right=Side(style="thin"),
+            top=Side(style="thin"),
+            bottom=Side(style="thin")
+        )
+
+        #Apply the border to a range of cells and center the text in each cell
+        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=12):  # Adjust range as needed
+            for cell in row:
+                cell.border = thin_border
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        #Set the height and width values of cells in the excel file
+        sheet.column_dimensions['A'].width = 13  #Width of column A
+        sheet.column_dimensions['B'].width = 10  
+        sheet.column_dimensions['C'].width = 6  
+        sheet.column_dimensions['D'].width = 13  
+        sheet.column_dimensions['E'].width = 10  
+        sheet.column_dimensions['F'].width = 15  
+        sheet.column_dimensions['G'].width = 15  
+        sheet.column_dimensions['H'].width = 15
+        sheet.column_dimensions['I'].width = 15  
+        sheet.column_dimensions['J'].width = 10
+        sheet.column_dimensions['K'].width = 10
+        sheet.column_dimensions['L'].width = 10
+
+
+        # Set row height
+        # sheet.row_dimensions[1].height = 20  # Height of row 1 set to 30
+
+
+        #Loop through materials{} and place values in excel file
+        row_counter = 2
+
+        for material in dict(reversed(globals.materials.items())):
+            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["Name"].get())
+            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness [nm]"].get())
+            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"].get())
+            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["Indent [nm]"].get())
+            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["Color"].get())
+            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["Modulus [GPa]"].get())
+            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["CTE [ppm/deg]"].get())
+            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"].get())
+            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"].get())
+            sheet.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"].get())
+            sheet.cell(row=row_counter, column=11, value=globals.materials[material]["R0"].get())
+            sheet.cell(row=row_counter, column=12, value=globals.materials[material]["R"].get())
+
+            #increment row_counter
+            row_counter += 1
+
+
+        #Find coordinates of canvas on the screen
+        canvas_x1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_rootx()
+        canvas_y1 = globals.layer_stack_canvas.layer_stack_canvas.winfo_rooty()
+        canvas_x2 = canvas_x1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_width()
+        canvas_y2 = canvas_y1 + globals.layer_stack_canvas.layer_stack_canvas.winfo_height()
+
+        bbox = (canvas_x1, canvas_y1, canvas_x2, canvas_y2)
+
+        #Take a screenshot of the screen where canvas is
+        screenshot = ImageGrab.grab(bbox=bbox)
+        screenshot.save(f"{main_folder}/{sub_folder}/canvas_screenshot.png", "PNG")
+
+        #Load the image with openpyxl
+        canvas_screenshot = Image(f"{main_folder}/{sub_folder}/canvas_screenshot.png")
+
+        #Set the width and height of image placed in excel file
+        match globals.current_view.get():
+            case "Stacked" | "Realistic" | "Stepped" | "Multi":
+                canvas_screenshot.width = 350
+                canvas_screenshot.height = 350
+            
+
+        #Add the image to the excel file in a specific cell
+        sheet.add_image(canvas_screenshot, "N1")
+
+        #Save the workbook as excel file
+        workbook.save(f"{main_folder}/{sub_folder}/{filename}")
