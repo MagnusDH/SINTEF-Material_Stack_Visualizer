@@ -121,17 +121,32 @@ class Material_Control_Panel:
         self.add_material_window.geometry(f"{settings.add_material_window_width}x{settings.add_material_window_height}")
         self.add_material_window.configure(bg=settings.add_material_window_background_color)
 
-        #Define the row&column layout of the material_control_panel_frame
-        self.add_material_window.columnconfigure(0, weight=34, uniform="group1")
-        self.add_material_window.columnconfigure(1, weight=33, uniform="group1")
-        self.add_material_window.columnconfigure(2, weight=33, uniform="group1")
+        #Define the row&column layout of the add_material_window
+        self.add_material_window.columnconfigure(0, weight=100, uniform="group1")
+        self.add_material_window.rowconfigure(0, weight=100, uniform="group1")
 
-        self.add_material_window.rowconfigure((0,1,2,3,4,5,6,7,8,9,10,11), weight=100, uniform="group1")
+        #Add a scrollable frame
+        self.add_material_frame = customtkinter.CTkScrollableFrame(
+            master=self.add_material_window,
+            fg_color=settings.add_material_window_background_color
+        )
+        self.add_material_frame.grid(
+            row=0,
+            column=0,
+            padx=(0,0),
+            pady=(0,0),
+            sticky="nsew"
+        )
+
+        #Define the row&column layout of the frame
+        self.add_material_frame.columnconfigure(0, weight=34, uniform="group1")
+        self.add_material_frame.columnconfigure(1, weight=33, uniform="group1")
+        self.add_material_frame.columnconfigure(2, weight=33, uniform="group1")
 
 
         #Create Labels and Entries for material properties 
         material_name_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Name", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -146,7 +161,7 @@ class Material_Control_Panel:
 
         #Name
         self.material_name_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -164,7 +179,7 @@ class Material_Control_Panel:
 
         #Thickness
         self.material_thickness_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Thickness [nm]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -178,7 +193,7 @@ class Material_Control_Panel:
         )
 
         self.material_thickness_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -196,7 +211,7 @@ class Material_Control_Panel:
 
         #Indent
         self.material_indent_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Indent [nm]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -210,7 +225,7 @@ class Material_Control_Panel:
         )
 
         self.material_indent_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -228,7 +243,7 @@ class Material_Control_Panel:
 
         #Color
         self.material_color_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Color", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -242,7 +257,7 @@ class Material_Control_Panel:
         )
 
         self.material_color_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -260,7 +275,7 @@ class Material_Control_Panel:
 
         #Modulus [GPa] value
         self.Modulus_value_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Modulus [GPa]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -274,7 +289,7 @@ class Material_Control_Panel:
         )
 
         self.Modulus_value_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -292,7 +307,7 @@ class Material_Control_Panel:
 
         #CTE [ppm/deg] value
         self.CTE_value_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="CTE [ppm/deg]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -306,7 +321,7 @@ class Material_Control_Panel:
         )
 
         self.CTE_value_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -324,7 +339,7 @@ class Material_Control_Panel:
 
         #Density [kg/m3] value
         self.Density_value_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Density [kg/m3]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -338,7 +353,7 @@ class Material_Control_Panel:
         )
 
         self.Density_value_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -357,7 +372,7 @@ class Material_Control_Panel:
         
         #Stress_x [MPa] value
         self.Stress_value_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Stress_x [MPa]", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -371,7 +386,7 @@ class Material_Control_Panel:
         )
 
         self.Stress_value_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -390,7 +405,7 @@ class Material_Control_Panel:
 
         #Poisson value
         self.Poisson_value_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="Poisson", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -404,7 +419,7 @@ class Material_Control_Panel:
         )
 
         self.Poisson_value_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -423,7 +438,7 @@ class Material_Control_Panel:
 
         #R0 value
         self.R0_value_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="R0", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -437,7 +452,7 @@ class Material_Control_Panel:
         )
 
         self.R0_value_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -456,7 +471,7 @@ class Material_Control_Panel:
 
         #R value
         self.R_value_label = customtkinter.CTkLabel(
-            master=self.add_material_window, 
+            master=self.add_material_frame, 
             text="R", 
             text_color=settings.add_material_window_text_color,
             fg_color=settings.add_material_window_background_color,
@@ -470,7 +485,7 @@ class Material_Control_Panel:
         )
 
         self.R_value_entry = customtkinter.CTkEntry(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             fg_color = settings.add_material_window_entry_background_color,
             border_color=settings.add_material_window_entry_border_color,
             border_width=0.4,
@@ -489,7 +504,7 @@ class Material_Control_Panel:
 
         #Find color buttom
         find_color_button = customtkinter.CTkButton(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             text="Find color",
             fg_color=settings.add_material_window_button_color,
             hover_color=settings.add_material_window_button_hover_color,
@@ -508,7 +523,7 @@ class Material_Control_Panel:
 
         #Confirm button
         confirm_button = customtkinter.CTkButton(
-            master=self.add_material_window,
+            master=self.add_material_frame,
             text="Confirm",
             fg_color=settings.add_material_window_button_color,
             hover_color=settings.add_material_window_button_hover_color,
@@ -518,7 +533,7 @@ class Material_Control_Panel:
         )
         confirm_button.grid(
             row=11,
-            column=1,
+            column=2,
             sticky="ew",
             padx=(0,0),
             pady=(3,0)
@@ -1674,6 +1689,9 @@ class Material_Control_Panel:
 
             #Recreate the material_adjustment_panel
             globals.material_adjustment_panel.create_material_adjustment_panel()
+
+            if(globals.parameters_panel != None):
+                globals.parameters_panel.create_parameters_panel()
 
         else:
             messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")

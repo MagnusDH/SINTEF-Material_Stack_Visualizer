@@ -111,23 +111,30 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Modify_materials() er full av bugs
     -legge til en funksjon for å legge til flere piezo materialer
-    -I parameters_panel hvor equations blir oppdatert: finn en løsning for aa velge "SiO2_thickness" og oppdater dette i "equations" hvor "SiO2_thickness" blir brukt 
+    
+    -I parameters_panel hvor equations blir oppdatert: finn en løsning for å velge "SiO2_thickness" og oppdater dette i "equations" hvor "SiO2_thickness" blir brukt 
+    
     -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?
+    
     -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert
+
     -Check the width of a materials->name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
-    -Add a "scrollable frame" in "add material" window
+
     -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
-    -Fjerne eller forbedre "reset values" knappen??????? (hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes)
+    
     -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
 
 # QUESTIONS:
     -spør runar om han har lastet ned customtkinter for entry boxene (command: pip show customtkinter)
-    
-    -Har prøvd å finne en løsning på størrelsen til SVG export. finner ingen god løsning men en plausibel løsning er å gjøre program vinduet mindre og lengre i bredden. dette vil lage en bedre SVG versjon av stacken
 
-    -fjerne "reset values" knapp? den har noen bugs og brukes kanskje ikke så ofte???
+    -legge til en entry for å velge materiale for "SiO2_thickness" i parameters panel?
+
+    -Har prøvd å finne en løsning på størrelsen til SVG export. finner ingen god løsning men en plausibel løsning er å gjøre program vinduet mindre og lengre i bredden. dette vil lage en bedre SVG versjon av stacken
+    
+    -Hvordan skal ZP vises når et extra piezo materiale blir lagt til? hvilket piezo materiale skal brukes i alle ligninger?
+
+    -fjerne "reset values" knapp? den har noen bugs og brukes kanskje ikke så ofte??? (hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes)
 
     
 # BUGS:

@@ -57,8 +57,8 @@ material_control_panel_text_size = 12
 
 #ADD MATERIAL WINDOW
 add_material_window_background_color = material_adjustment_panel_background_color
-add_material_window_width = 400
-add_material_window_height = 420
+add_material_window_width = 450
+add_material_window_height = 550
 add_material_window_text_color = "#B1E0FF"
 
 add_material_window_button_color = "#B1E0FF"
