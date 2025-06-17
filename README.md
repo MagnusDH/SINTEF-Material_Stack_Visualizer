@@ -57,6 +57,7 @@
                     ["R"] : tkinter.DoubleVar
                     ["Label_name_id]" : tkinter(value),                      == ID of the label in material_adjustment_panel
                     ["Delete_material_button_id"] : tkinter(value),
+                    ["Piezo_checkbox_id"] : tkinter(value),
                     ["Move_down_button_id"] : tkinter(value),
                     ["Move_up_button_id"] : tkinter(value),
                     ["Entry_id"] : tkinter(value),
@@ -111,10 +112,16 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -legge til en funksjon for å legge til flere piezo materialer
+    -Når du tar svg eksport av stack med zp piler, så er ikke fargen på pilene korrekt, kun linjen er korrekt
     
-    -I parameters_panel hvor equations blir oppdatert: finn en løsning for å velge "SiO2_thickness" og oppdater dette i "equations" hvor "SiO2_thickness" blir brukt 
+    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
     
+    -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
+    
+    -Sørg for at key "piezo_checkbox_id" blir oppdatert over alt 
+    
+    -legge til settings for størrelse på svg eksport
+
     -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?
     
     -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert
@@ -123,20 +130,16 @@
 
     -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
     
-    -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
 
 # QUESTIONS:
-    -spør runar om han har lastet ned customtkinter for entry boxene (command: pip show customtkinter)
+    -Spør om design problemet er fikset hos runar nå. (har bare økt border radius til entry bokser fra 0.4 til 1)
+    -neutralize_global_stress i equations er IKKE ferdig. hva skjer her?
+    -vis runar grønne kommentar meldinger over funksjoner i "equations.py" 
+    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
+    -Be runar ta en dobbelsjekk for om at alle utregninger fremdeles er korrekt
 
-    -legge til en entry for å velge materiale for "SiO2_thickness" i parameters panel?
 
-    -Har prøvd å finne en løsning på størrelsen til SVG export. finner ingen god løsning men en plausibel løsning er å gjøre program vinduet mindre og lengre i bredden. dette vil lage en bedre SVG versjon av stacken
-    
-    -Hvordan skal ZP vises når et extra piezo materiale blir lagt til? hvilket piezo materiale skal brukes i alle ligninger?
 
-    -fjerne "reset values" knapp? den har noen bugs og brukes kanskje ikke så ofte??? (hvis nye materialer er lagt til eller navnet på et materiale er endret så vil ikke dette materialet resettes)
-
-    
 # BUGS:
     -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
 

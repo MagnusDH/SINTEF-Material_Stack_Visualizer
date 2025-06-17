@@ -328,6 +328,7 @@ class App:
                         "R": row["r"],
                         "Label_name_id": None,
                         "Delete_material_button_id": None,
+                        "Piezo_checkbox_id": None,
                         "Move_down_button_id": None,
                         "Move_up_button_id": None,
                         "Entry_id": None,
@@ -463,15 +464,19 @@ class App:
             case "material_thickness_updated":
                 print("Thickness value updated")
 
-                if(globals.layer_stack_canvas != None):
-                    globals.layer_stack_canvas.draw_material_stack()
+                if(globals.current_view.get() == "Stacked" or globals.current_view.get() == "Realistic"):
+                    if(globals.layer_stack_canvas != None):
+                        globals.layer_stack_canvas.draw_material_stack()
+                else:
+                    if(globals.layer_stack_canvas != None):
+                        globals.layer_stack_canvas.draw_material_stack()
 
-                if(globals.parameters_panel != None):
-                    globals.parameters_panel.create_parameters_panel()
+                    if(globals.parameters_panel != None):
+                        globals.parameters_panel.create_parameters_panel()
 
-                if(globals.graph_canvas != None):
-                    globals.graph_canvas.draw_z_tip_is_graph()
-                    globals.graph_canvas.draw_stoney_graph()
+                    if(globals.graph_canvas != None):
+                        globals.graph_canvas.draw_z_tip_is_graph()
+                        globals.graph_canvas.draw_stoney_graph()
 
             case "material_layer_updated":
                 print("Layer variable is updated")
@@ -631,20 +636,21 @@ class App:
                 if(globals.parameters_panel != None):
                     globals.parameters_panel.create_parameters_panel()
             
-            case "stoney_layer1_updated":
-                print("stoney_layer1 updated")
-                if(globals.graph_canvas != None):
-                    globals.graph_canvas.draw_stoney_graph()
-            
-            case "stoney_layer2_updated":
-                print("stoney_layer2 updated")
+            case "stoney_filament_updated":
+                print("stoney_filament updated")
                 if(globals.graph_canvas != None):
                     globals.graph_canvas.draw_stoney_graph()
 
-            # case "t_sol":
-                # print("t_sol updated")
+            case "neutralizing_material_updated":
+                print("neutralizing_material_name updated")
+                
+                if(globals.parameters_panel != None):
+                    globals.parameters_panel.create_parameters_panel()
+            
+            case "t_sol":
+                print("t_sol updated. nothing here is being updated")
                 # if(globals.parameters_panel != None):
-                #     globals.parameters_panel.create_parameters_panel()
+                    # globals.parameters_panel.create_parameters_panel()
 
             # case "M_p":
                 # print("M_p updated")

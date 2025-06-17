@@ -44,6 +44,10 @@ def initialize_globals(root_window):
     volt_value = tkinter.DoubleVar(value=0)
     volt_value.trace_add("write", lambda *args, identifier="volt_value_updated": app.update_widgets(identifier))
 
+    global neutralizing_material_name
+    neutralizing_material_name = tkinter.StringVar(value="")
+    neutralizing_material_name.trace_add("write", lambda *args, identifier="neutralizing_material_updated": app.update_widgets(identifier))
+
     # global stress_neutral_SiO2_thickness_value
     # stress_neutral_SiO2_thickness_value = tkinter.DoubleVar(value=0)
     # stress_neutral_SiO2_thickness_value.trace_add("write", lambda *args, identifier="stress_neutral_SiO2_thickness_value": app.update_widgets(identifier))
@@ -104,9 +108,6 @@ def initialize_globals(root_window):
     t_sol = tkinter.DoubleVar(value=0)
     t_sol.trace_add("write", lambda *args, identifier="t_sol": app.update_widgets(identifier))
 
-    global stoney_substrate
     global stoney_filament
-    stoney_substrate = tkinter.StringVar(value="")
     stoney_filament = tkinter.StringVar(value="")
-    stoney_substrate.trace_add("write", lambda *args, identifier="stoney_layer1_updated": app.update_widgets(identifier))
-    stoney_filament.trace_add("write", lambda *args, identifier="stoney_layer2_updated": app.update_widgets(identifier))
+    stoney_filament.trace_add("write", lambda *args, identifier="stoney_filament_updated": app.update_widgets(identifier))

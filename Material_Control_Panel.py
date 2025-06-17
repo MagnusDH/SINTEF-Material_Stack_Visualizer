@@ -90,17 +90,17 @@ class Material_Control_Panel:
         ) 
 
         #Reset values button
-        reset_values_button = customtkinter.CTkButton(
+        reset_button = customtkinter.CTkButton(
             master=material_control_panel_frame,
-            text="Reset materials",
+            text="Reset to original",
             font=(settings.text_font, settings.material_control_panel_text_size),
             fg_color= settings.material_control_panel_button_color, 
-            hover_color=settings.material_control_panel_button_hover_color, 
+            hover_color=settings.material_control_panel_button_hover_color,
             text_color=settings.material_control_panel_button_text_color,
             command=self.reset_values
         )
-        reset_values_button.grid(
-            row=0, 
+        reset_button.grid(
+            row=1, 
             column=1, 
             sticky="nsew", 
             padx=(5,5), 
@@ -1670,7 +1670,9 @@ class Material_Control_Panel:
                 widget.destroy()
             
             del globals.material_adjustment_panel.material_headline
-            del globals.material_adjustment_panel.slider_label
+            del globals.material_adjustment_panel.slider_headline
+            del globals.material_adjustment_panel.piezo_headline
+
 
             
             #Clear the existing globals.materials

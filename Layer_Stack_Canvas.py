@@ -1033,8 +1033,6 @@ class Layer_Stack_Canvas:
             if(len(globals.materials) == 0):
                 raise ValueError("No materials")
 
-            if(globals.piezo_material_name.get() == ""):
-                raise ValueError("No Piezo material selected")
 
             #Create line from bottom of stack to top of stack (total height line)
             self.layer_stack_canvas.create_line(
@@ -1129,63 +1127,72 @@ class Layer_Stack_Canvas:
             )
 
 
-            #Populate a list with thickness values from layer1 up until "PZT" material
-            t_piezo_list = []
-            for material in globals.materials:
-                # if(material == globals.parameters_panel.piezo_material_entry.get()):
-                if(material == globals.piezo_material_name.get()):
-                    break
+            #Variable to keep track of placement for Zp->arrow
+            zp_arrow = 10
 
-                #Convert thickness to nanometers and append it to list 
-                t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
-                
-            #Fetch thickness value for Piezo material
-            # piezo_thickness = globals.materials[globals.parameters_panel.piezo_material_entry.get()]["Thickness [nm]"].get() / 1e9
-            piezo_thickness = globals.materials[globals.piezo_material_name.get()]["Thickness [nm]"].get() / 1e9
+            #DRAW ZP
+            for material in dict(reversed(globals.materials.items())):
+                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                    piezo_material = material
 
+                    #Populate a list with thickness values from layer1 up until "PZT" material
+                    t_piezo_list = []
+                    for material in globals.materials:
+                        if(material == piezo_material):
+                            break
 
-            #Calculate Zp
-            Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/ 1e9
-            if(isinstance(Zp, Exception)):
-                raise ValueError(f"Zp could not be calculated.\nerror:'{Zp}'")
-
-
-            #Convert Zn to nanometers
-            Zp = Zp * 1e9
-
-            #Convert Zp to pixels
-            Zp_pixels = Zp / nm_per_pixel 
-
-            #Draw the Zp line on the canvas
-            self.layer_stack_canvas.create_line(
-                self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels,
-                self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zp_pixels, 
-                fill="blue",
-                width=4,
-                dash=1,
-                tags="dotted_line"
-            )
-
-            #Draw line from Zn to Zp
-            self.layer_stack_canvas.create_line(
-                (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels),
-                (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels), 
-                arrow=tkinter.BOTH, 
-                arrowshape=(10,10,5),
-                fill="black",
-                width = 3,
-                tags="arrow_line_both"
-            )
+                        #Convert thickness to nanometers and append it to list 
+                        t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                        
+                    #Fetch thickness value for Piezo material
+                    piezo_thickness = globals.materials[piezo_material]["Thickness [nm]"].get() / 1e9
 
 
-            #Write "Zp" text
-            self.layer_stack_canvas.create_text(
-                self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
-                text=f"Zp={round(Zp-Zn, 1)}", 
-                fill="black", 
-                font=(settings.text_font, settings.layer_stack_canvas_text_size), 
-                tags="text"
-            )
+                    #Calculate Zp
+                    Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/ 1e9
+                    if(isinstance(Zp, Exception)):
+                        raise ValueError(f"Zp could not be calculated.\nerror:'{Zp}'")
+                    
+
+                    #Convert Zn to nanometers
+                    Zp = Zp * 1e9
+
+
+                    #Convert Zp to pixels
+                    Zp_pixels = Zp / nm_per_pixel 
+
+                    #Draw the Zp line on the canvas
+                    self.layer_stack_canvas.create_line(
+                        self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zp_pixels,
+                        self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zp_pixels, 
+                        fill="blue",
+                        width=4,
+                        dash=1,
+                        tags="dotted_line"
+                    )
+
+                    #Draw line from Zn to Zp
+                    self.layer_stack_canvas.create_line(
+                        (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - zp_arrow, self.visible_canvas_bbox_y0 - Zn_pixels),
+                        (self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - zp_arrow, self.visible_canvas_bbox_y0 - Zp_pixels), 
+                        arrow=tkinter.BOTH, 
+                        arrowshape=(10,10,5),
+                        fill=globals.materials[piezo_material]["Color"].get(),
+                        width = 3,
+                        tags="arrow_line_both"
+                    )
+
+                    #Write "Zp" text
+                    self.layer_stack_canvas.create_text(
+                        self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
+                        text=f"Zp={round(Zp-Zn, 1)}", 
+                        fill=globals.materials[piezo_material]["Color"].get(), 
+                        font=(settings.text_font, settings.layer_stack_canvas_text_size), 
+                        tags="text"
+                    )
+
+                    zp_arrow += 10
+
 
         except Exception as error:
             self.layer_stack_canvas.create_text(
@@ -1195,3 +1202,4 @@ class Layer_Stack_Canvas:
                 font=(settings.text_font, settings.layer_stack_canvas_text_size), 
             )
             return
+        

@@ -68,55 +68,6 @@ class Parameters_Panel:
             )
 
 
-        #PIEZO_MATERIAL LABEL
-        if not hasattr(self, "piezo_material_label"):
-            self.piezo_material_label = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="Piezo material:", 
-                fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
-            )
-            self.piezo_material_label.grid(
-                row=1, 
-                column=0, 
-                columnspan=2,
-                sticky="w", 
-                padx=(0,0),
-                pady=(0,0)
-            )
-            
-
-        #PIEZO_MATERIAL COMBOBOX
-        if not hasattr(self, "piezo_material_combobox"):
-            self.piezo_material_combobox = customtkinter.CTkComboBox(
-                master=self.parameters_panel_frame,
-                variable=globals.piezo_material_name,
-                values=list(reversed((globals.materials.keys()))),
-                border_width=0.5,
-                border_color=settings.parameters_panel_combobox_border_color,
-                fg_color=settings.parameters_panel_combobox_background_color,
-                text_color=settings.parameters_panel_combobox_text_color,
-                button_color=settings.parameters_panel_combobox_button_color,
-                button_hover_color=settings.parameters_panel_combobox_button_hover_color,
-                dropdown_fg_color=settings.parameters_panel_combobox_dropdown_fg_color,
-                dropdown_hover_color=settings.parameters_panel_combobox_dropdown_hover_color,
-                dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
-            )
-            self.piezo_material_combobox.grid(
-                row=1, 
-                column=2, 
-                sticky="",
-                padx=(0,0),
-                pady=(0,0),
-            )
-        else:
-            if(self.piezo_material_combobox.get() not in globals.materials.keys()):
-                self.piezo_material_combobox.set("")
-            self.piezo_material_combobox.configure(
-                values=list(reversed((globals.materials.keys())))
-            )
-
-
         #"L μm" LABEL
         if not hasattr(self, "L_label"):
             self.L_label = customtkinter.CTkLabel(
@@ -126,11 +77,11 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.L_label.grid(
-                row=2, 
+                row=1, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
 
@@ -141,16 +92,17 @@ class Parameters_Panel:
                 textvariable=globals.L_value,
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
-                border_width=0.4,
+                # border_width=0.4,
+                border_width=1,
                 text_color=settings.parameters_panel_entry_text_color,
                 justify="center"
             )
             self.L_entry.grid(
-                row=2, 
+                row=1, 
                 column=2,
                 sticky="",
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
 
@@ -163,11 +115,11 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.ri_label.grid(
-                row=3, 
+                row=2, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
 
@@ -178,16 +130,16 @@ class Parameters_Panel:
                 textvariable=tkinter.StringVar(value="not in use"),
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
-                border_width=0.4,
+                border_width=1,
                 text_color=settings.parameters_panel_entry_text_color,
                 justify="center"
             )
             self.ri_entry.grid(
-                row=3, 
+                row=2, 
                 column=2,
                 sticky="",
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
 
@@ -200,11 +152,11 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.ro_label.grid(
-                row=4, 
+                row=3, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
 
@@ -215,16 +167,16 @@ class Parameters_Panel:
                 textvariable=tkinter.StringVar(value="not in use"),
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
-                border_width=0.4,
+                border_width=1,
                 text_color=settings.parameters_panel_entry_text_color,
                 justify="center"
             )
             self.ro_entry.grid(
-                row=4, 
+                row=3, 
                 column=2,
                 sticky="",
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
             
@@ -237,11 +189,11 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.e_31_f_label.grid(
-                row=5, 
+                row=4, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
             
 
@@ -252,16 +204,16 @@ class Parameters_Panel:
                 textvariable=globals.e_31_f_value,
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
-                border_width=0.4,
+                border_width=1,
                 text_color=settings.parameters_panel_entry_text_color,
                 justify="center"
             )
             self.e_31_f_entry.grid(
-                row=5, 
+                row=4, 
                 column=2,
                 sticky="",
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
 
@@ -274,11 +226,11 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.volt_label.grid(
-                row=6, 
+                row=5, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
 
 
@@ -296,11 +248,11 @@ class Parameters_Panel:
                 button_hover_color=settings.parameters_panel_slider_hover_color,
             )
             self.volt_slider.grid(
-                row=6, 
+                row=5, 
                 column=1,
                 sticky="",
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
             )
             
 
@@ -311,16 +263,113 @@ class Parameters_Panel:
                 textvariable=globals.volt_value,
                 fg_color = settings.parameters_panel_entry_background_color,
                 border_color=settings.parameters_panel_entry_border_color,
-                border_width=0.4,
+                border_width=1,
                 text_color=settings.parameters_panel_entry_text_color,
                 justify="center"
             )
             self.volt_entry.grid(
-                row=6, 
+                row=5, 
                 column=2,
                 sticky="",
                 padx=(0,0),
-                pady=(0,0)
+                pady=(0,1)
+            )
+
+        #PIEZO_MATERIAL LABEL
+        if not hasattr(self, "piezo_material_label"):
+            self.piezo_material_label = customtkinter.CTkLabel(
+                master=self.parameters_panel_frame, 
+                text="Piezo material:", 
+                fg_color=settings.parameters_panel_background_color,
+                text_color=settings.parameters_panel_text_color
+            )
+            self.piezo_material_label.grid(
+                row=6, 
+                column=0, 
+                columnspan=2,
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,1)
+            )
+            
+
+        #PIEZO_MATERIAL COMBOBOX
+        if not hasattr(self, "piezo_material_combobox"):
+            self.piezo_material_combobox = customtkinter.CTkComboBox(
+                master=self.parameters_panel_frame,
+                variable=globals.piezo_material_name,
+                values=list(reversed((globals.materials.keys()))),
+                border_width=1,
+                border_color=settings.parameters_panel_combobox_border_color,
+                fg_color=settings.parameters_panel_combobox_background_color,
+                text_color=settings.parameters_panel_combobox_text_color,
+                button_color=settings.parameters_panel_combobox_button_color,
+                button_hover_color=settings.parameters_panel_combobox_button_hover_color,
+                dropdown_fg_color=settings.parameters_panel_combobox_dropdown_fg_color,
+                dropdown_hover_color=settings.parameters_panel_combobox_dropdown_hover_color,
+                dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
+            )
+            self.piezo_material_combobox.grid(
+                row=6, 
+                column=2, 
+                sticky="",
+                padx=(0,0),
+                pady=(0,1),
+            )
+        else:
+            if(self.piezo_material_combobox.get() not in globals.materials.keys()):
+                self.piezo_material_combobox.set("")
+            self.piezo_material_combobox.configure(
+                values=list(reversed((globals.materials.keys())))
+            )
+
+
+        #NEUTRALIZING_MATERIAL LABEL
+        if not hasattr(self, "neutralizing_material_label"):
+            self.neutralizing_material_label = customtkinter.CTkLabel(
+                master=self.parameters_panel_frame, 
+                text="Neutralizing material:", 
+                fg_color=settings.parameters_panel_background_color,
+                text_color=settings.parameters_panel_text_color
+            )
+            self.neutralizing_material_label.grid(
+                row=7, 
+                column=0, 
+                columnspan=2,
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,1)
+            )
+            
+
+        #NEUTRALIZING_MATERIAL COMBOBOX
+        if not hasattr(self, "neutralizing_material_combobox"):
+            self.neutralizing_material_combobox = customtkinter.CTkComboBox(
+                master=self.parameters_panel_frame,
+                variable=globals.neutralizing_material_name,
+                values=list(reversed((globals.materials.keys()))),
+                border_width=1,
+                border_color=settings.parameters_panel_combobox_border_color,
+                fg_color=settings.parameters_panel_combobox_background_color,
+                text_color=settings.parameters_panel_combobox_text_color,
+                button_color=settings.parameters_panel_combobox_button_color,
+                button_hover_color=settings.parameters_panel_combobox_button_hover_color,
+                dropdown_fg_color=settings.parameters_panel_combobox_dropdown_fg_color,
+                dropdown_hover_color=settings.parameters_panel_combobox_dropdown_hover_color,
+                dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
+            )
+            self.neutralizing_material_combobox.grid(
+                row=7, 
+                column=2, 
+                sticky="",
+                padx=(0,0),
+                pady=(0,1),
+            )
+        else:
+            if(self.neutralizing_material_combobox.get() not in globals.materials.keys()):
+                self.neutralizing_material_combobox.set("")
+            self.neutralizing_material_combobox.configure(
+                values=list(reversed((globals.materials.keys())))
             )
 
 
@@ -333,11 +382,11 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.stoney_filament_label.grid(
-                row=7, 
+                row=8, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0),
+                pady=(0,1),
                 columnspan=2,
             )
         
@@ -348,7 +397,7 @@ class Parameters_Panel:
                 master=self.parameters_panel_frame,
                 variable=globals.stoney_filament,
                 values=list(reversed((globals.materials.keys()))),
-                border_width=0.5,
+                border_width=1,
                 border_color=settings.parameters_panel_combobox_border_color,
                 fg_color=settings.parameters_panel_combobox_background_color,
                 text_color=settings.parameters_panel_combobox_text_color,
@@ -359,66 +408,16 @@ class Parameters_Panel:
                 dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
             )
             self.stoney_filament_combobox.grid(
-                row=7, 
+                row=8, 
                 column=2, 
                 sticky="", 
                 padx=(0,0),
-                pady=(0,0),
+                pady=(0,1),
             )
         else:
             if(self.stoney_filament_combobox.get() not in globals.materials.keys()):
                 self.stoney_filament_combobox.set("")
             self.stoney_filament_combobox.configure(
-                values=list(reversed((globals.materials.keys())))
-            )
-
-
-        #STONEY SUBSTRATE LABEL
-        if not hasattr(self, "stoney_substrate_label"):
-            self.stoney_substrate_label = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="Stoney substrate", 
-                fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
-            )
-            self.stoney_substrate_label.grid(
-                row=8, 
-                column=0, 
-                sticky="w", 
-                padx=(0,0),
-                pady=(0,0),
-                columnspan=2,
-            )
-
-
-        #STONEY_SUBSTRATE COMBOBOX
-        if not hasattr(self, "stoney_substrate_combobox"):
-            self.stoney_substrate_combobox = customtkinter.CTkComboBox(
-                master=self.parameters_panel_frame,
-                variable=globals.stoney_substrate,
-                values=list(reversed((globals.materials.keys()))),
-                border_width=0.5,
-                border_color=settings.parameters_panel_combobox_border_color,
-                fg_color=settings.parameters_panel_combobox_background_color,
-                text_color=settings.parameters_panel_combobox_text_color,
-                button_color=settings.parameters_panel_combobox_button_color,
-                button_hover_color=settings.parameters_panel_combobox_button_hover_color,
-                dropdown_fg_color=settings.parameters_panel_combobox_dropdown_fg_color,
-                dropdown_hover_color=settings.parameters_panel_combobox_dropdown_hover_color,
-                dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
-            )
-            self.stoney_substrate_combobox.grid(
-                row=8, 
-                column=2, 
-                sticky="",
-                padx=(0,0),
-                pady=(0,0),
-            )
-        else:
-            if(self.stoney_substrate_combobox.get() not in globals.materials.keys()):
-                self.stoney_substrate_combobox.set("")
-
-            self.stoney_substrate_combobox.configure(
                 values=list(reversed((globals.materials.keys())))
             )
 
@@ -436,24 +435,23 @@ class Parameters_Panel:
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0),
+                pady=(0,1),
                 columnspan=3
             )
             self.stress_neutral_SiO2_thickness_label2 = customtkinter.CTkLabel(
                 master=self.parameters_panel_frame,
-                # textvariable=globals.t_sol,
-                text="Equation not finished",
+                textvariable=globals.t_sol,
                 fg_color=settings.parameters_panel_background_color,
-                # text_color=settings.parameters_panel_text_color
-                text_color="red",
+                text_color=settings.parameters_panel_text_color,
+                anchor="w"
             )
             self.stress_neutral_SiO2_thickness_label2.grid(
                 row=9, 
                 column=2, 
-                sticky="nsew", 
+                sticky="w", 
                 padx=(0,0),
-                pady=(0,0),
-                columnspan=3
+                pady=(0,1),
+                columnspan=3,
             )
             
 
@@ -463,28 +461,29 @@ class Parameters_Panel:
                 master=self.parameters_panel_frame, 
                 text=f"Piezoelectric bending moment:", 
                 fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
+                text_color=settings.parameters_panel_text_color,
             )
             self.piezoelectric_bending_moment_label1.grid(
                 row=10, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0),
+                pady=(0,1),
                 columnspan=3
             )
             self.piezoelectric_bending_moment_label2 = customtkinter.CTkLabel(
                 master=self.parameters_panel_frame, 
                 textvariable=globals.M_p,
                 fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
+                text_color=settings.parameters_panel_text_color,
+                anchor="w"
             )
             self.piezoelectric_bending_moment_label2.grid(
                 row=10, 
                 column=2, 
                 sticky="nsew", 
                 padx=(0,0),
-                pady=(0,0),
+                pady=(0,1),
                 columnspan=3
             )
             
@@ -503,15 +502,14 @@ class Parameters_Panel:
                 columnspan=3,
                 sticky="w", 
                 padx=(0,0),
-                pady=(0,0),
+                pady=(0,1),
             )
             self.blocking_force_cantilever_label2 = customtkinter.CTkLabel(
                 master=self.parameters_panel_frame, 
-                # textvariable=globals.blocking_force_cantilever, 
-                text="Equation not finished",
+                textvariable=globals.blocking_force_cantilever, 
                 fg_color=settings.parameters_panel_background_color,
-                # text_color=settings.parameters_panel_text_color
-                text_color="red",
+                text_color=settings.parameters_panel_text_color,
+                anchor="w"
             )
             self.blocking_force_cantilever_label2.grid(
                 row=11, 
@@ -519,76 +517,10 @@ class Parameters_Panel:
                 columnspan=3,
                 sticky="nsew", 
                 padx=(0,0),
-                pady=(0,0),
+                pady=(0,1),
             )
 
 
-        #INITIAL_CURVATURE LABEL
-        if not hasattr(self, "initial_curvature_label1"):
-            self.initial_curvature_label1 = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="Initial curvature:", 
-                fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
-            )
-            self.initial_curvature_label1.grid(
-                row=12, 
-                column=0, 
-                columnspan=3,
-                sticky="w", 
-                padx=(0,0),
-                pady=(0,0),
-            )
-            self.initial_curvature_label2 = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="Equation not finished",
-                fg_color=settings.parameters_panel_background_color,
-                # text_color=settings.parameters_panel_text_color
-                text_color="red"
-            )
-            self.initial_curvature_label2.grid(
-                row=12, 
-                column=2, 
-                columnspan=3,
-                sticky="nsew", 
-                padx=(0,0),
-                pady=(0,0),
-            )
-
-
-        #FINAL_CURVATURE LABEL
-        if not hasattr(self, "final_curvature_label1"):
-            self.final_curvature_label1 = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="Final curvature:", 
-                fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
-            )
-            self.final_curvature_label1.grid(
-                row=13, 
-                column=0, 
-                columnspan=3,
-                sticky="w", 
-                padx=(0,0),
-                pady=(0,0),
-            )
-            self.final_curvature_label2 = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="Equation not finished",
-                fg_color=settings.parameters_panel_background_color,
-                # text_color=settings.parameters_panel_text_color
-                text_color="red"
-            )
-            self.final_curvature_label2.grid(
-                row=13, 
-                column=2, 
-                columnspan=3,
-                sticky="nsew", 
-                padx=(0,0),
-                pady=(0,0),
-            )
-
-       
         #Update the values in the equation labels
         self.update_equation_labels()
 
@@ -601,74 +533,167 @@ class Parameters_Panel:
         """
         """
 
-        # print("UPDATE_EQUATION_LABELS()")
        
-        t = []
-        # sigma_i = []
-        E = []
-        nu = []
-        
-        for material in globals.materials:
-            t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
-            #sigma_i.append(globals.materials[material]["Stress_x [MPa]"].get() * 1e6)
-            E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
-            nu.append(globals.materials[material]["Poisson"].get())
 
-        # L = globals.L_value.get() 
+
+
+
+
+        #lag en try-except block for hver label
+        #finn ut hvilke verdier er nødvendige før hver label, slik at hvis en verdi er feil så kan de tilsvarende labelene også feile
+
+
+
+        print("UPDATE_EQUATION_LABELS()")
+
+        # # try:
+        # #     # E
+        # #     # t
+        # #     # W
+        # #     # piezo_thickness    
+        # #     # V_p
+        # #     # e_31_f
+        # #     # L
+        # #     # h_Si
+        # #     #calculate blocking
+        # #     #set blocking label
+        # # except
+        # #     #set all labels to error
+        # #     return
+
+        # try:
+        #     # nu
+        #     # Zn
+        #     # Zp
+        #     #calucalte M_p
+        #     #set M_p label
+
+        # except
+        #     #set M_p and t_sol label to error
+        #     return 
+
+        # try:
+        #     # sigma_i
+        #     # M_is
+        #     # M_p
+        #     # M_tot
+        #     # EI
+        #     # curv_is
+        #     # neutralizing_material_thickness
+        #     #calculate t_sol
+        #     #set t_sol
+        # except
+        #     #set t_sol label to error
+
 
         try:
-            Zn = globals.equations.calculate_Zn(E, t, nu)
-        except Exception as error:
-            print("Could not calculate Zn in parameters panel\n", error)
+            #Fetch necessary values and calculations
+            W = 160 / 1e6
+            t = []
+            sigma_i = []
+            E = []
+            nu = []
+            for material in globals.materials:
+                t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                sigma_i.append(globals.materials[material]["Stress_x [MPa]"].get() * 1e6)
+                E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
+                nu.append(globals.materials[material]["Poisson"].get())
+            
 
-        W = 160 / 1e6
-
-        # M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W)
-        
-        try:
-            piezo_thickness = globals.materials[globals.piezo_material_name.get()]["Thickness [nm]"].get() / 1e9
-        except Exception as error:
-            print("No piezo material selected. ERROR:", error, "\n")
-
-        try:
-            Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
-        except Exception as error:
-            print("Could not calculate Zp in parameters panel. ERROR:", error, "\n")
-
-        try:
+            #piezo material thickness
+            try:
+                piezo_thickness = globals.materials[globals.piezo_material_name.get()]["Thickness [nm]"].get() / 1e9
+            except:
+                raise ValueError("Select piezo material")
+            
+            #Volt value
             V_p = globals.volt_value.get()
-        except Exception as error:
-            print("No volt value selected. ERROR:", error, "\n")
 
-        try:
+            #e_31_f value
             e_31_f = globals.e_31_f_value.get()
+
+            #L value
+            L = globals.L_value.get()
+
+            #Total thickness of materials from substrate up to (but not including) chosen piezo material
+            h_Si = 0 
+            for material in globals.materials:
+                if(material == globals.piezo_material_name.get()):
+                    break
+                h_Si += globals.materials[material]["Thickness [nm]"].get()
+                
+            #CALCULATE BLOCKING FORCE CANTILEVER
+            blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
+            globals.blocking_force_cantilever.set(f"{blocking_force:.2e}")
+            self.blocking_force_cantilever_label2.configure(text="", textvariable=globals.blocking_force_cantilever, text_color=settings.parameters_panel_text_color)
+
         except Exception as error:
-            print("No e_31_f value selected. ERROR:", error, "\n")
+            #Set M_p to error
+            self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="", text_color="red")
+            self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="")
 
-        # M_p = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
+            #Set blocking force to error
+            self.blocking_force_cantilever_label2.configure(text=f"{error}", textvariable="", text_color="red")
+            self.blocking_force_cantilever_label2.configure(text=f"{error}", textvariable="")
 
-        # M_tot = globals.equations.calculate_M_tot_cantilever(M_is, M_p)
+            #Set t_sol to error
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="", text_color="red")
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="")
 
-        # EI = globals.equations.calculate_EI(E, t, nu, W, Zn)
-
-        # curv_is = globals.equations.calculate_curvature(M_tot, EI)
-
-        #navn: "stress neutralizer"
-        # SiO2_thickness = globals.materials["SiO2"]["Thickness [nm]"].get() / 1e9
-
-        # t_sol = globals.equations.find_t_solution(t, L, curv_is, SiO2_thickness)
-        # if(isinstance(t_sol, Exception)):
-        #     raise ValueError(f"Could not calculate t_sol.\nerror:'{t_sol}'")
-        # else: 
-        #     globals.t_sol.set(t_sol)
-
+            return
+        
         try:
+            #CALCULATE ZN
+            Zn = globals.equations.calculate_Zn(E, t, nu)
+            
+            #CALCULATE ZP
+            Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+
+            #CALCULATE M_p
             M_p = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
             globals.M_p.set(f"{M_p:.2e}")
             self.piezoelectric_bending_moment_label2.configure(text="", textvariable=globals.M_p, text_color=settings.parameters_panel_text_color)
 
-        except Exception as error:
-            self.program_window.update()
-            self.piezoelectric_bending_moment_label2.configure(text="No piezo material selected", textvariable="", text_color="red")
-            self.piezoelectric_bending_moment_label2.configure(text="No piezo material selected", textvariable="")
 
+        except Exception as error:
+            #Set M_p to error
+            self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="", text_color="red")
+            self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="")
+
+            #Set t_sol to error
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="", text_color="red")
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="")
+            
+            return 
+        
+        try:
+            #CALCULATE M_IS
+            M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W) 
+
+            #CALCULATE M_TOT
+            M_tot = globals.equations.calculate_M_tot_cantilever(M_is, M_p)
+
+            #CALCULATE EI
+            EI = globals.equations.calculate_EI(E, t, nu, W, Zn)
+
+            #CALCULATE CURV_IS
+            curv_is = globals.equations.calculate_curvature(M_tot, EI)
+
+            #Neutralizing material thickness
+            try:
+                neutralizing_material_thickness = globals.materials[globals.neutralizing_material_name.get()]["Thickness [nm]"].get() / 1e9     
+            except:
+                raise ValueError("Select neutralizing material")      
+
+            #CALCULATE T_SOL
+            t_sol = globals.equations.find_t_solution(t, L, curv_is, neutralizing_material_thickness)
+            globals.t_sol.set(t_sol)
+            self.stress_neutral_SiO2_thickness_label2.configure(text="", textvariable=globals.t_sol, text_color=settings.parameters_panel_text_color)
+        
+        except Exception as error:
+            print(error)
+            #Set t_sol to error
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="", text_color="red")
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="")
+
+            return

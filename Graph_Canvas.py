@@ -128,9 +128,6 @@ class Graph_Canvas:
             if(len(globals.materials) == 0):
                 raise ValueError("No materials")
 
-            if(globals.stoney_substrate.get()==""):
-                raise ValueError("No substrate selected")
-            
             if(globals.stoney_filament.get()==""):
                 raise ValueError("No filament selected")
 
@@ -148,12 +145,18 @@ class Graph_Canvas:
             self.graph2.axvline(0, color="black", linewidth=1)
 
             #Fetch necessary values
+            #Substrate material
+            for material in globals.materials:
+                if(globals.materials[material]["Layer"].get() == 1):
+                    substrate = material
+                    break
+            
             #Modulus value for substrate in pascals
-            Es = globals.materials[globals.stoney_substrate.get()]["Modulus [GPa]"].get() * 1000000000
+            Es = globals.materials[substrate]["Modulus [GPa]"].get() * 1000000000
             #Poisson value for substrate
-            Vs = globals.materials[globals.stoney_substrate.get()]["Poisson"].get()
+            Vs = globals.materials[substrate]["Poisson"].get()
             #Thickness for substrate in meters
-            Ts = globals.materials[globals.stoney_substrate.get()]["Thickness [nm]"].get() / 1000000000
+            Ts = globals.materials[substrate]["Thickness [nm]"].get() / 1000000000
             
             #Thickness for filament in meters
             Tf = globals.materials[globals.stoney_filament.get()]["Thickness [nm]"].get() / 1000000000
@@ -174,7 +177,7 @@ class Graph_Canvas:
                 raise ValueError(f"The 'R0' value for '{globals.stoney_filament.get()}' can not be zero")
             
             if(1-Vs) == 0:
-                raise ValueError(f"The 'poisson' value for '{globals.stoney_substrate.get()}' can not be 1")
+                raise ValueError(f"The 'poisson' value for '{substrate}' can not be 1")
             
             #Calculate the sigma_R value
             sigma_R = ( (Es* (Ts**2)) / (6*(1-Vs)*Tf)) * ( (1/R) - (1/R0) )

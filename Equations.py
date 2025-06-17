@@ -215,6 +215,7 @@ class Equations:
 
 
     #HVA ER RETUR VERDI???
+    #hva er second_thickness?
     def neutralize_global_stress(self, second_thickness, t:list, L:float, curv_is:float):
         """
         Objective function for fsolve: sets the second-layer thickness to t_guess[0],
@@ -222,6 +223,7 @@ class Equations:
         Returns the tip displacement in the same units that calculate_tip_placement uses\n
 
         PARAMETERS:\n
+            second_thickness: ????????????????????????????
             t: list of thickness values in unit "meters"
             L: value in unit "meters"
             SiO2_thickness in unit "meters"
@@ -252,7 +254,7 @@ class Equations:
 
 
     #HVA ER RETUR VERDI???
-    def find_t_solution(self, t:list, L:float, curv_is:float, SiO2_thickness:float):
+    def find_t_solution(self, t:list, L:float, curv_is:float, neutralizing_material_thickness:float):
         """
         Solve for and return the thickness of the second layer that makes the
         stress-induced tip displacement zero.\n
@@ -261,7 +263,7 @@ class Equations:
             t: list of thickness values in unit "meters"
             L: value in unit "meters"
             curv_is: value in unit "1/meters"
-            SiO2_thickness in unit "meters"
+            neutralizing_material_thickness: thickness of neutralizing material in unit "meters"
 
         Returns the neutralizing thickness in unit: "nanometer???????????????" if succesfull.
         If not successfull the error is returned.
@@ -269,11 +271,11 @@ class Equations:
         # print("FIND_T_SOLUTION()")
 
         try:
-            #Convert SiO2_thickness into a list object so it can be used in "fsolve"
-            SiO2_thickness_list = [SiO2_thickness]
+            #Convert neutralizing_material_thickness into a list object so it can be used in "fsolve"
+            neutralizing_material_thickness = [neutralizing_material_thickness]
 
             #Use fsolve to find the root of neutralize_global_stress
-            t_sol = fsolve(self.neutralize_global_stress(t, L, curv_is), SiO2_thickness_list)[0]
+            t_sol = fsolve(self.neutralize_global_stress(t, L, curv_is), neutralizing_material_thickness)[0]
 
             return t_sol
         
@@ -281,8 +283,7 @@ class Equations:
             return error
 
 
-    #ADD EXPLANATION
-    def calculate_blocking_force(self, E:list, t:list, V:float, e_31_f:float, h_PZT:float, h_Si:float, w:float, L:float):
+    def calculate_blocking_force(self, E:list, t:list, V_p:float, e_31_f:float, h_PZT:float, h_Si:float, w:float, L:float):
         """
         Blocking force calculation.
 
@@ -291,9 +292,9 @@ class Equations:
             t: list of thickness values in unit "meters"
             V: value in "volt"
             e_31_f: value in unit "c/m2"
-            h_PZT: ???????????????????????
-            h_Si: ?????????????????????????
-            w: ????????????????????????????
+            h_PZT: thickness of chosen piezo material in unit "meters" 
+            h_Si: thickness of materials from substrate up to (but not including) chosen piezo material
+            W: value in unit "meters"
             L: value in unit "meters"
 
         Returns the "blocking force" if succesfull.
@@ -316,7 +317,7 @@ class Equations:
             num = -3 * d31 * h_Si * (h_PZT + h_Si) * w
             den =  4 * (S11_PZT * h_Si + S11_Si * h_PZT) * L
 
-            blocking_force = (num/den) * V
+            blocking_force = (num/den) * V_p
 
             return blocking_force
         
