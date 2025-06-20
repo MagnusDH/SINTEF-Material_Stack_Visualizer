@@ -1053,8 +1053,15 @@ class Layer_Stack_Canvas:
             
             #Create text to explain the total height of the stack in "nm"
             self.layer_stack_canvas.create_text(
-                self.visible_canvas_bbox_x0 + 95, self.visible_canvas_bbox_y1 + 30,
-                text=f"Total height:\n{total_height_of_materials} nm", 
+                self.visible_canvas_bbox_x0 + 75, self.visible_canvas_bbox_y1 + 20,
+                text=f"Total height:", 
+                fill=settings.layer_stack_canvas_text_color, 
+                font=(settings.text_font, settings.layer_stack_canvas_text_size),
+                tags="text" 
+            )
+            self.layer_stack_canvas.create_text(
+                self.visible_canvas_bbox_x0 + 75, self.visible_canvas_bbox_y1 + 40,
+                text=f"{total_height_of_materials} nm", 
                 fill=settings.layer_stack_canvas_text_color, 
                 font=(settings.text_font, settings.layer_stack_canvas_text_size),
                 tags="text" 
@@ -1185,13 +1192,13 @@ class Layer_Stack_Canvas:
                     #Write "Zp" text
                     self.layer_stack_canvas.create_text(
                         self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 70, self.visible_canvas_bbox_y0 - Zp_pixels - (Zn_pixels - Zp_pixels)/2,
-                        text=f"Zp={round(Zp-Zn, 1)}", 
+                        text=f"Zp={round(Zp-Zn)}", 
                         fill=globals.materials[piezo_material]["Color"].get(), 
                         font=(settings.text_font, settings.layer_stack_canvas_text_size), 
                         tags="text"
                     )
 
-                    zp_arrow += 10
+                    zp_arrow += 15
 
 
         except Exception as error:

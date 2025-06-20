@@ -112,14 +112,10 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Når du tar svg eksport av stack med zp piler, så er ikke fargen på pilene korrekt, kun linjen er korrekt
-    
-    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
-    
     -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
     
-    -Sørg for at key "piezo_checkbox_id" blir oppdatert over alt 
-    
+    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
+
     -legge til settings for størrelse på svg eksport
 
     -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?

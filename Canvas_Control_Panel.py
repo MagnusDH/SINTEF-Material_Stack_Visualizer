@@ -531,9 +531,8 @@ class Canvas_Control_Panel:
                             text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(item, 'text')
                             text_color = globals.layer_stack_canvas.layer_stack_canvas.itemcget(item, 'fill')
                             svg_text_element = '<text x="{}" y="{}" fill="{}" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(text_x0, text_y0, text_color, settings.svg_text_size, text_content)
-                            
                             f.write(svg_text_element)
-
+                            
                         case "text_bbox":
                             #Create SVG-element of text bbox
                             rect_x0, rect_y0, rect_x1, rect_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(item)
@@ -577,19 +576,31 @@ class Canvas_Control_Panel:
                         case "arrow_line_both":
                             line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(item)
                             line_color = globals.layer_stack_canvas.layer_stack_canvas.itemcget(item, "fill")
-                            svg_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="{}" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(line_coords[0], line_coords[1], line_coords[2], line_coords[3], line_color)
 
-                            #Add arrowheads on both sides of the line
-                            svg_line_element += (
-                                '<defs>\n'
-                                '    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="10" refY="3" orient="auto">\n'
-                                '        <path d="M0,0 L0,6 L9,3 z" fill="black" />\n'
-                                '    </marker>\n'
-                                '    <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto">\n'
-                                '        <path d="M0,3 L9,0 L9,6 z" fill="black" />\n'
-                                '    </marker>\n'
-                                '</defs>\n'
+                            #Use a unique ID based on the line color
+                            color_id = line_color.replace("#", "")  # Strip # for ID safety
+
+                            #SVG line element
+                            svg_line_element = (
+                                f'<line x1="{line_coords[0]}" y1="{line_coords[1]}" '
+                                f'x2="{line_coords[2]}" y2="{line_coords[3]}" '
+                                f'stroke="{line_color}" stroke-width="2" '
+                                f'marker-start="url(#arrow-start-{color_id})" '
+                                f'marker-end="url(#arrow-end-{color_id})" />\n'
                             )
+
+                            #Add arrowheads on both sides of the line with the same color
+                            svg_line_element += (
+                                f'<defs>\n'
+                                f'    <marker id="arrow-end-{color_id}" markerWidth="10" markerHeight="10" refX="10" refY="3" orient="auto">\n'
+                                f'        <path d="M0,0 L0,6 L9,3 z" fill="{line_color}" />\n'
+                                f'    </marker>\n'
+                                f'    <marker id="arrow-start-{color_id}" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto">\n'
+                                f'        <path d="M0,3 L9,0 L9,6 z" fill="{line_color}" />\n'
+                                f'    </marker>\n'
+                                f'</defs>\n'
+                            )
+
                             f.write(svg_line_element)
 
 
