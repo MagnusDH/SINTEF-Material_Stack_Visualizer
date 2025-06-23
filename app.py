@@ -326,22 +326,6 @@ class App:
                         "Poisson": row["poisson"],
                         "R0": row["r0"],
                         "R": row["r"],
-                        "Label_name_id": None,
-                        "Delete_material_button_id": None,
-                        "Piezo_checkbox_id": None,
-                        "Move_down_button_id": None,
-                        "Move_up_button_id": None,
-                        "Entry_id": None,
-                        "Slider_id": None,
-                        "Checkbox_id": None,
-                        "Rectangle_id": None,
-                        "Text_id": None,
-                        "Text_bbox_id" : None,
-                        "Line_id": None,
-                        "Indent_text_id": None,
-                        "Indent_text_bbox_id": None,
-                        "Indent_line_id": None,
-                        "Indent_arrow_pointer_id": None
                     }
 
                     #Put "info" dictionary into self.materials dictionary
@@ -576,6 +560,7 @@ class App:
             
             case "piezo_material_updated":
                 print("piezo_material variable is updated")
+
                 #To update equation labels
                 if(globals.parameters_panel != None):
                     globals.parameters_panel.create_parameters_panel()
@@ -920,7 +905,7 @@ class App:
             print("\n")
 
 
-    def program_window_resized(self, event): 
+    def program_window_resized(self, *event): 
         """Scales the layer_stack_canvas correctly based on the size of the program_window"""
         # print("PROGRAM_WINDOW_RESIZED()")
         

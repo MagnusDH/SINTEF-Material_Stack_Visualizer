@@ -800,21 +800,6 @@ class Material_Control_Panel:
             "Poisson": Poisson_value,
             "R0": R0_value,
             "R": R_value,
-            "Label_name_id": None,
-            "Delete_material_button_id": None,
-            "Move_down_button_id": None,
-            "Move_up_button_id": None,
-            "Rectangle_id": None,
-            "Text_id": None,
-            "Text_bbox_id" : None,
-            "Line_id": None,
-            "Entry_id": None,
-            "Slider_id": None,
-            "Checkbox_id": None,
-            "Indent_text_id": None,
-            "Indent_text_bbox_id": None,
-            "Indent_line_id": None,
-            "Indent_arrow_pointer_id": None
         }
 
         #Set piezo material name if not already set
@@ -1629,21 +1614,6 @@ class Material_Control_Panel:
             globals.materials[new_key]["Poisson"].trace_add("write", lambda *args, identifier="material_poisson_updated": globals.app.update_widgets(identifier))
             globals.materials[new_key]["R0"].trace_add("write", lambda *args, identifier="material_R0_updated": globals.app.update_widgets(identifier))
             globals.materials[new_key]["R"].trace_add("write", lambda *args, identifier="material_R_updated": globals.app.update_widgets(identifier))
-
-
-            #Set new variable values
-            # globals.materials[new_key]["Name"].set(self.entry_dictionary[material]["Name_entry"].get())
-            # globals.materials[new_key]["Thickness [nm]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Thickness_entry"].get()))  
-            # globals.materials[new_key]["Unit"].set(self.entry_dictionary[material]["Unit_entry"].get())  
-            # globals.materials[new_key]["Indent [nm]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Indent_entry"].get())) 
-            # globals.materials[new_key]["Color"].set(self.entry_dictionary[material]["Color_entry"].get())  
-            # globals.materials[new_key]["Modulus [GPa]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Modulus_entry"].get()))  
-            # globals.materials[new_key]["CTE [ppm/deg]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["CTE_entry"].get()))
-            # globals.materials[new_key]["Density [kg/m3]"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Density_entry"].get()))
-            # globals.materials[new_key]["Stress_x [MPa]"].set(value=helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Stress_entry"].get()))
-            # globals.materials[new_key]["Poisson"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["Poisson_entry"].get()))
-            # globals.materials[new_key]["R0"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R0_entry"].get()))
-            # globals.materials[new_key]["R"].set(helper_functions.convert_decimal_string_to_float(self.entry_dictionary[material]["R_entry"].get()))
 
 
         #Sort materials dictionary

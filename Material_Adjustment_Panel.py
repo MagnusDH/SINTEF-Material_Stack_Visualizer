@@ -72,11 +72,6 @@ class Material_Adjustment_Panel:
 
                 self.material_adjustment_panel_frame.rowconfigure((0,1), weight=4, uniform="group1")  
 
-                # #If checkboxes has been made, disable it
-                # for material in globals.materials:
-                #     if(globals.materials[material]["Checkbox_id"] != None):
-                #         globals.materials[material]["Checkbox_id"].grid_forget()
-
                 #Create label headline for "material"
                 if not hasattr(self, 'material_headline'):
                     #Create label headline for "material"
@@ -127,8 +122,8 @@ class Material_Adjustment_Panel:
                 if(len(globals.materials) > 0):
                     for material in dict(reversed(globals.materials.items())): 
                         
-                        #DELETE BUTTON                        
-                        if(globals.materials[material]["Delete_material_button_id"] == None):
+                        #DELETE BUTTON
+                        if("Delete_material_button_id" not in globals.materials[material]):                  
                             delete_material_button = customtkinter.CTkButton(
                                 master=self.material_adjustment_panel_frame, 
                                 width=1,
@@ -159,7 +154,8 @@ class Material_Adjustment_Panel:
 
 
                         #MATERIAL NAME LABEL
-                        if(globals.materials[material]["Label_name_id"] == None):
+                        if("Label_name_id" not in globals.materials[material]):                  
+
                             label = customtkinter.CTkLabel(
                                 master=self.material_adjustment_panel_frame, 
                                 textvariable=globals.materials[material]["Name"], 
@@ -185,7 +181,7 @@ class Material_Adjustment_Panel:
 
 
                         #THICNKESS ENTRY
-                        if(globals.materials[material]["Entry_id"] == None):
+                        if("Entry_id" not in globals.materials[material]):                  
                             entry = customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
                                 textvariable=globals.materials[material]["Thickness [nm]"],
@@ -212,7 +208,7 @@ class Material_Adjustment_Panel:
 
 
                         #THICKNESS SLIDER
-                        if(globals.materials[material]["Slider_id"] == None):
+                        if("Slider_id" not in globals.materials[material]):                  
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
                                 from_=settings.material_adjustment_panel_slider_range_min, 
@@ -243,7 +239,7 @@ class Material_Adjustment_Panel:
 
 
                         #MOVE DOWN BUTTON
-                        if(globals.materials[material]["Move_down_button_id"] == None):
+                        if("Move_down_button_id" not in globals.materials[material]):                  
                             move_down_button = customtkinter.CTkButton(
                                 master=self.material_adjustment_panel_frame, 
                                 text="⬇", #⬆ ⬇ 🔼 🔽
@@ -272,7 +268,7 @@ class Material_Adjustment_Panel:
 
 
                         #MOVE UP BUTTON
-                        if(globals.materials[material]["Move_up_button_id"] == None):
+                        if("Move_up_button_id" not in globals.materials[material]):                  
                             move_up_button = customtkinter.CTkButton(
                                 master=self.material_adjustment_panel_frame, 
                                 text="⬆", #⬆ ⬇ 🔼 🔽
@@ -312,12 +308,6 @@ class Material_Adjustment_Panel:
                 self.material_adjustment_panel_frame.columnconfigure(5, weight=6, uniform="group1")    #Up Button
 
                 self.material_adjustment_panel_frame.rowconfigure((0,1), weight=4, uniform="group1")  
-
-                # #If checkboxes has been made, disable it
-                # for material in globals.materials:
-                #     if(globals.materials[material]["Checkbox_id"] != None):
-                #         globals.materials[material]["Checkbox_id"].grid_forget()
-
 
                 #MATERIAL HEADLINE
                 if not hasattr(self, 'material_headline'):
@@ -369,7 +359,7 @@ class Material_Adjustment_Panel:
                 if(len(globals.materials) > 0):
                     for material in dict(reversed(globals.materials.items())): 
                         #DELETE MATERIAL BUTTON
-                        if(globals.materials[material]["Delete_material_button_id"] == None):
+                        if("Delete_material_button_id" not in globals.materials[material]):                  
                             delete_material_button = customtkinter.CTkButton(
                                 master=self.material_adjustment_panel_frame, 
                                 width=1,
@@ -399,7 +389,7 @@ class Material_Adjustment_Panel:
 
 
                         #MATERIAL NAME LABEL
-                        if(globals.materials[material]["Label_name_id"] == None):
+                        if("Label_name_id" not in globals.materials[material]):                  
                             label = customtkinter.CTkLabel(
                                 master=self.material_adjustment_panel_frame, 
                                 textvariable=globals.materials[material]["Name"], 
@@ -425,7 +415,7 @@ class Material_Adjustment_Panel:
 
                         
                         #THCIKNESS ENTRY
-                        if(globals.materials[material]["Entry_id"] == None):
+                        if("Entry_id" not in globals.materials[material]):                  
                             entry=customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
                                 textvariable=globals.materials[material]["Indent [nm]"],
@@ -453,7 +443,7 @@ class Material_Adjustment_Panel:
 
 
                         #THICKNESS SLIDER
-                        if(globals.materials[material]["Slider_id"] == None):
+                        if("Slider_id" not in globals.materials[material]):                  
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
                                 from_=settings.material_adjustment_panel_slider_range_min, 
@@ -487,7 +477,7 @@ class Material_Adjustment_Panel:
                         if(len(globals.materials) > 1):
 
                             #DOWN BUTTON
-                            if(globals.materials[material]["Move_down_button_id"] == None):
+                            if("Move_down_button_id" not in globals.materials[material]):                  
                                 move_down_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬇", #⬆ ⬇ 🔼 🔽
@@ -516,7 +506,7 @@ class Material_Adjustment_Panel:
 
 
                             #UP BUTTON
-                            if(globals.materials[material]["Move_up_button_id"] == None):
+                            if("Move_up_button_id" not in globals.materials[material]):                  
                                 move_up_button = customtkinter.CTkButton(
                                     master=self.material_adjustment_panel_frame, 
                                     text="⬆", #⬆ ⬇ 🔼 🔽
@@ -633,7 +623,7 @@ class Material_Adjustment_Panel:
                     for material in dict(reversed(globals.materials.items())): 
                         
                         #DELETE BUTTON                        
-                        if(globals.materials[material]["Delete_material_button_id"] == None):
+                        if("Delete_material_button_id" not in globals.materials[material]):                  
                             delete_material_button = customtkinter.CTkButton(
                                 master=self.material_adjustment_panel_frame, 
                                 width=1,
@@ -664,7 +654,7 @@ class Material_Adjustment_Panel:
 
 
                         #MATERIAL NAME LABEL
-                        if(globals.materials[material]["Label_name_id"] == None):
+                        if("Label_name_id" not in globals.materials[material]):                  
                             label = customtkinter.CTkLabel(
                                 master=self.material_adjustment_panel_frame, 
                                 textvariable=globals.materials[material]["Name"], 
@@ -690,7 +680,7 @@ class Material_Adjustment_Panel:
 
 
                         #CREATE PIEZO CHECKBOX
-                        if(globals.materials[material]["Piezo_checkbox_id"] == None):
+                        if("Piezo_checkbox_id" not in globals.materials[material]):                  
                             piezo_checkbox = customtkinter.CTkCheckBox(
                                 master=self.material_adjustment_panel_frame,
                                 text="",
@@ -718,7 +708,7 @@ class Material_Adjustment_Panel:
 
 
                         #THICNKESS ENTRY
-                        if(globals.materials[material]["Entry_id"] == None):
+                        if("Entry_id" not in globals.materials[material]):                  
                             entry = customtkinter.CTkEntry(
                                 master=self.material_adjustment_panel_frame,
                                 textvariable=globals.materials[material]["Thickness [nm]"],
@@ -745,7 +735,7 @@ class Material_Adjustment_Panel:
 
 
                         #THICKNESS SLIDER
-                        if(globals.materials[material]["Slider_id"] == None):
+                        if("Slider_id" not in globals.materials[material]):                  
                             slider = customtkinter.CTkSlider(
                                 master=self.material_adjustment_panel_frame, 
                                 from_=settings.material_adjustment_panel_slider_range_min, 
@@ -776,7 +766,7 @@ class Material_Adjustment_Panel:
 
 
                         #MOVE DOWN BUTTON
-                        if(globals.materials[material]["Move_down_button_id"] == None):
+                        if("Move_down_button_id" not in globals.materials[material]):                  
                             move_down_button = customtkinter.CTkButton(
                                 master=self.material_adjustment_panel_frame, 
                                 text="⬇", #⬆ ⬇ 🔼 🔽
@@ -805,7 +795,7 @@ class Material_Adjustment_Panel:
 
 
                         #MOVE UP BUTTON
-                        if(globals.materials[material]["Move_up_button_id"] == None):
+                        if("Move_up_button_id" not in globals.materials[material]):                  
                             move_up_button = customtkinter.CTkButton(
                                 master=self.material_adjustment_panel_frame, 
                                 text="⬆", #⬆ ⬇ 🔼 🔽
@@ -968,37 +958,27 @@ class Material_Adjustment_Panel:
         # print("DELETE_MATERIAL()")
 
         #Destroy all widgets related to material
-        if(globals.materials[material]["Label_name_id"] != None):
+        if("Label_name_id" in globals.materials[material]):                          
             globals.materials[material]["Label_name_id"].destroy()
-        if(globals.materials[material]["Delete_material_button_id"] != None):
+
+        if("Delete_material_button_id" in globals.materials[material]):                  
             globals.materials[material]["Delete_material_button_id"].destroy()
-        if(globals.materials[material]["Move_down_button_id"] != None):
+
+        if("Move_down_button_id" in globals.materials[material]):                          
             globals.materials[material]["Move_down_button_id"].destroy()
-        if(globals.materials[material]["Move_up_button_id"] != None):
+        
+        if("Move_up_button_id" in globals.materials[material]):                          
             globals.materials[material]["Move_up_button_id"].destroy()
-        if(globals.materials[material]["Entry_id"] != None):
+
+        if("Entry_id" in globals.materials[material]):                          
             globals.materials[material]["Entry_id"].destroy()
-        if(globals.materials[material]["Slider_id"] != None):
+
+        if("Slider_id" in globals.materials[material]):                                      
             globals.materials[material]["Slider_id"].destroy()
-        if(globals.materials[material]["Checkbox_id"] != None):
+
+        if("Checkbox_id" in globals.materials[material]):                                                  
             globals.materials[material]["Checkbox_id"].destroy()
 
-        # if(globals.materials[material]["Rectangle_id"] != None):
-        #     globals.materials[material]["Rectangle_id"].destroy()
-        # if(globals.materials[material]["Text_id"] != None):
-        #     globals.materials[material]["Text_id"].destroy()
-        # if(globals.materials[material]["Text_bbox_id"] != None):
-        #     globals.materials[material]["Text_bbox_id"].destroy()
-        # if(globals.materials[material]["Line_id"] != None):
-        #     globals.materials[material]["Line_id"].destroy()
-        # if(globals.materials[material]["Indent_text_id"] != None):
-        #     globals.materials[material]["Indent_text_id"].destroy()
-        # if(globals.materials[material]["Indent_text_bbox_id"] != None):
-        #     globals.materials[material]["Indent_text_bbox_id"].destroy()
-        # if(globals.materials[material]["Indent_line_id"] != None):
-        #     globals.materials[material]["Indent_line_id"].destroy()
-        # if(globals.materials[material]["Indent_arrow_pointer_id"] != None):
-        #     globals.materials[material]["Indent_arrow_pointer_id"].destroy()
 
         #delete material from dictionary
         del globals.materials[material]

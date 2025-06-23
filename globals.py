@@ -18,6 +18,10 @@ equations = None
 current_program_window_height = None
 current_program_window_width = None
 
+
+#TEMPORARY DICTIONARY FOR RUNAR TO USE (key is material name, value is Zp value)
+zp = {}
+
 def initialize_globals(root_window):
     """
     Creates variables that are used globaly in the program

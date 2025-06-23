@@ -1,5 +1,21 @@
 # Python Graphical User Interface program for visualizing thickness of materials and their behaviours
 
+# RUNAR
+    -Alle Zp verdier blir lagret i en dictionary kalt "globals.zp".
+    -Zp verdi blir kun regnet ut og lagret hvis du har markert et materiale som piezo materiale i check-boksene 
+
+
+    dictionary key = "navn på materialet"
+    dictionary value = Zp  
+
+    KODE FOR Å HENTE UT ZP VERDIER:
+
+    for key in globals.zp:
+        material_name = key
+        zp_value = globals.zp[key]
+        print(f"Key:{material_name}, Zp value: {zp_value}")
+        
+
 # How to run program
     1. Open a terminal in the folder containing the "app.py" file
     2. Run one of the following commands:
@@ -112,29 +128,21 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Istedetfor å sjekke om en widget eller noe i materials{} er "None" før du lager det, kan du heller sjekke om "key'en" finnes, slik at du slipper å legge til alle variabler i materials{} når du start programmet eller legger til nye materialer
-    
-    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
+    -legge til flere piezo electric bending moment labels (som runar viste på bilde)
+
+    -Slette globals.zp liste?
 
     -legge til settings for størrelse på svg eksport
 
-    -Sette alle dictionary variabler til "None" i draw_material_stack, og ikke i alle separate funksjoner?
-    
+    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
+
     -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert
-
-    -Check the width of a materials->name. If the name is really long then the text is overlapping the rectangle on the layer stack canvas
-
-    -I write_text_on_stack: hvis et rectangel er for kort i vidden, så blir teksten skrevet utfor rektanglet på begge sider. Lag en tekst box heller på siden?
-    
 
 # QUESTIONS:
     -Spør om design problemet er fikset hos runar nå. (har bare økt border radius til entry bokser fra 0.4 til 1)
-    -neutralize_global_stress i equations er IKKE ferdig. hva skjer her?
-    -vis runar grønne kommentar meldinger over funksjoner i "equations.py" 
+    
     -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
     -Be runar ta en dobbelsjekk for om at alle utregninger fremdeles er korrekt
-
-
 
 # BUGS:
     -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
@@ -163,7 +171,4 @@ for material in globals.materials:
     t.append(float(globals.materials[material]["Thickness [nm]"].get()) / 1e9)
 
 blocking_force_value = globals.equations.calculate_blocking_force(E, t, V, e_31_f, h_Piezo, h_Si, w, L)
-
-
-
 

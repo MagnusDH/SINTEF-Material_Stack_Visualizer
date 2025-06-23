@@ -253,7 +253,6 @@ class Equations:
             return error
 
 
-    #HVA ER RETUR VERDI???
     def find_t_solution(self, t:list, L:float, curv_is:float, neutralizing_material_thickness:float):
         """
         Solve for and return the thickness of the second layer that makes the
@@ -265,7 +264,7 @@ class Equations:
             curv_is: value in unit "1/meters"
             neutralizing_material_thickness: thickness of neutralizing material in unit "meters"
 
-        Returns the neutralizing thickness in unit: "nanometer???????????????" if succesfull.
+        Returns the neutralizing thickness in unit: "meter" if succesfull.
         If not successfull the error is returned.
         """
         # print("FIND_T_SOLUTION()")

@@ -187,7 +187,18 @@ class Canvas_Control_Panel:
         #Call functions based on export_option_menu value
         match self.export_option_menu.get():
             case "Stack with text (SVG)":
+                #########
+                self.program_window.geometry(f"{1500}x{300}")
+                self.program_window.update()
+                self.program_window.update_idletasks()
+                #########
                 self.export_full_stack_as_svg()
+
+                #########
+                self.program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
+                self.program_window.update()
+                self.program_window.update_idletasks()
+                #########
 
             case "Stack without text (SVG)":
                 self.export_material_stack_as_svg()
@@ -296,7 +307,7 @@ class Canvas_Control_Panel:
         #Iterate through all the materials
         for material in globals.materials:
             #Only create svg element if there is a rectangle
-            if(globals.materials[material]["Rectangle_id"] != None):
+            if("Rectangle_id" in globals.materials[material]):
 
                 #Create a name for the SVG file for the current layer
                 # filename = f"{layer_counter}materials_{material}_{globals.current_view.get()}.svg"
@@ -332,7 +343,7 @@ class Canvas_Control_Panel:
                     previously_created_elements.append(svg_bbox_element)
 
                     #Create SVG-element for material text
-                    if(globals.materials[material]["Text_id"] != None):
+                    if("Text_id" in globals.materials[material]):
 
                         text_x0, text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Text_id"])
                         text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["Text_id"], 'text')
@@ -341,7 +352,7 @@ class Canvas_Control_Panel:
                         previously_created_elements.append(svg_text_element)
 
                     #Create SVG-element for text bounding box
-                    if(globals.materials[material]["Text_bbox_id"] != None):
+                    if("Text_bbox_id" in globals.materials[material]):
 
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         svg_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
@@ -351,7 +362,8 @@ class Canvas_Control_Panel:
                         previously_created_elements.append(svg_bbox_element)
 
                     #Create SVG-element for arrow line pointing from box to rectangle
-                    if(globals.materials[material]["Line_id"] != None):
+                    if("Line_id" in globals.materials[material]):
+
                         #Line must be drawn from the right side of stack to left side of text
                         match globals.current_view.get():
                             case "Stacked" | "Realistic" | "Multi":
@@ -396,7 +408,8 @@ class Canvas_Control_Panel:
 
 
                     #Create SVG-element for indent_text
-                    if(globals.materials[material]["Indent_text_id"] != None):
+                    if("Indent_text_id" in globals.materials[material]):                    
+
                         indent_text_x0, indent_text_y0 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Indent_text_id"])
                         indent_text_content = globals.layer_stack_canvas.layer_stack_canvas.itemcget(globals.materials[material]["Indent_text_id"], 'text')
                         svg_indent_text_element = '<text x="{}" y="{}" fill="black" font-size="{}" font-weight="bold" dominant-baseline="middle" text-anchor="middle">{}</text>\n'.format(indent_text_x0, indent_text_y0, settings.svg_text_size, indent_text_content)
@@ -406,7 +419,8 @@ class Canvas_Control_Panel:
 
 
                     #Create SVG-element for indent_text bounding box
-                    if(globals.materials[material]["Indent_text_bbox_id"] != None):
+                    if("Indent_text_bbox_id" in globals.materials[material]):                    
+
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                         svg_indent_text_bbox_element = '<rect x="{}" y="{}" width="{}" height="{}" fill="none" stroke="black"/>\n'.format(bbox_x0, bbox_y0, bbox_x1-bbox_x0, bbox_y1-bbox_y0, settings.text_color)
                             
@@ -416,7 +430,8 @@ class Canvas_Control_Panel:
 
 
                     #Create SVG-element for indent_line
-                    if(globals.materials[material]["Indent_line_id"] != None):
+                    if("Indent_line_id" in globals.materials[material]):                    
+
                         indent_line_x0, indent_line_y0, indent_line_x1, indent_line_y1 = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Indent_line_id"])
                         #Construct an SVG <line> element for arrows
                         svg_indent_line_element = '<line x1="{}" y1="{}" x2="{}" y2="{}" stroke="black" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />\n'.format(indent_line_x0+8, indent_line_y0, indent_line_x1-10, indent_line_y1)
@@ -439,7 +454,8 @@ class Canvas_Control_Panel:
 
 
                     #Create SVG-element for arrow line pointing from indent_text to indent_line
-                    if(globals.materials[material]["Indent_arrow_pointer_id"] != None):
+                    if("Indent_arrow_pointer_id" in globals.materials[material]):                    
+
                         line_coords = globals.layer_stack_canvas.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"])
                         #Construct an SVG <line> element for arrows
                         bbox_x0, bbox_y0, bbox_x1, bbox_y1 = globals.layer_stack_canvas.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
@@ -492,16 +508,15 @@ class Canvas_Control_Panel:
         filename = f"{globals.current_view.get()}_stack_with_text.svg"
         file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
 
+
         #Open the file for writing
         with open(file_path, 'w') as f:
             #Write XML declaration for the SVG file, specifying the XML version, character encoding, and standalone status.
             f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
 
             #Write opening tag for the SVG file, specifying the width and height attributes based on the canvas dimensions. The xmlns attribute defines the XML namespace for SVG.
-            # f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(self.program_window.winfo_width(), self.program_window.winfo_height()))
-            f.write('<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg">\n'.format(globals.layer_stack_canvas.layer_stack_canvas.winfo_width(), globals.layer_stack_canvas.layer_stack_canvas.winfo_height()))
-
-            
+            f.write(f"<svg width='{globals.layer_stack_canvas.layer_stack_canvas.winfo_width()}' height='{globals.layer_stack_canvas.layer_stack_canvas.winfo_height()}' xmlns='http://www.w3.org/2000/svg'>\n")
+           
 
             #Iterate through all the items
             for item in all_items:

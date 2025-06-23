@@ -108,14 +108,29 @@ class Layer_Stack_Canvas:
         #Clear all existing elements on canvas and in dictionary
         self.layer_stack_canvas.delete("all")
         for material in globals.materials:
-            globals.materials[material]["Rectangle_id"] = None
-            globals.materials[material]["Text_id"] = None
-            globals.materials[material]["Text_bbox_id"] = None
-            globals.materials[material]["Line_id"] = None
-            globals.materials[material]["Indent_text_id"] = None
-            globals.materials[material]["Indent_text_bbox_id"] = None
-            globals.materials[material]["Indent_line_id"] = None
-            globals.materials[material]["Indent_arrow_pointer_id"] = None
+            if("Rectangle_id" in globals.materials[material]):
+                del globals.materials[material]["Rectangle_id"]
+            
+            if("Text_id" in globals.materials[material]):
+                del globals.materials[material]["Text_id"]
+    
+            if("Text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Text_bbox_id"]
+            
+            if("Line_id" in globals.materials[material]):
+                del globals.materials[material]["Line_id"]
+            
+            if("Indent_text_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_id"]
+            
+            if("Indent_text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_bbox_id"]
+            
+            if("Indent_line_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_line_id"]
+            
+            if("Indent_arrow_pointer_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_arrow_pointer_id"]
 
         #Sort the materials dictionary after the "layer" value
         globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
@@ -398,7 +413,7 @@ class Layer_Stack_Canvas:
                 #Loop through every material:
                 for material in globals.materials:
                     #If material has a rectangle that text can be written on
-                    if(globals.materials[material]["Rectangle_id"] != None):
+                    if("Rectangle_id" in globals.materials[material]):
                         #Find coordinates and height of current material_rectangle
                         rectangle_x0 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0]
                         rectangle_y0 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1]
@@ -460,7 +475,7 @@ class Layer_Stack_Canvas:
                 #Loop through every material:
                 for material in globals.materials:
                     #If there is a rectangle to draw text on
-                    if(globals.materials[material]["Rectangle_id"] != None):
+                    if("Rectangle_id" in globals.materials[material]):
                         #Find coordinates and height of materials->rectangle
                         rectangle_x0 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[0]
                         rectangle_y0 = self.layer_stack_canvas.bbox(globals.materials[material]["Rectangle_id"])[1]
@@ -525,8 +540,7 @@ class Layer_Stack_Canvas:
             case "Stacked" | "Realistic" | "Multi":
                 #Loop through all materials
                 for material in globals.materials:
-                    if(globals.materials[material]["Text_bbox_id"] != None):
-
+                    if("Text_bbox_id" in globals.materials[material]):
                         #Get the coordinates of the text_bbox
                         text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         text_bbox_x0 = text_bbox_coordinates[0]
@@ -558,8 +572,7 @@ class Layer_Stack_Canvas:
             case "Stepped":
                 #Loop through all materials
                 for material in globals.materials:
-                    if(globals.materials[material]["Text_bbox_id"] != None):
-
+                    if("Text_bbox_id" in globals.materials[material]):
                         #Get the coordinates of the text_bbox
                         text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                         text_bbox_x0 = text_bbox_coordinates[0]
@@ -591,7 +604,7 @@ class Layer_Stack_Canvas:
         #Loop through every material from TOP layer to LOWEST layer
         previous_text_bbox_id = None
         for material in dict(reversed(globals.materials.items())):
-            if(globals.materials[material]["Text_bbox_id"] != None):
+            if("Text_bbox_id" in globals.materials[material]):
                 #Get the coordinates of the current_material_text_bbox
                 current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                 current_text_bbox_x0 = current_text_bbox[0]
@@ -674,7 +687,7 @@ class Layer_Stack_Canvas:
         #Loop through every material from LOWEST layer to TOP layer
         previous_text_bbox_id = None
         for material in globals.materials:
-            if(globals.materials[material]["Text_bbox_id"] != None):
+            if("Text_bbox_id" in globals.materials[material]):
                 #Get the coordinates of the current_material_text_bbox
                 current_text_bbox = self.layer_stack_canvas.bbox(globals.materials[material]["Text_bbox_id"])
                 current_text_bbox_x0 = current_text_bbox[0]
@@ -785,7 +798,8 @@ class Layer_Stack_Canvas:
         #Go through every material from LOWEST layer to TOP layer
         for material in globals.materials:
             #Only create indent text if the material has a rectangle that indent can be drawn on
-            if(globals.materials[material]["Rectangle_id"] != None):
+            if("Rectangle_id" in globals.materials[material]):
+
                 #if there is a previous material
                 if(previous_material != None):
                     #Only create indent text if material->indent value is bigger than zero
@@ -858,9 +872,9 @@ class Layer_Stack_Canvas:
         previous_material = None
         #Go through every material
         for material in globals.materials:
-            if(globals.materials[material]["Rectangle_id"] != None):
+            if("Rectangle_id" in globals.materials[material]):
                 #if current material has a indent_text_bbox
-                if(globals.materials[material]["Indent_text_bbox_id"] != None):
+                if("Indent_text_bbox_id" in globals.materials[material]):
                     #Get coordinates of indent_text_bbox
                     indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                     indent_text_bbox_x0 = indent_text_bbox_coordinates[0]
@@ -902,9 +916,9 @@ class Layer_Stack_Canvas:
         #Go through every material from LOWEST layer to TOP layer
         for material in globals.materials:
             #If current material has a rectangle
-            if(globals.materials[material]["Rectangle_id"] != None):
+            if("Rectangle_id" in globals.materials[material]):
                 #if current material has a indent_text_bbox
-                if(globals.materials[material]["Indent_text_bbox_id"] != None):
+                if("Indent_text_bbox_id" in globals.materials[material]):
                     #Get current_indent_text_bbox coordinates
                     current_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                     current_indent_bbox_x0 = current_indent_text_bbox_coordinates[0]
@@ -969,7 +983,7 @@ class Layer_Stack_Canvas:
                         self.layer_stack_canvas.coords(globals.materials[material]["Indent_arrow_pointer_id"], current_indent_bbox_x0, current_indent_bbox_middle_y, previous_rectangle_x1, previous_rectangle_y1-3)
 
                     #if there is a previous_indent_text_bbox
-                    if(globals.materials[previous_material]["Indent_text_bbox_id"] != None):
+                    if("Indent_text_bbox_id" in globals.materials[previous_material]):
                         #get coordinates of current material indent_text_bbox
                         current_indent_text_bbox_coordinates = self.layer_stack_canvas.bbox(globals.materials[material]["Indent_text_bbox_id"])
                         current_indent_bbox_x0 = current_indent_text_bbox_coordinates[0]
@@ -1097,7 +1111,7 @@ class Layer_Stack_Canvas:
             self.layer_stack_canvas.create_line(
                 self.visible_canvas_bbox_x0 + settings.layer_stack_canvas_multi_offset_left_side - 10, self.visible_canvas_bbox_y0 - Zn_pixels,
                 self.visible_canvas_bbox_x1 - settings.layer_stack_canvas_multi_offset_right_side + 10, self.visible_canvas_bbox_y0 - Zn_pixels, 
-                fill="orange",
+                fill="black",
                 width=4,
                 dash=1,
                 tags="dotted_line"
@@ -1137,6 +1151,9 @@ class Layer_Stack_Canvas:
             #Variable to keep track of placement for Zp->arrow
             zp_arrow = 10
 
+            #CLEAR ZP LIST (remove later?)
+            globals.zp.clear()
+
             #DRAW ZP
             for material in dict(reversed(globals.materials.items())):
                 if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
@@ -1159,6 +1176,9 @@ class Layer_Stack_Canvas:
                     Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/ 1e9
                     if(isinstance(Zp, Exception)):
                         raise ValueError(f"Zp could not be calculated.\nerror:'{Zp}'")
+                    
+                    #REMOVE THIS LATER??
+                    globals.zp[piezo_material] = Zp
                     
 
                     #Convert Zn to nanometers
@@ -1199,7 +1219,7 @@ class Layer_Stack_Canvas:
                     )
 
                     zp_arrow += 15
-
+                    
 
         except Exception as error:
             self.layer_stack_canvas.create_text(

@@ -688,12 +688,21 @@ class Parameters_Panel:
             #CALCULATE T_SOL
             t_sol = globals.equations.find_t_solution(t, L, curv_is, neutralizing_material_thickness)
             globals.t_sol.set(t_sol)
-            self.stress_neutral_SiO2_thickness_label2.configure(text="", textvariable=globals.t_sol, text_color=settings.parameters_panel_text_color)
-        
+            # self.stress_neutral_SiO2_thickness_label2.configure(text="", textvariable=globals.t_sol, text_color=settings.parameters_panel_text_color)
+
+            #REMOVE THIS WHEN NEUTRFALIZE GLOBAL STRESS IS FIXED
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"fix neutralize_global_stress()", textvariable="", text_color="red")
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"fix neutralize_global_stress()", textvariable="")
+            ##########################################################
+
         except Exception as error:
-            print(error)
             #Set t_sol to error
-            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="", text_color="red")
-            self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="")
+            # self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="", text_color="red")
+            # self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="")
+
+            #REMOVE THIS WHEN NEUTRFALIZE GLOBAL STRESS IS FIXED
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"fix neutralize_global_stress()", textvariable="", text_color="red")
+            self.stress_neutral_SiO2_thickness_label2.configure(text=f"fix neutralize_global_stress()", textvariable="")
+            ##########################################################
 
             return
