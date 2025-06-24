@@ -10,7 +10,7 @@ text_color = "black"
 #MATERIAL ADJUSTMENT PANEL
 material_adjustment_panel_background_color = "#284154"
 material_adjustment_panel_padding_top = 4
-material_adjustment_panel_padding_bottom = 2
+material_adjustment_panel_padding_bottom = 1
 material_adjustment_panel_padding_right = 2
 material_adjustment_panel_padding_left = 4
 
@@ -41,18 +41,6 @@ material_adjustment_panel_checkbox_background_color = "#284154"
 material_adjustment_panel_checkbox_border_color = "#B1E0FF"
 material_adjustment_panel_checkbox_hover_color = "#85A8BF"
 material_adjustment_panel_checkbox_checkmark_color = "#B1E0FF"
-
-
-#MATERIAL CONTROL PANEL
-material_control_panel_background_color = material_adjustment_panel_background_color
-material_control_panel_padding_top = 2
-material_control_panel_padding_bottom = 4
-material_control_panel_padding_right = 2
-material_control_panel_padding_left = 4
-material_control_panel_button_color = "#B1E0FF"#"#0080ca"
-material_control_panel_button_hover_color = "#85A8BF"#"#009ffb"
-material_control_panel_button_text_color = "black" 
-material_control_panel_text_size = 12
 
 
 #ADD MATERIAL WINDOW
@@ -88,9 +76,9 @@ modify_material_window_entry_text_color = "#B1E0FF"
 
 modify_material_window_text_size = 12
 
-#NEW PANEL
-parameters_panel_padding_top = 2 
-parameters_panel_padding_bottom = 2 
+#PARAMETERS PANEL
+parameters_panel_padding_top = 1
+parameters_panel_padding_bottom = 1 
 parameters_panel_padding_left = 4 
 parameters_panel_padding_right = 2
 parameters_panel_background_color = material_adjustment_panel_background_color
@@ -119,6 +107,31 @@ parameters_panel_slider_background_color = "black"
 parameters_panel_slider_button_color = "#B1E0FF"
 parameters_panel_slider_progress_color = "#B1E0FF"
 parameters_panel_slider_hover_color = "#85A8BF"
+
+
+#RESULTS PANEL
+results_panel_padding_top = 1 
+results_panel_padding_bottom = 1 
+results_panel_padding_left = 4 
+results_panel_padding_right = 2
+results_panel_background_color = material_adjustment_panel_background_color
+
+results_panel_text_color = "#B1E0FF"
+results_panel_headline_size = 15
+results_panel_headline_font = "Arial"
+results_panel_headline_weight = "bold"
+
+
+#MATERIAL CONTROL PANEL
+material_control_panel_background_color = material_adjustment_panel_background_color
+material_control_panel_padding_top = 1
+material_control_panel_padding_bottom = 1
+material_control_panel_padding_right = 2
+material_control_panel_padding_left = 4
+material_control_panel_button_color = "#B1E0FF"#"#0080ca"
+material_control_panel_button_hover_color = "#85A8BF"#"#009ffb"
+material_control_panel_button_text_color = "black" 
+material_control_panel_text_size = 12
 
 
 #LAYER STACK CANVAS
