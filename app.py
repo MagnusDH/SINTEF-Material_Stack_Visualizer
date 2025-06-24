@@ -955,8 +955,8 @@ if __name__ == "__main__":
     program_window = tkinter.Tk()
     
     #Set the dimensions of the program window
-    # program_window.state("zoomed")
-    program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
+    program_window.state("zoomed")
+    # program_window.geometry(f"{settings.program_window_width}x{settings.program_window_height}")
     
     #Set the program window title
     program_window.title(settings.program_window_title)
