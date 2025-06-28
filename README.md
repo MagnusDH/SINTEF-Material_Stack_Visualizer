@@ -14,7 +14,7 @@
         material_name = key
         zp_value = globals.zp[key]
         print(f"Key:{material_name}, Zp value: {zp_value}")
-        
+
 
 # How to run program
     1. Open a terminal in the folder containing the "app.py" file
@@ -73,7 +73,7 @@
                     ["R"] : tkinter.DoubleVar
                     ["Label_name_id]" : tkinter(value),                      == ID of the label in material_adjustment_panel
                     ["Delete_material_button_id"] : tkinter(value),
-                    ["Piezo_checkbox_id"] : tkinter(value),
+                    ["Piezo_checkbox_id"] : tkinter(value),                  == stringvalue "on" or "off"
                     ["Move_down_button_id"] : tkinter(value),
                     ["Move_up_button_id"] : tkinter(value),
                     ["Entry_id"] : tkinter(value),
@@ -129,10 +129,11 @@
 
 # TO DO
     -legge til flere piezo electric bending moment labels (som runar viste på bilde)
+        -legge til en Zp og en M_p verdi i materials for hvert materiale, som alltid oppdateres? slik at denne verdien kan legges rett inn i forskjellige labels?
+        
+    -legge til flere blocking force cantilvere tip labels (som runar viste på bilde)
 
     -Slette globals.zp liste?
-
-    -legge til settings for størrelse på svg eksport
 
     -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
 
