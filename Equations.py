@@ -282,7 +282,7 @@ class Equations:
             return error
 
 
-    def calculate_blocking_force(self, E:list, t:list, V_p:float, e_31_f:float, h_PZT:float, h_Si:float, w:float, L:float):
+    def calculate_blocking_force(self, E:list, t:list, V_p:float, e_31_f:float, piezo_thickness:float, h_Si:float, w:float, L:float):
         """
         Blocking force calculation.
 
@@ -291,7 +291,7 @@ class Equations:
             t: list of thickness values in unit "meters"
             V: value in "volt"
             e_31_f: value in unit "c/m2"
-            h_PZT: thickness of chosen piezo material in unit "meters" 
+            piezo_thickness: thickness of chosen piezo material in unit "meters" 
             h_Si: thickness of materials from substrate up to (but not including) chosen piezo material
             W: value in unit "meters"
             L: value in unit "meters"
@@ -311,10 +311,10 @@ class Equations:
             d31 = e_31_f * (S11_PZT + S12_PZT)
 
             # 10) Layer thicknesses for blocking force formula
-            h_PZT = t[3]            # PZT layer thickness [m]
+            piezo_thickness = t[3]            # PZT layer thickness [m]
             h_Si  = t[0]            # substrate layer thickness [m]
-            num = -3 * d31 * h_Si * (h_PZT + h_Si) * w
-            den =  4 * (S11_PZT * h_Si + S11_Si * h_PZT) * L
+            num = -3 * d31 * h_Si * (piezo_thickness + h_Si) * w
+            den =  4 * (S11_PZT * h_Si + S11_Si * piezo_thickness) * L
 
             blocking_force = (num/den) * V_p
 

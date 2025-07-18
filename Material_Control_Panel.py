@@ -1664,6 +1664,9 @@ class Material_Control_Panel:
 
             if(globals.parameters_panel != None):
                 globals.parameters_panel.create_parameters_panel()
+            
+            if(globals.results_panel != None):
+                globals.results_panel.create_results_panel()
 
         else:
             messagebox.showerror("Error", "Can not reset values because there is no 'materials.xlsx' file to fetch original values from")

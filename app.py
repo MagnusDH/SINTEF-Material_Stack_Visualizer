@@ -337,6 +337,9 @@ class App:
                 #Sort the materials dictionary
                 self.sort_dictionary()
 
+                #Update widgets
+                self.update_widgets("all")
+
             except Exception as error:
                 messagebox.showerror("Error", "Could not load materials from Excel-file")
                 traceback.print_exc()

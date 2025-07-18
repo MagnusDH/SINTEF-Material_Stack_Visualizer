@@ -63,30 +63,36 @@
                     ["Unit"] : tkinter.StringVar,
                     ["Indent [nm]"] : tkinter.DoubleVar,
                     ["Color"] : tkinter.StringVar,
-                    ["Status"] : tkinter.StringVar,                          == "active" or "inactive"                             
-                    ["Modulus [GPa]"] : tkinter.DoubleVar,                   == E
+                    ["Modulus [GPa]"] : tkinter.DoubleVar,                                      == E
                     ["CTE [ppm/deg]"] : tkinter.DoubleVar,
-                    ["Density [kg/m3]"] : tkinter.DoubleVar,                 == rho
-                    ["Stress_x [MPa]"] : tkinter.DoubleVar,                  == sigma
-                    ["Poisson"] : tkinter.DoubleVar,                         == nu
+                    ["Density [kg/m3]"] : tkinter.DoubleVar,                                    == rho
+                    ["Stress_x [MPa]"] : tkinter.DoubleVar,                                     == sigma
+                    ["Poisson"] : tkinter.DoubleVar,                                            == nu
                     ["R0"] : tkinter.DoubleVar,
-                    ["R"] : tkinter.DoubleVar
-                    ["Label_name_id]" : tkinter(value),                      == ID of the label in material_adjustment_panel
-                    ["Delete_material_button_id"] : tkinter(value),
-                    ["Piezo_checkbox_id"] : tkinter(value),                  == stringvalue "on" or "off"
-                    ["Move_down_button_id"] : tkinter(value),
-                    ["Move_up_button_id"] : tkinter(value),
-                    ["Entry_id"] : tkinter(value),
-                    ["Slider_id"] : tkinter(value),
-                    ["Checkbox_id"] : tkinter(value),
-                    ["Rectangle_id"] : tkinter(value),
-                    ["Text_id"] : tkinter(value),
-                    ["Text_bbox_id"] : tkinter(value),
-                    ["Line_id"] : tkinter(value),
-                    ["Indent_text_id"] : tkinter(value),
-                    ["Indent_text_bbox_id"] : tkinter(value),
-                    ["Indent_line_id"] : tkinter(value),
-                    ["Indent_arrow_pointer_id"] : tkinter(value)
+                    ["R"] : tkinter.DoubleVar,
+                    ["Zp_value"] : tkinter.DoubleVar,                                           == most recent calculated Zp value for material
+                    ["Mp_value"] : tkinter.DoubleVar,                                           == most recent calculated M_p value for material
+                    ["Blocking_force_value"] : tkinter.DoubleVar,                               == most recent calculated Blocking_force value for material
+                    ["Label_name_id]" : tkinter(value),                                         == ID of the label in material_adjustment_panel
+                    ["Delete_material_button_id"] : tkinter(value),                             == ID for widget in "material_adjustment_panel"
+                    ["Piezo_checkbox_id"] : tkinter(value),                                     == ID for widget in "material_adjustment_panel" stringvalue "on" or "off"
+                    ["Move_down_button_id"] : tkinter(value),                                   == ID for widget in "material_adjustment_panel"
+                    ["Move_up_button_id"] : tkinter(value),                                     == ID for widget in "material_adjustment_panel"
+                    ["Entry_id"] : tkinter(value),                                              == ID for widget in "material_adjustment_panel"
+                    ["Slider_id"] : tkinter(value),                                             == ID for widget in "material_adjustment_panel"
+                    ["Checkbox_id"] : tkinter(value),                                           == ID for widget in "material_adjustment_panel"
+                    ["Results_panel_Mp_material_name_label_id"] : tkinter(value)                == ID for widget in "result_panel"
+                    ["Results_panel_Mp_value_label_id"] : tkinter(value)                        == ID for widget in "result_panel"
+                    ["Results_panel_blocking_force_material_name_label_id"] : tkinter(value)    == ID for widget in "result_panel"
+                    ["Results_panel_blocking_force_value_label_id"] : tkinter(value)            == ID for widget in "result_panel"
+                    ["Rectangle_id"] : tkinter(value),                                          == ID for widget in "layer_stack_canvas"
+                    ["Text_id"] : tkinter(value),                                               == ID for widget in "layer_stack_canvas"
+                    ["Text_bbox_id"] : tkinter(value),                                          == ID for widget in "layer_stack_canvas"
+                    ["Line_id"] : tkinter(value),                                               == ID for widget in "layer_stack_canvas"
+                    ["Indent_text_id"] : tkinter(value),                                        == ID for widget in "layer_stack_canvas"
+                    ["Indent_text_bbox_id"] : tkinter(value),                                   == ID for widget in "layer_stack_canvas"
+                    ["Indent_line_id"] : tkinter(value),                                        == ID for widget in "layer_stack_canvas"
+                    ["Indent_arrow_pointer_id"] : tkinter(value)                                == ID for widget in "layer_stack_canvas"
                 }
         }
     
@@ -128,11 +134,6 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -legge til flere piezo electric bending moment labels (som runar viste på bilde)
-        -legge til en Zp og en M_p verdi i materials for hvert materiale, som alltid oppdateres? slik at denne verdien kan legges rett inn i forskjellige labels?
-        
-    -legge til flere blocking force cantilvere tip labels (som runar viste på bilde)
-
     -Slette globals.zp liste?
 
     -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
@@ -140,36 +141,16 @@
     -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert
 
 # QUESTIONS:
+    -Er "blocking force" verdiene riktig i results panel? alle er identisk nå
+
     -Spør om design problemet er fikset hos runar nå. (har bare økt border radius til entry bokser fra 0.4 til 1)
     
     -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
+
     -Be runar ta en dobbelsjekk for om at alle utregninger fremdeles er korrekt
+
+    -Vet Runar hvorfor "blocking force cantilever tip" viser "Error" når det bare er 3 eller færre materialer i results panel?
+    Funksjonen hans "calculate_blocking_force" returnerer en ERROR når det er færre enn 3 materialer i programmet
 
 # BUGS:
     -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
-
-
-
-
-
-
-
-
-
-
-
-V = helper_functions.convert_decimal_string_to_float(self.volt_entry.get())
-V = 100
-e_31_f = helper_functions.convert_decimal_string_to_float(self.e_31_f_entry.get())
-h_Piezo = helper_functions.convert_decimal_string_to_float(self.piezo_material_entry.get())
-h_Si = list(globals.materials)[0]
-w = 160/1e6
-L = helper_functions.convert_decimal_string_to_float(self.L_entry.get())
-E = []
-t = []
-for material in globals.materials:
-    E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
-    t.append(float(globals.materials[material]["Thickness [nm]"].get()) / 1e9)
-
-blocking_force_value = globals.equations.calculate_blocking_force(E, t, V, e_31_f, h_Piezo, h_Si, w, L)
-

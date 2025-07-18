@@ -963,6 +963,9 @@ class Material_Adjustment_Panel:
 
         if("Delete_material_button_id" in globals.materials[material]):                  
             globals.materials[material]["Delete_material_button_id"].destroy()
+        
+        if("Piezo_checkbox_id" in globals.materials[material]):                  
+            globals.materials[material]["Piezo_checkbox_id"].destroy()
 
         if("Move_down_button_id" in globals.materials[material]):                          
             globals.materials[material]["Move_down_button_id"].destroy()
@@ -978,6 +981,18 @@ class Material_Adjustment_Panel:
 
         if("Checkbox_id" in globals.materials[material]):                                                  
             globals.materials[material]["Checkbox_id"].destroy()
+
+        if("Results_panel_Mp_material_name_label_id" in globals.materials[material]):                                                  
+            globals.materials[material]["Results_panel_Mp_material_name_label_id"].destroy()
+        
+        if("Results_panel_Mp_value_label_id" in globals.materials[material]):                                                  
+            globals.materials[material]["Results_panel_Mp_value_label_id"].destroy()
+        
+        if("Results_panel_blocking_force_material_name_label_id" in globals.materials[material]):                                                  
+            globals.materials[material]["Results_panel_blocking_force_material_name_label_id"].destroy()
+        
+        if("Results_panel_blocking_force_value_label_id" in globals.materials[material]):                                                  
+            globals.materials[material]["Results_panel_blocking_force_value_label_id"].destroy()
 
 
         #delete material from dictionary
