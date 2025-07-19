@@ -129,72 +129,73 @@ class Results_Panel:
 
         #Loop through all materials:
         for material in dict(reversed(globals.materials.items())):
-            #Remove label_name and label_value widget if piezo material was selected before, but not anymore
-            if globals.materials[material]["Piezo_checkbox_id"].get() == "off":
-                checkbox_counter += 1
-                if("Results_panel_Mp_material_name_label_id" in globals.materials[material]):
-                    globals.materials[material]["Results_panel_Mp_material_name_label_id"].destroy()
-                    del globals.materials[material]["Results_panel_Mp_material_name_label_id"]
-                
-                if("Results_panel_Mp_value_label_id" in globals.materials[material]):
-                    globals.materials[material]["Results_panel_Mp_value_label_id"].destroy()
-                    del globals.materials[material]["Results_panel_Mp_value_label_id"]
-                
+            if("Piezo_checkbox_id" in globals.materials[material]):
+                #Remove label_name and label_value widget if piezo material was selected before, but not anymore
+                if globals.materials[material]["Piezo_checkbox_id"].get() == "off":
+                    checkbox_counter += 1
+                    if("Results_panel_Mp_material_name_label_id" in globals.materials[material]):
+                        globals.materials[material]["Results_panel_Mp_material_name_label_id"].destroy()
+                        del globals.materials[material]["Results_panel_Mp_material_name_label_id"]
+                    
+                    if("Results_panel_Mp_value_label_id" in globals.materials[material]):
+                        globals.materials[material]["Results_panel_Mp_value_label_id"].destroy()
+                        del globals.materials[material]["Results_panel_Mp_value_label_id"]
+                    
 
-            #material->piezo_checkbox is "on":
-            if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                #Check if label for this material has been created before
-                if("Results_panel_Mp_material_name_label_id" not in globals.materials[material]):
-                    #create label for material_name in row and column
-                    material_name_label = customtkinter.CTkLabel(
+                #material->piezo_checkbox is "on":
+                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                    #Check if label for this material has been created before
+                    if("Results_panel_Mp_material_name_label_id" not in globals.materials[material]):
+                        #create label for material_name in row and column
+                        material_name_label = customtkinter.CTkLabel(
+                            master=self.results_panel_frame, 
+                            text=f"{material}", 
+                            fg_color=settings.results_panel_background_color,
+                            text_color=globals.materials[material]["Color"].get(),
+                        )
+                        material_name_label.grid(
+                            row=row_counter, 
+                            column=column_counter, 
+                            sticky="nsew", 
+                            padx=(0,0),
+                            pady=(0,0),
+                        )
+
+                        #Store the label
+                        globals.materials[material]["Results_panel_Mp_material_name_label_id"] = material_name_label
+                    #Label exists, move it
+                    else:
+                        globals.materials[material]["Results_panel_Mp_material_name_label_id"].grid(row=row_counter, column=column_counter)
+
+                    
+
+                    #create label for value in row+1 and column
+                    if("Results_panel_Mp_value_label_id" not in globals.materials[material]):                  
+                        Mp_value_label = customtkinter.CTkLabel(
                         master=self.results_panel_frame, 
-                        text=f"{material}", 
-                        fg_color=settings.results_panel_background_color,
-                        text_color=globals.materials[material]["Color"].get(),
-                    )
-                    material_name_label.grid(
-                        row=row_counter, 
-                        column=column_counter, 
-                        sticky="nsew", 
-                        padx=(0,0),
-                        pady=(0,0),
-                    )
-
-                    #Store the label
-                    globals.materials[material]["Results_panel_Mp_material_name_label_id"] = material_name_label
-                #Label exists, move it
-                else:
-                    globals.materials[material]["Results_panel_Mp_material_name_label_id"].grid(row=row_counter, column=column_counter)
-
-                
-
-                #create label for value in row+1 and column
-                if("Results_panel_Mp_value_label_id" not in globals.materials[material]):                  
-                    Mp_value_label = customtkinter.CTkLabel(
-                    master=self.results_panel_frame, 
-                    # textvariable=(is set in later function),
-                    fg_color="#49910d",
-                    text_color=settings.results_panel_text_color,
-                    )
-                    Mp_value_label.grid(
-                        row=row_counter+1, 
-                        column=column_counter, 
-                        sticky="nsew", 
-                        padx=(0,2),
-                        pady=(0,0),
-                    )
-                    #Store the label
-                    globals.materials[material]["Results_panel_Mp_value_label_id"] = Mp_value_label
-                else:
-                    globals.materials[material]["Results_panel_Mp_value_label_id"].grid(row=row_counter+1, column=column_counter)
+                        # textvariable=(is set in later function),
+                        fg_color="#49910d",
+                        text_color=settings.results_panel_text_color,
+                        )
+                        Mp_value_label.grid(
+                            row=row_counter+1, 
+                            column=column_counter, 
+                            sticky="nsew", 
+                            padx=(0,2),
+                            pady=(0,0),
+                        )
+                        #Store the label
+                        globals.materials[material]["Results_panel_Mp_value_label_id"] = Mp_value_label
+                    else:
+                        globals.materials[material]["Results_panel_Mp_value_label_id"].grid(row=row_counter+1, column=column_counter)
 
 
-                column_counter += 1
+                    column_counter += 1
 
-                if(column_counter >= 6):
-                    #Reset column_counter
-                    column_counter = 0
-                    row_counter += 2
+                    if(column_counter >= 6):
+                        #Reset column_counter
+                        column_counter = 0
+                        row_counter += 2
 
 
             #Display error message if no piezo materials have been chosen
@@ -251,71 +252,72 @@ class Results_Panel:
 
         #Loop through all materials:
         for material in dict(reversed(globals.materials.items())):
-            #Remove label_name and label_value widget if piezo material was selected before, but not anymore
-            if globals.materials[material]["Piezo_checkbox_id"].get() == "off":
-                checkbox_counter += 1
-                if("Results_panel_blocking_force_material_name_label_id" in globals.materials[material]):
-                    globals.materials[material]["Results_panel_blocking_force_material_name_label_id"].destroy()
-                    del globals.materials[material]["Results_panel_blocking_force_material_name_label_id"]
-                
-                if("Results_panel_blocking_force_value_label_id" in globals.materials[material]):
-                    globals.materials[material]["Results_panel_blocking_force_value_label_id"].destroy()
-                    del globals.materials[material]["Results_panel_blocking_force_value_label_id"]
+            if("Piezo_checkbox_id" in globals.materials[material]):
+                #Remove label_name and label_value widget if piezo material was selected before, but not anymore
+                if globals.materials[material]["Piezo_checkbox_id"].get() == "off":
+                    checkbox_counter += 1
+                    if("Results_panel_blocking_force_material_name_label_id" in globals.materials[material]):
+                        globals.materials[material]["Results_panel_blocking_force_material_name_label_id"].destroy()
+                        del globals.materials[material]["Results_panel_blocking_force_material_name_label_id"]
+                    
+                    if("Results_panel_blocking_force_value_label_id" in globals.materials[material]):
+                        globals.materials[material]["Results_panel_blocking_force_value_label_id"].destroy()
+                        del globals.materials[material]["Results_panel_blocking_force_value_label_id"]
 
-            #material->piezo_checkbox is "on":
-            if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                #Check if label for this material has been created before
-                if("Results_panel_blocking_force_material_name_label_id" not in globals.materials[material]):
-                    #create label for material_name in row and column
-                    material_name_label = customtkinter.CTkLabel(
+                #material->piezo_checkbox is "on":
+                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                    #Check if label for this material has been created before
+                    if("Results_panel_blocking_force_material_name_label_id" not in globals.materials[material]):
+                        #create label for material_name in row and column
+                        material_name_label = customtkinter.CTkLabel(
+                            master=self.results_panel_frame, 
+                            text=f"{material}", 
+                            fg_color=settings.results_panel_background_color,
+                            text_color=globals.materials[material]["Color"].get(),
+                        )
+                        material_name_label.grid(
+                            row=row_counter, 
+                            column=column_counter, 
+                            sticky="nsew", 
+                            padx=(0,0),
+                            pady=(0,0),
+                        )
+
+                        #Store the label
+                        globals.materials[material]["Results_panel_blocking_force_material_name_label_id"] = material_name_label
+                    #Label exists, move it
+                    else:
+                        globals.materials[material]["Results_panel_blocking_force_material_name_label_id"].grid(row=row_counter, column=column_counter)
+
+                    
+
+                    #create label for value in row+1 and column
+                    if("Results_panel_blocking_force_value_label_id" not in globals.materials[material]):                  
+                        blocking_force_value_label = customtkinter.CTkLabel(
                         master=self.results_panel_frame, 
-                        text=f"{material}", 
-                        fg_color=settings.results_panel_background_color,
-                        text_color=globals.materials[material]["Color"].get(),
-                    )
-                    material_name_label.grid(
-                        row=row_counter, 
-                        column=column_counter, 
-                        sticky="nsew", 
-                        padx=(0,0),
-                        pady=(0,0),
-                    )
-
-                    #Store the label
-                    globals.materials[material]["Results_panel_blocking_force_material_name_label_id"] = material_name_label
-                #Label exists, move it
-                else:
-                    globals.materials[material]["Results_panel_blocking_force_material_name_label_id"].grid(row=row_counter, column=column_counter)
-
-                
-
-                #create label for value in row+1 and column
-                if("Results_panel_blocking_force_value_label_id" not in globals.materials[material]):                  
-                    blocking_force_value_label = customtkinter.CTkLabel(
-                    master=self.results_panel_frame, 
-                    # textvariable=(is set in later function),
-                    fg_color="#ba3609",
-                    text_color=settings.results_panel_text_color,
-                    )
-                    blocking_force_value_label.grid(
-                        row=row_counter+1, 
-                        column=column_counter, 
-                        sticky="nsew", 
-                        padx=(0,2),
-                        pady=(0,0),
-                    )
-                    #Store the label
-                    globals.materials[material]["Results_panel_blocking_force_value_label_id"] = blocking_force_value_label
-                else:
-                    globals.materials[material]["Results_panel_blocking_force_value_label_id"].grid(row=row_counter+1, column=column_counter)
+                        # textvariable=(is set in later function),
+                        fg_color="#ba3609",
+                        text_color=settings.results_panel_text_color,
+                        )
+                        blocking_force_value_label.grid(
+                            row=row_counter+1, 
+                            column=column_counter, 
+                            sticky="nsew", 
+                            padx=(0,2),
+                            pady=(0,0),
+                        )
+                        #Store the label
+                        globals.materials[material]["Results_panel_blocking_force_value_label_id"] = blocking_force_value_label
+                    else:
+                        globals.materials[material]["Results_panel_blocking_force_value_label_id"].grid(row=row_counter+1, column=column_counter)
 
 
-                column_counter += 1
+                    column_counter += 1
 
-                if(column_counter >= 6):
-                    #Reset column_counter
-                    column_counter = 0
-                    row_counter += 2
+                    if(column_counter >= 6):
+                        #Reset column_counter
+                        column_counter = 0
+                        row_counter += 2
 
 
             #Display error message if no piezo materials have been chosen
@@ -376,24 +378,25 @@ class Results_Panel:
 
         #CALCULATE BLOCKING FORCE CANTILEVER
         for material in globals.materials:
-            if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
-                
-                #Total thickness of materials from substrate up to (but not including) chosen piezo material
-                h_Si = 0 
-                for material2 in globals.materials:
-                    if(material2 == material):
-                        break
-                    h_Si += globals.materials[material2]["Thickness [nm]"].get()
-                
-                blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
-                if("Results_panel_blocking_force_value_label_id" in globals.materials[material]):
-                    if(isinstance(blocking_force, Exception)):
-                        print(blocking_force)
-                        globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"ERROR")
-                    else:
-                        globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"{blocking_force:.2e}")
-                        globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
+            if("Piezo_checkbox_id" in globals.materials[material]):
+                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                    piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
+                    
+                    #Total thickness of materials from substrate up to (but not including) chosen piezo material
+                    h_Si = 0 
+                    for material2 in globals.materials:
+                        if(material2 == material):
+                            break
+                        h_Si += globals.materials[material2]["Thickness [nm]"].get()
+                    
+                    blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
+                    if("Results_panel_blocking_force_value_label_id" in globals.materials[material]):
+                        if(isinstance(blocking_force, Exception)):
+                            print(blocking_force)
+                            globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"ERROR")
+                        else:
+                            globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"{blocking_force:.2e}")
+                            globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
 
 
         # except Exception as error:
@@ -421,21 +424,22 @@ class Results_Panel:
         Zn = globals.equations.calculate_Zn(E, t, nu)
 
         for material in globals.materials: 
-            if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
+            if("Piezo_checkbox_id" in globals.materials[material]):
+                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                    piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
 
-                #CALCULATE ZP
-                Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
-                globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
+                    #CALCULATE ZP
+                    Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+                    globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
 
-                #CALCULATE M_p
-                Mp = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
-                if("Results_panel_Mp_value_label_id" in globals.materials[material]):
-                    if(isinstance(Mp, Exception)):
-                        globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"ERROR")
-                    else:
-                        globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"{Mp:.2e}")
-                        globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
+                    #CALCULATE M_p
+                    Mp = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
+                    if("Results_panel_Mp_value_label_id" in globals.materials[material]):
+                        if(isinstance(Mp, Exception)):
+                            globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"ERROR")
+                        else:
+                            globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"{Mp:.2e}")
+                            globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
 
 
 

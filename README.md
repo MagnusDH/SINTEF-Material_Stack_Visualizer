@@ -138,8 +138,6 @@
 
     -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
 
-    -Sjekk "TODO" i starten av "write_indent_on_stepped_stack" funksjonen. den er ikke helt ferdig implementert
-
 # QUESTIONS:
     -Er "blocking force" verdiene riktig i results panel? alle er identisk nå
 
@@ -153,4 +151,4 @@
     Funksjonen hans "calculate_blocking_force" returnerer en ERROR når det er færre enn 3 materialer i programmet
 
 # BUGS:
-    -I "draw_indent_on_stepped_stack" så kan indent bokser tegnes over canvas og overlappe hverandre fra toppen av stacken og nedover. For å finne en løsning på dette må man loope gjennom material{} og samtidig finne rektangel koordinatene til det neste materialet i materials{} og dette har jeg ikke funnet en løsning på. 
+    -
