@@ -129,7 +129,7 @@ class Graph_Canvas:
                 raise ValueError("No materials")
 
             if(globals.stoney_filament.get()==""):
-                raise ValueError("No filament selected")
+                raise ValueError("No 'Stoney filament' selected")
 
         
             #Set labels for the graph
@@ -171,13 +171,13 @@ class Graph_Canvas:
                 raise ValueError(f"The 'thickness' of '{globals.stoney_filament.get()}' can not be zero")
 
             if(R == 0):
-                raise ValueError(f"The 'R' value for '{globals.stoney_filament.get()}' can not be zero")
+                raise ValueError(f"The 'R' value for '{globals.stoney_filament.get()}' can not be zero\n(You can change this in 'Modify material')")
 
             if(R0 == 0):
-                raise ValueError(f"The 'R0' value for '{globals.stoney_filament.get()}' can not be zero")
+                raise ValueError(f"The 'R0' value for '{globals.stoney_filament.get()}' can not be zero\n(You can change this in 'Modify material')")
             
             if(1-Vs) == 0:
-                raise ValueError(f"The 'poisson' value for '{substrate}' can not be 1")
+                raise ValueError(f"The 'poisson' value for '{substrate}' can not be 1.\n(You can change this in 'Modify material')")
             
             #Calculate the sigma_R value
             sigma_R = ( (Es* (Ts**2)) / (6*(1-Vs)*Tf)) * ( (1/R) - (1/R0) )
@@ -255,6 +255,7 @@ class Graph_Canvas:
             #Draw the canvas to display the updates
             self.graph2.figure.canvas.draw()
 
+
     def stoney(self, R0, x):
         return R0 - numpy.sqrt(R0**2 - x**2)
 
@@ -264,9 +265,8 @@ class Graph_Canvas:
         -Draws the 'z_tip_is' graph
         """
 
-        # print("DRAW_Z_TIP_IS_GRAPH()")
+        print("DRAW_Z_TIP_IS_GRAPH()")
         
-
         try:
             #Clear the graph
             self.graph1.clear()
@@ -275,11 +275,10 @@ class Graph_Canvas:
             if(len(globals.materials) == 0):
                 raise ValueError("No materials")
 
-            if(globals.piezo_material_name.get() == ""):
-                raise ValueError("No Piezo material selected")
+            # if(globals.piezo_material_name.get() == ""):
+            #     raise ValueError("No Piezo material selected")
 
 
-            
             #Set labels for the graph
             self.graph1.set_title("Cantilever bending")
             self.graph1.set_xlabel("X [μm]", fontsize=10, labelpad=3)
@@ -291,7 +290,7 @@ class Graph_Canvas:
             #Set display limits of the x axis
             self.graph1.set_xlim([settings.z_tip_is_graph_x_axis_range_min, L*1.05])
             
-            #########################################################################
+
             #Fetch necessary values
             E = []
             t = []
@@ -305,28 +304,36 @@ class Graph_Canvas:
 
 
             W = 160 / 1e6 #In micrometers
-            piezo_thickness = float(globals.materials[globals.piezo_material_name.get()]["Thickness [nm]"].get()) / 1e9
 
             Zn = globals.equations.calculate_Zn(E, t, nu)
             if(isinstance(Zn, Exception)):
                 raise ValueError(f"Zn could not be calculated.\nerror:'{Zn}'")
             
-            Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
-            if(isinstance(Zp, Exception)):
-                raise ValueError(f"Zp could not be calculated.\nerror:'{Zp}'")
-            
             V_p = globals.volt_value.get()
             e_31_f = globals.e_31_f_value.get()
 
-            M_p = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
-            if(isinstance(M_p, Exception)):
-                raise ValueError(f"M_p could not be calculated.\nerror:'{M_p}'")
+            zp_list = []
+            for material in globals.materials:
+                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                    piezo_thickness = float(globals.materials[material]["Thickness [nm]"].get()) / 1e9
+                    # Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+                    Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+
+                    print(f"Zp for {material} is {Zp}")
+                    zp_list.append(Zp)
+            
+            if(len(zp_list) == 0):
+                raise ValueError("No piezo materials selected")
+            
+            cumulative_Mp = globals.equations.calculate_cumulative_Mp_cantilever(zp_list, W, V_p, e_31_f)
+            if(isinstance(cumulative_Mp, Exception)):
+                raise ValueError(f"Cumulative_Mp could not be calculated.\nerror:'{cumulative_Mp}'")
             
             M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W)
             if(isinstance(M_is, Exception)):
                 raise ValueError(f"M_is could not be calculated.\nerror:'{M_is}'")
             
-            M_tot = globals.equations.calculate_M_tot_cantilever(M_is, M_p)
+            M_tot = globals.equations.calculate_M_tot_cantilever(M_is, cumulative_Mp)
             if(isinstance(M_tot, Exception)):
                 raise ValueError(f"M_tot could not be calculated.\nerror:'{M_tot}'")
             

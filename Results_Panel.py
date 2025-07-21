@@ -109,8 +109,8 @@ class Results_Panel:
                 master=self.results_panel_frame, 
                 text=f"Piezo electric bending moment:",
                 fg_color=settings.results_panel_background_color,
-                # text_color=settings.results_panel_text_color,
-                text_color="#49910d",
+                text_color=settings.results_panel_text_color,
+                # text_color="#49910d",
                 font=(settings.results_panel_headline_font, settings.results_panel_headline_size, settings.results_panel_headline_weight) 
             )
         self.piezo_electric_bending_moment_label.grid(
@@ -232,8 +232,8 @@ class Results_Panel:
                 master=self.results_panel_frame, 
                 text=f"Blocking force cantilever tip:", 
                 fg_color=settings.results_panel_background_color,
-                # text_color=settings.results_panel_text_color
-                text_color="#ba3609",
+                text_color=settings.results_panel_text_color,
+                # text_color="#ba3609",
                 font=(settings.results_panel_headline_font, settings.results_panel_headline_size, settings.results_panel_headline_weight) 
             )
         self.blocking_force_cantilever_label.grid(
@@ -399,27 +399,6 @@ class Results_Panel:
                             globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
 
 
-        # except Exception as error:
-        #     #Set M_p to error
-        #     self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="", text_color="red")
-        #     self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="")
-
-        #     #Set blocking force to error
-        #     self.blocking_force_cantilever_label2.configure(text=f"{error}", textvariable="", text_color="red")
-        #     self.blocking_force_cantilever_label2.configure(text=f"{error}", textvariable="")
-
-        #     #Set t_sol to error
-        #     self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="", text_color="red")
-        #     self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="")
-
-        #     return
-
-
-
-
-                
-        
-        # try:
         #CALCULATE ZN
         Zn = globals.equations.calculate_Zn(E, t, nu)
 
@@ -430,10 +409,11 @@ class Results_Panel:
 
                     #CALCULATE ZP
                     Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+
                     globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
 
                     #CALCULATE M_p
-                    Mp = globals.equations.calculate_M_p_cantilever(Zp, W, V_p, e_31_f)
+                    Mp = globals.equations.calculate_Mp_cantilever(Zp, W, V_p, e_31_f)
                     if("Results_panel_Mp_value_label_id" in globals.materials[material]):
                         if(isinstance(Mp, Exception)):
                             globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"ERROR")
@@ -444,17 +424,6 @@ class Results_Panel:
 
 
 
-        # except Exception as error:
-        #     #Set M_p to error
-        #     self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="", text_color="red")
-        #     self.piezoelectric_bending_moment_label2.configure(text=f"{error}", textvariable="")
-
-        #     #Set t_sol to error
-        #     self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="", text_color="red")
-        #     self.stress_neutral_SiO2_thickness_label2.configure(text=f"{error}", textvariable="")
-            
-        #     return 
-        
         # try:
             #CALCULATE M_IS
             # M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W) 

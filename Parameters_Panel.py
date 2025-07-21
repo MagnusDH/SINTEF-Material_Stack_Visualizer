@@ -46,7 +46,7 @@ class Parameters_Panel:
             self.parameters_panel_frame.columnconfigure(1, weight=40, uniform="group1")
             self.parameters_panel_frame.columnconfigure(2, weight=40, uniform="group1")
 
-            self.parameters_panel_frame.rowconfigure((0,1,2,3,4,5,6,7), weight=1, uniform="group1")
+            self.parameters_panel_frame.rowconfigure((0,1,2,3,4,5), weight=1, uniform="group1")
 
 
         #HEADLINE
@@ -56,7 +56,7 @@ class Parameters_Panel:
                 text="Parameters", 
                 fg_color=settings.parameters_panel_background_color,
                 text_color=settings.parameters_panel_text_color,
-                font=(settings.parameters_panel_headline_font, settings.parameters_panel_headline_size, settings.parameters_panel_headline_weight) 
+                font=(settings.parameters_panel_headline_font, settings.parameters_panel_headline_size, settings.parameters_panel_headline_weight)
             )
             self.parameters_panel_headline.grid(
                 row=0, 
@@ -106,78 +106,78 @@ class Parameters_Panel:
             )
 
 
-        #"rᵢ [μm]" LABEL
-        if not hasattr(self, "ri_label"):
-            self.ri_label = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="rᵢ [μm]", 
-                fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
-            )
-            self.ri_label.grid(
-                row=2, 
-                column=0, 
-                sticky="w", 
-                padx=(0,0),
-                pady=(0,1)
-            )
+        # #"rᵢ [μm]" LABEL
+        # if not hasattr(self, "ri_label"):
+        #     self.ri_label = customtkinter.CTkLabel(
+        #         master=self.parameters_panel_frame, 
+        #         text="rᵢ [μm]", 
+        #         fg_color=settings.parameters_panel_background_color,
+        #         text_color=settings.parameters_panel_text_color
+        #     )
+        #     self.ri_label.grid(
+        #         row=2, 
+        #         column=0, 
+        #         sticky="w", 
+        #         padx=(0,0),
+        #         pady=(0,1)
+        #     )
 
 
-        #"rᵢ [μm]" ENTRY
-        if not hasattr(self, "ri_entry"):
-            self.ri_entry = customtkinter.CTkEntry(
-                master=self.parameters_panel_frame,
-                textvariable=tkinter.StringVar(value="not in use"),
-                fg_color = settings.parameters_panel_entry_background_color,
-                border_color=settings.parameters_panel_entry_border_color,
-                border_width=1,
-                text_color=settings.parameters_panel_entry_text_color,
-                justify="center"
-            )
-            self.ri_entry.grid(
-                row=2, 
-                column=2,
-                sticky="",
-                padx=(0,0),
-                pady=(0,1)
-            )
+        # #"rᵢ [μm]" ENTRY
+        # if not hasattr(self, "ri_entry"):
+        #     self.ri_entry = customtkinter.CTkEntry(
+        #         master=self.parameters_panel_frame,
+        #         textvariable=tkinter.StringVar(value="not in use"),
+        #         fg_color = settings.parameters_panel_entry_background_color,
+        #         border_color=settings.parameters_panel_entry_border_color,
+        #         border_width=1,
+        #         text_color=settings.parameters_panel_entry_text_color,
+        #         justify="center"
+        #     )
+        #     self.ri_entry.grid(
+        #         row=2, 
+        #         column=2,
+        #         sticky="",
+        #         padx=(0,0),
+        #         pady=(0,1)
+        #     )
 
 
-        #"r₀ [μm]" LABEL
-        if not hasattr(self, "ro_label"):
-            self.ro_label = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text=" r₀ [μm]", 
-                fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
-            )
-            self.ro_label.grid(
-                row=3, 
-                column=0, 
-                sticky="w", 
-                padx=(0,0),
-                pady=(0,1)
-            )
+        # #"r₀ [μm]" LABEL
+        # if not hasattr(self, "ro_label"):
+        #     self.ro_label = customtkinter.CTkLabel(
+        #         master=self.parameters_panel_frame, 
+        #         text=" r₀ [μm]", 
+        #         fg_color=settings.parameters_panel_background_color,
+        #         text_color=settings.parameters_panel_text_color
+        #     )
+        #     self.ro_label.grid(
+        #         row=3, 
+        #         column=0, 
+        #         sticky="w", 
+        #         padx=(0,0),
+        #         pady=(0,1)
+        #     )
 
 
-        #"r₀ [μm]" ENTRY
-        if not hasattr(self, "ro_entry"):
-            self.ro_entry = customtkinter.CTkEntry(
-                master=self.parameters_panel_frame,
-                textvariable=tkinter.StringVar(value="not in use"),
-                fg_color = settings.parameters_panel_entry_background_color,
-                border_color=settings.parameters_panel_entry_border_color,
-                border_width=1,
-                text_color=settings.parameters_panel_entry_text_color,
-                justify="center"
-            )
-            self.ro_entry.grid(
-                row=3, 
-                column=2,
-                sticky="",
-                padx=(0,0),
-                pady=(0,1)
-            )
+        # #"r₀ [μm]" ENTRY
+        # if not hasattr(self, "ro_entry"):
+        #     self.ro_entry = customtkinter.CTkEntry(
+        #         master=self.parameters_panel_frame,
+        #         textvariable=tkinter.StringVar(value="not in use"),
+        #         fg_color = settings.parameters_panel_entry_background_color,
+        #         border_color=settings.parameters_panel_entry_border_color,
+        #         border_width=1,
+        #         text_color=settings.parameters_panel_entry_text_color,
+        #         justify="center"
+        #     )
+        #     self.ro_entry.grid(
+        #         row=3, 
+        #         column=2,
+        #         sticky="",
+        #         padx=(0,0),
+        #         pady=(0,1)
+        #     )
 
             
         #E_31_F LABEL
@@ -189,7 +189,7 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.e_31_f_label.grid(
-                row=4, 
+                row=2, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
@@ -209,7 +209,7 @@ class Parameters_Panel:
                 justify="center"
             )
             self.e_31_f_entry.grid(
-                row=4, 
+                row=2, 
                 column=2,
                 sticky="",
                 padx=(0,0),
@@ -226,7 +226,7 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.volt_label.grid(
-                row=5, 
+                row=3, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
@@ -248,7 +248,7 @@ class Parameters_Panel:
                 button_hover_color=settings.parameters_panel_slider_hover_color,
             )
             self.volt_slider.grid(
-                row=5, 
+                row=3, 
                 column=1,
                 sticky="",
                 padx=(0,0),
@@ -268,59 +268,11 @@ class Parameters_Panel:
                 justify="center"
             )
             self.volt_entry.grid(
-                row=5, 
+                row=3, 
                 column=2,
                 sticky="",
                 padx=(0,0),
                 pady=(0,1)
-            )
-
-        #PIEZO_MATERIAL LABEL
-        if not hasattr(self, "piezo_material_label"):
-            self.piezo_material_label = customtkinter.CTkLabel(
-                master=self.parameters_panel_frame, 
-                text="Piezo material:", 
-                fg_color=settings.parameters_panel_background_color,
-                text_color=settings.parameters_panel_text_color
-            )
-            self.piezo_material_label.grid(
-                row=6, 
-                column=0, 
-                columnspan=2,
-                sticky="w", 
-                padx=(0,0),
-                pady=(0,1)
-            )
-            
-
-        #PIEZO_MATERIAL COMBOBOX
-        if not hasattr(self, "piezo_material_combobox"):
-            self.piezo_material_combobox = customtkinter.CTkComboBox(
-                master=self.parameters_panel_frame,
-                variable=globals.piezo_material_name,
-                values=list(reversed((globals.materials.keys()))),
-                border_width=1,
-                border_color=settings.parameters_panel_combobox_border_color,
-                fg_color=settings.parameters_panel_combobox_background_color,
-                text_color=settings.parameters_panel_combobox_text_color,
-                button_color=settings.parameters_panel_combobox_button_color,
-                button_hover_color=settings.parameters_panel_combobox_button_hover_color,
-                dropdown_fg_color=settings.parameters_panel_combobox_dropdown_fg_color,
-                dropdown_hover_color=settings.parameters_panel_combobox_dropdown_hover_color,
-                dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
-            )
-            self.piezo_material_combobox.grid(
-                row=6, 
-                column=2, 
-                sticky="",
-                padx=(0,0),
-                pady=(0,1),
-            )
-        else:
-            if(self.piezo_material_combobox.get() not in globals.materials.keys()):
-                self.piezo_material_combobox.set("")
-            self.piezo_material_combobox.configure(
-                values=list(reversed((globals.materials.keys())))
             )
 
 
@@ -333,7 +285,7 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.neutralizing_material_label.grid(
-                row=7, 
+                row=4, 
                 column=0, 
                 columnspan=2,
                 sticky="w", 
@@ -359,7 +311,7 @@ class Parameters_Panel:
                 dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
             )
             self.neutralizing_material_combobox.grid(
-                row=7, 
+                row=4, 
                 column=2, 
                 sticky="",
                 padx=(0,0),
@@ -382,7 +334,7 @@ class Parameters_Panel:
                 text_color=settings.parameters_panel_text_color
             )
             self.stoney_filament_label.grid(
-                row=8, 
+                row=5, 
                 column=0, 
                 sticky="w", 
                 padx=(0,0),
@@ -408,7 +360,7 @@ class Parameters_Panel:
                 dropdown_text_color=settings.parameters_panel_combobox_dropdown_text_color
             )
             self.stoney_filament_combobox.grid(
-                row=8, 
+                row=5, 
                 column=2, 
                 sticky="", 
                 padx=(0,0),

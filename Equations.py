@@ -127,17 +127,17 @@ class Equations:
             return error
 
 
-    def calculate_M_tot_cantilever(self, M_is:float, M_p:float):
+    def calculate_M_tot_cantilever(self, M_is:float, cumulative_M_p:float):
         """
         PARAMETERS:\n
             M_is: value in unit "newton meters"
-            M_p: value in unit "newton meters"
+            cumulative_M_p: value in unit "newton meters"
 
         Returns "M_tot" in unit "newton meters" if succesfull.
         If not successfull the error is returned.
         """
         try:
-            M_tot = M_is + M_p
+            M_tot = M_is + cumulative_M_p
 
             return M_tot
 
@@ -189,7 +189,7 @@ class Equations:
             return error
 
 
-    def calculate_M_p_cantilever(self, Zp:float, W:float, V_p:float, e_31_f:float):
+    def calculate_Mp_cantilever(self, Zp:float, W:float, V_p:float, e_31_f:float):
         """
         Calculates cantilever piezoelectric moment (M_p)
 
@@ -199,20 +199,44 @@ class Equations:
             V_p: value in unit "volt"
             e_31_f: value in unit "c/m2"
 
-        Returns "M_p" in unit "newton meters" if succesfull.
+        Returns "Mp" in unit "newton meters" if succesfull.
+        If not successfull the error is returned.
+        """
+        # print("CALCULATE_M_P_CANTILEVER()")
+
+        try:
+            #Calculate Mp value
+            Mp = e_31_f * V_p * Zp * W
+
+            return Mp
+
+        except Exception as error:
+            return error
+
+
+    def calculate_cumulative_Mp_cantilever(self, Zp:list, W:float, V_p:float, e_31_f:float):
+        """
+        Calculates the cumulative cantilever piezoelectric moment (cumulative_Mp)
+
+        PARAMETERS:\n
+            Zp: list of zp values in unit "meters"
+            W: value in unit "meters"
+            V_p: value in unit "volt"
+            e_31_f: value in unit "c/m2"
+
+        Returns "cumulative_M_p" in unit "newton meters" if succesfull.
         If not successfull the error is returned.
         """
         # print("CALCULATE_M_P_CANTILEVER()")
 
         try:
             #Calculate M_p value
-            M_p = e_31_f * V_p * Zp * W
+            cumulative_Mp = e_31_f * V_p * sum(Zp) * W
 
-            return M_p
+            return cumulative_Mp
 
         except Exception as error:
             return error
-
 
     #HVA ER RETUR VERDI???
     #hva er second_thickness?
@@ -311,7 +335,6 @@ class Equations:
             d31 = e_31_f * (S11_PZT + S12_PZT)
 
             # 10) Layer thicknesses for blocking force formula
-            piezo_thickness = t[3]            # PZT layer thickness [m]
             h_Si  = t[0]            # substrate layer thickness [m]
             num = -3 * d31 * h_Si * (piezo_thickness + h_Si) * w
             den =  4 * (S11_PZT * h_Si + S11_Si * piezo_thickness) * L

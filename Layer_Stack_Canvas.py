@@ -1228,9 +1228,6 @@ class Layer_Stack_Canvas:
             #Variable to keep track of placement for Zp->arrow
             zp_arrow = 10
 
-            #CLEAR ZP LIST (remove later?)
-            globals.zp.clear()
-
             #DRAW ZP
             for material in dict(reversed(globals.materials.items())):
                 if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
@@ -1250,12 +1247,9 @@ class Layer_Stack_Canvas:
 
 
                     #Calculate Zp
-                    Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/ 1e9
+                    Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn/1e9, piezo_thickness) + Zn/1e9
                     if(isinstance(Zp, Exception)):
                         raise ValueError(f"Zp could not be calculated.\nerror:'{Zp}'")
-                    
-                    #REMOVE THIS LATER??
-                    globals.zp[piezo_material] = Zp
                     
 
                     #Convert Zn to nanometers

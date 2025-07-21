@@ -774,8 +774,8 @@ class App:
                 self.program_window.columnconfigure(2, weight=33, uniform="group1")  
 
                 self.program_window.rowconfigure(0, weight=30, uniform="group1")    
-                self.program_window.rowconfigure(1, weight=40, uniform="group1")
-                self.program_window.rowconfigure(2, weight=20, uniform="group1")
+                self.program_window.rowconfigure(1, weight=28, uniform="group1")
+                self.program_window.rowconfigure(2, weight=32, uniform="group1")
                 self.program_window.rowconfigure(3, weight=10, minsize=100, uniform="group1")
 
 

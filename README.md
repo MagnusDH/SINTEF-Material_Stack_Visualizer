@@ -1,21 +1,5 @@
 # Python Graphical User Interface program for visualizing thickness of materials and their behaviours
 
-# RUNAR
-    -Alle Zp verdier blir lagret i en dictionary kalt "globals.zp".
-    -Zp verdi blir kun regnet ut og lagret hvis du har markert et materiale som piezo materiale i check-boksene 
-
-
-    dictionary key = "navn på materialet"
-    dictionary value = Zp  
-
-    KODE FOR Å HENTE UT ZP VERDIER:
-
-    for key in globals.zp:
-        material_name = key
-        zp_value = globals.zp[key]
-        print(f"Key:{material_name}, Zp value: {zp_value}")
-
-
 # How to run program
     1. Open a terminal in the folder containing the "app.py" file
     2. Run one of the following commands:
@@ -134,21 +118,11 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Slette globals.zp liste?
-
-    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
+    -export til excel skal ta med multi view, realistic view og realistic uten tekst
 
 # QUESTIONS:
-    -Er "blocking force" verdiene riktig i results panel? alle er identisk nå
-
-    -Spør om design problemet er fikset hos runar nå. (har bare økt border radius til entry bokser fra 0.4 til 1)
-    
-    -hvordan ta bort piezo material entry og fremdeles tegne graf og equation labels riktig?
-
-    -Be runar ta en dobbelsjekk for om at alle utregninger fremdeles er korrekt
-
-    -Vet Runar hvorfor "blocking force cantilever tip" viser "Error" når det bare er 3 eller færre materialer i results panel?
-    Funksjonen hans "calculate_blocking_force" returnerer en ERROR når det er færre enn 3 materialer i programmet
+    -Gå gjennom draw_z_tip_is_graph, utregning av Zp må være feil
+    -fjerne "neutralizing_material combobox" og neutralizing_material variabel? den brukes ikke sånn som programmet er nå
 
 # BUGS:
     -
