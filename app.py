@@ -645,6 +645,9 @@ class App:
                 if(globals.results_panel != None):
                     globals.results_panel.create_results_panel()
             
+            case "Zn":
+                print("Zn updated. nothing here is being updated")
+
             case "t_sol":
                 print("t_sol updated. nothing here is being updated")
                 # if(globals.results_panel != None):

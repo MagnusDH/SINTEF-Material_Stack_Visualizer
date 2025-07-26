@@ -1,5 +1,8 @@
 # Python Graphical User Interface program for visualizing thickness of materials and their behaviours
 
+# EXPLANATION OF APPLICATION
+    -Add explanation....
+
 # How to run program
     1. Open a terminal in the folder containing the "app.py" file
     2. Run one of the following commands:
@@ -118,11 +121,21 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -export til excel skal ta med multi view, realistic view og realistic uten tekst
+    -Export_to_excel
+        -Create new excel tab named "Calculations"
+        -Add parameters from "parameters panel" and calculations made
+        -Add screenshot of "multi view", "realistic view" and "realistic view without text"
+
+    
+    -Add explanation of app in README file
 
 # QUESTIONS:
     -Gå gjennom draw_z_tip_is_graph, utregning av Zp må være feil
     -fjerne "neutralizing_material combobox" og neutralizing_material variabel? den brukes ikke sånn som programmet er nå
+
+    -Hvilket format skal "Zn", "Zp", "Mp" og "Blocking force cantilever tip" verdier i excel filen vises som?
+
+    -Hva skal regnes ut for "Curve [1/m]", "M_is [nm]" og "Stress neutral [nm]" i excel filen??
 
 # BUGS:
     -

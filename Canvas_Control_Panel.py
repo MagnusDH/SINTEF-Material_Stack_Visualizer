@@ -8,6 +8,7 @@ from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Border, Side, Font, Alignment
 from PIL import ImageGrab
 from openpyxl.drawing.image import Image
+from openpyxl.utils import get_column_letter
 
 
 #This class handles the buttons that perform actions on the canvas
@@ -677,7 +678,7 @@ class Canvas_Control_Panel:
 
         # Optionally, rename the default sheet
         sheet = workbook.active
-        # sheet.title = ""
+        sheet.title = "Materials"
 
         #Create header cells
         sheet["A1"] = "Material"          # Add a new header in column A row 1
@@ -783,5 +784,95 @@ class Canvas_Control_Panel:
         #Add the image to the excel file in a specific cell
         sheet.add_image(canvas_screenshot, "N1")
 
+        #Create "calculations" tab in same excel file
+        self.create_excel_calculations_tab(workbook)
+
         #Save the workbook as excel file
         workbook.save(f"{main_folder}/{sub_folder}/{filename}")
+
+    
+    def create_excel_calculations_tab(self, excel_workbook):
+        """
+        Creates a 'calculations' tab in the given excel file
+        """
+        print("CREATE_EXCEL_CALCULATIONS_TAB()")
+
+        new_tab = excel_workbook.create_sheet(title="Calculations")
+
+        #Set the width value of cells in the excel file
+        new_tab.column_dimensions['A'].width = 25
+
+        #Create cells
+        new_tab["A1"] = "Parameters"
+        new_tab["A1"].font = Font(bold=True)
+
+        new_tab["A2"] = "e₃₁ [C/m²]"
+        new_tab["B2"] = globals.e_31_f_value.get()
+        
+        new_tab["A3"] = "Zn [nm]"
+        new_tab["B3"] = globals.Zn.get()
+
+        new_tab["A4"] = "Curve [1/m]"
+        new_tab["B4"] = "Not calculated in application"
+
+        new_tab["A5"] = "M_is [nm]"
+        new_tab["B5"] = "Not calculated in application"
+
+        new_tab["A6"] = "Stress neutral [nm]"
+        new_tab["B6"] = "???"
+
+        new_tab["A7"] = "L [μm]"
+        new_tab["B7"] = globals.L_value.get()
+
+
+        new_tab["A8"] = "Volt"
+        new_tab["B8"] = globals.volt_value.get()
+
+        new_tab["A10"] = "Plot"
+        new_tab["A10"].font = Font(bold=True)
+
+
+        
+        #Create cells for each piezo material selected
+        column_counter = 1
+        fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
+
+        for material in globals.materials:
+            if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                
+                #Set column dimensions
+                if(column_counter % 2 != 0):
+                    column_letter = get_column_letter(column_counter)
+                    new_tab.column_dimensions[column_letter].width = 25
+
+
+                #Merge cells for material name
+                new_tab.merge_cells(start_row=11, start_column=column_counter, end_row=11, end_column=column_counter+1)
+                header_cell = new_tab.cell(row=11, column=column_counter, value=f"{material} (layer {globals.materials[material]["Layer"].get()})")
+                header_cell.font = Font(bold=True)
+                header_cell.fill = fill_color
+
+                new_tab.cell(row=12, column=column_counter, value="ZP")
+                new_tab.cell(row=12, column=column_counter+1, value=globals.materials[material]["Zp_value"].get())
+                
+
+                new_tab.cell(row=13, column=column_counter, value="Mp")
+                new_tab.cell(row=13, column=column_counter+1, value=globals.materials[material]["Mp_value"].get())
+
+                new_tab.cell(row=14, column=column_counter, value="Blocking force cantilever tip")
+                new_tab.cell(row=14, column=column_counter+1, value=globals.materials[material]["Blocking_force_value"].get())
+
+                #Increment column counter
+                column_counter += 2
+            
+        
+        #Apply borders around the piezo material cells
+        start_row = 11 
+        end_row = 15
+        start_column = 1
+        end_column = column_counter
+        thin_side = Side(style="thin")
+        for row in range(start_row, end_row):
+            for col in range(start_column, end_column):
+                cell = new_tab.cell(row=row, column=col)
+                cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
