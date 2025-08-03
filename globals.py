@@ -70,9 +70,9 @@ def initialize_globals(root_window):
     M_tot = tkinter.DoubleVar(value=0)
     M_tot.trace_add("write", lambda *args, identifier="M_tot": app.update_widgets(identifier))
     
-    # global curv_is
-    # curv_is = tkinter.DoubleVar(value=0)
-    # curv_is.trace_add("write", lambda *args, identifier="curv_is": app.update_widgets(identifier))
+    global curv_is
+    curv_is = tkinter.DoubleVar(value=0)
+    curv_is.trace_add("write", lambda *args, identifier="curv_is": app.update_widgets(identifier))
     
     # global z_tip_tot
     # z_tip_tot = tkinter.DoubleVar(value=0)

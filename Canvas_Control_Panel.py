@@ -634,7 +634,7 @@ class Canvas_Control_Panel:
     def export_graphs(self):
         """Exports the graph as svg file"""
         
-        print("EXPORT_GRAPHS()")
+        # print("EXPORT_GRAPHS()")
 
         #CREATE FOLDER HIERARCHY
         main_folder = "exports"
@@ -694,7 +694,7 @@ class Canvas_Control_Panel:
 
         
     def create_excel_materials_tab(self, excel_workbook):
-        print("CREATE_EXCEL_MATERIALS_TAB()")
+        # print("CREATE_EXCEL_MATERIALS_TAB()")
 
         main_folder = "exports"
         sub_folder = "excel"
@@ -785,20 +785,137 @@ class Canvas_Control_Panel:
 
         bbox = (canvas_x1, canvas_y1, canvas_x2, canvas_y2)
 
-        #Take a screenshot of the screen where canvas is
+
+        #########test########
+        globals.layer_stack_canvas.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            if("Rectangle_id" in globals.materials[material]):
+                del globals.materials[material]["Rectangle_id"]
+            
+            if("Text_id" in globals.materials[material]):
+                del globals.materials[material]["Text_id"]
+    
+            if("Text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Text_bbox_id"]
+            
+            if("Line_id" in globals.materials[material]):
+                del globals.materials[material]["Line_id"]
+            
+            if("Indent_text_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_id"]
+            
+            if("Indent_text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_bbox_id"]
+            
+            if("Indent_line_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_line_id"]
+            
+            if("Indent_arrow_pointer_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_arrow_pointer_id"]
+
+        # Sort the materials dictionary after the "layer" value
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
+        globals.layer_stack_canvas.draw_material_stack_stacked()        
+        globals.layer_stack_canvas.write_text_on_stack()
+        self.program_window.update()
         screenshot = ImageGrab.grab(bbox=bbox)
-        screenshot.save(f"{main_folder}/{sub_folder}/canvas_screenshot.png", "PNG")
+        screenshot.save(f"{main_folder}/{sub_folder}/canvas_screenshot_stacked.png", "PNG")
+
+
+        #Take a screenshot of the screen where canvas is
+        globals.layer_stack_canvas.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            if("Rectangle_id" in globals.materials[material]):
+                del globals.materials[material]["Rectangle_id"]
+            
+            if("Text_id" in globals.materials[material]):
+                del globals.materials[material]["Text_id"]
+    
+            if("Text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Text_bbox_id"]
+            
+            if("Line_id" in globals.materials[material]):
+                del globals.materials[material]["Line_id"]
+            
+            if("Indent_text_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_id"]
+            
+            if("Indent_text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_bbox_id"]
+            
+            if("Indent_line_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_line_id"]
+            
+            if("Indent_arrow_pointer_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_arrow_pointer_id"]
+
+        #Sort the materials dictionary after the "layer" value
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
+        globals.layer_stack_canvas.draw_material_stack_realistic()        
+        self.program_window.update()
+        screenshot = ImageGrab.grab(bbox=bbox)
+        screenshot.save(f"{main_folder}/{sub_folder}/canvas_screenshot_realistic.png", "PNG")
+
+
+
+        #Take a screenshot of the screen where canvas is
+        globals.layer_stack_canvas.layer_stack_canvas.delete("all")
+        for material in globals.materials:
+            if("Rectangle_id" in globals.materials[material]):
+                del globals.materials[material]["Rectangle_id"]
+            
+            if("Text_id" in globals.materials[material]):
+                del globals.materials[material]["Text_id"]
+    
+            if("Text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Text_bbox_id"]
+            
+            if("Line_id" in globals.materials[material]):
+                del globals.materials[material]["Line_id"]
+            
+            if("Indent_text_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_id"]
+            
+            if("Indent_text_bbox_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_text_bbox_id"]
+            
+            if("Indent_line_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_line_id"]
+            
+            if("Indent_arrow_pointer_id" in globals.materials[material]):
+                del globals.materials[material]["Indent_arrow_pointer_id"]
+
+        #Sort the materials dictionary after the "layer" value
+        globals.materials = dict(sorted(globals.materials.items(), key=lambda item: item[1]["Layer"].get()))
+        globals.layer_stack_canvas.draw_material_stack_realistic()
+        globals.layer_stack_canvas.write_text_on_stack()
+        globals.layer_stack_canvas.draw_Zn_and_Zp()   
+        self.program_window.update()
+        screenshot = ImageGrab.grab(bbox=bbox)
+        screenshot.save(f"{main_folder}/{sub_folder}/canvas_screenshot_multi.png", "PNG")
+        #####################
 
         #Load the image with openpyxl
-        canvas_screenshot = Image(f"{main_folder}/{sub_folder}/canvas_screenshot.png")
+        canvas_screenshot_stacked = Image(f"{main_folder}/{sub_folder}/canvas_screenshot_stacked.png")
+        canvas_screenshot_realistic = Image(f"{main_folder}/{sub_folder}/canvas_screenshot_realistic.png")
+        canvas_screenshot_multi = Image(f"{main_folder}/{sub_folder}/canvas_screenshot_multi.png")
+
 
         #Set the width and height of image placed in excel file
-        canvas_screenshot.width = 350
-        canvas_screenshot.height = 450
+        canvas_screenshot_stacked.width = 350
+        canvas_screenshot_stacked.height = 450
+
+        canvas_screenshot_realistic.width = 350
+        canvas_screenshot_realistic.height = 450
+
+        canvas_screenshot_multi.width = 350
+        canvas_screenshot_multi.height = 450
             
 
         #Add the image to the excel file in a specific cell
-        tab.add_image(canvas_screenshot, "N1")
+        tab.add_image(canvas_screenshot_stacked, "N1")
+        tab.add_image(canvas_screenshot_realistic, "T1")
+        tab.add_image(canvas_screenshot_multi, "Z1")
 
 
     def create_excel_calculations_tab(self, excel_workbook):
@@ -806,7 +923,7 @@ class Canvas_Control_Panel:
         Creates a 'calculations' tab in the given excel file
         """
       
-        print("CREATE_EXCEL_CALCULATIONS_TAB()")
+        # print("CREATE_EXCEL_CALCULATIONS_TAB()")
 
         tab = excel_workbook.create_sheet(title="Calculations")
 

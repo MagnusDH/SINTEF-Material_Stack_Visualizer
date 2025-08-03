@@ -118,8 +118,6 @@ class Graph_Canvas:
         """
         # print("DRAW_STONEY_GRAPH()")
 
-
-        # print("DRAW_STONEY_GRAPH()")
         try:
             #Clear the graph
             self.graph2.clear()

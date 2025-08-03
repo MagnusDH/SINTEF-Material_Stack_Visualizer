@@ -115,6 +115,8 @@ class Equations:
         If not successfull the error is returned.
         """
 
+        # print("CALCULATE_M_IS_CANTILEVER")
+
         try:
             #Calculate M_tot
             term1 = W * t[0] * sigma_i[0] * (t[0] / 2 - Zn)

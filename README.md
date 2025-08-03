@@ -121,12 +121,10 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Export_to_excel
-        -Add screenshot of "multi view", "realistic view" and "realistic view without text"
-
+    -Se over kode og prøv å integrer "calculate_all_equations" istedetfor å regne det ut over alt på forskjellige steder
+    
     -Add explanation of app in README file
 
-    -Se over kode og prøv å integrer "calculate_all_equations" istedetfor å regne det ut over alt på forskjellige steder
 
 # QUESTIONS:
     -Gå gjennom draw_z_tip_is_graph, utregning av Zp må være feil
