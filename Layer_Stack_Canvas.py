@@ -1175,8 +1175,7 @@ class Layer_Stack_Canvas:
             #Calculate Zn
             # Zn = round(globals.equations.calculate_Zn(E, t, nu), 1)
             Zn = globals.equations.calculate_Zn(E, t, nu)
-            globals.Zn.set(Zn)
-            print(f"UPDATED ZN!!!!!!!!!!!!!!!!!!!!!!!!!!!!! {Zn} -- {globals.Zn.get()}")
+            # globals.Zn.set(Zn)
             
             if(isinstance(Zn, Exception)):
                 raise ValueError(f"Zn could not be calculated.\nerror:'{Zn}'")

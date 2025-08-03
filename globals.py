@@ -54,17 +54,21 @@ def initialize_globals(root_window):
     Zn = tkinter.DoubleVar(value=0)
     Zn.trace_add("write", lambda *args, identifier="Zn": app.update_widgets(identifier))
     
-    # global EI
-    # EI = tkinter.DoubleVar(value=0)
-    # EI.trace_add("write", lambda *args, identifier="EI": app.update_widgets(identifier))
+    global cumulative_Mp_cantilever
+    cumulative_Mp_cantilever = tkinter.DoubleVar(value=0)
+    cumulative_Mp_cantilever.trace_add("write", lambda *args, identifier="cumulative_Mp_cantilever": app.update_widgets(identifier))
     
-    # global M_is
-    # M_is = tkinter.DoubleVar(value=0)
-    # M_is.trace_add("write", lambda *args, identifier="M_is": app.update_widgets(identifier))
+    global EI
+    EI = tkinter.DoubleVar(value=0)
+    EI.trace_add("write", lambda *args, identifier="EI": app.update_widgets(identifier))
     
-    # global M_tot
-    # M_tot = tkinter.DoubleVar(value=0)
-    # M_tot.trace_add("write", lambda *args, identifier="M_tot": app.update_widgets(identifier))
+    global M_is
+    M_is = tkinter.DoubleVar(value=0)
+    M_is.trace_add("write", lambda *args, identifier="M_is": app.update_widgets(identifier))
+    
+    global M_tot
+    M_tot = tkinter.DoubleVar(value=0)
+    M_tot.trace_add("write", lambda *args, identifier="M_tot": app.update_widgets(identifier))
     
     # global curv_is
     # curv_is = tkinter.DoubleVar(value=0)

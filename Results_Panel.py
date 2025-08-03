@@ -352,7 +352,7 @@ class Results_Panel:
         """
         """
 
-        print("UPDATE_EQUATION_LABELS()")
+        # print("UPDATE_EQUATION_LABELS()")
 
         #Fetch necessary values and calculations
         W = 160 / 1e6

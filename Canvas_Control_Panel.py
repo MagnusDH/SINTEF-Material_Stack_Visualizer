@@ -211,6 +211,10 @@ class Canvas_Control_Panel:
                 self.export_graphs()
 
             case "Material properties + screenshot (EXCEL)":
+                #Make graphs if they have not been made
+                if(globals.graph_canvas != None):
+                    self.export_graphs()
+
                 self.export_to_excel()
 
             case "All":
@@ -630,7 +634,7 @@ class Canvas_Control_Panel:
     def export_graphs(self):
         """Exports the graph as svg file"""
         
-        #print("EXPORT_GRAPHS()")
+        print("EXPORT_GRAPHS()")
 
         #CREATE FOLDER HIERARCHY
         main_folder = "exports"
@@ -647,14 +651,20 @@ class Canvas_Control_Panel:
             os.makedirs(f"{main_folder}/{sub_folder}")
         
         #Create name for the file
-        filename = "graphs.svg"
+        filenameSVG = "graphs.svg"
+        filenameJPG = "graphs.jpg"
 
-        #Save the graph as svg file
-        globals.graph_canvas.graph_container.savefig(f"{main_folder}/{sub_folder}/{filename}")
+
+        #Save the graph as .svg and .jpg file
+        globals.graph_canvas.graph_container.savefig(f"{main_folder}/{sub_folder}/{filenameSVG}")
+        globals.graph_canvas.graph_container.savefig(f"{main_folder}/{sub_folder}/{filenameJPG}")
 
 
     def export_to_excel(self):
-        """Saves the values from materials{} to an excel file and places a screenshot of the current stack in the excel file"""
+        """
+        Creates two tabs in an excel file containing information about each material, equations, pictures of the stack and the graphs
+        """
+
         # print("EXPORT_TO_EXCEL()")
 
         #Create an filename and a workbook to contain data
@@ -670,36 +680,48 @@ class Canvas_Control_Panel:
         if not os.path.exists(f"{main_folder}/{sub_folder}"):
             os.makedirs(f"{main_folder}/{sub_folder}")
         
-
-        #Create path for file to be saved in
-        file_path = os.path.join(f"{main_folder}/{sub_folder}/{filename}")
-
+        #Create excel workbook/file
         workbook = Workbook()
 
-        # Optionally, rename the default sheet
-        sheet = workbook.active
-        sheet.title = "Materials"
+        #Create "calculations" tab in excel file
+        self.create_excel_materials_tab(workbook)
+
+        #Create "calculations" tab in excel file
+        self.create_excel_calculations_tab(workbook)
+
+        #Save the workbook as excel file
+        workbook.save(f"{main_folder}/{sub_folder}/{filename}")
+
+        
+    def create_excel_materials_tab(self, excel_workbook):
+        print("CREATE_EXCEL_MATERIALS_TAB()")
+
+        main_folder = "exports"
+        sub_folder = "excel"
+
+        tab = excel_workbook.active
+        tab.title = "Materials"
 
         #Create header cells
-        sheet["A1"] = "Material"          # Add a new header in column A row 1
-        sheet["B1"] = "Thickness [nm]"
-        sheet["C1"] = "Unit"
-        sheet["D1"] = "Indent [nm]"
-        sheet["E1"] = "Color"
-        sheet["F1"] = "Modulus [GPa]"
-        sheet["G1"] = "CTE [ppm/deg]"
-        sheet["H1"] = "Density [kg/m3]"
-        sheet["I1"] = "Stress_x [MPa]"
-        sheet["J1"] = "Poisson"
-        sheet["K1"] = "R0"
-        sheet["L1"] = "R"
+        tab["A1"] = "Material"          # Add a new header in column A row 1
+        tab["B1"] = "Thickness [nm]"
+        tab["C1"] = "Unit"
+        tab["D1"] = "Indent [nm]"
+        tab["E1"] = "Color"
+        tab["F1"] = "Modulus [GPa]"
+        tab["G1"] = "CTE [ppm/deg]"
+        tab["H1"] = "Density [kg/m3]"
+        tab["I1"] = "Stress_x [MPa]"
+        tab["J1"] = "Poisson"
+        tab["K1"] = "R0"
+        tab["L1"] = "R"
 
 
         #Define a fill_color for cells
-        fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
+        fill_color = PatternFill(start_color="2f9ff5", end_color="2f9ff5", fill_type="solid")
 
         #Loop through the desired range of columns and rows to apply the fill_color and set a bold font
-        for row in sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=12):  # Adjust row/column range as needed
+        for row in tab.iter_rows(min_row=1, max_row=1, min_col=1, max_col=12):  # Adjust row/column range as needed
             for cell in row:
                 cell.font = Font(bold=True)
                 cell.fill = fill_color
@@ -714,46 +736,42 @@ class Canvas_Control_Panel:
         )
 
         #Apply the border to a range of cells and center the text in each cell
-        for row in sheet.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=12):  # Adjust range as needed
+        for row in tab.iter_rows(min_row=1, max_row=len(globals.materials)+1, min_col=1, max_col=12):  # Adjust range as needed
             for cell in row:
                 cell.border = thin_border
                 cell.alignment = Alignment(horizontal="center", vertical="center")
 
         #Set the height and width values of cells in the excel file
-        sheet.column_dimensions['A'].width = 13  #Width of column A
-        sheet.column_dimensions['B'].width = 10  
-        sheet.column_dimensions['C'].width = 6  
-        sheet.column_dimensions['D'].width = 13  
-        sheet.column_dimensions['E'].width = 10  
-        sheet.column_dimensions['F'].width = 15  
-        sheet.column_dimensions['G'].width = 15  
-        sheet.column_dimensions['H'].width = 15
-        sheet.column_dimensions['I'].width = 15  
-        sheet.column_dimensions['J'].width = 10
-        sheet.column_dimensions['K'].width = 10
-        sheet.column_dimensions['L'].width = 10
-
-
-        # Set row height
-        # sheet.row_dimensions[1].height = 20  # Height of row 1 set to 30
+        tab.column_dimensions['A'].width = 13  #Width of column A
+        tab.column_dimensions['B'].width = 10  
+        tab.column_dimensions['C'].width = 6  
+        tab.column_dimensions['D'].width = 13  
+        tab.column_dimensions['E'].width = 10  
+        tab.column_dimensions['F'].width = 15  
+        tab.column_dimensions['G'].width = 15  
+        tab.column_dimensions['H'].width = 15
+        tab.column_dimensions['I'].width = 15  
+        tab.column_dimensions['J'].width = 10
+        tab.column_dimensions['K'].width = 10
+        tab.column_dimensions['L'].width = 10
 
 
         #Loop through materials{} and place values in excel file
         row_counter = 2
 
         for material in dict(reversed(globals.materials.items())):
-            sheet.cell(row=row_counter, column=1, value=globals.materials[material]["Name"].get())
-            sheet.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness [nm]"].get())
-            sheet.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"].get())
-            sheet.cell(row=row_counter, column=4, value=globals.materials[material]["Indent [nm]"].get())
-            sheet.cell(row=row_counter, column=5, value=globals.materials[material]["Color"].get())
-            sheet.cell(row=row_counter, column=6, value=globals.materials[material]["Modulus [GPa]"].get())
-            sheet.cell(row=row_counter, column=7, value=globals.materials[material]["CTE [ppm/deg]"].get())
-            sheet.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"].get())
-            sheet.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"].get())
-            sheet.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"].get())
-            sheet.cell(row=row_counter, column=11, value=globals.materials[material]["R0"].get())
-            sheet.cell(row=row_counter, column=12, value=globals.materials[material]["R"].get())
+            tab.cell(row=row_counter, column=1, value=globals.materials[material]["Name"].get())
+            tab.cell(row=row_counter, column=2, value=globals.materials[material]["Thickness [nm]"].get())
+            tab.cell(row=row_counter, column=3, value=globals.materials[material]["Unit"].get())
+            tab.cell(row=row_counter, column=4, value=globals.materials[material]["Indent [nm]"].get())
+            tab.cell(row=row_counter, column=5, value=globals.materials[material]["Color"].get())
+            tab.cell(row=row_counter, column=6, value=globals.materials[material]["Modulus [GPa]"].get())
+            tab.cell(row=row_counter, column=7, value=globals.materials[material]["CTE [ppm/deg]"].get())
+            tab.cell(row=row_counter, column=8, value=globals.materials[material]["Density [kg/m3]"].get())
+            tab.cell(row=row_counter, column=9, value=globals.materials[material]["Stress_x [MPa]"].get())
+            tab.cell(row=row_counter, column=10, value=globals.materials[material]["Poisson"].get())
+            tab.cell(row=row_counter, column=11, value=globals.materials[material]["R0"].get())
+            tab.cell(row=row_counter, column=12, value=globals.materials[material]["R"].get())
 
             #increment row_counter
             row_counter += 1
@@ -775,104 +793,258 @@ class Canvas_Control_Panel:
         canvas_screenshot = Image(f"{main_folder}/{sub_folder}/canvas_screenshot.png")
 
         #Set the width and height of image placed in excel file
-        match globals.current_view.get():
-            case "Stacked" | "Realistic" | "Stepped" | "Multi":
-                canvas_screenshot.width = 350
-                canvas_screenshot.height = 350
+        canvas_screenshot.width = 350
+        canvas_screenshot.height = 450
             
 
         #Add the image to the excel file in a specific cell
-        sheet.add_image(canvas_screenshot, "N1")
+        tab.add_image(canvas_screenshot, "N1")
 
-        #Create "calculations" tab in same excel file
-        self.create_excel_calculations_tab(workbook)
 
-        #Save the workbook as excel file
-        workbook.save(f"{main_folder}/{sub_folder}/{filename}")
-
-    
     def create_excel_calculations_tab(self, excel_workbook):
         """
         Creates a 'calculations' tab in the given excel file
         """
+      
         print("CREATE_EXCEL_CALCULATIONS_TAB()")
 
-        new_tab = excel_workbook.create_sheet(title="Calculations")
+        tab = excel_workbook.create_sheet(title="Calculations")
 
         #Set the width value of cells in the excel file
-        new_tab.column_dimensions['A'].width = 25
+        tab.column_dimensions['A'].width = 25
+        tab.column_dimensions['B'].width = 15
+
 
         #Create cells
-        new_tab["A1"] = "Parameters"
-        new_tab["A1"].font = Font(bold=True)
+        tab.merge_cells(start_row=1, start_column=1, end_row=1, end_column=2)
+        tab["A1"] = "Parameters"
+        tab["A1"].font = Font(bold=True)
+        tab["A1"].alignment = Alignment(horizontal="center", vertical="center")
+        tab["A1"].fill = PatternFill(start_color="2f9ff5", end_color="2f9ff5", fill_type="solid")
 
-        new_tab["A2"] = "e₃₁ [C/m²]"
-        new_tab["B2"] = globals.e_31_f_value.get()
+
+        tab["A2"] = "e₃₁ [C/m²]"
+        tab["B2"] = globals.e_31_f_value.get()
         
-        new_tab["A3"] = "Zn [nm]"
-        new_tab["B3"] = globals.Zn.get()
+        tab["A3"] = "Zn [nm]"
+        tab["B3"] = globals.Zn.get()
 
-        new_tab["A4"] = "Curve [1/m]"
-        new_tab["B4"] = "Not calculated in application"
+        tab["A4"] = "Curve [1/m]"
+        tab["B4"] = "Not calculated in application"
 
-        new_tab["A5"] = "M_is [nm]"
-        new_tab["B5"] = "Not calculated in application"
+        tab["A5"] = "M_is [nm]"
+        tab["B5"] = "Not calculated in application"
 
-        new_tab["A6"] = "Stress neutral [nm]"
-        new_tab["B6"] = "???"
+        tab["A6"] = "Stress neutral [nm]"
+        tab["B6"] = "???"
 
-        new_tab["A7"] = "L [μm]"
-        new_tab["B7"] = globals.L_value.get()
-
-
-        new_tab["A8"] = "Volt"
-        new_tab["B8"] = globals.volt_value.get()
-
-        new_tab["A10"] = "Plot"
-        new_tab["A10"].font = Font(bold=True)
+        tab["A7"] = "L [μm]"
+        tab["B7"] = globals.L_value.get()
 
 
-        
+        tab["A8"] = "Volt"
+        tab["B8"] = globals.volt_value.get()
+
+
+        #Apply borders around the cells
+        start_row = 1
+        end_row = 9
+        start_column = 1
+        end_column = 3
+        thin_side = Side(style="thin")
+        for row in range(start_row, end_row):
+            for col in range(start_column, end_column):
+                cell = tab.cell(row=row, column=col)
+                cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+
+
+        tab.merge_cells(start_row=10, start_column=1, end_row=10, end_column=2)
+        tab["A10"] = "Plot"
+        tab["A10"].font = Font(bold=True)
+        tab["A10"].alignment = Alignment(horizontal="center", vertical="center")
+        tab["A10"].fill = PatternFill(start_color="2f9ff5", end_color="2f9ff5", fill_type="solid")
+
+
+
         #Create cells for each piezo material selected
         column_counter = 1
-        fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
+        row_counter = 11
+        fill_color = PatternFill(start_color="93cefa", end_color="93cefa", fill_type="solid")
 
-        for material in globals.materials:
+        for material in dict(reversed(globals.materials.items())):
             if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
                 
                 #Set column dimensions
                 if(column_counter % 2 != 0):
                     column_letter = get_column_letter(column_counter)
-                    new_tab.column_dimensions[column_letter].width = 25
+                    tab.column_dimensions[column_letter].width = 25
 
 
                 #Merge cells for material name
-                new_tab.merge_cells(start_row=11, start_column=column_counter, end_row=11, end_column=column_counter+1)
-                header_cell = new_tab.cell(row=11, column=column_counter, value=f"{material} (layer {globals.materials[material]["Layer"].get()})")
+                tab.merge_cells(start_row=row_counter, start_column=column_counter, end_row=row_counter, end_column=column_counter+1)
+                header_cell = tab.cell(row=row_counter, column=column_counter, value=f"{material} (layer {globals.materials[material]["Layer"].get()})")
                 header_cell.font = Font(bold=True)
                 header_cell.fill = fill_color
 
-                new_tab.cell(row=12, column=column_counter, value="ZP")
-                new_tab.cell(row=12, column=column_counter+1, value=globals.materials[material]["Zp_value"].get())
+                tab.cell(row=row_counter+1, column=column_counter, value="ZP")
+                tab.cell(row=row_counter+1, column=column_counter+1, value=globals.materials[material]["Zp_value"].get())
                 
 
-                new_tab.cell(row=13, column=column_counter, value="Mp")
-                new_tab.cell(row=13, column=column_counter+1, value=globals.materials[material]["Mp_value"].get())
+                tab.cell(row=row_counter+2, column=column_counter, value="Mp")
+                tab.cell(row=row_counter+2, column=column_counter+1, value=globals.materials[material]["Mp_value"].get())
 
-                new_tab.cell(row=14, column=column_counter, value="Blocking force cantilever tip")
-                new_tab.cell(row=14, column=column_counter+1, value=globals.materials[material]["Blocking_force_value"].get())
+                tab.cell(row=row_counter+3, column=column_counter, value="Blocking force cantilever tip")
+                tab.cell(row=row_counter+3, column=column_counter+1, value=globals.materials[material]["Blocking_force_value"].get())
 
                 #Increment column counter
-                column_counter += 2
+                row_counter += 4
             
         
         #Apply borders around the piezo material cells
-        start_row = 11 
-        end_row = 15
+        start_row = 10
+        end_row = row_counter
         start_column = 1
-        end_column = column_counter
+        end_column = 3
         thin_side = Side(style="thin")
         for row in range(start_row, end_row):
             for col in range(start_column, end_column):
-                cell = new_tab.cell(row=row, column=col)
+                cell = tab.cell(row=row, column=col)
                 cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+
+        
+
+        #Load graphs image
+        main_folder = "exports"
+        sub_folder = "graphs"
+        filenameJPG = "graphs.jpg"
+        graphs_image = Image(f"{main_folder}/{sub_folder}/{filenameJPG}")
+
+        #Set the width and height of image placed in excel file
+        graphs_image.width = 400
+        graphs_image.height = 600
+
+        #Add the image to the excel file in a specific cell
+        tab.add_image(graphs_image, "E1")
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    # def create_excel_calculations_tab(self, excel_workbook):
+    #     """
+    #     Creates a 'calculations' tab in the given excel file
+    #     """
+      
+    #     print("CREATE_EXCEL_CALCULATIONS_TAB()")
+
+    #     new_tab = excel_workbook.create_sheet(title="Calculations")
+
+    #     #Set the width value of cells in the excel file
+    #     new_tab.column_dimensions['A'].width = 25
+
+    #     #Create cells
+    #     new_tab["A1"] = "Parameters"
+    #     new_tab["A1"].font = Font(bold=True)
+
+    #     new_tab["A2"] = "e₃₁ [C/m²]"
+    #     new_tab["B2"] = globals.e_31_f_value.get()
+        
+    #     new_tab["A3"] = "Zn [nm]"
+    #     new_tab["B3"] = globals.Zn.get()
+
+    #     new_tab["A4"] = "Curve [1/m]"
+    #     new_tab["B4"] = "Not calculated in application"
+
+    #     new_tab["A5"] = "M_is [nm]"
+    #     new_tab["B5"] = "Not calculated in application"
+
+    #     new_tab["A6"] = "Stress neutral [nm]"
+    #     new_tab["B6"] = "???"
+
+    #     new_tab["A7"] = "L [μm]"
+    #     new_tab["B7"] = globals.L_value.get()
+
+
+    #     new_tab["A8"] = "Volt"
+    #     new_tab["B8"] = globals.volt_value.get()
+
+    #     new_tab["A10"] = "Plot"
+    #     new_tab["A10"].font = Font(bold=True)
+
+
+        
+    #     #Create cells for each piezo material selected
+    #     column_counter = 1
+    #     fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
+
+    #     for material in globals.materials:
+    #         if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                
+    #             #Set column dimensions
+    #             if(column_counter % 2 != 0):
+    #                 column_letter = get_column_letter(column_counter)
+    #                 new_tab.column_dimensions[column_letter].width = 25
+
+
+    #             #Merge cells for material name
+    #             new_tab.merge_cells(start_row=11, start_column=column_counter, end_row=11, end_column=column_counter+1)
+    #             header_cell = new_tab.cell(row=11, column=column_counter, value=f"{material} (layer {globals.materials[material]["Layer"].get()})")
+    #             header_cell.font = Font(bold=True)
+    #             header_cell.fill = fill_color
+
+    #             new_tab.cell(row=12, column=column_counter, value="ZP")
+    #             new_tab.cell(row=12, column=column_counter+1, value=globals.materials[material]["Zp_value"].get())
+                
+
+    #             new_tab.cell(row=13, column=column_counter, value="Mp")
+    #             new_tab.cell(row=13, column=column_counter+1, value=globals.materials[material]["Mp_value"].get())
+
+    #             new_tab.cell(row=14, column=column_counter, value="Blocking force cantilever tip")
+    #             new_tab.cell(row=14, column=column_counter+1, value=globals.materials[material]["Blocking_force_value"].get())
+
+    #             #Increment column counter
+    #             column_counter += 2
+            
+        
+    #     #Apply borders around the piezo material cells
+    #     start_row = 11 
+    #     end_row = 15
+    #     start_column = 1
+    #     end_column = column_counter
+    #     thin_side = Side(style="thin")
+    #     for row in range(start_row, end_row):
+    #         for col in range(start_column, end_column):
+    #             cell = new_tab.cell(row=row, column=col)
+    #             cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+
+        
+
+    #     #Load graphs image
+    #     main_folder = "exports"
+    #     sub_folder = "graphs"
+    #     filenameJPG = "graphs.jpg"
+    #     graphs_image = Image(f"{main_folder}/{sub_folder}/{filenameJPG}")
+
+    #     #Set the width and height of image placed in excel file
+    #     graphs_image.width = 400
+    #     graphs_image.height = 500
+
+    #     #Add the image to the excel file in a specific cell
+    #     new_tab.add_image(graphs_image, "A17")

@@ -122,12 +122,11 @@
 
 # TO DO
     -Export_to_excel
-        -Create new excel tab named "Calculations"
-        -Add parameters from "parameters panel" and calculations made
         -Add screenshot of "multi view", "realistic view" and "realistic view without text"
 
-    
     -Add explanation of app in README file
+
+    -Se over kode og prøv å integrer "calculate_all_equations" istedetfor å regne det ut over alt på forskjellige steder
 
 # QUESTIONS:
     -Gå gjennom draw_z_tip_is_graph, utregning av Zp må være feil
@@ -136,6 +135,11 @@
     -Hvilket format skal "Zn", "Zp", "Mp" og "Blocking force cantilever tip" verdier i excel filen vises som?
 
     -Hva skal regnes ut for "Curve [1/m]", "M_is [nm]" og "Stress neutral [nm]" i excel filen??
+
+    -El_is [Nm2] er ikke en ting i applikasjonen så kan derfor ikke puttes inn i excel eksporten
+
+    -Vil han ha "Volt" med i excel eksporten?
+
 
 # BUGS:
     -

@@ -265,7 +265,7 @@ class Graph_Canvas:
         -Draws the 'z_tip_is' graph
         """
 
-        print("DRAW_Z_TIP_IS_GRAPH()")
+        # print("DRAW_Z_TIP_IS_GRAPH()")
         
         try:
             #Clear the graph
@@ -319,7 +319,6 @@ class Graph_Canvas:
                     # Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
                     Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
 
-                    print(f"Zp for {material} is {Zp}")
                     zp_list.append(Zp)
             
             if(len(zp_list) == 0):

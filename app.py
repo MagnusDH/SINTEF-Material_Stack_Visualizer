@@ -357,7 +357,7 @@ class App:
 
         match identifier:
             case "all":
-                print("all updated")
+                print("all widgets updated")
                 if(globals.material_adjustment_panel != None):
                     globals.material_adjustment_panel.create_material_adjustment_panel()
                 
@@ -658,9 +658,28 @@ class App:
                 # if(globals.parameters_panel != None):
                 #     globals.parameters_panel.create_parameters_panel()
 
-            case _:
-                # print("There is not a match-case for this variable:", identifier)
+            case "cumulative_Mp_cantilever":
+                # print("cumulative_Mp_cantilever updated")
                 pass
+            
+            case "M_is":
+                # print("M_is updated")
+                pass
+
+            case "M_tot":
+                # print("M_tot updated")
+                pass
+            
+            case "EI":
+                # print("EI updated")
+                pass
+
+            case "curv_is":
+                # print("curv_is updated")
+                pass
+            
+            case _:
+                print("app.UPDATE_WIDGETS(): There is not a match-case for this variable:", identifier)
 
 
     def set_layout(self):
@@ -695,6 +714,8 @@ class App:
 
                 self.program_window.rowconfigure(0, weight=90, uniform="group1")    
                 self.program_window.rowconfigure(1, weight=10, minsize=100, uniform="group1")
+
+                globals.canvas_control_panel.export_graphs()
 
                 #MATERIAL_ADJUSTMENT_PANEL
                 if(globals.material_adjustment_panel == None):
@@ -954,6 +975,142 @@ class App:
             #Redraw the layer_stack_canvas
             globals.layer_stack_canvas.draw_material_stack()
 
+
+    def calculate_all_equations(self):
+        """
+        -Calculates all equations with the current values in the main material dictionary\n
+        -Values are stored either in globals or in dictionary for each material
+
+        UPDATED VALUES:\n     
+            -Zn\n
+            -Zp (for each piezo material)\n
+            -Mp (for each piezo material)\n
+            -Blocking_force (for each piezo material)\n
+            -Cumulative_Mp_cantilever\n
+            -M_is_cantilever\n
+            -M_tot_cantilever\n
+            -EI\n
+            -curv_is\n
+
+        """
+        print("CALCULATE_ALL_EQUATIONS()")
+
+        try:
+            #Check for errors
+            if(len(globals.materials) == 0):
+                raise ValueError("No materials")
+
+            #Fetch necessary values
+            E = []
+            t = []
+            nu = []
+            sigma_i = []
+            for material in globals.materials:
+                E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
+                t.append(float(globals.materials[material]["Thickness [nm]"].get()) / 1e9)
+                nu.append(globals.materials[material]["Poisson"].get())
+                sigma_i.append(float(globals.materials[material]["Stress_x [MPa]"].get()) * 1e6)
+
+            L = globals.L_value.get()
+            W = 160 / 1e6 #In micrometers
+            V_p = globals.volt_value.get()
+            e_31_f = globals.e_31_f_value.get()
+
+
+            #CALCULATE ZN
+            Zn = globals.equations.calculate_Zn(E, t, nu)
+            if(isinstance(Zn, Exception)):
+                raise ValueError(f"Zn could not be calculated.\nerror:'{Zn}'")
+            else:
+                globals.Zn.set(Zn)
+
+
+            #CALCULATE ZP, MP AND BLOCKING_FORCE FOR EACH PIEZO MATERIAL
+            zp_list = []
+            for material in globals.materials:
+                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                    piezo_thickness = float(globals.materials[material]["Thickness [nm]"].get()) / 1e9
+                    
+                    #CALCULATE ZP
+                    Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+                    if(isinstance(Zp, Exception)):
+                        raise ValueError(f"Zp for {material} could not be calculated.\nerror:'{Zp}'")
+                    else:
+                        globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
+                        zp_list.append(Zp)
+                    
+
+                    #CALCULATE M_p
+                    Mp = globals.equations.calculate_Mp_cantilever(Zp, W, V_p, e_31_f)
+                    if(isinstance(Mp, Exception)):
+                        raise ValueError(f"Mp for {material} could not be calculated.\nerror:'{Mp}'")
+                    else:
+                        globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
+
+                    #CALCULATE BLOCKING FORCE
+                    #Total thickness of materials from substrate up to (but not including) chosen piezo material
+                    h_Si = 0 
+                    for material2 in globals.materials:
+                        if(material2 == material):
+                            break
+                        h_Si += globals.materials[material2]["Thickness [nm]"].get()
+                    
+                    blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
+                    if(isinstance(blocking_force, Exception)):
+                        raise ValueError(f"blocking_force could not be calculated.\nerror:'{blocking_force}'")
+                    else:
+                        globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
+
+            
+            #CALCULATE CUMULATIVE_MP_CANTILEVER
+            cumulative_Mp = globals.equations.calculate_cumulative_Mp_cantilever(zp_list, W, V_p, e_31_f)
+            if(isinstance(cumulative_Mp, Exception)):
+                raise ValueError(f"Cumulative_Mp could not be calculated.\nerror:'{cumulative_Mp}'")
+            else:
+                globals.cumulative_Mp_cantilever.set(cumulative_Mp)
+        
+        
+            #CALCULATE M_IS_CANTILEVER
+            M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W)
+            if(isinstance(M_is, Exception)):
+                raise ValueError(f"M_is could not be calculated.\nerror:'{M_is}'")
+            else:
+                globals.M_is.set(M_is)
+
+
+            #CALCULATE M_TOT_CANTILEVER
+            M_tot = globals.equations.calculate_M_tot_cantilever(M_is, cumulative_Mp)
+            if(isinstance(M_tot, Exception)):
+                raise ValueError(f"M_tot could not be calculated.\nerror:'{M_tot}'")
+            else:
+                globals.M_tot.set(M_tot)
+
+
+            #CALCULATE EI
+            EI = globals.equations.calculate_EI(E, t, nu, W, Zn)
+            if(isinstance(EI, Exception)):
+                raise ValueError(f"EI could not be calculated.\nerror:'{EI}'")
+            else:
+                globals.EI.set(EI)
+
+
+            #CALCULATE CURV_IS
+            curv_is = globals.equations.calculate_curvature(M_tot, EI)
+            if(isinstance(curv_is, Exception)):
+                raise ValueError(f"curv_is could not be calculated.\nerror:'{curv_is}'")
+            else:
+                globals.curv_is.set(curv_is)
+
+        
+
+        # calculate_tip_placement???
+        # neutralize_global_stress???
+        # find_t_solution???
+
+        except Exception as error:
+            print(f"There was an error in calculating 'all equations.\nERROR:\n{error}")
+            return error
+        
 
 
 if __name__ == "__main__":
