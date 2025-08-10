@@ -646,12 +646,14 @@ class App:
                     globals.results_panel.create_results_panel()
             
             case "Zn":
-                print("Zn updated. nothing here is being updated")
+                # print("Zn updated. nothing here is being updated")
+                pass
 
             case "t_sol":
-                print("t_sol updated. nothing here is being updated")
+                # print("t_sol updated. nothing here is being updated")
                 # if(globals.results_panel != None):
                 #     globals.results_panel.create_results_panel()
+                pass
 
             # case "M_p":
                 # print("M_p updated")
@@ -994,7 +996,7 @@ class App:
             -curv_is\n
 
         """
-        print("CALCULATE_ALL_EQUATIONS()")
+        # print("CALCULATE_ALL_EQUATIONS()")
 
         try:
             #Check for errors
@@ -1021,6 +1023,7 @@ class App:
             #CALCULATE ZN
             Zn = globals.equations.calculate_Zn(E, t, nu)
             if(isinstance(Zn, Exception)):
+                globals.Zn = tkinter.DoubleVar(value=float('nan'))
                 raise ValueError(f"Zn could not be calculated.\nerror:'{Zn}'")
             else:
                 globals.Zn.set(Zn)
@@ -1047,15 +1050,17 @@ class App:
 
                         Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn, piezo_thickness)
                         if(isinstance(Zp, Exception)):
+                            globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=float('nan'))
                             raise ValueError(f"Zp for {material} could not be calculated.\nerror:'{Zp}'")
                         else:
-                            globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
+                            globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)                       
                             zp_list.append(Zp)
                         
 
                         #CALCULATE M_p
                         Mp = globals.equations.calculate_Mp_cantilever(Zp, W, V_p, e_31_f)
                         if(isinstance(Mp, Exception)):
+                            globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=float('nan'))
                             raise ValueError(f"Mp for {material} could not be calculated.\nerror:'{Mp}'")
                         else:
                             globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
@@ -1070,6 +1075,7 @@ class App:
                         
                         blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
                         if(isinstance(blocking_force, Exception)):
+                            globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=float('nan'))
                             raise ValueError(f"blocking_force could not be calculated.\nerror:'{blocking_force}'")
                         else:
                             globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
@@ -1078,6 +1084,7 @@ class App:
             #CALCULATE CUMULATIVE_MP_CANTILEVER
             cumulative_Mp = globals.equations.calculate_cumulative_Mp_cantilever(zp_list, W, V_p, e_31_f)
             if(isinstance(cumulative_Mp, Exception)):
+                globals.cumulative_Mp_cantilever = tkinter.DoubleVar(value=float('nan'))
                 raise ValueError(f"Cumulative_Mp could not be calculated.\nerror:'{cumulative_Mp}'")
             else:
                 globals.cumulative_Mp_cantilever.set(cumulative_Mp)
@@ -1086,6 +1093,7 @@ class App:
             #CALCULATE M_IS_CANTILEVER
             M_is = globals.equations.calculate_M_is_cantilever(Zn, sigma_i, t, W)
             if(isinstance(M_is, Exception)):
+                globals.M_is = tkinter.DoubleVar(value=float('nan'))
                 raise ValueError(f"M_is could not be calculated.\nerror:'{M_is}'")
             else:
                 globals.M_is.set(M_is)
@@ -1094,6 +1102,7 @@ class App:
             #CALCULATE M_TOT_CANTILEVER
             M_tot = globals.equations.calculate_M_tot_cantilever(M_is, cumulative_Mp)
             if(isinstance(M_tot, Exception)):
+                globals.M_tot = tkinter.DoubleVar(value=float('nan'))
                 raise ValueError(f"M_tot could not be calculated.\nerror:'{M_tot}'")
             else:
                 globals.M_tot.set(M_tot)
@@ -1102,6 +1111,7 @@ class App:
             #CALCULATE EI
             EI = globals.equations.calculate_EI(E, t, nu, W, Zn)
             if(isinstance(EI, Exception)):
+                globals.EI = tkinter.DoubleVar(value=float('nan'))
                 raise ValueError(f"EI could not be calculated.\nerror:'{EI}'")
             else:
                 globals.EI.set(EI)
@@ -1110,6 +1120,7 @@ class App:
             #CALCULATE CURV_IS
             curv_is = globals.equations.calculate_curvature(M_tot, EI)
             if(isinstance(curv_is, Exception)):
+                globals.curv_is = tkinter.DoubleVar(value=float('nan'))
                 raise ValueError(f"curv_is could not be calculated.\nerror:'{curv_is}'")
             else:
                 globals.curv_is.set(curv_is)

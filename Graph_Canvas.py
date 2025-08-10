@@ -436,7 +436,7 @@ class Graph_Canvas:
         
             # Add text to show the height
             self.graph1.text(
-                0.95*x_tip, (0 + y_tip) / 2,
+                0.90*x_tip, (0 + y_tip) / 2,
                 f"{round(y_tip,1)}",
                 fontsize=9,
                 color='k',

@@ -143,7 +143,7 @@ class Results_Panel:
                     
 
                 #material->piezo_checkbox is "on":
-                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                elif(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
                     #Check if label for this material has been created before
                     if("Results_panel_Mp_material_name_label_id" not in globals.materials[material]):
                         #create label for material_name in row and column
@@ -198,25 +198,27 @@ class Results_Panel:
                         row_counter += 2
 
 
-            #Display error message if no piezo materials have been chosen
-            if(checkbox_counter == len(globals.materials)):
+        #Display error message if no piezo materials have been chosen
+        if(checkbox_counter == len(globals.materials)):
+            if not hasattr(self, "error_label"):   
                 self.error_label = customtkinter.CTkLabel(
                     master=self.results_panel_frame, 
                     text=f"No piezo material selected", 
                     fg_color=settings.results_panel_background_color,
                     text_color="red",
                 )
-                self.error_label.grid(
-                    row=row_counter, 
-                    column=0, 
-                    sticky="nsew", 
-                    padx=(0,0),
-                    pady=(0,0),
-                    columnspan=6
-                )
-            else:
-                if hasattr(self, "error_label"):                  
-                    self.error_label.destroy()
+            self.error_label.grid(
+                row=row_counter, 
+                column=0, 
+                sticky="nsew", 
+                padx=(0,0),
+                pady=(0,0),
+                columnspan=6
+            )
+        else:
+            if hasattr(self, "error_label"):  
+                self.error_label.destroy()
+                del self.error_label
 
 
 
@@ -265,7 +267,7 @@ class Results_Panel:
                         del globals.materials[material]["Results_panel_blocking_force_value_label_id"]
 
                 #material->piezo_checkbox is "on":
-                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                elif(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
                     #Check if label for this material has been created before
                     if("Results_panel_blocking_force_material_name_label_id" not in globals.materials[material]):
                         #create label for material_name in row and column
@@ -320,25 +322,28 @@ class Results_Panel:
                         row_counter += 2
 
 
-            #Display error message if no piezo materials have been chosen
-            if(checkbox_counter == len(globals.materials)):
+        #Display error message if no piezo materials have been chosen
+        if(checkbox_counter == len(globals.materials)):
+            if not hasattr(self, "error_label2"):   
                 self.error_label2 = customtkinter.CTkLabel(
                     master=self.results_panel_frame, 
                     text=f"No piezo material selected", 
                     fg_color=settings.results_panel_background_color,
                     text_color="red",
                 )
-                self.error_label2.grid(
-                    row=row_counter, 
-                    column=0, 
-                    sticky="nsew", 
-                    padx=(0,0),
-                    pady=(0,0),
-                    columnspan=6
-                )
-            else:
-                if hasattr(self, "error_label2"):                  
-                    self.error_label2.destroy()
+            self.error_label2.grid(
+                row=row_counter, 
+                column=0, 
+                sticky="nsew", 
+                padx=(0,0),
+                pady=(0,0),
+                columnspan=6
+            )
+        else:
+            if hasattr(self, "error_label2"):                  
+                self.error_label2.destroy()
+                del self.error_label2
+
 
 
         #Update the values in the equation labels
@@ -347,9 +352,9 @@ class Results_Panel:
         return self.results_panel_frame
         
 
-    #ADD DESCRIPTION OF FUNCTION
     def update_equation_labels(self):
         """
+        -Updates the labels and their values in "Results_Panel"
         """
 
         # print("UPDATE_EQUATION_LABELS()")

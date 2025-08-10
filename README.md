@@ -121,8 +121,6 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Mp i "results panel" er ikke regnet ut riktig
-
     -Add explanation of app in README file
 
 # QUESTIONS:
