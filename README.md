@@ -130,4 +130,4 @@
 
 
 # BUGS:
-    -
+    -Hvis du trykker "reset to original" så blir ikke lablene i "results_panel" slettet og det ser rart ut
