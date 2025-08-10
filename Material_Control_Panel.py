@@ -802,10 +802,6 @@ class Material_Control_Panel:
             "R": R_value,
         }
 
-        #Set piezo material name if not already set
-        if(globals.piezo_material_name == ""):
-            globals.piezo_material_name.set(material_name)
-        
         #Put "info" dictionary into self.materials dictionary
         globals.materials[str(self.material_name_entry.get())] = info
 

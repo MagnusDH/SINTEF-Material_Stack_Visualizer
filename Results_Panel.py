@@ -353,70 +353,86 @@ class Results_Panel:
         """
 
         # print("UPDATE_EQUATION_LABELS()")
+    
+        try:
 
-        #Fetch necessary values and calculations
-        W = 160 / 1e6
-        t = []
-        sigma_i = []
-        E = []
-        nu = []
-        for material in globals.materials:
-            t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
-            sigma_i.append(globals.materials[material]["Stress_x [MPa]"].get() * 1e6)
-            E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
-            nu.append(globals.materials[material]["Poisson"].get())
-        
-        #Volt value
-        V_p = globals.volt_value.get()
-
-        #e_31_f value
-        e_31_f = globals.e_31_f_value.get()
-
-        #L value
-        L = globals.L_value.get()
+            #Fetch necessary values and calculations
+            t = []
+            sigma_i = []
+            E = []
+            nu = []
+            for material in globals.materials:
+                t.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                sigma_i.append(globals.materials[material]["Stress_x [MPa]"].get() * 1e6)
+                E.append(globals.materials[material]["Modulus [GPa]"].get() * 1e9)
+                nu.append(globals.materials[material]["Poisson"].get())
+            
+            W = 160 / 1e6
+            V_p = globals.volt_value.get()
+            e_31_f = globals.e_31_f_value.get()
+            L = globals.L_value.get()
 
 
-        #CALCULATE BLOCKING FORCE CANTILEVER
-        for material in globals.materials:
-            if("Piezo_checkbox_id" in globals.materials[material]):
-                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                    piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
-                    
-                    #Total thickness of materials from substrate up to (but not including) chosen piezo material
-                    h_Si = 0 
-                    for material2 in globals.materials:
-                        if(material2 == material):
-                            break
-                        h_Si += globals.materials[material2]["Thickness [nm]"].get()
-                    
-                    blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
-                    if("Results_panel_blocking_force_value_label_id" in globals.materials[material]):
-                        if(isinstance(blocking_force, Exception)):
-                            print(blocking_force)
-                            globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"ERROR")
+            #CALCULATE BLOCKING FORCE CANTILEVER
+            for material in globals.materials:
+                if("Piezo_checkbox_id" in globals.materials[material]):
+                    if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                        
+                        #Fetch thickness value for Piezo material and convert it to "meters"
+                        piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
+                        
+                        #Total thickness of materials from substrate up to (but not including) chosen piezo material
+                        h_Si = 0 
+                        for material2 in globals.materials:
+                            if(material2 == material):
+                                break
+                            h_Si += globals.materials[material2]["Thickness [nm]"].get() / 1e9
+                        
+                        blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
+                        if("Results_panel_blocking_force_value_label_id" in globals.materials[material]):
+                            if(isinstance(blocking_force, Exception)):
+                                globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"ERROR")
+                            else:
+                                globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"{blocking_force:.2e}")
+                                globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
+
+
+            #CALCULATE ZN
+            Zn = globals.equations.calculate_Zn(E, t, nu)
+
+            for material in dict(reversed(globals.materials.items())): 
+                if("Piezo_checkbox_id" in globals.materials[material]):
+                    if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                        piezo_material = material
+
+                        #Populate a list with thickness values from layer1 up until "PZT" material
+                        t_piezo_list = []
+                        for material in globals.materials:
+                            if(material == piezo_material):
+                                break
+
+                            #Convert thickness to meters and append it to list
+                            t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+
+                        
+                        piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
+
+                        #CALCULATE ZP
+                        Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn, piezo_thickness)
+                        if(isinstance(Zp, Exception)):
+                            raise ValueError(f"Zp for {material} could not be calculated.\nerror:'{Zp}'")
                         else:
-                            globals.materials[material]["Results_panel_blocking_force_value_label_id"].configure(text=f"{blocking_force:.2e}")
-                            globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
+                            globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
 
+                        #CALCULATE M_p
+                        Mp = globals.equations.calculate_Mp_cantilever(Zp, W, V_p, e_31_f)
+                        if("Results_panel_Mp_value_label_id" in globals.materials[material]):
+                            if(isinstance(Mp, Exception)):
+                                globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"ERROR")
+                            else:
+                                globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"{Mp:.2e}")
+                                globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
 
-        #CALCULATE ZN
-        Zn = globals.equations.calculate_Zn(E, t, nu)
-
-        for material in globals.materials: 
-            if("Piezo_checkbox_id" in globals.materials[material]):
-                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                    piezo_thickness = globals.materials[material]["Thickness [nm]"].get() / 1e9
-
-                    #CALCULATE ZP
-                    Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
-
-                    globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
-
-                    #CALCULATE M_p
-                    Mp = globals.equations.calculate_Mp_cantilever(Zp, W, V_p, e_31_f)
-                    if("Results_panel_Mp_value_label_id" in globals.materials[material]):
-                        if(isinstance(Mp, Exception)):
-                            globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"ERROR")
-                        else:
-                            globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"{Mp:.2e}")
-                            globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
+        except Exception as error:
+            print(f"There was an error in 'Results_Panel.update_equation_labels()'.\nERROR:\n{error}")
+            return error

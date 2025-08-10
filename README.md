@@ -121,8 +121,6 @@
     -e_31_f is a value in "c/m2" and needs no conversion
 
 # TO DO
-    -Se over kode og prøv å integrer "calculate_all_equations" istedetfor å regne det ut over alt på forskjellige steder
-
     -Mp i "results panel" er ikke regnet ut riktig
 
     -Add explanation of app in README file

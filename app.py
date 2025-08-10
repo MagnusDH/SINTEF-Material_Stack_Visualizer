@@ -1029,49 +1029,50 @@ class App:
             #CALCULATE ZP, MP AND BLOCKING_FORCE FOR EACH PIEZO MATERIAL
             zp_list = []
             for material in dict(reversed(globals.materials.items())):
-                if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                    piezo_material = material
+                if("Piezo_checkbox_id" in globals.materials[material]):    
+                    if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
+                        piezo_material = material
 
-                    #Populate a list with thickness values from layer1 up until "PZT" material
-                    t_piezo_list = []
-                    for material in globals.materials:
-                        if(material == piezo_material):
-                            break
+                        #Populate a list with thickness values from layer1 up until "PZT" material
+                        t_piezo_list = []
+                        for material in globals.materials:
+                            if(material == piezo_material):
+                                break
 
-                        #Convert thickness to meters and append it to list
-                        t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                            #Convert thickness to meters and append it to list
+                            t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                            
+                        #Fetch thickness value for Piezo material and convert it to "meters"
+                        piezo_thickness = globals.materials[piezo_material]["Thickness [nm]"].get() / 1e9
+
+                        Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn, piezo_thickness)
+                        if(isinstance(Zp, Exception)):
+                            raise ValueError(f"Zp for {material} could not be calculated.\nerror:'{Zp}'")
+                        else:
+                            globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
+                            zp_list.append(Zp)
                         
-                    #Fetch thickness value for Piezo material and convert it to "meters"
-                    piezo_thickness = globals.materials[piezo_material]["Thickness [nm]"].get() / 1e9
 
-                    Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn, piezo_thickness)
-                    if(isinstance(Zp, Exception)):
-                        raise ValueError(f"Zp for {material} could not be calculated.\nerror:'{Zp}'")
-                    else:
-                        globals.materials[material]["Zp_value"] = tkinter.DoubleVar(value=Zp)
-                        zp_list.append(Zp)
-                    
+                        #CALCULATE M_p
+                        Mp = globals.equations.calculate_Mp_cantilever(Zp, W, V_p, e_31_f)
+                        if(isinstance(Mp, Exception)):
+                            raise ValueError(f"Mp for {material} could not be calculated.\nerror:'{Mp}'")
+                        else:
+                            globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
 
-                    #CALCULATE M_p
-                    Mp = globals.equations.calculate_Mp_cantilever(Zp, W, V_p, e_31_f)
-                    if(isinstance(Mp, Exception)):
-                        raise ValueError(f"Mp for {material} could not be calculated.\nerror:'{Mp}'")
-                    else:
-                        globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
-
-                    #CALCULATE BLOCKING FORCE
-                    #Total thickness of materials from substrate up to (but not including) chosen piezo material
-                    h_Si = 0 
-                    for material2 in globals.materials:
-                        if(material2 == material):
-                            break
-                        h_Si += globals.materials[material2]["Thickness [nm]"].get() / 1e9
-                    
-                    blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
-                    if(isinstance(blocking_force, Exception)):
-                        raise ValueError(f"blocking_force could not be calculated.\nerror:'{blocking_force}'")
-                    else:
-                        globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
+                        #CALCULATE BLOCKING FORCE
+                        #Total thickness of materials from substrate up to (but not including) chosen piezo material
+                        h_Si = 0 
+                        for material2 in globals.materials:
+                            if(material2 == material):
+                                break
+                            h_Si += globals.materials[material2]["Thickness [nm]"].get() / 1e9
+                        
+                        blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
+                        if(isinstance(blocking_force, Exception)):
+                            raise ValueError(f"blocking_force could not be calculated.\nerror:'{blocking_force}'")
+                        else:
+                            globals.materials[material]["Blocking_force_value"] = tkinter.DoubleVar(value=blocking_force)
 
             
             #CALCULATE CUMULATIVE_MP_CANTILEVER
