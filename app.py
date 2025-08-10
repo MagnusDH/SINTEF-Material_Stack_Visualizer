@@ -979,7 +979,8 @@ class App:
     def calculate_all_equations(self):
         """
         -Calculates all equations with the current values in the main material dictionary\n
-        -Values are stored either in globals or in dictionary for each material
+        -Values are stored in globals and in dictionary for each material
+        -Returns error-message if something went wrong
 
         UPDATED VALUES:\n     
             -Zn\n
@@ -1027,12 +1028,23 @@ class App:
 
             #CALCULATE ZP, MP AND BLOCKING_FORCE FOR EACH PIEZO MATERIAL
             zp_list = []
-            for material in globals.materials:
+            for material in dict(reversed(globals.materials.items())):
                 if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                    piezo_thickness = float(globals.materials[material]["Thickness [nm]"].get()) / 1e9
-                    
-                    #CALCULATE ZP
-                    Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+                    piezo_material = material
+
+                    #Populate a list with thickness values from layer1 up until "PZT" material
+                    t_piezo_list = []
+                    for material in globals.materials:
+                        if(material == piezo_material):
+                            break
+
+                        #Convert thickness to meters and append it to list
+                        t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                        
+                    #Fetch thickness value for Piezo material and convert it to "meters"
+                    piezo_thickness = globals.materials[piezo_material]["Thickness [nm]"].get() / 1e9
+
+                    Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn, piezo_thickness)
                     if(isinstance(Zp, Exception)):
                         raise ValueError(f"Zp for {material} could not be calculated.\nerror:'{Zp}'")
                     else:
@@ -1053,7 +1065,7 @@ class App:
                     for material2 in globals.materials:
                         if(material2 == material):
                             break
-                        h_Si += globals.materials[material2]["Thickness [nm]"].get()
+                        h_Si += globals.materials[material2]["Thickness [nm]"].get() / 1e9
                     
                     blocking_force = globals.equations.calculate_blocking_force(E, t, V_p, e_31_f, piezo_thickness, h_Si, W, L)
                     if(isinstance(blocking_force, Exception)):
@@ -1102,13 +1114,12 @@ class App:
                 globals.curv_is.set(curv_is)
 
         
-
         # calculate_tip_placement???
         # neutralize_global_stress???
         # find_t_solution???
 
         except Exception as error:
-            print(f"There was an error in calculating 'all equations.\nERROR:\n{error}")
+            print(f"There was an error in 'app.calculate_all_equations()'.\nERROR:\n{error}")
             return error
         
 

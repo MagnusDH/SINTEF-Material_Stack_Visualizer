@@ -1173,9 +1173,7 @@ class Layer_Stack_Canvas:
                 nu.append(globals.materials[material]["Poisson"].get())
 
             #Calculate Zn
-            # Zn = round(globals.equations.calculate_Zn(E, t, nu), 1)
             Zn = globals.equations.calculate_Zn(E, t, nu)
-            # globals.Zn.set(Zn)
             
             if(isinstance(Zn, Exception)):
                 raise ValueError(f"Zn could not be calculated.\nerror:'{Zn}'")
@@ -1253,10 +1251,10 @@ class Layer_Stack_Canvas:
                     if(isinstance(Zp, Exception)):
                         raise ValueError(f"Zp could not be calculated.\nerror:'{Zp}'")
                     
+                    
 
                     #Convert Zn to nanometers
                     Zp = Zp * 1e9
-
 
                     #Convert Zp to pixels
                     Zp_pixels = Zp / nm_per_pixel 

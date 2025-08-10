@@ -680,6 +680,9 @@ class Canvas_Control_Panel:
         if not os.path.exists(f"{main_folder}/{sub_folder}"):
             os.makedirs(f"{main_folder}/{sub_folder}")
         
+        #Update all equations so that correct numbers are put in excel file
+        globals.app.calculate_all_equations()
+
         #Create excel workbook/file
         workbook = Workbook()
 
@@ -943,29 +946,33 @@ class Canvas_Control_Panel:
         tab["A2"] = "e₃₁ [C/m²]"
         tab["B2"] = globals.e_31_f_value.get()
         
-        tab["A3"] = "Zn [nm]"
+        tab["A3"] = "Zn [m]"
+        #Insert Zn as "meters"
         tab["B3"] = globals.Zn.get()
 
         tab["A4"] = "Curve [1/m]"
-        tab["B4"] = "Not calculated in application"
+        tab["B4"] = globals.curv_is.get()
 
-        tab["A5"] = "M_is [nm]"
-        tab["B5"] = "Not calculated in application"
+        tab["A5"] = "EI_is [Nm²]"
+        tab["B5"] = globals.EI.get()
 
-        tab["A6"] = "Stress neutral [nm]"
-        tab["B6"] = "???"
+        tab["A6"] = "M_is [nm]"
+        tab["B6"] = globals.M_is.get()
 
-        tab["A7"] = "L [μm]"
-        tab["B7"] = globals.L_value.get()
+        tab["A7"] = "Stress neutral [nm]"
+        tab["B7"] = "???"
+
+        tab["A8"] = "L [μm]"
+        tab["B8"] = globals.L_value.get()
 
 
-        tab["A8"] = "Volt"
-        tab["B8"] = globals.volt_value.get()
+        tab["A9"] = "Volt"
+        tab["B9"] = globals.volt_value.get()
 
 
         #Apply borders around the cells
         start_row = 1
-        end_row = 9
+        end_row = 10
         start_column = 1
         end_column = 3
         thin_side = Side(style="thin")
@@ -975,17 +982,17 @@ class Canvas_Control_Panel:
                 cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
 
 
-        tab.merge_cells(start_row=10, start_column=1, end_row=10, end_column=2)
-        tab["A10"] = "Plot"
-        tab["A10"].font = Font(bold=True)
-        tab["A10"].alignment = Alignment(horizontal="center", vertical="center")
-        tab["A10"].fill = PatternFill(start_color="2f9ff5", end_color="2f9ff5", fill_type="solid")
+        tab.merge_cells(start_row=11, start_column=1, end_row=11, end_column=2)
+        tab["A11"] = "Plot"
+        tab["A11"].font = Font(bold=True)
+        tab["A11"].alignment = Alignment(horizontal="center", vertical="center")
+        tab["A11"].fill = PatternFill(start_color="2f9ff5", end_color="2f9ff5", fill_type="solid")
 
 
 
         #Create cells for each piezo material selected
         column_counter = 1
-        row_counter = 11
+        row_counter = 12
         fill_color = PatternFill(start_color="93cefa", end_color="93cefa", fill_type="solid")
 
         for material in dict(reversed(globals.materials.items())):
@@ -995,6 +1002,7 @@ class Canvas_Control_Panel:
                 if(column_counter % 2 != 0):
                     column_letter = get_column_letter(column_counter)
                     tab.column_dimensions[column_letter].width = 25
+                    
 
 
                 #Merge cells for material name
@@ -1003,22 +1011,24 @@ class Canvas_Control_Panel:
                 header_cell.font = Font(bold=True)
                 header_cell.fill = fill_color
 
-                tab.cell(row=row_counter+1, column=column_counter, value="ZP")
-                tab.cell(row=row_counter+1, column=column_counter+1, value=globals.materials[material]["Zp_value"].get())
-                
+                tab.cell(row=row_counter+1, column=column_counter, value="ZP [nm]")
+                #Insert Zp in unit "nanometers"
+                tab.cell(row=row_counter+1, column=column_counter+1, value=round(globals.materials[material]["Zp_value"].get()*1e9, 1))
 
-                tab.cell(row=row_counter+2, column=column_counter, value="Mp")
+                tab.cell(row=row_counter+2, column=column_counter, value="Mp [Nm]")
                 tab.cell(row=row_counter+2, column=column_counter+1, value=globals.materials[material]["Mp_value"].get())
+                tab.cell(row=row_counter+2, column=column_counter+1, value=f"{globals.materials[material]["Mp_value"].get():.2e}")
+
 
                 tab.cell(row=row_counter+3, column=column_counter, value="Blocking force cantilever tip")
-                tab.cell(row=row_counter+3, column=column_counter+1, value=globals.materials[material]["Blocking_force_value"].get())
+                tab.cell(row=row_counter+3, column=column_counter+1, value=f"{globals.materials[material]["Blocking_force_value"].get():.2e}")
 
                 #Increment column counter
                 row_counter += 4
             
         
         #Apply borders around the piezo material cells
-        start_row = 10
+        start_row = 11
         end_row = row_counter
         start_column = 1
         end_column = 3
@@ -1028,6 +1038,11 @@ class Canvas_Control_Panel:
                 cell = tab.cell(row=row, column=col)
                 cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
 
+        #Align cells in column B to "left"
+        left_alignment = Alignment(horizontal="left")
+        for row in range(1, tab.max_row + 1):
+            cell = tab.cell(row=row, column=2)  # column 2 is 'B'
+            cell.alignment = left_alignment
         
 
         #Load graphs image
@@ -1042,126 +1057,3 @@ class Canvas_Control_Panel:
 
         #Add the image to the excel file in a specific cell
         tab.add_image(graphs_image, "E1")
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    # def create_excel_calculations_tab(self, excel_workbook):
-    #     """
-    #     Creates a 'calculations' tab in the given excel file
-    #     """
-      
-    #     print("CREATE_EXCEL_CALCULATIONS_TAB()")
-
-    #     new_tab = excel_workbook.create_sheet(title="Calculations")
-
-    #     #Set the width value of cells in the excel file
-    #     new_tab.column_dimensions['A'].width = 25
-
-    #     #Create cells
-    #     new_tab["A1"] = "Parameters"
-    #     new_tab["A1"].font = Font(bold=True)
-
-    #     new_tab["A2"] = "e₃₁ [C/m²]"
-    #     new_tab["B2"] = globals.e_31_f_value.get()
-        
-    #     new_tab["A3"] = "Zn [nm]"
-    #     new_tab["B3"] = globals.Zn.get()
-
-    #     new_tab["A4"] = "Curve [1/m]"
-    #     new_tab["B4"] = "Not calculated in application"
-
-    #     new_tab["A5"] = "M_is [nm]"
-    #     new_tab["B5"] = "Not calculated in application"
-
-    #     new_tab["A6"] = "Stress neutral [nm]"
-    #     new_tab["B6"] = "???"
-
-    #     new_tab["A7"] = "L [μm]"
-    #     new_tab["B7"] = globals.L_value.get()
-
-
-    #     new_tab["A8"] = "Volt"
-    #     new_tab["B8"] = globals.volt_value.get()
-
-    #     new_tab["A10"] = "Plot"
-    #     new_tab["A10"].font = Font(bold=True)
-
-
-        
-    #     #Create cells for each piezo material selected
-    #     column_counter = 1
-    #     fill_color = PatternFill(start_color="85c4f3", end_color="85c4f3", fill_type="solid")
-
-    #     for material in globals.materials:
-    #         if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                
-    #             #Set column dimensions
-    #             if(column_counter % 2 != 0):
-    #                 column_letter = get_column_letter(column_counter)
-    #                 new_tab.column_dimensions[column_letter].width = 25
-
-
-    #             #Merge cells for material name
-    #             new_tab.merge_cells(start_row=11, start_column=column_counter, end_row=11, end_column=column_counter+1)
-    #             header_cell = new_tab.cell(row=11, column=column_counter, value=f"{material} (layer {globals.materials[material]["Layer"].get()})")
-    #             header_cell.font = Font(bold=True)
-    #             header_cell.fill = fill_color
-
-    #             new_tab.cell(row=12, column=column_counter, value="ZP")
-    #             new_tab.cell(row=12, column=column_counter+1, value=globals.materials[material]["Zp_value"].get())
-                
-
-    #             new_tab.cell(row=13, column=column_counter, value="Mp")
-    #             new_tab.cell(row=13, column=column_counter+1, value=globals.materials[material]["Mp_value"].get())
-
-    #             new_tab.cell(row=14, column=column_counter, value="Blocking force cantilever tip")
-    #             new_tab.cell(row=14, column=column_counter+1, value=globals.materials[material]["Blocking_force_value"].get())
-
-    #             #Increment column counter
-    #             column_counter += 2
-            
-        
-    #     #Apply borders around the piezo material cells
-    #     start_row = 11 
-    #     end_row = 15
-    #     start_column = 1
-    #     end_column = column_counter
-    #     thin_side = Side(style="thin")
-    #     for row in range(start_row, end_row):
-    #         for col in range(start_column, end_column):
-    #             cell = new_tab.cell(row=row, column=col)
-    #             cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
-
-        
-
-    #     #Load graphs image
-    #     main_folder = "exports"
-    #     sub_folder = "graphs"
-    #     filenameJPG = "graphs.jpg"
-    #     graphs_image = Image(f"{main_folder}/{sub_folder}/{filenameJPG}")
-
-    #     #Set the width and height of image placed in excel file
-    #     graphs_image.width = 400
-    #     graphs_image.height = 500
-
-    #     #Add the image to the excel file in a specific cell
-    #     new_tab.add_image(graphs_image, "A17")

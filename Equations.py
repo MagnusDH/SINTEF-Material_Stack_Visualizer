@@ -107,9 +107,10 @@ class Equations:
         Function to calculate cantilever stress bending moment (M_tot)\n
 
         PARAMETERS:\n
-            sigma_i: list of Stress_x values in unit "pascal"
-            W: value in unit "meters"
             Zn: value in unit "meters"
+            sigma_i: list of Stress_x values in unit "pascal"
+            t: list of Thickness values in unit "meters"
+            W: value in unit "meters"
 
         Returns "M_is" in unit "newton meters" if succesfull.
         If not successfull the error is returned.
@@ -155,7 +156,7 @@ class Equations:
             M_tot: value in unit "newton meters"
             EI: value in unit "newton meter**2"
 
-        Returns "curv_is" in unit "1/meters" if succesfull.
+        Returns "curv_is"    if succesfull.
         If not successfull the error is returned.
         """
 
@@ -318,7 +319,7 @@ class Equations:
             V: value in "volt"
             e_31_f: value in unit "c/m2"
             piezo_thickness: thickness of chosen piezo material in unit "meters" 
-            h_Si: thickness of materials from substrate up to (but not including) chosen piezo material
+            h_Si: thickness of materials from substrate up to (but not including) chosen piezo material in unit "meters"
             W: value in unit "meters"
             L: value in unit "meters"
 

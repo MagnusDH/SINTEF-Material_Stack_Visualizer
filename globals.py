@@ -50,27 +50,27 @@ def initialize_globals(root_window):
     blocking_force_cantilever = tkinter.DoubleVar(value=0)
     blocking_force_cantilever.trace_add("write", lambda *args, identifier="blocking_force_cantilever_updated": app.update_widgets(identifier))
     
-    global Zn
+    global Zn #In unit: "meters"
     Zn = tkinter.DoubleVar(value=0)
     Zn.trace_add("write", lambda *args, identifier="Zn": app.update_widgets(identifier))
     
-    global cumulative_Mp_cantilever
+    global cumulative_Mp_cantilever #In unit "newton meters"
     cumulative_Mp_cantilever = tkinter.DoubleVar(value=0)
     cumulative_Mp_cantilever.trace_add("write", lambda *args, identifier="cumulative_Mp_cantilever": app.update_widgets(identifier))
     
-    global EI
+    global EI #In unit "newton meter**2"
     EI = tkinter.DoubleVar(value=0)
     EI.trace_add("write", lambda *args, identifier="EI": app.update_widgets(identifier))
     
-    global M_is
+    global M_is #In unit "newton meters"
     M_is = tkinter.DoubleVar(value=0)
     M_is.trace_add("write", lambda *args, identifier="M_is": app.update_widgets(identifier))
     
-    global M_tot
+    global M_tot #In unit "newton meters"
     M_tot = tkinter.DoubleVar(value=0)
     M_tot.trace_add("write", lambda *args, identifier="M_tot": app.update_widgets(identifier))
     
-    global curv_is
+    global curv_is #In unit "1/meters"
     curv_is = tkinter.DoubleVar(value=0)
     curv_is.trace_add("write", lambda *args, identifier="curv_is": app.update_widgets(identifier))
     

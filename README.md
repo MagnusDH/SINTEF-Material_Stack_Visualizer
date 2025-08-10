@@ -57,9 +57,9 @@
                     ["Poisson"] : tkinter.DoubleVar,                                            == nu
                     ["R0"] : tkinter.DoubleVar,
                     ["R"] : tkinter.DoubleVar,
-                    ["Zp_value"] : tkinter.DoubleVar,                                           == most recent calculated Zp value for material
-                    ["Mp_value"] : tkinter.DoubleVar,                                           == most recent calculated M_p value for material
-                    ["Blocking_force_value"] : tkinter.DoubleVar,                               == most recent calculated Blocking_force value for material
+                    ["Zp_value"] : tkinter.DoubleVar,                                           == most recent calculated Zp value for material in unit "meters"
+                    ["Mp_value"] : tkinter.DoubleVar,                                           == most recent calculated M_p value for material in unit "newton meters"
+                    ["Blocking_force_value"] : tkinter.DoubleVar,                               == most recent calculated Blocking_force value for material in unit "???"
                     ["Label_name_id]" : tkinter(value),                                         == ID of the label in material_adjustment_panel
                     ["Delete_material_button_id"] : tkinter(value),                             == ID for widget in "material_adjustment_panel"
                     ["Piezo_checkbox_id"] : tkinter(value),                                     == ID for widget in "material_adjustment_panel" stringvalue "on" or "off"
@@ -122,21 +122,15 @@
 
 # TO DO
     -Se over kode og prøv å integrer "calculate_all_equations" istedetfor å regne det ut over alt på forskjellige steder
-    
+
+    -Mp i "results panel" er ikke regnet ut riktig
+
     -Add explanation of app in README file
 
-
 # QUESTIONS:
-    -Gå gjennom draw_z_tip_is_graph, utregning av Zp må være feil
-    -fjerne "neutralizing_material combobox" og neutralizing_material variabel? den brukes ikke sånn som programmet er nå
+    -Does "blocking_force" calculation return the result in a specific unit? (!!!!!!!!!!!!!!!remember to add this unit to "equation units" explanation and in dictionary explanation)
 
-    -Hvilket format skal "Zn", "Zp", "Mp" og "Blocking force cantilever tip" verdier i excel filen vises som?
-
-    -Hva skal regnes ut for "Curve [1/m]", "M_is [nm]" og "Stress neutral [nm]" i excel filen??
-
-    -El_is [Nm2] er ikke en ting i applikasjonen så kan derfor ikke puttes inn i excel eksporten
-
-    -Vil han ha "Volt" med i excel eksporten?
+    -Legg til "W" variabel i excel calculations tab
 
 
 # BUGS:

@@ -311,11 +311,24 @@ class Graph_Canvas:
             e_31_f = globals.e_31_f_value.get()
 
             zp_list = []
-            for material in globals.materials:
+            # for material in globals.materials:
+            for material in dict(reversed(globals.materials.items())):
                 if(globals.materials[material]["Piezo_checkbox_id"].get() == "on"):
-                    piezo_thickness = float(globals.materials[material]["Thickness [nm]"].get()) / 1e9
-                    # Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
-                    Zp = globals.equations.calculate_mid_piezo(t, Zn, piezo_thickness)
+                    piezo_material = material
+
+                    #Populate a list with thickness values from layer1 up until "PZT" material
+                    t_piezo_list = []
+                    for material in globals.materials:
+                        if(material == piezo_material):
+                            break
+
+                        #Convert thickness to nanometers and append it to list 
+                        t_piezo_list.append(globals.materials[material]["Thickness [nm]"].get() / 1e9)
+                        
+                    #Fetch thickness value for Piezo material
+                    piezo_thickness = globals.materials[piezo_material]["Thickness [nm]"].get() / 1e9
+
+                    Zp = globals.equations.calculate_mid_piezo(t_piezo_list, Zn, piezo_thickness)
 
                     zp_list.append(Zp)
             
