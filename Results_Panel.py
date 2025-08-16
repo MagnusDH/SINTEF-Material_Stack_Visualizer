@@ -101,7 +101,30 @@ class Results_Panel:
             pady=(0,0),
             columnspan=3
         )
-            
+        
+
+        #DISPLAY ERROR MESSAGE IF NO NEUTRALIZING MATERIAL HAS BEEN CHOSEN'
+        if(globals.neutralizing_material_name.get() == ""):
+            if not hasattr(self, "neutralizing_material_error_label"):   
+                self.neutralizing_material_error_label = customtkinter.CTkLabel(
+                    master=self.results_panel_frame, 
+                    text=f"No neutralizing material selected", 
+                    fg_color=settings.results_panel_background_color,
+                    text_color="red",
+                )
+            self.neutralizing_material_error_label.grid(
+                row=1, 
+                column=3, 
+                sticky="w", 
+                padx=(0,0),
+                pady=(0,0),
+                columnspan=3
+            )
+        else:
+            if hasattr(self, "neutralizing_material_error_label"):                  
+                self.neutralizing_material_error_label.destroy()
+                del self.neutralizing_material_error_label
+
         
         #PIEZOELECTRIC_BENDING_MOMENT LABELS
         if not hasattr(self, "piezo_electric_bending_moment_label"):
@@ -168,7 +191,6 @@ class Results_Panel:
                         globals.materials[material]["Results_panel_Mp_material_name_label_id"].grid(row=row_counter, column=column_counter)
 
                     
-
                     #create label for value in row+1 and column
                     if("Results_panel_Mp_value_label_id" not in globals.materials[material]):                  
                         Mp_value_label = customtkinter.CTkLabel(
@@ -378,6 +400,16 @@ class Results_Panel:
             L = globals.L_value.get()
 
 
+            #CALCULATE T_SOLUTION
+            if(globals.neutralizing_material_name.get() != ""):
+                neutralizing_material_thickness = globals.materials[globals.neutralizing_material_name.get()]["Thickness [nm]"].get()
+                t_solution = globals.equations.find_t_solution(E, t, nu, sigma_i, W, L, neutralizing_material_thickness)
+                if(isinstance(t_solution, Exception)):
+                    raise ValueError(f"t_solution could not be calculated.\nerror:'{t_solution}'")
+                else:
+                    globals.t_sol.set(t_solution)
+
+
             #CALCULATE BLOCKING FORCE CANTILEVER
             for material in globals.materials:
                 if("Piezo_checkbox_id" in globals.materials[material]):
@@ -437,6 +469,8 @@ class Results_Panel:
                             else:
                                 globals.materials[material]["Results_panel_Mp_value_label_id"].configure(text=f"{Mp:.2e}")
                                 globals.materials[material]["Mp_value"] = tkinter.DoubleVar(value=Mp)
+
+
 
         except Exception as error:
             print(f"There was an error in 'Results_Panel.update_equation_labels()'.\nERROR:\n{error}")

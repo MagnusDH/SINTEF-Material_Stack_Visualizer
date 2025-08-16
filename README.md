@@ -126,8 +126,11 @@
 # QUESTIONS:
     -Does "blocking_force" calculation return the result in a specific unit? (!!!!!!!!!!!!!!!remember to add this unit to "equation units" explanation and in dictionary explanation)
 
-    -Legg til "W" variabel i excel calculations tab
+    -Legg til "W" variabel og "stress neutral material" i excel calculations tab??
 
+    -What unit should "t1_guess" / "neutralizing material thicnkess" be in "find_t_solution"?????
+
+    -Se på error messages jeg har skrevet i equations filen
 
 # BUGS:
     -Hvis du trykker "reset to original" så blir ikke lablene i "results_panel" slettet og det ser rart ut

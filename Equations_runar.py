@@ -2,8 +2,8 @@
 # import tkinter
 # from tkinter import messagebox
 # import helper_functions
+import numpy as np
 from scipy.optimize import fsolve
-
 
 class Equations:
     # def __init__(self):
@@ -26,7 +26,7 @@ class Equations:
 
         try:
             #Calculate term1
-            term1 = (E[0] * (t[0] ** 2)) / (2 * (1 - (nu[0] ** 2)))
+            term1 = (E[0] * (t[0] * 2)) / (2 * (1 - (nu[0] * 2)))
 
             #Calculate term2
             term2 = 0
@@ -148,6 +148,28 @@ class Equations:
             return error
 
 
+    #HERE IS A NEW FUNCTION with an error!!!
+    def calculate_is_curvature(self, M_tot:float, EI:float):
+        """
+        Function to calculate Curvature\n
+
+        PARAMETERS:\n
+            M_tot: value in unit "newton meters"
+            EI: value in unit "newton meter**2"
+
+        Returns "curv_is"    if succesfull.
+        If not successfull the error is returned.
+        """
+
+        try:
+            curv_is = M_is / EI
+
+            return curv_is
+    
+        except Exception as error:
+            return error
+
+
     def calculate_curvature(self, M_tot:float, EI:float):
         """
         Function to calculate Curvature\n
@@ -161,13 +183,12 @@ class Equations:
         """
 
         try:
-            curv_is = M_tot / EI
+            curv_tot = M_tot / EI
 
-            return curv_is
+            return curv_tot
     
         except Exception as error:
             return error
-
 
     def calculate_tip_placement(self, curv_is:float, L:float):
         """
@@ -241,9 +262,6 @@ class Equations:
         except Exception as error:
             return error
 
-    
-    #HVA ER RETUR VERDI??
-    #HVA ER t1?????
     def neutralize_global_stress(self, t1, E:list, t:list, nu:list, W:float, L:float, sigma_i:list):
         """
         Given a trial thickness t1 for layer 2 (SiO2), compute the stress-only
@@ -251,13 +269,12 @@ class Equations:
 
         PARAMETERS:
         t1: ?????
-        E: list of Modulus values in unit "pascal"
+        E: ?????
         t: list of thickness values in unit "meters"
-        nu: list of Poisson values in unit: "no special unit"
-        W: value in unit "meters"
+        nu: ?????
+        W: ?????
         L: value in unit "meters"
-        sigma_i: list of Stress_x values in unit "pascal"
-
+        sigma_i: ?????   
 
         Returns "z_tip_is" in unit "meters??" if succesfull.
         If not successfull the error is returned.
@@ -281,36 +298,35 @@ class Equations:
         except Exception as error:
             return error
 
-
-    #SEE EXPLANATION OF FUNCTION FOR QUESTION!!!!!!
-    #WHAT IS CORRECT RETURN VALUE????
-    def find_t_solution(self, E:list, t:list, nu:list, sigma_i:list, W:float, L:float, neutralizing_material_thickness:float):
+    def find_t_solution(self, E:list, t:list, nu:list, sigma_i:list, W:float, L:float):
         """
         Solve for the layer-2 (SiO2) thickness that makes the stress-only
         tip displacement zero. Returns thickness in meters.
 
         PARAMETERS:\n
-            E: list of Modulus values in unit "pascal"
+            E: ????
             t: list of thickness values in unit "meters"
-            nu: list of Poisson values in unit: "no special unit"
-            sigma_i: list of Stress_x values in unit "pascal"
-            W: value in unit "meters"
+            nu: ????
+            sigma_i: ????
+            W: ????
             L: value in unit "meters"
-            neutralizing_material_thickness: thickness of chosen neutralizing material in unit "?????????"
 
         Returns the neutralizing thickness in unit: "meter" if succesfull.
         If not successfull the error is returned.
         """
         try:
-            # t1_guess = 1e-6
-            t1_guess = neutralizing_material_thickness
+            # t1_guess = float(t[1]) #Tykkelse på SiO2 - "neutralizing filament"
+            # t1_guess = globals.materials[globals.neutralizing_material_name.get()]["Thickness [nm]"].get() 
+            t1_guess = 1e-6
+
+            # print(globals.neutralizing_material_name.get())
     
             # root function: only t1 varies; everything else is captured
             def root_fn(t1):
                 return self.neutralize_global_stress(t1, E, t, nu, W, L, sigma_i)
     
             t1_sol = fsolve(root_fn, x0=t1_guess)[0]
-
+            print(t1_sol)
             return float(t1_sol)
         
         except Exception as error:
@@ -356,4 +372,52 @@ class Equations:
         
         except Exception as error:
             return error
-        
+
+    def solve_sigma_for_target_curvature(self, curv_is: float,
+                                         E: list, t: list, nu: list, W: float,
+                                         sigma_i: list, layer_index: int = 3):
+        """
+        Solve for sigma_i[layer_index] (Pa) that yields the given stress-only curvature (1/m).
+    
+        PARAMETERS:
+            curv_is: target stress-induced curvature (1/m)
+            E, t, nu: lists (SI units) for modulus (Pa), thickness (m), Poisson (-)
+            W: beam width (m)
+            sigma_i: list of current layer stresses (Pa); sigma_i[layer_index] will be solved
+            layer_index: which layer's stress to solve for (default 3 => 4th layer)
+    
+        RETURNS:
+            sigma_required (Pa) or raises ValueError on singular geometry.
+        """
+        # Make safe copies
+        E = list(E); t = list(t); nu = list(nu); sigma = list(sigma_i)
+    
+        # Geometry / stiffness
+        Zn = self.calculate_Zn(E, t, nu)
+        EI = self.calculate_EI(E, t, nu, W, Zn)
+    
+        # Target bending moment from desired curvature
+        M_target = curv_is * EI
+    
+        # Helper: centroid lever arm of layer i relative to Zn
+        def lever_arm(i):
+            return (sum(t[:i]) + t[i]/2.0) - Zn
+    
+        # Moment from all other layers (exclude the solved layer)
+        M_others = 0.0
+        for i in range(len(t)):
+            if i == layer_index:
+                continue
+            M_others += W * t[i] * sigma[i] * lever_arm(i)
+    
+        # Denominator term for the unknown layer
+        denom = W * t[layer_index] * lever_arm(layer_index)
+        if abs(denom) < 1e-30:
+            raise ValueError(
+                f"Layer {layer_index} centroid is at the neutral axis (lever arm ~ 0); "
+                "cannot achieve the target curvature by changing this layer's stress."
+            )
+    
+        # Solve for the required stress in the chosen layer (Pa)
+        sigma_required = (M_target - M_others) / denom
+        return sigma_required
